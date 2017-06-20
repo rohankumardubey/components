@@ -36,6 +36,7 @@ public class SalesforceModuleWizardDefinitionTest {
     private SalesforceModuleWizardDefinition definition;
     private SalesforceModuleListProperties properties;
 
+
     @Before
     public void setUp() {
         definition = new SalesforceModuleWizardDefinition();
@@ -46,13 +47,13 @@ public class SalesforceModuleWizardDefinitionTest {
 
     @Test
     public void testSupportsProperties() {
-        assertTrue(definition.supportsProperties(SalesforceModuleListProperties.class));
-        assertFalse(definition.supportsProperties(SalesforceConnectionProperties.class));
+        assertTrue(definition.supportsProperties(SalesforceConnectionProperties.class));
+        assertFalse(definition.supportsProperties(SalesforceModuleListProperties.class));
     }
 
     @Test
     public void testCreateWizard() {
-        ComponentWizard wizard = definition.createWizard(properties, repoLocation);
+        ComponentWizard wizard = definition.createWizard(properties.getConnectionProperties(), repoLocation);
 
         assertThat(wizard, instanceOf(SalesforceModuleWizard.class));
         assertEquals(definition, wizard.getDefinition());
