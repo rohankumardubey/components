@@ -12,14 +12,19 @@
 // ============================================================================
 package org.talend.components.marketo.wizard;
 
+import static org.talend.components.marketo.MarketoComponentDefinition.RUNTIME_SOURCEORSINK_CLASS;
+import static org.talend.components.marketo.MarketoComponentDefinition.getSandboxedInstance;
 import static org.talend.daikon.properties.property.PropertyFactory.newEnum;
 import static org.talend.daikon.properties.property.PropertyFactory.newString;
 
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.marketo.MarketoComponentProperties;
 import org.talend.daikon.properties.property.Property;
+import org.talend.daikon.sandbox.SandboxedInstance;
 
 public class MarketoComponentWizardBaseProperties extends MarketoComponentProperties {
 
@@ -33,6 +38,8 @@ public class MarketoComponentWizardBaseProperties extends MarketoComponentProper
 
     public Property<CustomObjectSyncAction> customObjectSyncAction = newEnum("customObjectSyncAction",
             CustomObjectSyncAction.class);
+
+    private static final Logger LOG = LoggerFactory.getLogger(MarketoComponentWizardBaseProperties.class);
 
     public MarketoComponentWizardBaseProperties(String name) {
         super(name);
@@ -73,4 +80,9 @@ public class MarketoComponentWizardBaseProperties extends MarketoComponentProper
         updateOnly,
         createOrUpdate
     }
+
+    protected SandboxedInstance getRuntimeSandboxedInstance() {
+        return getSandboxedInstance(RUNTIME_SOURCEORSINK_CLASS);
+    }
+
 }

@@ -49,7 +49,8 @@ import org.talend.components.marketo.MarketoUtils;
 import org.talend.components.marketo.helpers.CompoundKeyTable;
 import org.talend.components.marketo.helpers.IncludeExcludeTypesTable;
 import org.talend.components.marketo.helpers.MarketoColumnMappingsTable;
-import org.talend.components.marketo.runtime.MarketoSourceOrSink;
+import org.talend.components.marketo.runtime.MarketoSourceOrSinkRuntime;
+import org.talend.components.marketo.runtime.MarketoSourceOrSinkSchemaProvider;
 import org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties;
 import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
@@ -60,6 +61,7 @@ import org.talend.daikon.properties.ValidationResultMutable;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
+import org.talend.daikon.sandbox.SandboxedInstance;
 import org.talend.daikon.serialize.PostDeserializeSetup;
 import org.talend.daikon.serialize.migration.SerializeSetVersion;
 
@@ -613,10 +615,10 @@ public class TMarketoInputProperties extends MarketoComponentWizardBasePropertie
 
     public ValidationResult validateFetchCustomObjectSchema() {
         ValidationResultMutable vr = new ValidationResultMutable();
-        try {
-            MarketoSourceOrSink sos = new MarketoSourceOrSink();
+        try (SandboxedInstance sandboxedInstance = getRuntimeSandboxedInstance()) {
+            MarketoSourceOrSinkRuntime sos = (MarketoSourceOrSinkRuntime) sandboxedInstance.getInstance();
             sos.initialize(null, this);
-            Schema schema = sos.getSchemaForCustomObject(customObjectName.getValue());
+            Schema schema = ((MarketoSourceOrSinkSchemaProvider) sos).getSchemaForCustomObject(customObjectName.getValue());
             if (schema == null) {
                 vr.setStatus(ValidationResult.Result.ERROR).setMessage(messages.getMessage(
                         "error.validation.customobjects.fetchcustomobjectschema", customObjectName.getValue(), "NULL"));
@@ -633,10 +635,10 @@ public class TMarketoInputProperties extends MarketoComponentWizardBasePropertie
 
     public ValidationResult validateFetchCompoundKey() {
         ValidationResultMutable vr = new ValidationResultMutable();
-        try {
-            MarketoSourceOrSink sos = new MarketoSourceOrSink();
+        try (SandboxedInstance sandboxedInstance = getRuntimeSandboxedInstance()) {
+            MarketoSourceOrSinkRuntime sos = (MarketoSourceOrSinkRuntime) sandboxedInstance.getInstance();
             sos.initialize(null, this);
-            List<String> keys = sos.getCompoundKeyFields(customObjectName.getValue());
+            List<String> keys = ((MarketoSourceOrSinkSchemaProvider) sos).getCompoundKeyFields(customObjectName.getValue());
             if (keys == null) {
                 vr.setStatus(ValidationResult.Result.ERROR).setMessage(messages
                         .getMessage("error.validation.customobjects.fetchcompoundkey", customObjectName.getValue(), "NULL"));
