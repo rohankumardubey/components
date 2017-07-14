@@ -118,7 +118,7 @@ public class SalesforceSourceOrSink implements SalesforceRuntimeSourceOrSink, Sa
     protected BulkConnection connectBulk(ConnectorConfig config) throws ComponentException {
         final SalesforceConnectionProperties connProps = getConnectionProperties();
         /*
-         * When PartnerConnection is instantiated, a login is implicitly executed and, if successful, a valid session is
+         * When PartnerConnection is instantiated, a login is implicitly executed and, if successful, a valid session id is
          * stored in the ConnectorConfig instance. Use this key to initialize a BulkConnection:
          */
         ConnectorConfig bulkConfig = new ConnectorConfig();
@@ -242,8 +242,6 @@ public class SalesforceSourceOrSink implements SalesforceRuntimeSourceOrSink, Sa
             // Design time
             connProps = connProps.getReferencedConnectionProperties();
         }
-
-        // FIXME add back reffed connection
 
         ConnectorConfig config = new ConnectorConfig();
         config.setUsername(StringUtils.strip(connProps.userPassword.userId.getStringValue(), "\""));
