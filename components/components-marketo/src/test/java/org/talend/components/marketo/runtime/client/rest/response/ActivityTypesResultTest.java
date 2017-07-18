@@ -12,7 +12,9 @@
 // ============================================================================
 package org.talend.components.marketo.runtime.client.rest.response;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+
+import java.util.Collections;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -29,7 +31,7 @@ public class ActivityTypesResultTest {
 
     @Test
     public void testGetResult() throws Exception {
-        assertNotNull(r.getResult());
+        assertEquals(Collections.emptyList(), r.getResult());
     }
 
     @Test

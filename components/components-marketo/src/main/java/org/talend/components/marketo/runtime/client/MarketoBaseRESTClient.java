@@ -13,6 +13,8 @@
 package org.talend.components.marketo.runtime.client;
 
 import static java.lang.String.format;
+import static org.talend.components.marketo.MarketoConstants.FIELD_ERROR_MSG;
+import static org.talend.components.marketo.MarketoConstants.FIELD_STATUS;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,7 +27,9 @@ import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -36,25 +40,25 @@ import javax.net.ssl.HttpsURLConnection;
 
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
-import org.apache.avro.Schema.Type;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.IndexedRecord;
-import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.marketo.runtime.client.rest.response.LeadResult;
 import org.talend.components.marketo.runtime.client.rest.response.RequestResult;
+import org.talend.components.marketo.runtime.client.rest.response.SyncResult;
 import org.talend.components.marketo.runtime.client.type.MarketoError;
 import org.talend.components.marketo.runtime.client.type.MarketoException;
 import org.talend.components.marketo.runtime.client.type.MarketoRecordResult;
+import org.talend.components.marketo.runtime.client.type.MarketoSyncResult;
 import org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProperties;
-import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.internal.LinkedTreeMap;
 
@@ -128,6 +132,12 @@ public abstract class MarketoBaseRESTClient extends MarketoClient {
 
     public static final String REQUEST_VALUE_APPLICATION_X_WWW_FORM_URLENCODED = "application/x-www-form-urlencoded";
 
+    public static final String FIELD_DEDUPE_FIELDS = "dedupeFields";
+
+    public static final String FIELD_SEARCHABLE_FIELDS = "searchableFields";
+
+    public static final String FIELD_RELATIONSHIPS = "relationships";
+
     private Map<Integer, String> supportedActivities;
 
     protected StringBuilder current_uri;
@@ -193,7 +203,6 @@ public abstract class MarketoBaseRESTClient extends MarketoClient {
                 throw new MarketoException(REST, responseCode, "Marketo Authentication failed! Please check your " + "setting!");
             }
         } catch (ProtocolException | SocketTimeoutException | SocketException e) {
-            // TODO mangage SocketTimeoutException and SocketException with timeout and retry properties
             LOG.error("AccessToken error: {}.", e.getMessage());
             throw new MarketoException(REST, "Marketo Authentication failed : " + e.getMessage());
         } catch (IOException e) {
@@ -297,19 +306,19 @@ public abstract class MarketoBaseRESTClient extends MarketoClient {
         LOG.debug("ltm = {}.", ltm);
         mkr.setRequestId(REST + "::" + ltm.get("requestId"));
         mkr.setSuccess(Boolean.parseBoolean(ltm.get("success").toString()));
-        mkr.setStreamPosition((String) ltm.get("nextPageToken"));
+        mkr.setStreamPosition((String) ltm.get(FIELD_NEXT_PAGE_TOKEN));
         if (!mkr.isSuccess() && ltm.get(FIELD_ERRORS) != null) {
             List<LinkedTreeMap> errors = (List<LinkedTreeMap>) ltm.get(FIELD_ERRORS);
             for (LinkedTreeMap err : errors) {
                 MarketoError error = new MarketoError(REST, (String) err.get("code"), (String) err.get("message"));
-                mkr.setErrors(Arrays.asList(error));
+                mkr.setErrors(Collections.singletonList(error));
             }
         }
         if (mkr.isSuccess()) {
             List<LinkedTreeMap> tmp = (List<LinkedTreeMap>) ltm.get("result");
             if (tmp != null) {
                 mkr.setRecordCount(tmp.size());
-                mkr.setRecords(parseCustomObjectRecords(tmp, schema));
+                mkr.setRecords(parseRecords(tmp, schema));
             }
             if (mkr.getStreamPosition() != null) {
                 mkr.setRemainCount(mkr.getRecordCount());
@@ -382,19 +391,28 @@ public abstract class MarketoBaseRESTClient extends MarketoClient {
         if (value == null) {
             return (T) value;
         }
-        Schema convSchema = field.schema();
-        Schema.Type type = field.schema().getType();
-        if (convSchema.getType().equals(Type.UNION)) {
-            for (Schema s : field.schema().getTypes()) {
-                if (s.getType() != Type.NULL) {
-                    type = s.getType();
-                    break;
-                }
+        if (MarketoClientUtils.isDateTypeField(field)) {
+            Date dt = null;
+            try {
+                // Mkto returns datetime in UTC and Follows W3C format (ISO 8601).
+                dt = new DateTime(String.valueOf(value), DateTimeZone.forID("UTC")).toDate();
+                return (T) Long.valueOf(dt.getTime());
+            } catch (Exception e) {
+                LOG.error("Error while parsing date : {}.", e.getMessage());
+                return null;
             }
         }
-        switch (type) {
+        switch (MarketoClientUtils.getFieldType(field)) {
         case STRING:
-            return (T) value;
+            switch (field.name()) {
+            case FIELD_FIELDS:
+            case FIELD_DEDUPE_FIELDS:
+            case FIELD_SEARCHABLE_FIELDS:
+            case FIELD_RELATIONSHIPS:
+                return (T) new Gson().toJson(value);
+            default:
+                return (T) value;
+            }
         case INT:
             return (T) (Integer) Float.valueOf(value.toString()).intValue();
         case BOOLEAN:
@@ -404,37 +422,22 @@ public abstract class MarketoBaseRESTClient extends MarketoClient {
         case DOUBLE:
             return (T) Double.valueOf(value.toString());
         case LONG:
-            String clazz = field.getProp(SchemaConstants.JAVA_CLASS_FLAG);
-            String pattr = field.getProp(SchemaConstants.TALEND_COLUMN_PATTERN);
-            if ((clazz != null && clazz.equals(Date.class.getCanonicalName())) || !StringUtils.isEmpty(pattr)) {
-                Date dt = null;
-                try {
-                    // Mkto returns datetime in UTC and Follows W3C format (ISO 8601).
-                    dt = new DateTime(value.toString(), DateTimeZone.forID("UTC")).toDate();
-                    return (T) dt;
-                } catch (Exception e) {
-                    LOG.error("Error while parsing date : {}.", e.getMessage());
-                }
-            } else {
-                return (T) Long.valueOf(value.toString());
-            }
-            break;
+            return (T) Long.valueOf(value.toString());
         default:
-            LOG.warn("Not managed -> type: {}, value: {} for field: {}.", convSchema.getType(), value, field);
+            LOG.warn("Not managed -> type: {}, value: {} for field: {}.", field.schema().getType(), value, field);
             return (T) value;
         }
-        return null;
     }
 
-    public List<IndexedRecord> parseCustomObjectRecords(List<LinkedTreeMap> customObjectRecords, Schema schema) {
+    public List<IndexedRecord> parseRecords(List<LinkedTreeMap> values, Schema schema) {
         List<IndexedRecord> records = new ArrayList<>();
-        if (customObjectRecords == null || schema == null) {
+        if (values == null || schema == null) {
             return records;
         }
-        for (LinkedTreeMap cor : customObjectRecords) {
+        for (LinkedTreeMap r : values) {
             IndexedRecord record = new GenericData.Record(schema);
             for (Field f : schema.getFields()) {
-                Object o = cor.get(f.name());
+                Object o = r.get(f.name());
                 record.put(f.pos(), getValueType(f, o));
             }
             records.add(record);
@@ -458,7 +461,7 @@ public abstract class MarketoBaseRESTClient extends MarketoClient {
                 LinkedTreeMap ltm = (LinkedTreeMap) gson.fromJson(reader, Object.class);
                 mkr.setRequestId(REST + "::" + ltm.get("requestId"));
                 mkr.setSuccess(Boolean.parseBoolean(ltm.get("success").toString()));
-                mkr.setStreamPosition((String) ltm.get("nextPageToken"));
+                mkr.setStreamPosition((String) ltm.get(FIELD_NEXT_PAGE_TOKEN));
                 if (!mkr.isSuccess() && ltm.get(FIELD_ERRORS) != null) {
                     List<LinkedTreeMap> errors = (List<LinkedTreeMap>) ltm.get(FIELD_ERRORS);
                     for (LinkedTreeMap err : errors) {
@@ -470,7 +473,7 @@ public abstract class MarketoBaseRESTClient extends MarketoClient {
                     List<LinkedTreeMap> tmp = (List<LinkedTreeMap>) ltm.get("result");
                     if (tmp != null) {
                         mkr.setRecordCount(tmp.size());
-                        mkr.setRecords(parseCustomObjectRecords(tmp, schema));
+                        mkr.setRecords(parseRecords(tmp, schema));
                     }
                     if (mkr.getStreamPosition() != null) {
                         mkr.setRemainCount(mkr.getRecordCount());
@@ -563,6 +566,94 @@ public abstract class MarketoBaseRESTClient extends MarketoClient {
             }
         }
         return false;
+    }
+
+    public JsonElement convertIndexedRecordsToJson(List<IndexedRecord> records) {
+        List<Map<String, Object>> results = new ArrayList<>();
+        for (IndexedRecord r : records) {
+            Map<String, Object> result = new HashMap<>();
+            for (Field f : r.getSchema().getFields()) {
+                Object value = r.get(f.pos());
+                // skip status & error fields
+                if (FIELD_STATUS.equals(f.name()) || FIELD_ERROR_MSG.equals(f.name())) {
+                    continue;
+                }
+                if (MarketoClientUtils.isDateTypeField(f) && value != null) {
+                    result.put(f.name(), MarketoClientUtils.formatLongToDateString(Long.valueOf(String.valueOf(value))));
+                    continue;
+                }
+                result.put(f.name(), value);
+            }
+            results.add(result);
+        }
+        return new Gson().toJsonTree(results);
+    }
+
+    /**
+     * Execute POST or GET request and feed the MarketoSyncResult to return
+     *
+     * @param paramPOSTJson
+     * @return
+     */
+    public MarketoSyncResult getSyncResultFromRequest(boolean sendPOST, JsonObject paramPOSTJson) {
+        MarketoSyncResult mkto = new MarketoSyncResult();
+        try {
+            SyncResult rs;
+            if (sendPOST) {
+                rs = (SyncResult) executePostRequest(SyncResult.class, paramPOSTJson);
+            } else {
+                rs = (SyncResult) executeGetRequest(SyncResult.class);
+            }
+            //
+            mkto.setRequestId(REST + "::" + rs.getRequestId());
+            mkto.setStreamPosition(rs.getNextPageToken());
+            mkto.setSuccess(rs.isSuccess());
+            if (mkto.isSuccess()) {
+                mkto.setRecordCount(rs.getResult().size());
+                mkto.setRemainCount(0);
+                mkto.setRecords(rs.getResult());
+                if (rs.isMoreResult()) {
+                    mkto.setRemainCount(mkto.getRecordCount());// cannot know how many remain...
+                    mkto.setStreamPosition(rs.getNextPageToken());
+                }
+                //
+            } else {
+                mkto.setRecordCount(0);
+                mkto.setErrors(rs.getErrors());
+            }
+            LOG.debug("rs = {}.", rs);
+        } catch (MarketoException e) {
+            mkto.setSuccess(false);
+            mkto.setErrors(Collections.singletonList(e.toMarketoError()));
+        }
+
+        return mkto;
+    }
+
+    /**
+     * Execute GET or fakeGET(POST in disguise) request and feed the MarketoRecordResult to return
+     * 
+     * @param schema
+     * @param isFakeGetRequest
+     * @param paramPOST
+     * @return
+     */
+    public MarketoRecordResult getRecordResultForFromRequestBySchema(Schema schema, boolean isFakeGetRequest, String paramPOST) {
+        MarketoRecordResult mkto = new MarketoRecordResult();
+        try {
+            if (isFakeGetRequest) {
+                mkto = executeFakeGetRequest(schema, paramPOST);
+            } else {
+                mkto = executeGetRequest(schema);
+            }
+        } catch (MarketoException e) {
+            LOG.error("{}.", e);
+            mkto.setSuccess(false);
+            mkto.setRecordCount(0);
+            mkto.setErrors(Collections.singletonList(e.toMarketoError()));
+        }
+
+        return mkto;
     }
 
 }

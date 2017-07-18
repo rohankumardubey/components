@@ -29,6 +29,7 @@ import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.marketo.MarketoConstants;
 import org.talend.components.marketo.MarketoProvideConnectionProperties;
+import org.talend.components.marketo.MarketoUtils;
 import org.talend.components.marketo.runtime.client.MarketoClientService;
 import org.talend.components.marketo.runtime.client.MarketoClientServiceExtended;
 import org.talend.components.marketo.runtime.client.MarketoRESTClient;
@@ -44,7 +45,6 @@ import org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.SimpleNamedThing;
 import org.talend.daikon.avro.AvroUtils;
-import org.talend.daikon.di.DiSchemaConstants;
 import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
 import org.talend.daikon.properties.ValidationResult;
@@ -137,13 +137,13 @@ public class MarketoSourceOrSink implements SourceOrSink, MarketoSourceOrSinkRun
     public Schema getEndpointSchema(RuntimeContainer container, String schemaName) throws IOException {
         MarketoRESTClient client = (MarketoRESTClient) getClientService(null);
         TMarketoInputProperties ip = new TMarketoInputProperties("retrieveSchema");
-        MarketoRecordResult r = new MarketoRecordResult();
         Schema describeSchema = MarketoConstants.getCustomObjectDescribeSchema();
         ip.connection = properties.getConnectionProperties();
         ip.inputOperation.setValue(InputOperation.CustomObject);
         ip.customObjectAction.setValue(CustomObjectAction.describe);
         ip.customObjectName.setValue(schemaName);
-        r = client.describeCustomObject(ip);
+        ip.schemaInput.schema.setValue(describeSchema);
+        MarketoRecordResult r = client.describeCustomObject(ip);
         if (!r.isSuccess()) {
             return null;
         }
@@ -184,13 +184,13 @@ public class MarketoSourceOrSink implements SourceOrSink, MarketoSourceOrSinkRun
     public List<String> getCompoundKeyFields(String resource) throws IOException {
         MarketoRESTClient client = (MarketoRESTClient) getClientService(null);
         TMarketoInputProperties ip = new TMarketoInputProperties("retrieveSchema");
-        MarketoRecordResult r = new MarketoRecordResult();
         Schema describeSchema = MarketoConstants.getCustomObjectDescribeSchema();
         ip.connection = properties.getConnectionProperties();
         ip.inputOperation.setValue(InputOperation.CustomObject);
         ip.customObjectAction.setValue(CustomObjectAction.describe);
         ip.customObjectName.setValue(resource);
-        r = client.describeCustomObject(ip);
+        ip.schemaInput.schema.setValue(describeSchema);
+        MarketoRecordResult r = client.describeCustomObject(ip);
         if (!r.isSuccess()) {
             return null;
         }
@@ -324,18 +324,9 @@ public class MarketoSourceOrSink implements SourceOrSink, MarketoSourceOrSinkRun
         return client;
     }
 
-    public static Field generateNewField(Field origin) {
-        Schema.Field field = new Schema.Field(origin.name(), origin.schema(), origin.doc(), origin.defaultVal(), origin.order());
-        field.getObjectProps().putAll(origin.getObjectProps());
-        for (Map.Entry<String, Object> entry : origin.getObjectProps().entrySet()) {
-            field.addProp(entry.getKey(), entry.getValue());
-        }
-        return field;
-    }
-
     public static Schema mergeDynamicSchemas(Schema data, Schema flow) {
         // TODO when https://jira.talendforge.org/browse/TDKN-154 will be resolved, use the new property here!
-        String dynamicFieldProperty = flow.getProp(DiSchemaConstants.TALEND6_DYNAMIC_COLUMN_POSITION);
+        String dynamicFieldProperty = flow.getProp(TALEND6_DYNAMIC_COLUMN_POSITION);
         int dynamicFieldPosition = -1;
         if (AvroUtils.isIncludeAllFields(flow) && dynamicFieldProperty != null) {
             dynamicFieldPosition = Integer.valueOf(dynamicFieldProperty);
@@ -346,15 +337,15 @@ public class MarketoSourceOrSink implements SourceOrSink, MarketoSourceOrSinkRun
                 for (Field cf : data.getFields()) {
                     // don't add field in that exists in flow schema
                     if (flow.getField(cf.name()) == null) {
-                        mergeFields.add(generateNewField(cf));
+                        mergeFields.add(MarketoUtils.generateNewField(cf));
                     }
                 }
                 // add field from flow at after dynamic index if exists
                 if (flow.getFields().get(f.pos()) != null) {
-                    mergeFields.add(generateNewField(f));
+                    mergeFields.add(MarketoUtils.generateNewField(f));
                 }
             } else {
-                mergeFields.add(generateNewField(f));
+                mergeFields.add(MarketoUtils.generateNewField(f));
             }
         }
         // dynamic column is at the end
@@ -362,7 +353,7 @@ public class MarketoSourceOrSink implements SourceOrSink, MarketoSourceOrSinkRun
             for (Field cf : data.getFields()) {
                 // don't add field in that exists in flow schema
                 if (flow.getField(cf.name()) == null) {
-                    mergeFields.add(generateNewField(cf));
+                    mergeFields.add(MarketoUtils.generateNewField(cf));
                 }
             }
         }

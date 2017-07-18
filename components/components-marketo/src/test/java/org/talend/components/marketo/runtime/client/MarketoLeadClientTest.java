@@ -93,6 +93,7 @@ public class MarketoLeadClientTest extends MarketoRuntimeTestBase {
         iprops.connection.endpoint.setValue("https://fake.io/rest");
         iprops.connection.clientAccessId.setValue("clientaccess");
         iprops.connection.secretKey.setValue("sekret");
+        iprops.connection.attemptsIntervalTime.setValue(200); // shorten interval for tests
         iprops.setupProperties();
         iprops.setupLayout();
 
@@ -105,6 +106,7 @@ public class MarketoLeadClientTest extends MarketoRuntimeTestBase {
         oprops.connection.endpoint.setValue("https://fake.io/rest");
         oprops.connection.clientAccessId.setValue("clientaccess");
         oprops.connection.secretKey.setValue("sekret");
+        oprops.connection.attemptsIntervalTime.setValue(200); // shorten interval for tests
         oprops.setupProperties();
         oprops.setupLayout();
 
@@ -117,6 +119,7 @@ public class MarketoLeadClientTest extends MarketoRuntimeTestBase {
         lprops.connection.endpoint.setValue("https://fake.io/rest");
         lprops.connection.clientAccessId.setValue("clientaccess");
         lprops.connection.secretKey.setValue("sekret");
+        lprops.connection.attemptsIntervalTime.setValue(200); // shorten interval for tests
         lprops.setupProperties();
         lprops.setupLayout();
 
@@ -178,6 +181,7 @@ public class MarketoLeadClientTest extends MarketoRuntimeTestBase {
 
     @Test
     public void testGetLead() throws Exception {
+        iprops.inputOperation.setValue(InputOperation.getLead);
         iprops.leadKeyTypeREST.setValue(LeadKeyTypeREST.id);
         iprops.leadKeyValue.setValue("12345");
         iprops.afterInputOperation();

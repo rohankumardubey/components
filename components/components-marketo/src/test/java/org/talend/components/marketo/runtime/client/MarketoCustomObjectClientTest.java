@@ -29,11 +29,7 @@ import org.apache.avro.generic.IndexedRecord;
 import org.junit.Before;
 import org.junit.Test;
 import org.talend.components.marketo.MarketoConstants;
-import org.talend.components.marketo.runtime.client.rest.response.CustomObjectResult;
 import org.talend.components.marketo.runtime.client.rest.response.SyncResult;
-import org.talend.components.marketo.runtime.client.rest.type.CustomObject;
-import org.talend.components.marketo.runtime.client.rest.type.CustomObject.ObjectRelation;
-import org.talend.components.marketo.runtime.client.rest.type.FieldDescription;
 import org.talend.components.marketo.runtime.client.type.MarketoException;
 import org.talend.components.marketo.runtime.client.type.MarketoRecordResult;
 import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties;
@@ -60,6 +56,7 @@ public class MarketoCustomObjectClientTest extends MarketoLeadClientTest {
         iprops.connection.endpoint.setValue("https://fake.io/rest");
         iprops.connection.clientAccessId.setValue("clientaccess");
         iprops.connection.secretKey.setValue("sekret");
+        iprops.connection.attemptsIntervalTime.setValue(200); // shorten interval for tests
         iprops.setupProperties();
         iprops.setupLayout();
         iprops.customObjectName.setValue("car_c");
@@ -74,28 +71,29 @@ public class MarketoCustomObjectClientTest extends MarketoLeadClientTest {
         oprops.connection.endpoint.setValue("https://fake.io/rest");
         oprops.connection.clientAccessId.setValue("clientaccess");
         oprops.connection.secretKey.setValue("sekret");
+        oprops.connection.attemptsIntervalTime.setValue(200); // shorten interval for tests
         oprops.setupProperties();
         oprops.setupLayout();
         oprops.customObjectName.setValue("car_c");
     }
 
-    public CustomObjectResult getCustomObjectResult() {
-        CustomObjectResult cor = new CustomObjectResult();
+    public MarketoRecordResult getCustomObjectResult() {
+        MarketoRecordResult cor = new MarketoRecordResult();
         cor.setSuccess(true);
-        List<CustomObject> cos = new ArrayList<>();
-        CustomObject co = new CustomObject();
-        co.setName("car_c");
-        co.setIdField("marketoGUID");
-        co.setUpdatedAt(new Date());
-        co.setCreatedAt(new Date());
-        co.setDedupeFields(new String[] { "brand", "model" });
-        co.setDisplayName("Car");
-        co.setDescription("Car system");
-        co.setSearchableFields(new String[][] {});
-        co.setRelationships(new ObjectRelation[] {});
-        co.setFields(new FieldDescription[] {});
+        List<IndexedRecord> cos = new ArrayList<>();
+        IndexedRecord co = new Record(MarketoConstants.getCustomObjectDescribeSchema());
+        co.put(0, "car_c");
+        co.put(1, "marketoGUID");
+        co.put(2, "Car");
+        co.put(3, "Car system");
+        co.put(4, new Date());
+        co.put(5, new Date());
+        co.put(6, "");
+        co.put(7, "{ \"brand\", \"model\" }");
+        co.put(8, "{}");
+        co.put(9, "{}");
         cos.add(co);
-        cor.setResult(cos);
+        cor.setRecords(cos);
         return cor;
     }
 
@@ -103,18 +101,17 @@ public class MarketoCustomObjectClientTest extends MarketoLeadClientTest {
     public void testDescribeCustomObject() throws Exception {
         iprops.customObjectAction.setValue(CustomObjectAction.describe);
         //
-        doThrow(new MarketoException("REST", "error")).when(client).executeGetRequest(CustomObjectResult.class);
+        doThrow(new MarketoException("REST", "error")).when(client).executeGetRequest(any(Schema.class));
         mktoRR = client.describeCustomObject(iprops);
         assertFalse(mktoRR.isSuccess());
         assertFalse(mktoRR.getErrorsString().isEmpty());
         //
-        doReturn(new CustomObjectResult()).when(client).executeGetRequest(CustomObjectResult.class);
+        doReturn(new MarketoRecordResult()).when(client).executeGetRequest(any(Schema.class));
         mktoRR = client.describeCustomObject(iprops);
         assertFalse(mktoRR.isSuccess());
         assertTrue(mktoRR.getErrorsString().isEmpty());
         //
-        CustomObjectResult cor = getCustomObjectResult();
-        doReturn(getCustomObjectResult()).when(client).executeGetRequest(CustomObjectResult.class);
+        doReturn(getCustomObjectResult()).when(client).executeGetRequest(any(Schema.class));
         mktoRR = client.describeCustomObject(iprops);
         assertTrue(mktoRR.isSuccess());
         assertTrue(mktoRR.getErrorsString().isEmpty());
@@ -123,17 +120,17 @@ public class MarketoCustomObjectClientTest extends MarketoLeadClientTest {
     @Test
     public void testListCustomObjects() throws Exception {
         iprops.customObjectAction.setValue(CustomObjectAction.list);
-        doThrow(new MarketoException("REST", "error")).when(client).executeGetRequest(CustomObjectResult.class);
+        doThrow(new MarketoException("REST", "error")).when(client).executeGetRequest(any(Schema.class));
         mktoRR = client.listCustomObjects(iprops);
         assertFalse(mktoRR.isSuccess());
         assertFalse(mktoRR.getErrorsString().isEmpty());
         //
-        doReturn(new CustomObjectResult()).when(client).executeGetRequest(CustomObjectResult.class);
+        doReturn(new MarketoRecordResult()).when(client).executeGetRequest(any(Schema.class));
         mktoRR = client.listCustomObjects(iprops);
         assertFalse(mktoRR.isSuccess());
         assertTrue(mktoRR.getErrorsString().isEmpty());
         //
-        doReturn(getCustomObjectResult()).when(client).executeGetRequest(CustomObjectResult.class);
+        doReturn(getCustomObjectResult()).when(client).executeGetRequest(any(Schema.class));
         mktoRR = client.listCustomObjects(iprops);
         assertTrue(mktoRR.isSuccess());
         assertTrue(mktoRR.getErrorsString().isEmpty());
@@ -213,7 +210,6 @@ public class MarketoCustomObjectClientTest extends MarketoLeadClientTest {
         doReturn(new SyncResult()).when(client).executePostRequest(eq(SyncResult.class), any(JsonObject.class));
         mktoSR = client.deleteCustomObjects(oprops, records);
         assertFalse(mktoSR.isSuccess());
-        assertFalse(mktoSR.getErrorsString().isEmpty());
         //
         doReturn(getListOperationResult(true, "deleted")).when(client).executePostRequest(eq(SyncResult.class),
                 any(JsonObject.class));

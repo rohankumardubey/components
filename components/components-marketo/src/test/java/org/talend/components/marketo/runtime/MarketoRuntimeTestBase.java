@@ -15,6 +15,7 @@ package org.talend.components.marketo.runtime;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.talend.components.marketo.runtime.MarketoSourceOrSink.TALEND6_DYNAMIC_COLUMN_POSITION;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,6 +25,7 @@ import java.util.List;
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
 import org.apache.avro.Schema.Field.Order;
+import org.apache.avro.Schema.Type;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.IndexedRecord;
 import org.junit.After;
@@ -32,7 +34,6 @@ import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.marketo.MarketoConstants;
 import org.talend.components.marketo.MarketoProvideConnectionProperties;
-import org.talend.components.marketo.MarketoTestBase;
 import org.talend.components.marketo.runtime.client.MarketoRESTClient;
 import org.talend.components.marketo.runtime.client.rest.type.SyncStatus;
 import org.talend.components.marketo.runtime.client.type.MarketoError;
@@ -40,7 +41,6 @@ import org.talend.components.marketo.runtime.client.type.MarketoRecordResult;
 import org.talend.components.marketo.runtime.client.type.MarketoSyncResult;
 import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties;
 import org.talend.daikon.avro.AvroUtils;
-import org.talend.daikon.di.DiSchemaConstants;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.ValidationResult.Result;
 
@@ -61,7 +61,7 @@ public class MarketoRuntimeTestBase {
         when(client.getApi()).thenReturn("REST");
         when(client.getMultipleLeads(any(TMarketoInputProperties.class), any(String.class)))
                 .thenReturn(getLeadRecordResult(false));
-        when(client.getAllLeadFields()).thenReturn(MarketoTestBase.fakeAllLeadFields());
+        when(client.getAllLeadFields()).thenReturn(fakeAllLeadFields());
 
         sourceOrSink = mock(MarketoSourceOrSink.class);
         when(sourceOrSink.initialize(any(RuntimeContainer.class), any(ComponentProperties.class)))
@@ -164,7 +164,7 @@ public class MarketoRuntimeTestBase {
         Field f1 = new Schema.Field("email", AvroUtils._string(), "", null, Order.ASCENDING);
         Field f2 = new Schema.Field("firstName", AvroUtils._string(), "", null, Order.ASCENDING);
         schema.setFields(Arrays.asList(f1, f2));
-        schema.addProp(DiSchemaConstants.TALEND6_DYNAMIC_COLUMN_POSITION, 2);
+        schema.addProp(TALEND6_DYNAMIC_COLUMN_POSITION, 2);
         schema = AvroUtils.setIncludeAllFields(schema, true);
         return schema;
     }
@@ -174,6 +174,24 @@ public class MarketoRuntimeTestBase {
         emptySchema.setFields(new ArrayList<Field>());
         emptySchema = AvroUtils.setIncludeAllFields(emptySchema, true);
         return emptySchema;
+    }
+
+    public static List<Field> fakeAllLeadFields() {
+        List<Field> fields = new ArrayList<>();
+        Field field = new Schema.Field("id", Schema.create(Type.INT), null, (Object) null);
+        fields.add(field);
+        field = new Schema.Field("email", Schema.create(Schema.Type.STRING), null, (Object) null);
+        fields.add(field);
+        field = new Schema.Field("accountType", Schema.create(Schema.Type.STRING), null, (Object) null);
+        fields.add(field);
+        field = new Schema.Field("linkedInId", Schema.create(Type.INT), null, (Object) null);
+        fields.add(field);
+        field = new Schema.Field("sfdcAccountId", Schema.create(Type.STRING), null, (Object) null);
+        fields.add(field);
+        field = new Schema.Field("company", Schema.create(Type.STRING), null, (Object) null);
+        fields.add(field);
+
+        return fields;
     }
 
 }
