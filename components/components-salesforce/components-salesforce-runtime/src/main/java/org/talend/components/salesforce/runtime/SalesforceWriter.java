@@ -38,6 +38,7 @@ import org.talend.components.api.component.runtime.WriterWithFeedback;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.salesforce.SalesforceOutputProperties;
+import org.talend.components.salesforce.SalesforceOutputProperties.OutputAction;
 import org.talend.components.salesforce.runtime.common.ConnectionHolder;
 import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties;
 import org.talend.daikon.avro.AvroUtils;
@@ -47,6 +48,7 @@ import org.talend.daikon.exception.ExceptionContext;
 import org.talend.daikon.exception.error.DefaultErrorCode;
 import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
+import org.talend.daikon.properties.property.Property;
 
 import com.sforce.soap.partner.DeleteResult;
 import com.sforce.soap.partner.Error;
@@ -176,8 +178,10 @@ final class SalesforceWriter implements WriterWithFeedback<Result, IndexedRecord
                     .createIndexedRecordConverter(datum.getClass());
         }
         IndexedRecord input = factory.convertToAvro(datum);
-
-        switch (sprops.outputAction.getValue()) {
+        Property<OutputAction> outputAction = sprops.outputAction;
+        LOGGER.info(MESSAGES.getMessage("info.startMessage",
+                sprops.outputAction.getPossibleValuesDisplayName(outputAction.getValue()).toLowerCase(), dataCount));
+        switch (outputAction.getValue()) {
         case INSERT:
             insert(input);
             break;
@@ -332,8 +336,9 @@ final class SalesforceWriter implements WriterWithFeedback<Result, IndexedRecord
             // Clean the feedback records at each batch write.
             cleanFeedbackRecords();
             SObject[] accs = new SObject[insertItems.size()];
-            for (int i = 0; i < insertItems.size(); i++)
+            for (int i = 0; i < insertItems.size(); i++) {
                 accs[i] = createSObject(insertItems.get(i));
+            }
 
             String[] changedItemKeys = new String[accs.length];
             SaveResult[] saveResults;
@@ -372,8 +377,9 @@ final class SalesforceWriter implements WriterWithFeedback<Result, IndexedRecord
             // Clean the feedback records at each batch write.
             cleanFeedbackRecords();
             SObject[] upds = new SObject[updateItems.size()];
-            for (int i = 0; i < updateItems.size(); i++)
+            for (int i = 0; i < updateItems.size(); i++) {
                 upds[i] = createSObject(updateItems.get(i));
+            }
 
             String[] changedItemKeys = new String[upds.length];
             for (int ix = 0; ix < upds.length; ++ix) {
@@ -416,8 +422,9 @@ final class SalesforceWriter implements WriterWithFeedback<Result, IndexedRecord
             // Clean the feedback records at each batch write.
             cleanFeedbackRecords();
             SObject[] upds = new SObject[upsertItems.size()];
-            for (int i = 0; i < upsertItems.size(); i++)
+            for (int i = 0; i < upsertItems.size(); i++) {
                 upds[i] = createSObjectForUpsert(upsertItems.get(i));
+            }
 
             String[] changedItemKeys = new String[upds.length];
             for (int ix = 0; ix < upds.length; ++ix) {
@@ -458,8 +465,9 @@ final class SalesforceWriter implements WriterWithFeedback<Result, IndexedRecord
     private void handleSuccess(IndexedRecord input, String id, String status) {
         successCount++;
         Schema outSchema = sprops.schemaFlow.schema.getValue();
-        if (outSchema == null || outSchema.getFields().size() == 0)
+        if (outSchema == null || outSchema.getFields().size() == 0) {
             return;
+        }
         if (input.getSchema().equals(outSchema)) {
             successfulWrites.add(input);
         } else {
@@ -478,6 +486,7 @@ final class SalesforceWriter implements WriterWithFeedback<Result, IndexedRecord
             }
             successfulWrites.add(successful);
         }
+        LOGGER.info(MESSAGES.getMessage("info.successfulRecord", getPastForm(sprops.outputAction.getValue()), dataCount));
     }
 
     private void handleReject(IndexedRecord input, Error[] resultErrors, String[] changedItemKeys, int batchIdx)
@@ -503,8 +512,9 @@ final class SalesforceWriter implements WriterWithFeedback<Result, IndexedRecord
         } else {
             rejectCount++;
             Schema outSchema = sprops.schemaReject.schema.getValue();
-            if (outSchema == null || outSchema.getFields().size() == 0)
+            if (outSchema == null || outSchema.getFields().size() == 0) {
                 return;
+            }
             if (input.getSchema().equals(outSchema)) {
                 rejectedWrites.add(input);
             } else {
@@ -512,13 +522,13 @@ final class SalesforceWriter implements WriterWithFeedback<Result, IndexedRecord
                 for (Schema.Field outField : reject.getSchema().getFields()) {
                     Object outValue = null;
                     Schema.Field inField = input.getSchema().getField(outField.name());
-                    if (inField != null)
+                    if (inField != null) {
                         outValue = input.get(inField.pos());
-                    else if (resultErrors.length > 0) {
+                    } else if (resultErrors.length > 0) {
                         Error error = resultErrors[0];
-                        if (TSalesforceOutputProperties.FIELD_ERROR_CODE.equals(outField.name()))
+                        if (TSalesforceOutputProperties.FIELD_ERROR_CODE.equals(outField.name())) {
                             outValue = error.getStatusCode() != null ? error.getStatusCode().toString() : null;
-                        else if (TSalesforceOutputProperties.FIELD_ERROR_FIELDS.equals(outField.name())) {
+                        } else if (TSalesforceOutputProperties.FIELD_ERROR_FIELDS.equals(outField.name())) {
                             StringBuffer fields = new StringBuffer();
                             for (String field : error.getFields()) {
                                 fields.append(field);
@@ -528,13 +538,17 @@ final class SalesforceWriter implements WriterWithFeedback<Result, IndexedRecord
                                 fields.deleteCharAt(fields.length() - 1);
                             }
                             outValue = fields.toString();
-                        } else if (TSalesforceOutputProperties.FIELD_ERROR_MESSAGE.equals(outField.name()))
+                        } else if (TSalesforceOutputProperties.FIELD_ERROR_MESSAGE.equals(outField.name())) {
                             outValue = error.getMessage();
+                        }
                     }
                     reject.put(outField.pos(), outValue);
                 }
                 rejectedWrites.add(reject);
             }
+            Property<OutputAction> outputAction = sprops.outputAction;
+            LOGGER.info(MESSAGES.getMessage("info.rejectedRecord",
+                    sprops.outputAction.getPossibleValuesDisplayName(outputAction.getValue()).toLowerCase(), dataCount));
         }
     }
 
@@ -596,6 +610,9 @@ final class SalesforceWriter implements WriterWithFeedback<Result, IndexedRecord
     @Override
     public Result close() throws IOException {
         logout();
+        LOGGER.info(MESSAGES.getMessage("info.seccessfulRecords", getPastForm(sprops.outputAction.getValue()), successCount));
+        LOGGER.info(MESSAGES.getMessage("info.rejectedRecords", rejectCount));
+        LOGGER.info(MESSAGES.getMessage("info.finishMessage"));
         // For "ceaseForError" is false
         if (logWriter != null) {
             logWriter.close();
@@ -652,5 +669,22 @@ final class SalesforceWriter implements WriterWithFeedback<Result, IndexedRecord
     private void cleanFeedbackRecords() {
         successfulWrites.clear();
         rejectedWrites.clear();
+    }
+
+    /**
+     * Transform {@link OutputAction} name into Past representation.
+     * <br/>
+     * Example:
+     * <ul>
+     * <li> {@link OutputAction#DELETE} - deleted.</li>
+     * <li> {@link OutputAction#INSERT} - inserted.</li>
+     * </ul>
+     *
+     * @param outputAction action to be performed on data.
+     * @return {@link String} representation of {@link OutputAction} in past form.
+     */
+    private String getPastForm(OutputAction outputAction) {
+
+        return MESSAGES.getMessage(String.format("outputAction.%s.pastForm", outputAction.name()));
     }
 }
