@@ -383,13 +383,6 @@ public abstract class SalesforceComponentTestIT extends SalesforceTestBase {
         // Edit connection wizard - we copy the connection properties, as we present the UI, so we use the
         // connection properties object created by the new wizard
         assertFalse(connProps == subWizards[1].getForms().get(0).getProperties());
-<<<<<<< HEAD
-        // Add module wizard - we refer to the existing connection properties as we don't present the UI
-        // for them.
-        assertTrue(connProps == ((SalesforceModuleListProperties) subWizards[2].getForms().get(0).getProperties())
-                .getConnectionProps());
-=======
->>>>>>> 18ecd95c2... Mbasiuk/tdi 39185 change wizard properties usage (#913)
         assertFalse(subWizards[1].getDefinition().isTopLevel());
         assertEquals("Edit Salesforce Connection", subWizards[1].getDefinition().getMenuItemName());
         assertTrue(subWizards[0].getDefinition().isTopLevel());
