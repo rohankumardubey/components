@@ -12,6 +12,15 @@
 // ============================================================================
 package org.talend.components.snowflake.tsnowflakeoutput;
 
+import static org.talend.daikon.properties.presentation.Widget.widget;
+import static org.talend.daikon.properties.property.PropertyFactory.newEnum;
+import static org.talend.daikon.properties.property.PropertyFactory.newString;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.apache.avro.Schema;
 import org.talend.components.api.component.Connector;
 import org.talend.components.api.component.ISchemaListener;
@@ -24,12 +33,6 @@ import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
-
-import java.util.*;
-
-import static org.talend.daikon.properties.presentation.Widget.widget;
-import static org.talend.daikon.properties.property.PropertyFactory.newEnum;
-import static org.talend.daikon.properties.property.PropertyFactory.newString;
 
 public class TSnowflakeOutputProperties extends SnowflakeConnectionTableProperties {
 
@@ -89,19 +92,25 @@ public class TSnowflakeOutputProperties extends SnowflakeConnectionTableProperti
         super.setupProperties();
 
         outputAction.setValue(OutputAction.INSERT);
+        ISchemaListener listener;
+
+        //This condition was added due to some strange behaviour of serialization.
+        if (table != null) {
+            listener = table.schemaListener;
+        } else {
+            listener = new ISchemaListener() {
+
+                @Override
+                public void afterSchema() {
+                    afterMainSchema();
+                }
+            };
+        }
 
         table = new TableSubclass("table");
         table.connection = connection;
+        table.setSchemaListener(listener);
         table.setupProperties();
-
-        table.setSchemaListener(new ISchemaListener() {
-
-            @Override
-            public void afterSchema() {
-                updateOutputSchemas();
-                beforeUpsertKeyColumn();
-            }
-        });
     }
 
     @Override
@@ -132,7 +141,7 @@ public class TSnowflakeOutputProperties extends SnowflakeConnectionTableProperti
         }
     }
 
-    protected List<String> getFieldNames(Property schema) {
+    protected List<String> getFieldNames(Property<?> schema) {
         Schema s = (Schema) schema.getValue();
         List<String> fieldNames = new ArrayList<>();
         for (Schema.Field f : s.getFields()) {
@@ -142,8 +151,9 @@ public class TSnowflakeOutputProperties extends SnowflakeConnectionTableProperti
     }
 
     public void beforeUpsertKeyColumn() {
-        if (table.main.schema.getValue() != null)
+        if (getSchema() != null) {
             upsertKeyColumn.setPossibleValues(getFieldNames(table.main.schema));
+        }
     }
 
 
@@ -189,6 +199,12 @@ public class TSnowflakeOutputProperties extends SnowflakeConnectionTableProperti
             connectors.add(MAIN_CONNECTOR);
         }
         return connectors;
+    }
+
+    @Override
+    public void afterMainSchema() {
+        updateOutputSchemas();
+        beforeUpsertKeyColumn();
     }
 
 

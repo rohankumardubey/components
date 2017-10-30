@@ -10,23 +10,25 @@ import java.util.Set;
 
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
+import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ErrorCollector;
 import org.talend.components.api.component.PropertyPathConnector;
-import org.talend.components.api.test.ComponentTestUtils;
 import org.talend.components.snowflake.tsnowflakeoutput.TSnowflakeOutputProperties.OutputAction;
 import org.talend.daikon.avro.AvroUtils;
-import org.talend.daikon.di.DiSchemaConstants;
+import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.property.SchemaProperty;
 
+/**
+ * Unit tests for {@link TSnowflakeOutputProperties} class
+ */
 public class TSnowflakeOutputPropertiesTest {
 
-    TSnowflakeOutputProperties outputProperties;
+    private static final String TALEND6_COLUMN_TALEND_TYPE = "di.column.talendType";
 
+    TSnowflakeOutputProperties outputProperties;
 
     @Before
     public void reset() {
@@ -114,9 +116,9 @@ public class TSnowflakeOutputPropertiesTest {
                 .name("age").type().intType().noDefault() //
                 .name("valid").type().booleanType().noDefault() //
                 .name("address").type().stringType().noDefault() //
-                .name("comment").prop(DiSchemaConstants.TALEND6_COLUMN_LENGTH, "255").type().stringType().noDefault() //
-                .name("createdDate").prop(DiSchemaConstants.TALEND6_COLUMN_TALEND_TYPE, "id_Date") //
-                .prop(DiSchemaConstants.TALEND6_COLUMN_PATTERN, "yyyy-MM-dd'T'HH:mm:ss'000Z'").type().nullable().longType() //
+                .name("comment").prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255").type().stringType().noDefault() //
+                .name("createdDate").prop(TALEND6_COLUMN_TALEND_TYPE, "id_Date") //
+                .prop(SchemaConstants.TALEND_COLUMN_PATTERN, "yyyy-MM-dd'T'HH:mm:ss'000Z'").type().nullable().longType() //
                 .noDefault() //
                 .endRecord(); //
 
@@ -153,5 +155,39 @@ public class TSnowflakeOutputPropertiesTest {
         emptyPropertyFieldNames = outputProperties.getFieldNames(emptySchemaProperty);
 
         assertTrue(emptyPropertyFieldNames.isEmpty());
+    }
+
+    @Test
+    public void testAfterTableName() throws Exception {
+        Schema schema = SchemaBuilder.builder().record("Record").fields() //
+                .requiredInt("id")
+                .requiredString("name")
+                .requiredInt("age")
+                .endRecord();
+        outputProperties.setupProperties();
+        outputProperties.table.main.schema.setValue(schema);
+        Assert.assertTrue(outputProperties.upsertKeyColumn.getPossibleValues().isEmpty());
+        outputProperties.table.afterTableName();
+        Assert.assertEquals(3, outputProperties.upsertKeyColumn.getPossibleValues().size());
+    }
+
+    @Test
+    public void testAfterTableWithNotSetSchema() throws Exception {
+        outputProperties.setupProperties();
+        Assert.assertTrue(outputProperties.upsertKeyColumn.getPossibleValues().isEmpty());
+        outputProperties.table.afterTableName();
+        Assert.assertTrue(outputProperties.upsertKeyColumn.getPossibleValues().isEmpty());
+    }
+
+    @Test
+    public void testAfterSchema() {
+        Schema schema = SchemaBuilder.builder().record("Record").fields() //
+                .requiredInt("id").endRecord();
+        outputProperties.setupProperties();
+        outputProperties.table.main.schema.setValue(schema);
+        Assert.assertTrue(outputProperties.schemaReject.schema.getValue().getFields().isEmpty());
+        outputProperties.table.schemaListener.afterSchema();
+        Assert.assertEquals(9, outputProperties.schemaReject.schema.getValue().getFields().size());
+
     }
 }

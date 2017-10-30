@@ -1,6 +1,6 @@
 // ============================================================================
 //
-// Copyright (C) 2006-2016 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2017 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
 // %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
@@ -63,7 +63,7 @@ public class SnowflakeCloseSourceOrSink implements SourceOrSink {
     private void closeConnection(RuntimeContainer container) throws SQLException {
         if (container != null) {
             Connection conn = (Connection) container.getComponentData(properties.getReferencedComponentId(),
-                    SnowflakeSourceOrSink.KEY_CONNECTION);
+                    SnowflakeRuntime.KEY_CONNECTION);
             if (conn != null) {
                 conn.close();
             }
