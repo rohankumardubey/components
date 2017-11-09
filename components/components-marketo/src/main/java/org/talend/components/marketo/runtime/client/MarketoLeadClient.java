@@ -311,7 +311,7 @@ public class MarketoLeadClient extends MarketoBaseRESTClient implements MarketoC
             mkto.setSuccess(result.isSuccess());
             if (mkto.isSuccess()) {
                 mkto.setRecordCount(result.getResult().isEmpty() ? 0 : result.getResult().size());
-                mkto.setRemainCount((result.getNextPageToken() != null && result.isMoreResult()) ? batchLimit : 0);
+                mkto.setRemainCount((result.getNextPageToken() != null) ? batchLimit : 0);
                 mkto.setStreamPosition(result.getNextPageToken());
                 if (mkto.getRecordCount() > 0) {
                     mkto.setRecords(convertLeadRecords(result.getResult(), parameters.schemaInput.schema.getValue(),
@@ -386,7 +386,7 @@ public class MarketoLeadClient extends MarketoBaseRESTClient implements MarketoC
             mkto.setSuccess(result.isSuccess());
             if (mkto.isSuccess()) {
                 mkto.setRecordCount(result.getResult().isEmpty() ? 0 : result.getResult().size());
-                mkto.setRemainCount((result.getNextPageToken() != null && mkto.getRecordCount() > 0) ? batchLimit : 0);
+                mkto.setRemainCount((result.getNextPageToken() != null) ? batchLimit : 0);
                 mkto.setStreamPosition(result.getNextPageToken());
                 if (mkto.getRecordCount() > 0) {
                     mkto.setRecords(convertLeadRecords(result.getResult(), parameters.schemaInput.schema.getValue(),
