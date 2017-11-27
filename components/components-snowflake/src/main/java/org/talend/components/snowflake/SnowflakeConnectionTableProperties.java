@@ -52,6 +52,14 @@ public abstract class SnowflakeConnectionTableProperties extends FixedConnectors
         return table.main.schema.getValue();
     }
 
+    /**
+     * This methods serves to update reject schema or/and schema flow after main schema(table.main.schema) was changed.
+     * +
+     */
+    public void afterMainSchema() {
+        // Implement in subclasses.
+    };
+
     @Override
     public void setupLayout() {
         super.setupLayout();
@@ -61,18 +69,6 @@ public abstract class SnowflakeConnectionTableProperties extends FixedConnectors
 
         Form advancedForm = new Form(this, Form.ADVANCED);
         advancedForm.addRow(connection.getForm(Form.ADVANCED));
-    }
-
-    /**
-     * This methods serves to update reject schema or/and schema flow after main schema(table.main.schema) was changed.
-     */
-    public void afterMainSchema() {
-        // Implement in subclasses.
-    };
-
-
-    public String getTableName() {
-        return table.tableName.getValue();
     }
 
     @Override

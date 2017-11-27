@@ -92,9 +92,10 @@ public class TSnowflakeOutputProperties extends SnowflakeConnectionTableProperti
         super.setupProperties();
 
         outputAction.setValue(OutputAction.INSERT);
+
         ISchemaListener listener;
 
-        //This condition was added due to some strange behaviour of serialization.
+        // This condition was added due to some strange behaviour of serialization.
         if (table != null) {
             listener = table.schemaListener;
         } else {
@@ -106,11 +107,11 @@ public class TSnowflakeOutputProperties extends SnowflakeConnectionTableProperti
                 }
             };
         }
-
         table = new TableSubclass("table");
-        table.connection = connection;
         table.setSchemaListener(listener);
+        table.connection = connection;
         table.setupProperties();
+
     }
 
     @Override
@@ -206,6 +207,4 @@ public class TSnowflakeOutputProperties extends SnowflakeConnectionTableProperti
         updateOutputSchemas();
         beforeUpsertKeyColumn();
     }
-
-
 }

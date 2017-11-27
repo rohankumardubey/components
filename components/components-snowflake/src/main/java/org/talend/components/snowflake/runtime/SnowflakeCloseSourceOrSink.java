@@ -63,7 +63,7 @@ public class SnowflakeCloseSourceOrSink implements SourceOrSink {
     private void closeConnection(RuntimeContainer container) throws SQLException {
         if (container != null) {
             Connection conn = (Connection) container.getComponentData(properties.getReferencedComponentId(),
-                    SnowflakeRuntime.KEY_CONNECTION);
+                    SnowflakeSourceOrSink.KEY_CONNECTION);
             if (conn != null) {
                 conn.close();
             }

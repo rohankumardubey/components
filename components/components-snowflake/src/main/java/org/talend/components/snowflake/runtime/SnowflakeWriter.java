@@ -100,16 +100,19 @@ public final class SnowflakeWriter implements WriterWithFeedback<Result, Indexed
     @Override
     public void open(String uId) throws IOException {
         this.uId = uId;
-        processingConnection = sink.createConnection(container);
-        uploadConnection = sink.createConnection(container);
+        processingConnection = sink.connect(container);
+        uploadConnection = sink.connect(container);
         if (null == mainSchema) {
-            mainSchema = sink.getRuntimeSchema(container);
+            mainSchema = sprops.table.main.schema.getValue();
+            if (AvroUtils.isIncludeAllFields(mainSchema)) {
+                mainSchema = sink.getSchema(container, processingConnection, sprops.table.tableName.getStringValue());
+            } // else schema is fully specified
         }
 
         SnowflakeConnectionProperties connectionProperties = sprops.getConnectionProperties();
 
         Map<LoaderProperty, Object> prop = new HashMap<>();
-        prop.put(LoaderProperty.tableName, sprops.getTableName());
+        prop.put(LoaderProperty.tableName, sprops.table.tableName.getStringValue());
         prop.put(LoaderProperty.schemaName, connectionProperties.schemaName.getStringValue());
         prop.put(LoaderProperty.databaseName, connectionProperties.db.getStringValue());
         switch (sprops.outputAction.getValue()) {

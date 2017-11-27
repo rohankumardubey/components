@@ -65,7 +65,7 @@ public class SnowflakeReader extends AbstractBoundedReader<IndexedRecord> {
 
     protected Connection getConnection() throws IOException {
         if (null == connection) {
-            connection = ((SnowflakeSource) getCurrentSource()).createConnection(container);
+            connection = ((SnowflakeSource) getCurrentSource()).connect(container);
         }
         return connection;
     }
