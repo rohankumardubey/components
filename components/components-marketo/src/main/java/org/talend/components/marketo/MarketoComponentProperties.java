@@ -12,7 +12,10 @@
 // ============================================================================
 package org.talend.components.marketo;
 
+import static org.talend.daikon.properties.property.PropertyFactory.newEnum;
+
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -27,6 +30,7 @@ import org.talend.components.common.SchemaProperties;
 import org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProperties;
 import org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProperties.APIMode;
 import org.talend.daikon.properties.presentation.Form;
+import org.talend.daikon.properties.property.Property;
 
 public abstract class MarketoComponentProperties extends FixedConnectorsComponentProperties
         implements MarketoProvideConnectionProperties {
@@ -142,4 +146,36 @@ public abstract class MarketoComponentProperties extends FixedConnectorsComponen
         return APIMode.REST.equals(getConnectionProperties().apiMode.getValue());
     }
 
+    protected <T extends Enum<T>> Property<T> checkForInvalidStoredEnumProperty(Property<T> property, Class<T> fixEnum) {
+        String name = property.getName();
+        Object o;
+        String value = null;
+        LinkedHashMap ov;
+        if (!(property.getStoredValue() instanceof LinkedHashMap) && fixEnum.getCanonicalName().equals(property.getType())) {
+            return property;
+        }
+        o = property.getStoredValue();
+        if (o instanceof LinkedHashMap) {
+            ov = (LinkedHashMap) o;
+            value = String.valueOf(ov.get("name"));
+        }
+        if (o instanceof String) {
+            value = String.valueOf(o);
+        }
+        if (value == null) {
+            LOG.warn("[checkForInvalidStoredEnumProperty] Cannot determine value for enum {} stored value: {} ({}).", name, o,
+                    o.getClass().getCanonicalName());
+            return property;
+        }
+        try {
+            LOG.warn("[checkForInvalidStoredEnumProperty] Fixing enum {} value: {}", name, value);
+            property = newEnum(name, fixEnum);
+            property.setValue(Enum.valueOf(fixEnum, value));
+            property.setStoredValue(Enum.valueOf(fixEnum, value));
+            property.setPossibleValues(fixEnum.getEnumConstants());
+        } catch (Exception e) {
+            LOG.error("[checkForInvalidStoredEnumProperty] Error during {} fix: {}.", name, e);
+        }
+        return property;
+    }
 }

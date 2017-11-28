@@ -26,7 +26,6 @@ import static org.talend.daikon.properties.property.PropertyFactory.newString;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -411,7 +410,12 @@ public class TMarketoOutputProperties extends MarketoComponentWizardBaseProperti
         } catch (ClassCastException cce) {
             migrated = super.postDeserialize(version, setup, false); // don't initLayout
         }
+        checkForInvalidStoredProperties();
         return migrated;
     }
 
+    private void checkForInvalidStoredProperties() {
+        outputOperation = checkForInvalidStoredEnumProperty(outputOperation, OutputOperation.class);
+        customObjectSyncAction = checkForInvalidStoredEnumProperty(customObjectSyncAction, CustomObjectSyncAction.class);
+    }
 }
