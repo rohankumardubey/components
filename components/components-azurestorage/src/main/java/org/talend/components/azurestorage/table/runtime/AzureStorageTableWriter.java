@@ -387,7 +387,7 @@ public class AzureStorageTableWriter implements WriterWithFeedback<Result, Index
         latestPartitionKey = "";
     }
 
-    private void handleSuccess(IndexedRecord record, int counted) {
+    private synchronized void handleSuccess(IndexedRecord record, int counted) {
         result.successCount = result.successCount + counted;
         if (writeSchema == null || writeSchema.getFields().isEmpty())
             return;
@@ -398,7 +398,7 @@ public class AzureStorageTableWriter implements WriterWithFeedback<Result, Index
         }
     }
 
-    private void handleReject(IndexedRecord record, StorageException e, int counted) {
+    private synchronized void handleReject(IndexedRecord record, StorageException e, int counted) {
         result.rejectCount = result.rejectCount + counted;
 
         if (rejectSchema == null || rejectSchema.getFields().isEmpty()) {

@@ -12,10 +12,7 @@
 // ============================================================================
 package org.talend.components.azurestorage.table;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -99,11 +96,12 @@ public class AzureStorageTableComponentsTest {
     public void getAllSchemaPropertiesConnectors() {
         TAzureStorageOutputTableProperties p = new TAzureStorageOutputTableProperties("test");
 
-        assertTrue(p.getAllSchemaPropertiesConnectors(true).isEmpty());
+        assertFalse(p.getAllSchemaPropertiesConnectors(true).isEmpty());
 
         HashSet<PropertyPathConnector> connectors = new HashSet<>();
         connectors.add(p.MAIN_CONNECTOR);
         assertEquals(connectors, p.getAllSchemaPropertiesConnectors(false));
+        assertEquals(2, p.getAllSchemaPropertiesConnectors(true).size());
     }
 
     /**
