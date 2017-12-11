@@ -26,12 +26,13 @@ import org.apache.avro.Schema.Type;
 
 public class MarketoUtils {
 
-    private static final List<SimpleDateFormat> allowedDateFormats =
-            Arrays.asList(new SimpleDateFormat(MarketoConstants.DATETIME_PATTERN_PARAM),
-                    new SimpleDateFormat(MarketoConstants.DATETIME_PATTERN_PARAM_ALT),
-                    new SimpleDateFormat(MarketoConstants.DATETIME_PATTERN_PARAM_UTC),
-                    new SimpleDateFormat(MarketoConstants.DATETIME_PATTERN_REST),
-                    new SimpleDateFormat(MarketoConstants.DATETIME_PATTERN_SOAP));
+    private static final List<SimpleDateFormat> allowedDateFormats = Arrays.asList( 
+            new SimpleDateFormat(MarketoConstants.DATETIME_PATTERN_BASE),
+            new SimpleDateFormat(MarketoConstants.DATETIME_PATTERN_PARAM),
+            new SimpleDateFormat(MarketoConstants.DATETIME_PATTERN_PARAM_ALT),
+            new SimpleDateFormat(MarketoConstants.DATETIME_PATTERN_PARAM_UTC),
+            new SimpleDateFormat(MarketoConstants.DATETIME_PATTERN_REST),
+            new SimpleDateFormat(MarketoConstants.DATETIME_PATTERN_SOAP));
 
     /**
      * Parse a string amongst date patterns allowed to give back the matching Date object
