@@ -12,9 +12,7 @@
 // ============================================================================
 package org.talend.components.marketo.runtime;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.text.DateFormat;
 import java.util.TimeZone;
@@ -83,8 +81,8 @@ public class MarketoSourceTest {
         assertTrue(source.isInvalidDate("20170516 112417"));
         assertTrue(source.isInvalidDate("20170516 11:24:17"));
         assertTrue(source.isInvalidDate("20170516 11:24:17 0000"));
-        assertTrue(source.isInvalidDate("2017-05-16 11:24:17 0000"));
-        assertTrue(source.isInvalidDate("2017-05-16 11:24:17"));
+        assertFalse(source.isInvalidDate("2017-05-16 11:24:17 0000"));
+        assertFalse(source.isInvalidDate("2017-05-16 11:24:17"));
         assertTrue(source.isInvalidDate("2017-05-16'T'11:24:17 +0100"));
         DateFormat format = FastDateParser.getInstance("yyyy-MM-dd HH:mm:ss Z");
         format.setTimeZone(TimeZone.getTimeZone("Europe/England"));
