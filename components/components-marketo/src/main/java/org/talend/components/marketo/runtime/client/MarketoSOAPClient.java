@@ -234,9 +234,11 @@ public class MarketoSOAPClient extends MarketoClient {
                                     : null);
                     break;
                 default:
+                    if (!input.getLeadAttributeList().isNil()) {
                     for (Attribute attr : input.getLeadAttributeList().getValue().getAttributes()) {
                         if (attr.getAttrName().equals(col)) {
                             record.put(f.pos(), attr.getAttrValue());
+                            }
                         }
                     }
                 }
@@ -296,9 +298,11 @@ public class MarketoSOAPClient extends MarketoClient {
                     record.put(f.pos(), input.getForeignSysOrgId() != null ? input.getForeignSysOrgId().getValue() : null);
                     break;
                 default:
+                    if (!input.getActivityAttributes().isNil()) {
                     for (Attribute attr : input.getActivityAttributes().getValue().getAttributes()) {
                         if (attr.getAttrName().equals(col)) {
                             record.put(f.pos(), attr.getAttrValue());
+                            }
                         }
                     }
                 }
@@ -347,9 +351,11 @@ public class MarketoSOAPClient extends MarketoClient {
                     record.put(f.pos(), input.getCampaign());
                     break;
                 default:
+                    if (!input.getActivityAttributes().isNil()) {
                     for (Attribute attr : input.getActivityAttributes().getValue().getAttributes()) {
                         if (attr.getAttrName().equals(col)) {
                             record.put(f.pos(), attr.getAttrValue());
+                            }
                         }
                     }
                 }
@@ -502,7 +508,7 @@ public class MarketoSOAPClient extends MarketoClient {
         // attributes
         // curiously we have to put some basic fields like Email in attributes if we have them feed...
         ArrayOfString attributes = new ArrayOfString();
-        for (String s : mappings.keySet()) {
+        for (String s : mappings.values()) {
             attributes.getStringItems().add(s);
         }
         attributes.getStringItems().add("Company");
@@ -574,7 +580,7 @@ public class MarketoSOAPClient extends MarketoClient {
         request.setLeadKey(key);
         // attributes
         ArrayOfString attributes = new ArrayOfString();
-        for (String s : mappings.keySet()) {
+        for (String s : mappings.values()) {
             attributes.getStringItems().add(s);
         }
         // Activity filter
@@ -699,7 +705,7 @@ public class MarketoSOAPClient extends MarketoClient {
 
         // attributes
         ArrayOfString attributes = new ArrayOfString();
-        for (String s : mappings.keySet()) {
+        for (String s : mappings.values()) {
             attributes.getStringItems().add(s);
         }
         // Activity filter
