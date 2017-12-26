@@ -6,6 +6,7 @@ import org.talend.components.api.Constants;
 
 import aQute.bnd.annotation.component.Component;
 
+@AutoService(ComponentInstaller.class)
 @Component(name = Constants.COMPONENT_INSTALLER_PREFIX + BatchModeFamilyDefinition.NAME, provide = ComponentInstaller.class)
 public class BatchModeFamilyDefinition extends AbstractComponentFamilyDefinition implements ComponentInstaller {
 
