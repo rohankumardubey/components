@@ -22,7 +22,6 @@ import static org.apache.avro.Schema.Field;
 import static org.apache.avro.generic.GenericData.Record;
 import static org.apache.commons.codec.binary.Hex.encodeHex;
 import static org.slf4j.LoggerFactory.getLogger;
-import static org.talend.components.marketo.MarketoConstants.DATETIME_PATTERN_PARAM;
 import static org.talend.components.marketo.MarketoConstants.FIELD_ERROR_MSG;
 import static org.talend.components.marketo.MarketoConstants.FIELD_MARKETO_GUID;
 import static org.talend.components.marketo.MarketoConstants.FIELD_STATUS;
@@ -64,6 +63,7 @@ import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
 import org.slf4j.Logger;
 import org.talend.components.api.exception.ComponentException;
+import org.talend.components.marketo.MarketoUtils;
 import org.talend.components.marketo.runtime.client.rest.type.SyncStatus;
 import org.talend.components.marketo.runtime.client.type.ListOperationParameters;
 import org.talend.components.marketo.runtime.client.type.MarketoError;
@@ -452,9 +452,8 @@ public class MarketoSOAPClient extends MarketoClient {
             try {
                 DatatypeFactory factory = newInstance();
                 ObjectFactory objectFactory = new ObjectFactory();
-                DateFormat df = new SimpleDateFormat(DATETIME_PATTERN_PARAM);
-                Date oldest = df.parse(parameters.oldestUpdateDate.getValue());
-                Date latest = df.parse(parameters.latestUpdateDate.getValue());
+                Date oldest = MarketoUtils.parseDateString(parameters.oldestUpdateDate.getValue());
+                Date latest = MarketoUtils.parseDateString(parameters.latestUpdateDate.getValue());
                 GregorianCalendar gc = new GregorianCalendar();
                 gc.setTime(latest);
                 JAXBElement<XMLGregorianCalendar> until = objectFactory
@@ -669,9 +668,8 @@ public class MarketoSOAPClient extends MarketoClient {
         ParamsGetLeadChanges request = new ParamsGetLeadChanges();
         LastUpdateAtSelector leadSelector = new LastUpdateAtSelector();
         try {
-            DateFormat df = new SimpleDateFormat(DATETIME_PATTERN_PARAM);
-            Date oldest = df.parse(sOldest);
-            Date latest = df.parse(sLatest);
+            Date oldest = MarketoUtils.parseDateString(sOldest);
+            Date latest = MarketoUtils.parseDateString(sLatest);
             GregorianCalendar gc = new GregorianCalendar();
             gc.setTime(latest);
             DatatypeFactory factory = newInstance();
