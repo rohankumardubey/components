@@ -222,10 +222,9 @@ public class MarketoLeadClient extends MarketoBaseRESTClient implements MarketoC
                 } else if (col.equals(FIELD_CAMPAIGN_ID)) {
                     record.put(f.pos(), input.getCampaignId());
                 } else {
-                    for (Map<String, String> attr : input.getAttributes()) {
-                        if (attr.get(col) != null) {
-                            record.put(f.pos(), attr.get(col));
-                        }
+                    String attr = input.getMktoAttributes().get(col);
+                    if (attr != null) {
+                        record.put(f.pos(), attr);
                     }
                 }
             }
@@ -260,10 +259,9 @@ public class MarketoLeadClient extends MarketoBaseRESTClient implements MarketoC
                 } else if (col.equals(FIELD_CAMPAIGN_ID)) {
                     record.put(f.pos(), input.getCampaignId());
                 } else {
-                    for (Map<String, String> attr : input.getAttributes()) {
-                        if (attr.get(col) != null) {
-                            record.put(f.pos(), attr.get(col));
-                        }
+                    String attr = input.getMktoAttributes().get(col);
+                    if (attr != null) {
+                        record.put(f.pos(), attr);
                     }
                 }
             }
