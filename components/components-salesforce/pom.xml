@@ -3,7 +3,7 @@
 
     <groupId>org.talend.components</groupId>
     <artifactId>components-salesforce-aggregator</artifactId>
-    <version>0.19-SNAPSHOT</version>
+    <version>0.19.9</version>
 
     <name>Components - Salesforce Aggregator</name>
     <packaging>pom</packaging>
