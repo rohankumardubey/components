@@ -12,7 +12,7 @@
 
 	<groupId>org.talend.components</groupId>
 	<artifactId>components-api-service-rest</artifactId>
-	<version>0.19.9</version>
+	<version>0.19-SNAPSHOT</version>
 
 	<name>Component REST API</name>
 	<properties>
