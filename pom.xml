@@ -7,10 +7,10 @@
     <artifactId>components</artifactId>
     <packaging>pom</packaging>
 
-	<scm>
-		<connection>scm:git:https://github.com/Talend/components.git</connection>
-	  <tag>HEAD</tag>
-  </scm>
+    <scm>
+	<connection>scm:git:https://github.com/Talend/components.git</connection>
+        <tag>HEAD</tag>
+    </scm>
 	
     <name>Component Aggregator</name>
     <modules>
