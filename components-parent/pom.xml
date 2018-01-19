@@ -1,11 +1,10 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>org.talend.components</groupId>
 	<artifactId>components-parent</artifactId>
 	<packaging>pom</packaging>
-	<version>0.21-SNAPSHOT</version>
+	<version>0.21.2</version>
 
 	<name>Component Parent POM</name>
 	<properties>
@@ -15,7 +14,7 @@
 		<!-- version properties will go to some bom pom -->
 		<spring.boot.version>1.5.1.RELEASE</spring.boot.version>
 		<avro.version>1.8.1</avro.version>
-		<components.version>0.21-SNAPSHOT</components.version>
+		<components.version>0.21.2</components.version>
 		<daikon.version>0.20.0</daikon.version>
 		<guava.version>19.0</guava.version>
 		<hamcrest.version>1.3</hamcrest.version>
@@ -36,7 +35,7 @@
 
 	<scm>
 		<connection>scm:git:https://github.com/Talend/components.git</connection>
-	  <tag>HEAD</tag>
+	  <tag>release/0.21.2</tag>
 	</scm>
 
 	<modules>

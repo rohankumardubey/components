@@ -1,18 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
         <groupId>org.talend.daikon</groupId>
         <artifactId>service-parent</artifactId>
         <version>0.20.0</version>
-        <relativePath></relativePath>
+        <relativePath />
     </parent>
 
     <groupId>org.talend.components</groupId>
     <artifactId>components-api-service-rest</artifactId>
-    <version>0.21-SNAPSHOT</version>
+    <version>0.21.2</version>
 
     <name>Component REST API</name>
     <properties>
@@ -449,4 +448,8 @@
             <url>https://talend-update.talend.com/nexus/content/repositories/libraries/</url>
         </repository>
     </repositories>
+
+  <scm>
+    <tag>release/0.21.2</tag>
+  </scm>
 </project>
