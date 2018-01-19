@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.talend.components</groupId>
     <artifactId>components-marketo-aggregator</artifactId>
-    <version>0.21.2</version>
+    <version>0.21.3-SNAPSHOT</version>
     <name>Components - Marketo Aggregator</name>
     <packaging>pom</packaging>
     <properties>

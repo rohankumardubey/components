@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.talend.components</groupId>
-    <version>0.21.2</version>
+    <version>0.21.3-SNAPSHOT</version>
     <artifactId>components</artifactId>
     <packaging>pom</packaging>
 
@@ -11,7 +11,7 @@
       <connection>scm:git:https://github.com/Talend/components.git</connection>
       <developerConnection>scm:git:https://github.com/Talend/components.git</developerConnection>
       <url>https://github.com/Talend/components</url>
-      <tag>release/0.21.2</tag>
+      <tag>maintenance/0.21</tag>
     </scm>
 
     <distributionManagement>

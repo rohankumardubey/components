@@ -11,7 +11,7 @@
 
     <groupId>org.talend.components</groupId>
     <artifactId>components-api-service-rest</artifactId>
-    <version>0.21.2</version>
+    <version>0.21.3-SNAPSHOT</version>
 
     <name>Component REST API</name>
     <properties>
@@ -448,8 +448,4 @@
             <url>https://talend-update.talend.com/nexus/content/repositories/libraries/</url>
         </repository>
     </repositories>
-
-  <scm>
-    <tag>release/0.21.2</tag>
-  </scm>
 </project>

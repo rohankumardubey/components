@@ -10,7 +10,7 @@
     </parent>
 
     <groupId>org.talend.components</groupId>
-    <version>0.21.2</version>
+    <version>0.21.3-SNAPSHOT</version>
 
     <artifactId>components-api-service-rest-all-components</artifactId>
 
@@ -334,10 +334,4 @@
             </build>
         </profile>
     </profiles>
-
-
-
-  <scm>
-    <tag>release/0.21.2</tag>
-  </scm>
 </project>
