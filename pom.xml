@@ -47,6 +47,7 @@
 				      <configuration>
 					      <scmCommentPrefix xml:space="preserve">release: </scmCommentPrefix>
 					      <tagNameFormat>release/@{project.version}</tagNameFormat>
+					      <autoVersionSubmodules>true</autoVersionSubmodules>
 				      </configuration>
 			      </plugin>
         </plugins>
