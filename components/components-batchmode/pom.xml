@@ -11,7 +11,7 @@
     </parent>
     <artifactId>components-batchmode</artifactId>
     <name>Components - Batch Mode Tests</name>
-    <packaging>bundle</packaging>
+    <packaging>jar</packaging>
 
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
@@ -184,8 +184,10 @@
                             <instructions>
                                 <Bundle-SymbolicName>org.talend.components.batchmode.lib</Bundle-SymbolicName>
                                 <Bundle-Name>${project.name} lib</Bundle-Name>
+                                <Service-Component>*</Service-Component>
+                                <Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
                                 <Include-Resource>
-                                    {maven-resources},META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt=target/classes/META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt
+                                    {maven-resources},META-INF/services/=target/classes/META-INF/services/,META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt=target/classes/META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt
                                 </Include-Resource>
                                 <Service-Component>*</Service-Component>
                                 <Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
@@ -201,14 +203,16 @@
                         <configuration>
                             <classifier>bundle</classifier>
                             <instructions>
-                                <Bundle-SymbolicName>org.talend.components.batchmode</Bundle-SymbolicName>
+                                <Bundle-SymbolicName>org.talend.components.googledrive</Bundle-SymbolicName>
                                 <Service-Component>*</Service-Component>
-                                <Embed-Dependency>*;scope=compile|runtime;inline=false;artifactId=!components*
+                                <Import-Package>*</Import-Package>
+                                <Embed-Dependency>
+                                    *;scope=compile|runtime;inline=false;artifactId=!components*|auto-service
                                 </Embed-Dependency>
-                                <Include-Resource>
-                                    {maven-resources},META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt=target/classes/META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt
-                                </Include-Resource>
                                 <Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
+                                <Include-Resource>
+                                    {maven-resources},META-INF/services/=target/classes/META-INF/services/,META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt=target/classes/META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt
+                                </Include-Resource>
                             </instructions>
                         </configuration>
                     </execution>
