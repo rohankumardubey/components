@@ -185,7 +185,7 @@
                                 <Bundle-SymbolicName>org.talend.components.batchmode.lib</Bundle-SymbolicName>
                                 <Bundle-Name>${project.name} lib</Bundle-Name>
                                 <Include-Resource>
-                                    {maven-resources},META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt=target/classes/META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt
+                                    {maven-resources},META-INF/services/=target/classes/META-INF/services/,META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt=target/classes/META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt
                                 </Include-Resource>
                                 <Service-Component>*</Service-Component>
                                 <Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
@@ -206,7 +206,7 @@
                                 <Embed-Dependency>*;scope=compile|runtime;inline=false;artifactId=!components*
                                 </Embed-Dependency>
                                 <Include-Resource>
-                                    {maven-resources},META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt=target/classes/META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt
+                                    {maven-resources},META-INF/services/=target/classes/META-INF/services/,META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt=target/classes/META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt
                                 </Include-Resource>
                                 <Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
                             </instructions>
