@@ -162,6 +162,7 @@ public class TJDBCInputProperties extends FixedConnectorsComponentProperties imp
         connection.setNotRequired();
 
         sql.setTaggedValue(org.talend.components.common.ComponentConstants.LINE_SEPARATOR_REPLACED_TO, " ");
+        sql.setTaggedValue(ComponentConstants.ALREADY_BE_UNESCAPE_JAVA_STRING_VALUE, "true");
     }
 
     @Override

@@ -47,4 +47,11 @@ public interface ComponentConstants {
     String MAPPING_LOCATION = "MAPPING_LOCATION";
     
     String MAPPING_URL_SUBFIX = "MAPPINGS_URL";
+    
+    /**
+     * We use this for a string property tag key to show the property's string value is already be unescape java string value. 
+     * So no need to call StringEscapeUtils.unescapeJava(stringValue), please see AbstractPropertyValueEvaluator.
+     * 
+     */
+    String ALREADY_BE_UNESCAPE_JAVA_STRING_VALUE = "ALREADY_BE_UNESCAPE_JAVA_STRING_VALUE";
 }
