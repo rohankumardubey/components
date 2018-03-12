@@ -15,6 +15,7 @@ package org.talend.components.snowflake.tsnowflakeoutput;
 import static org.talend.daikon.properties.presentation.Widget.widget;
 import static org.talend.daikon.properties.property.PropertyFactory.newEnum;
 import static org.talend.daikon.properties.property.PropertyFactory.newString;
+import static org.talend.daikon.properties.property.PropertyFactory.newBoolean;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -33,8 +34,12 @@ import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
+import org.talend.daikon.serialize.PostDeserializeSetup;
+import org.talend.daikon.serialize.migration.SerializeSetVersion;
 
-public class TSnowflakeOutputProperties extends SnowflakeConnectionTableProperties {
+public class TSnowflakeOutputProperties extends SnowflakeConnectionTableProperties implements SerializeSetVersion {
+
+    private static final int CONVERT_COLUMNS_AND_TABLE_TO_UPPERCASE_VERSION = 1;
 
     public enum OutputAction {
         INSERT,
@@ -53,6 +58,7 @@ public class TSnowflakeOutputProperties extends SnowflakeConnectionTableProperti
 
     public SchemaProperties schemaReject = new SchemaProperties("schemaReject"); //$NON-NLS-1$
 
+    public Property<Boolean> convertColumnsAndTableToUppercase = newBoolean("convertColumnsAndTableToUppercase");
     // Have to use an explicit class to get the override of afterTableName(), an anonymous
     // class cannot be public and thus cannot be called.
     public class TableSubclass extends SnowflakeTableProperties {
@@ -112,6 +118,7 @@ public class TSnowflakeOutputProperties extends SnowflakeConnectionTableProperti
         table.connection = connection;
         table.setupProperties();
 
+        convertColumnsAndTableToUppercase.setValue(true);
     }
 
     @Override
@@ -120,6 +127,9 @@ public class TSnowflakeOutputProperties extends SnowflakeConnectionTableProperti
         Form mainForm = getForm(Form.MAIN);
         mainForm.addRow(outputAction);
         mainForm.addColumn(widget(upsertKeyColumn).setWidgetType(Widget.ENUMERATION_WIDGET_TYPE));
+
+        Form advancedForm = getForm(Form.ADVANCED);
+        advancedForm.addRow(convertColumnsAndTableToUppercase);
     }
 
     public void afterOutputAction() {
@@ -206,5 +216,20 @@ public class TSnowflakeOutputProperties extends SnowflakeConnectionTableProperti
     public void afterMainSchema() {
         updateOutputSchemas();
         beforeUpsertKeyColumn();
+    }
+
+    @Override
+    public int getVersionNumber() {
+        return 1;
+    }
+
+    @Override
+    public boolean postDeserialize(int version, PostDeserializeSetup setup, boolean persistent) {
+        boolean migrated = super.postDeserialize(version, setup, persistent);
+        if (version < CONVERT_COLUMNS_AND_TABLE_TO_UPPERCASE_VERSION) {
+            convertColumnsAndTableToUppercase.setValue(false);
+            migrated = true;
+        }
+        return migrated;
     }
 }

@@ -112,7 +112,10 @@ public final class SnowflakeWriter implements WriterWithFeedback<Result, Indexed
         SnowflakeConnectionProperties connectionProperties = sprops.getConnectionProperties();
 
         Map<LoaderProperty, Object> prop = new HashMap<>();
-        prop.put(LoaderProperty.tableName, sprops.table.tableName.getStringValue());
+        boolean isUpperCase = sprops.convertColumnsAndTableToUppercase.getValue();
+        String tableName = isUpperCase ? sprops.table.tableName.getStringValue().toUpperCase()
+                : sprops.table.tableName.getStringValue();
+        prop.put(LoaderProperty.tableName, tableName);
         prop.put(LoaderProperty.schemaName, connectionProperties.schemaName.getStringValue());
         prop.put(LoaderProperty.databaseName, connectionProperties.db.getStringValue());
         switch (sprops.outputAction.getValue()) {
@@ -134,9 +137,10 @@ public final class SnowflakeWriter implements WriterWithFeedback<Result, Indexed
         List<String> keyStr = new ArrayList<>();
         List<String> columnsStr = new ArrayList<>();
         for (Field f : columns) {
-            columnsStr.add(f.name());
+            String fName = isUpperCase ? f.name().toUpperCase() : f.name();
+            columnsStr.add(fName);
             if (null != f.getProp(SchemaConstants.TALEND_COLUMN_IS_KEY)) {
-                keyStr.add(f.name());
+                keyStr.add(fName);
             }
         }
 

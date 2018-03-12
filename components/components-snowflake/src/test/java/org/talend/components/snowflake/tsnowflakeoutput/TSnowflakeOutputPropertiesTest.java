@@ -60,10 +60,13 @@ public class TSnowflakeOutputPropertiesTest {
     @Test
     public void testDefaultValue() {
         OutputAction defaultValueOutputAction;
+        boolean defaultConvertColumnsAndTableToUppercase;
 
         defaultValueOutputAction = outputProperties.outputAction.getValue();
+        defaultConvertColumnsAndTableToUppercase = outputProperties.convertColumnsAndTableToUppercase.getValue();
 
         assertEquals(defaultValueOutputAction, OutputAction.INSERT);
+        assertTrue(defaultConvertColumnsAndTableToUppercase);
     }
 
     @Test
