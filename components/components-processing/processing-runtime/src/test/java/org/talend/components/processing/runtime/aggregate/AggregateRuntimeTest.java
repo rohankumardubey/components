@@ -12,6 +12,7 @@ import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.testing.PAssert;
 import org.apache.beam.sdk.testing.TestPipeline;
 import org.apache.beam.sdk.transforms.Create;
+import org.apache.beam.sdk.transforms.DoFn;
 import org.apache.beam.sdk.values.PCollection;
 import org.junit.Rule;
 import org.junit.Test;
@@ -530,4 +531,27 @@ public class AggregateRuntimeTest {
         pipeline.run();
     }
 
+    /**
+     * Tests the results when there are no group or operations.  This is normally not an allowed state, except when the
+     * component has been added to a pipeline without any configuration.
+     */
+    @Test
+    public void basicTestEmptyForm() {
+        AggregateRuntime aggregateRuntime = new AggregateRuntime();
+        AggregateProperties props = new AggregateProperties("aggregate");
+        props.init();
+
+        addIntoGroup(props, Arrays.asList(""));
+
+        // This is the part that can only happen when the component is in a default state.
+        addIntoOperations(props, AggregateFieldOperationType.MIN, Arrays.asList(""));
+
+        aggregateRuntime.initialize(null, props);
+
+        PCollection<IndexedRecord> result = pipeline.apply(Create.of(basicList)).apply(aggregateRuntime);
+
+        PAssert.that(result).containsInAnyOrder(new ArrayList<IndexedRecord>());
+
+        pipeline.run();
+    }
 }
