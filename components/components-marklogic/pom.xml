@@ -3,7 +3,7 @@
     <parent>
         <artifactId>components-implementation-aggregator</artifactId>
         <groupId>org.talend.components</groupId>
-        <version>0.22.0-SNAPSHOT</version>
+        <version>0.22.1-SNAPSHOT</version>
         <relativePath>../../components/pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
