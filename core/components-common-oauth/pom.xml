@@ -84,8 +84,9 @@
 								<Import-Package>org.talend*,javax.net.ssl*</Import-Package>
 								<Service-Component>*</Service-Component>
 								<Embed-Transitive>true</Embed-Transitive><!-- We need to embed oauth.common 
-									this is why we set this to true -->
-								<Embed-Dependency>artifactId=org.apache.oltu.oauth2*|jetty*|javax.servlet*;inline=false</Embed-Dependency>
+									this is why we set this to true, and the json is a transitive dep of 3 level,
+								need to be embedded explicitly -->
+								<Embed-Dependency>artifactId=org.apache.oltu.oauth2*|jetty*|javax.servlet*|json;inline=false</Embed-Dependency>
 								<Export-Package>org.talend.components.common.oauth*</Export-Package>
 								<_exportcontents>org.apache.oltu.oauth2*</_exportcontents>
 							</instructions>
