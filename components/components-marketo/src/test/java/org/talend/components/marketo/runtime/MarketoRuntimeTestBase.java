@@ -108,10 +108,10 @@ public class MarketoRuntimeTestBase {
         return mkto;
     }
 
-    public static MarketoRecordResult getFailedRecordResult() {
+    public static MarketoRecordResult getFailedRecordResult(String api, String code, String message) {
         MarketoRecordResult mkto = new MarketoRecordResult();
         mkto.setSuccess(false);
-        mkto.setErrors(Arrays.asList(new MarketoError("REST", "error")));
+        mkto.setErrors(Arrays.asList(new MarketoError(api, code, message)));
         return mkto;
     }
 
@@ -143,6 +143,18 @@ public class MarketoRuntimeTestBase {
         sts1.setMarketoGUID("mktoGUID");
         sts1.setSeq(0);
         mkto.setRecords(Arrays.asList(sts1));
+
+        return mkto;
+    }
+
+    public MarketoSyncResult getFailedSyncResult(String api, String code, String message) {
+        MarketoSyncResult mkto = new MarketoSyncResult();
+        mkto.setSuccess(false);
+        mkto.setRecordCount(0);
+        List<MarketoError> errors = new ArrayList<>();
+        MarketoError error = new MarketoError(api, code, message);
+        errors.add(error);
+        mkto.setErrors(errors);
 
         return mkto;
     }
