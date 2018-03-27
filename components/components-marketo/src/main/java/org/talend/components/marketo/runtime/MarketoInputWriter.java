@@ -89,7 +89,6 @@ public class MarketoInputWriter extends MarketoWriter {
         //
         inputRecord = (IndexedRecord) object;
         result.totalCount++;
-        result.apiCalls++;
         // This for dynamic which would get schema from the first record
         if (inputSchema == null) {
             inputSchema = inputRecord.getSchema();
@@ -99,17 +98,32 @@ public class MarketoInputWriter extends MarketoWriter {
         }
         // switch between column name in design and column value for runtime
         properties.leadKeyValues.setValue(String.valueOf(inputRecord.get(inputSchema.getField(leadKeyColumn).pos())));
-        MarketoRecordResult result = client.getMultipleLeads(properties, null);
-        if (!result.isSuccess()) {
-            if (dieOnError) {
-                throw new IOException(result.getErrorsString());
-            }
-            LOG.error(result.getErrors().toString());
-        }
-        for (IndexedRecord record : result.getRecords()) {
-            if (record != null) {
-                this.result.successCount++;
-                successfulWrites.add(record);
+        //
+        for (int i = 0; i < getRetryAttemps(); i++) {
+            result.apiCalls++;
+            MarketoRecordResult mktoResult = client.getMultipleLeads(properties, null);
+            //
+            if (!mktoResult.isSuccess()) {
+                if (dieOnError) {
+                    throw new IOException(mktoResult.getErrorsString());
+                }
+                // is recoverable error
+                if (client.isErrorRecoverable(mktoResult.getErrors())) {
+                    LOG.debug("Recoverable error during operation : `{}`. Retrying...", mktoResult.getErrorsString());
+                    waitForRetryAttempInterval();
+                    continue;
+                } else {
+                    LOG.error("Unrecoverable error : `{}`.", mktoResult.getErrorsString());
+                    break;
+                }
+            } else {
+                for (IndexedRecord record : mktoResult.getRecords()) {
+                    if (record != null) {
+                        this.result.successCount++;
+                        successfulWrites.add(record);
+                    }
+                }
+                break;
             }
         }
     }

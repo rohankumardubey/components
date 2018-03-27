@@ -19,13 +19,14 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.talend.components.api.component.ComponentDefinition.RETURN_ERROR_MESSAGE;
 import static org.talend.components.marketo.MarketoComponentDefinition.RETURN_NB_CALL;
 
-import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.avro.generic.GenericData;
@@ -65,7 +66,7 @@ public class MarketoBulkExecReaderTest {
         try {
             assertFalse(reader.start());
             fail("Should not be here");
-        } catch (IOException e) {
+        } catch (Exception e) {
         }
         reader.properties.dieOnError.setValue(false);
         MarketoRecordResult mkto = new MarketoRecordResult();
@@ -95,6 +96,60 @@ public class MarketoBulkExecReaderTest {
         assertNotNull(r);
         assertEquals(0, r.get(RETURN_NB_CALL));
         assertNull(r.get(RETURN_ERROR_MESSAGE));
+    }
+
+    @Test
+    public void testRetryOperationSuccess() throws Exception {
+        IndexedRecord record = new GenericData.Record(MarketoConstants.getEmptySchema());
+        MarketoRecordResult mkto = new MarketoRecordResult();
+        mkto.setSuccess(true);
+        mkto.setRecords(Arrays.asList(record));
+        when(client.bulkImport(any(TMarketoBulkExecProperties.class))).thenReturn(mkto);
+        assertTrue(reader.start());
+        assertFalse(reader.advance());
+        int result = (int) reader.getReturnValues().get(RETURN_NB_CALL);
+        assertEquals(1, result);
+    }
+
+    @Test
+    public void testRetryOperationFailDieOnError() throws Exception {
+        MarketoRecordResult mkto = new MarketoRecordResult();
+        mkto.setErrors(Arrays.asList(new MarketoError("REST", "902", "Invalid operation")));
+        when(client.bulkImport(any(TMarketoBulkExecProperties.class))).thenReturn(mkto);
+        try {
+            reader.start();
+            fail("Should not be here");
+        } catch (Exception e) {
+            assertTrue(e.getMessage().contains("902"));
+        }
+    }
+
+    @Test
+    public void testRetryOperationFailNonRecoverableErrror() throws Exception {
+        MarketoRecordResult mkto = new MarketoRecordResult();
+        mkto.setErrors(Arrays.asList(new MarketoError("REST", "902", "Invalid operation")));
+        when(client.bulkImport(any(TMarketoBulkExecProperties.class))).thenReturn(mkto);
+        doReturn(false).when(client).isErrorRecoverable(any(List.class));
+        reader.properties.dieOnError.setValue(false);
+        assertFalse(reader.start());
+        int result = (int) reader.getReturnValues().get(RETURN_NB_CALL);
+        assertEquals(1, result);
+    }
+
+    @Test
+    public void testRetryOperationFailRecoverableErrror() throws Exception {
+        MarketoRecordResult mkto = new MarketoRecordResult();
+        mkto.setErrors(Arrays.asList(new MarketoError("REST", "602", "expired header")));
+        when(client.bulkImport(any(TMarketoBulkExecProperties.class))).thenReturn(mkto);
+        doReturn(true).when(client).isErrorRecoverable(any(List.class));
+        reader.properties.dieOnError.setValue(false);
+        int minDelay = reader.getRetryAttemps() * reader.getRetryInterval();
+        long start = System.currentTimeMillis();
+        assertFalse(reader.start());
+        long end = System.currentTimeMillis();
+        int result = (int) reader.getReturnValues().get(RETURN_NB_CALL);
+        assertEquals((long) reader.getRetryAttemps(), result);
+        assertTrue(minDelay <= (end - start));
     }
 
 }

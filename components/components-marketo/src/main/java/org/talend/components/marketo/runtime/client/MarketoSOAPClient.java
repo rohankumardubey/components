@@ -46,6 +46,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.regex.Pattern;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -1030,5 +1031,67 @@ public class MarketoSOAPClient extends MarketoClient {
 
     public MktowsPort getPort() {
         return port;
+    }
+
+    /**
+     * Check if one of errors is due to AuthentificationHeader expiration
+     * 
+     * @param errors
+     * @return
+     */
+    public boolean isAuthentificationHeaderExpired(List<MarketoError> errors) {
+        if (errors != null) {
+            for (MarketoError error : errors) {
+                if (error.getMessage().contains("20016")) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Renew Authentification Header
+     * 
+     * @throws InvalidKeyException
+     * @throws NoSuchAlgorithmException
+     */
+    public void refreshAuthentificationHeader() throws InvalidKeyException, NoSuchAlgorithmException {
+        header = getAuthentificationHeader();
+    }
+
+    /**
+     * Returns true if error is recoverable (we can retry operation).
+     *
+     * param error : Error string coming from a MarketoError.
+     *
+     * Potential recoverable errors returned by API:
+     *
+     * <li>10001 Internal Error Severe system failure</li>
+     * <li>20011 Internal Error API service failure</li>
+     * <li>20016 Request Expired Request signature is too old. The given timestamp and request signature are in the past and
+     * are no longer valid. Request can be retried with a newly generated timestamp and signature.</li>
+     * <li>20023 Rate Limit Exceeded The number of calls in the past 20 seconds was greater than 100</li>
+     * <li>20024 Concurrency Limit Exceeded The number of concurrent calls was greater than 10</li>
+     */
+    @Override
+    public boolean isErrorRecoverable(List<MarketoError> errors) {
+        if (isAuthentificationHeaderExpired(errors)) {
+            try {
+                // refresh token : the only action we have a possibility to act by ourselves.
+                refreshAuthentificationHeader();
+                return true;
+            } catch (Exception e) {
+                // retry until retry count is reached.
+                return true;
+            }
+        }
+        final Pattern pattern = Pattern.compile(".*(10001|20011|20023|20024).*");
+        for (MarketoError error : errors) {
+            if (pattern.matcher(error.getMessage()).matches()) {
+                return true;
+            }
+        }
+        return false;
     }
 }

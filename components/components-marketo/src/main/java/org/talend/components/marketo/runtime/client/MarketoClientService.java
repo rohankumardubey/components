@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.apache.avro.generic.IndexedRecord;
 import org.talend.components.marketo.runtime.client.type.ListOperationParameters;
+import org.talend.components.marketo.runtime.client.type.MarketoError;
 import org.talend.components.marketo.runtime.client.type.MarketoRecordResult;
 import org.talend.components.marketo.runtime.client.type.MarketoSyncResult;
 import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties;
@@ -24,6 +25,8 @@ import org.talend.components.marketo.tmarketooutput.TMarketoOutputProperties;
 public interface MarketoClientService {
 
     String getApi();
+
+    boolean isErrorRecoverable(List<MarketoError> errors);
 
     // Leads
     MarketoRecordResult getLead(TMarketoInputProperties parameters, String offset);

@@ -64,15 +64,22 @@ public abstract class MarketoWriter implements WriterWithFeedback<Result, Indexe
 
     protected String API_SOAP = "SOAP";
 
+    protected int retryAttemps = 1;
+
+    protected int retryInterval;
+
     public MarketoWriter(WriteOperation writeOperation, RuntimeContainer runtime) {
         this.runtime = runtime;
         this.writeOperation = writeOperation;
         this.sink = (MarketoSink) writeOperation.getSink();
-        result = new MarketoResult();
+
+        retryAttemps = this.sink.getProperties().getConnectionProperties().maxReconnAttemps.getValue();
+        retryInterval = this.sink.getProperties().getConnectionProperties().attemptsIntervalTime.getValue();
     }
 
     @Override
     public void open(String uId) throws IOException {
+        result = new MarketoResult();
         client = sink.getClientService(runtime);
         api = client.getApi();
         use_soap_api = API_SOAP.equals(api);
@@ -103,4 +110,22 @@ public abstract class MarketoWriter implements WriterWithFeedback<Result, Indexe
         return Collections.unmodifiableList(rejectedWrites);
     }
 
+    public int getRetryAttemps() {
+        return retryAttemps;
+    }
+
+    public int getRetryInterval() {
+        return retryInterval;
+    }
+
+    /**
+     * Sleeps for retryInterval time
+     *
+     */
+    protected void waitForRetryAttempInterval() {
+        try {
+            Thread.sleep(getRetryInterval());
+        } catch (InterruptedException e) {
+        }
+    }
 }

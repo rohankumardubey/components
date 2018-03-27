@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
+import java.util.regex.Pattern;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -519,6 +520,49 @@ public abstract class MarketoBaseRESTClient extends MarketoClient {
             LOG.error("GET request failed: {}", e.getMessage());
             throw new MarketoException(REST, e.getMessage());
         }
+    }
+
+    /**
+     * Returns true if error is recoverable (we can retry operation).
+     *
+     * param error : Error string coming from a MarketoError.
+     *
+     * Potential recoverable errors returned by API:
+     *
+     * <li><502 Bad Gateway The remote server returned an error. Likely a timeout. The request should be retried with
+     * exponential backoff.</li>
+     * <li>602 Access token expired The Access Token included in the call is no longer valid due to expiration.</li>
+     * <li>604 Request timed out The request was running for too long, or exceeded the time-out period specified in the
+     * header of the call.</li>
+     * <li>606 Max rate limit ‘%s’ exceeded with in ‘%s’ secs The number of calls in the past 20 seconds was greater than
+     * 100</li>
+     * <li>608 API Temporarily Unavailable</li>
+     * <li>611 System error All unhandled exceptions</li>
+     * <li>614 Invalid Subscription The destination subscription cannot be found or is unreachable. This usually indicates
+     * temporary inaccessibility.</li>
+     * <li>615 Concurrent access limit reached At most 10 requests can be processed by any subscription at a time. This will
+     * be returned if there are already 10 requests for the subscription ongoing.</li>
+     *
+     */
+    @Override
+    public boolean isErrorRecoverable(List<MarketoError> errors) {
+        if (isAccessTokenExpired(errors)) {
+            try {
+                // refresh token : the only action we have a possibility to act by ourselves.
+                getToken();
+                return true;
+            } catch (MarketoException e) {
+                // retry until retry count is reached.
+                return true;
+            }
+        }
+        final Pattern pattern = Pattern.compile("(502|604|606|608|611|614|615)");
+        for (MarketoError error : errors) {
+            if (pattern.matcher(error.getCode()).matches()) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

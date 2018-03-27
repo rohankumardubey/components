@@ -47,8 +47,11 @@ public class MarketoWriteOperationTest {
     public void testCreateWriter() throws Exception {
         MarketoSink sink = new MarketoSink();
         TMarketoListOperationProperties plist = new TMarketoListOperationProperties("test");
+        plist.init();
         TMarketoOutputProperties pout = new TMarketoOutputProperties("test");
+        pout.init();
         TMarketoInputProperties pin = new TMarketoInputProperties("test");
+        pin.init();
         sink.initialize(null, null);
         wop = new MarketoWriteOperation(sink);
         assertNull(wop.createWriter(null));

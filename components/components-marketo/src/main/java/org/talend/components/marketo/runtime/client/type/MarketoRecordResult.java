@@ -36,6 +36,10 @@ public class MarketoRecordResult extends MarketoBaseResult<IndexedRecord> {
     }
 
     public List<IndexedRecord> getRecords() {
+        // ensure that records is never null
+        if (records == null) {
+            return new ArrayList<>();
+        }
         return records;
     }
 

@@ -49,6 +49,10 @@ public class MarketoBulkExecReader extends AbstractBoundedReader<IndexedRecord> 
 
     protected int apiCalls = 0;
 
+    protected int retryAttemps = 1;
+
+    protected int retryInterval;
+
     private static final I18nMessages messages = GlobalI18N.getI18nMessageProvider().getI18nMessages(MarketoBulkExecReader.class);
 
     private static final Logger LOG = LoggerFactory.getLogger(MarketoBulkExecReader.class);
@@ -58,25 +62,40 @@ public class MarketoBulkExecReader extends AbstractBoundedReader<IndexedRecord> 
         this.adaptor = adaptor;
         this.source = source;
         this.properties = properties;
+
+        retryAttemps = this.properties.getConnectionProperties().maxReconnAttemps.getValue();
+        retryInterval = this.properties.getConnectionProperties().attemptsIntervalTime.getValue();
     }
 
     @Override
     public boolean start() throws IOException {
         Boolean startable;
         client = (MarketoRESTClient) source.getClientService(null);
-        mktoResult = client.bulkImport(properties);
-        apiCalls++;
+        for (int i = 0; i < getRetryAttemps(); i++) {
+            apiCalls++;
+            mktoResult = client.bulkImport(properties);
+            if (!mktoResult.isSuccess()) {
+                if (properties.dieOnError.getValue()) {
+                    throw new MarketoRuntimeException(mktoResult.getErrorsString());
+                }
+                errorMessage = mktoResult.getErrorsString();
+                // is recoverable error
+                if (client.isErrorRecoverable(mktoResult.getErrors())) {
+                    LOG.debug("Recoverable error during operation : `{}`. Retrying...", errorMessage);
+                    waitForRetryAttempInterval();
+                    continue;
+                } else {
+                    LOG.error("Unrecoverable error : `{}`.", errorMessage);
+                    break;
+                }
+            } else {
+                break;
+            }
+        }
+        //
         startable = mktoResult.isSuccess();
         if (startable) {
             record = mktoResult.getRecords().get(0);
-        } else {
-            errorMessage = mktoResult.getErrors().size() > 0 ? mktoResult.getErrors().get(0).toString()
-                    : messages.getMessage("error.runtime.unknown");
-            if (properties.dieOnError.getValue()) {
-                throw new IOException(errorMessage);
-            } else {
-                LOG.error(errorMessage);
-            }
         }
         return startable;
     }
@@ -101,4 +120,24 @@ public class MarketoBulkExecReader extends AbstractBoundedReader<IndexedRecord> 
         res.put(RETURN_ERROR_MESSAGE, errorMessage);
         return res;
     }
+
+    public int getRetryAttemps() {
+        return retryAttemps;
+    }
+
+    public int getRetryInterval() {
+        return retryInterval;
+    }
+
+    /**
+     * Sleeps for retryInterval time
+     *
+     */
+    protected void waitForRetryAttempInterval() {
+        try {
+            Thread.sleep(getRetryInterval());
+        } catch (InterruptedException e) {
+        }
+    }
+
 }

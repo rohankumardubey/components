@@ -34,6 +34,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.talend.components.marketo.MarketoConstants;
 import org.talend.components.marketo.runtime.client.type.ListOperationParameters;
+import org.talend.components.marketo.runtime.client.type.MarketoError;
+import org.talend.components.marketo.runtime.client.type.MarketoException;
 import org.talend.components.marketo.runtime.client.type.MarketoRecordResult;
 import org.talend.components.marketo.runtime.client.type.MarketoSyncResult;
 import org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProperties.APIMode;
@@ -481,6 +483,18 @@ public class MarketoSOAPClientTest {
         mktoSR = client.syncMultipleLeads(oprops, Arrays.asList(record));
         assertNotNull(mktoSR);
         assertFalse(mktoSR.isSuccess());
+    }
+
+    @Test
+    public void testIsErrorRecoverable() throws Exception {
+        MarketoError error = new MarketoException("SOAP", "20016 Request Expired").toMarketoError();
+        assertTrue(client.isErrorRecoverable(Arrays.asList(error)));
+        for (String code : new String[] { "10001", "20011", "20023", "20024" }) {
+            error = new MarketoException("SOAP", String.format("SOAP %s Concurrency Limit Exceeded", code)).toMarketoError();
+            assertTrue(client.isErrorRecoverable(Arrays.asList(error)));
+        }
+        error = new MarketoException("SOAP", "404 Page not found").toMarketoError();
+        assertFalse(client.isErrorRecoverable(Arrays.asList(error)));
     }
 
 }

@@ -13,14 +13,11 @@
 package org.talend.components.marketo.runtime;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 
 import java.util.Collections;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.talend.components.api.component.runtime.Result;
 import org.talend.components.marketo.tmarketooutput.TMarketoOutputProperties;
 
 public class MarketoWriterTest extends MarketoRuntimeTestBase {
@@ -44,16 +41,6 @@ public class MarketoWriterTest extends MarketoRuntimeTestBase {
     @Test
     public void testGetWriteOperation() throws Exception {
         assertEquals(wop, writer.getWriteOperation());
-    }
-
-    @Test
-    public void testClose() throws Exception {
-        Result r = writer.close();
-        assertNotNull(r);
-        assertEquals(0, r.getTotalCount());
-        assertEquals(0, r.getSuccessCount());
-        assertEquals(0, r.getRejectCount());
-        assertNull(r.getuId());
     }
 
     @Test

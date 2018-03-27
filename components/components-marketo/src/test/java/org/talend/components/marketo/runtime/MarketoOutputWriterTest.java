@@ -156,6 +156,7 @@ public class MarketoOutputWriterTest extends MarketoRuntimeTestBase {
 
     @Test
     public void testClose() throws Exception {
+        writer.open("test");
         assertNotNull(writer.close());
         assertEquals(0, writer.result.totalCount);
     }
@@ -168,6 +169,91 @@ public class MarketoOutputWriterTest extends MarketoRuntimeTestBase {
     @Test
     public void testGetRejectedWrites() throws Exception {
         assertEquals(Collections.emptyList(), writer.getRejectedWrites());
+    }
+
+    @Test
+    public void testRetryOperationSuccess() throws Exception {
+        IndexedRecord record = new Record(MarketoConstants.getRESTOutputSchemaForSyncMultipleLeads());
+        record.put(0, 12345);
+        doReturn(getSuccessSyncResult("created")).when(client).syncMultipleLeads(any(TMarketoOutputProperties.class),
+                any(List.class));
+        props.outputOperation.setValue(OutputOperation.syncMultipleLeads);
+        props.updateSchemaRelated();
+        when(sink.getProperties()).thenReturn(props);
+        writer.open("test");
+        writer.write(record);
+        MarketoResult result = (MarketoResult) writer.close();
+        assertEquals(1, result.apiCalls);
+    }
+
+    @Test
+    public void testRetryOperationFailDieOnError() throws Exception {
+        IndexedRecord record = new Record(MarketoConstants.getRESTOutputSchemaForSyncMultipleLeads());
+        record.put(0, 12345);
+        doReturn(false).when(client).isErrorRecoverable(any(List.class));
+        doReturn(getFailedSyncResult("REST", "902", "Invalid operation")).when(client)
+                .syncMultipleLeads(any(TMarketoOutputProperties.class), any(List.class));
+        props.outputOperation.setValue(OutputOperation.syncMultipleLeads);
+        props.updateSchemaRelated();
+        when(sink.getProperties()).thenReturn(props);
+        writer.open("test");
+        try {
+            writer.write(record);
+            writer.close();
+            fail("Should not be here");
+        } catch (Exception e) {
+            assertTrue(e.getMessage().contains("902"));
+        }
+    }
+
+    @Test
+    public void testRetryOperationFailNonRecoverableErrror() throws Exception {
+        IndexedRecord record = new Record(MarketoConstants.getRESTOutputSchemaForSyncMultipleLeads());
+        record.put(0, 12345);
+        doReturn(false).when(client).isErrorRecoverable(any(List.class));
+        doReturn(getFailedSyncResult("REST", "902", "Invalid operation")).when(client)
+                .syncMultipleLeads(any(TMarketoOutputProperties.class), any(List.class));
+        props.dieOnError.setValue(false);
+        props.outputOperation.setValue(OutputOperation.syncMultipleLeads);
+        props.updateSchemaRelated();
+        when(sink.getProperties()).thenReturn(props);
+        writer.open("test");
+        writer.write(record);
+        MarketoResult result = (MarketoResult) writer.close();
+        assertEquals(1, result.apiCalls);
+        assertEquals(Collections.emptyList(), writer.getSuccessfulWrites());
+        List<IndexedRecord> rejects = writer.getRejectedWrites();
+        IndexedRecord reject = rejects.get(0);
+        assertNotNull(reject);
+        assertEquals("failed", reject.get(4));
+        assertTrue(String.valueOf(reject.get(5)).contains("902"));
+    }
+
+    @Test
+    public void testRetryOperationFailRecoverableErrror() throws Exception {
+        IndexedRecord record = new Record(MarketoConstants.getRESTOutputSchemaForSyncMultipleLeads());
+        record.put(0, 12345);
+        doReturn(getFailedSyncResult("REST", "602", "expired header")).when(client)
+                .syncMultipleLeads(any(TMarketoOutputProperties.class), any(List.class));
+        doReturn(true).when(client).isErrorRecoverable(any(List.class));
+        props.dieOnError.setValue(false);
+        props.outputOperation.setValue(OutputOperation.syncMultipleLeads);
+        props.updateSchemaRelated();
+        when(sink.getProperties()).thenReturn(props);
+        int minDelay = props.connection.maxReconnAttemps.getValue() * props.connection.attemptsIntervalTime.getValue();
+        long start = System.currentTimeMillis();
+        writer.open("test");
+        writer.write(record);
+        MarketoResult result = (MarketoResult) writer.close();
+        long end = System.currentTimeMillis();
+        assertEquals((long) props.connection.maxReconnAttemps.getValue(), result.apiCalls);
+        assertEquals(Collections.emptyList(), writer.getSuccessfulWrites());
+        assertTrue(minDelay <= (end - start));
+        List<IndexedRecord> rejects = writer.getRejectedWrites();
+        IndexedRecord reject = rejects.get(0);
+        assertNotNull(reject);
+        assertEquals("failed", reject.get(4));
+        assertTrue(String.valueOf(reject.get(5)).contains("602"));
     }
 
 }

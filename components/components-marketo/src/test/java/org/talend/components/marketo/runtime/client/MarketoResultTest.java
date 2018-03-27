@@ -16,11 +16,11 @@ import static java.util.Collections.emptyList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 
 import org.apache.avro.generic.GenericData.Record;
 import org.apache.avro.generic.IndexedRecord;
@@ -71,7 +71,7 @@ public class MarketoResultTest {
         assertTrue(result.isSuccess());
         assertNotNull(result.getErrors());
         result = new MarketoRecordResult("200", 200, 200, null);
-        assertNull(result.getRecords());
+        assertEquals(Collections.emptyList(), result.getRecords());
         assertEquals(200, result.getRecordCount());
         assertEquals(200, result.getRemainCount());
         assertEquals("200", result.getStreamPosition());

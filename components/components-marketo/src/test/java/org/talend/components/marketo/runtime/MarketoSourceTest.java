@@ -61,6 +61,7 @@ public class MarketoSourceTest extends MarketoRuntimeTestBase {
         //
         bulkProps = new TMarketoBulkExecProperties("test");
         bulkProps.setupProperties();
+        bulkProps.connection.init();
     }
 
     @Test

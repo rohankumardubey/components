@@ -113,34 +113,53 @@ public class MarketoOutputWriter extends MarketoWriter {
         if (recordsToProcess.isEmpty()) {
             return;
         }
-        switch (operation) {
-        case syncLead:
-            processResult(client.syncLead(properties, recordsToProcess.get(0)));
-            break;
-        case syncMultipleLeads:
-            processResult(client.syncMultipleLeads(properties, recordsToProcess));
-            break;
-        case deleteLeads:
-            processResult(((MarketoRESTClient) client).deleteLeads(recordsToProcess));
-            break;
-        case syncCustomObjects:
-            processResult(((MarketoRESTClient) client).syncCustomObjects(properties, recordsToProcess));
-            break;
-        case deleteCustomObjects:
-            processResult(((MarketoRESTClient) client).deleteCustomObjects(properties, recordsToProcess));
-            break;
+        MarketoSyncResult mktoResult = new MarketoSyncResult();
+        for (int i = 0; i < getRetryAttemps(); i++) {
+            result.apiCalls++;
+            switch (operation) {
+            case syncLead:
+                mktoResult = client.syncLead(properties, recordsToProcess.get(0));
+                break;
+            case syncMultipleLeads:
+                mktoResult = client.syncMultipleLeads(properties, recordsToProcess);
+                break;
+            case deleteLeads:
+                mktoResult = ((MarketoRESTClient) client).deleteLeads(recordsToProcess);
+                break;
+            case syncCustomObjects:
+                mktoResult = ((MarketoRESTClient) client).syncCustomObjects(properties, recordsToProcess);
+                break;
+            case deleteCustomObjects:
+                mktoResult = ((MarketoRESTClient) client).deleteCustomObjects(properties, recordsToProcess);
+                break;
+            }
+            //
+            if (!mktoResult.isSuccess()) {
+                if (dieOnError) {
+                    throw new MarketoRuntimeException(mktoResult.getErrorsString());
+                }
+                // is recoverable error
+                if (client.isErrorRecoverable(mktoResult.getErrors())) {
+                    LOG.debug("Recoverable error during operation : `{}`. Retrying...", mktoResult.getErrorsString());
+                    waitForRetryAttempInterval();
+                    continue;
+                } else {
+                    LOG.error("Unrecoverable error : `{}`.", mktoResult.getErrorsString());
+                    break;
+                }
+            } else {
+                break;
+            }
         }
+        processResult(mktoResult);
+        // clear the list
         recordsToProcess.clear();
     }
 
     public void processResult(MarketoSyncResult mktoResult) {
         successfulWrites.clear();
         rejectedWrites.clear();
-        result.apiCalls++;
         if (!mktoResult.isSuccess()) {
-            if (dieOnError) {
-                throw new MarketoRuntimeException(mktoResult.getErrorsString());
-            }
             // build a SyncStatus for record which failed
             SyncStatus status = new SyncStatus();
             status.setStatus("failed");
