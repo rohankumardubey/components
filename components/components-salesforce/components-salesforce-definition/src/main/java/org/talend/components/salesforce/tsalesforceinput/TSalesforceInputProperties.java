@@ -1,6 +1,6 @@
 // ============================================================================
 //
-// Copyright (C) 2006-2017 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2018 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
 // %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
@@ -37,10 +37,10 @@ import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.sandbox.SandboxedInstance;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
 import org.talend.daikon.serialize.PostDeserializeSetup;
 import org.talend.daikon.serialize.migration.SerializeSetVersion;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class TSalesforceInputProperties extends SalesforceConnectionModuleProperties implements SerializeSetVersion {
 
@@ -85,6 +85,8 @@ public class TSalesforceInputProperties extends SalesforceConnectionModuleProper
     public static final int DEFAULT_JOB_TIME_OUT = 0; // Default : no timeout to wait until the job fails or is in success
 
     public Property<Integer> jobTimeOut = newInteger("jobTimeOut");
+
+    public Property<Boolean> safetySwitch = newBoolean("safetySwitch", true);
 
     public Property<Boolean> pkChunking = newBoolean("pkChunking", false);
 
@@ -142,6 +144,7 @@ public class TSalesforceInputProperties extends SalesforceConnectionModuleProper
 
         Form advancedForm = getForm(Form.ADVANCED);
         advancedForm.addRow(jobTimeOut);
+        advancedForm.addRow(safetySwitch);
         advancedForm.addRow(pkChunking);
         advancedForm.addRow(chunkSize);
         advancedForm.addRow(chunkSleepTime);
@@ -246,6 +249,7 @@ public class TSalesforceInputProperties extends SalesforceConnectionModuleProper
         if (Form.ADVANCED.equals(form.getName())) {
             boolean isBulkQuery = queryMode.getValue().equals(QueryMode.Bulk);
             form.getWidget(jobTimeOut.getName()).setVisible(isBulkQuery);
+            form.getWidget(safetySwitch.getName()).setVisible(isBulkQuery);
             form.getWidget(pkChunking.getName()).setVisible(isBulkQuery);
             form.getWidget(chunkSize.getName()).setVisible(isBulkQuery && pkChunking.getValue());
             form.getWidget(chunkSleepTime.getName()).setVisible(isBulkQuery && pkChunking.getValue());
