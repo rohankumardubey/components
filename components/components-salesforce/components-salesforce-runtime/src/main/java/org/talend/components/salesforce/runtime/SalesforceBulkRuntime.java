@@ -1,6 +1,6 @@
 // ============================================================================
 //
-// Copyright (C) 2006-2017 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2018 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
 // %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
@@ -100,6 +100,8 @@ public class SalesforceBulkRuntime {
 
     private long awaitTime = 10000L;
 
+    private boolean safetySwitch = true;
+
     private int chunkSize;
 
     private int chunkSleepTime;
@@ -157,6 +159,10 @@ public class SalesforceBulkRuntime {
             timeout = TSalesforceInputProperties.DEFAULT_JOB_TIME_OUT;
         }
         this.jobTimeOut = timeout * 1000; // from seconds to milliseconds
+    }
+
+    public void setSafetySwitch(boolean safetySwitch) {
+        this.safetySwitch = safetySwitch;
     }
 
     private void setBulkOperation(String sObjectType, OutputAction userOperation, String externalIdFieldName,
@@ -552,6 +558,7 @@ public class SalesforceBulkRuntime {
                 new InputStreamReader(getQueryResultStream(job.getId(), batchInfoList.get(0).getId(), resultId), FILE_ENCODING)),
                 ',');
 
+        baseFileReader.setSafetySwitch(safetySwitch);
         if (baseFileReader.readRecord()) {
             baseFileHeader = Arrays.asList(baseFileReader.getValues());
         }
