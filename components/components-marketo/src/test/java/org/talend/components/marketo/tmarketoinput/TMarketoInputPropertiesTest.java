@@ -954,4 +954,115 @@ public class TMarketoInputPropertiesTest extends MarketoTestBase {
         }
     }
 
+    @Test
+    public void testLeadActivityVisibility() throws Exception {
+        String tl_setExcludeTypes = props.setExcludeTypes.getName();
+        String tl_excludeTypes = props.excludeTypes.getName();
+        String tl_setIncludeTypes = props.setIncludeTypes.getName();
+        String tl_includeTypes = props.includeTypes.getName();
+        props.refreshLayout(props.getForm(Form.MAIN));
+        Form f = props.getForm(Form.MAIN);
+        // leadActivity SOAP
+        props.connection.apiMode.setValue(APIMode.SOAP);
+        props.inputOperation.setValue(InputOperation.getLeadActivity);
+        props.refreshLayout(f);
+        assertTrue(f.getWidget(tl_setExcludeTypes).isVisible());
+        assertTrue(f.getWidget(tl_setIncludeTypes).isVisible());
+        assertFalse(f.getWidget(tl_excludeTypes).isVisible());
+        assertFalse(f.getWidget(tl_includeTypes).isVisible());
+        props.setExcludeTypes.setValue(true);
+        props.refreshLayout(f);
+        assertTrue(f.getWidget(tl_setExcludeTypes).isVisible());
+        assertTrue(f.getWidget(tl_setIncludeTypes).isVisible());
+        assertTrue(f.getWidget(tl_excludeTypes).isVisible());
+        assertFalse(f.getWidget(tl_includeTypes).isVisible());
+        props.setIncludeTypes.setValue(true);
+        props.refreshLayout(f);
+        assertTrue(f.getWidget(tl_setExcludeTypes).isVisible());
+        assertTrue(f.getWidget(tl_setIncludeTypes).isVisible());
+        assertTrue(f.getWidget(tl_excludeTypes).isVisible());
+        assertTrue(f.getWidget(tl_includeTypes).isVisible());
+        // leadActivity REST
+        props.connection.apiMode.setValue(APIMode.REST);
+        props.inputOperation.setValue(InputOperation.getLeadActivity);
+        props.refreshLayout(f);
+        props.setExcludeTypes.setValue(false);
+        props.setIncludeTypes.setValue(false);
+        props.refreshLayout(f);
+        assertTrue(f.getWidget(tl_setExcludeTypes).isVisible());
+        assertTrue(f.getWidget(tl_setIncludeTypes).isVisible());
+        assertFalse(f.getWidget(tl_excludeTypes).isVisible());
+        assertFalse(f.getWidget(tl_includeTypes).isVisible());
+        props.setExcludeTypes.setValue(true);
+        props.refreshLayout(f);
+        assertTrue(f.getWidget(tl_setExcludeTypes).isVisible());
+        assertFalse(f.getWidget(tl_setIncludeTypes).isVisible());
+        assertTrue(f.getWidget(tl_excludeTypes).isVisible());
+        assertFalse(f.getWidget(tl_includeTypes).isVisible());
+        props.setExcludeTypes.setValue(false);
+        props.setIncludeTypes.setValue(true);
+        props.refreshLayout(f);
+        assertFalse(f.getWidget(tl_setExcludeTypes).isVisible());
+        assertTrue(f.getWidget(tl_setIncludeTypes).isVisible());
+        assertFalse(f.getWidget(tl_excludeTypes).isVisible());
+        assertTrue(f.getWidget(tl_includeTypes).isVisible());
+    }
+
+    @Test
+    public void testLeadChangeVisibility() throws Exception {
+        String tl_setExcludeTypes = props.setExcludeTypes.getName();
+        String tl_excludeTypes = props.excludeTypes.getName();
+        String tl_setIncludeTypes = props.setIncludeTypes.getName();
+        String tl_includeTypes = props.includeTypes.getName();
+        props.refreshLayout(props.getForm(Form.MAIN));
+        Form f = props.getForm(Form.MAIN);
+        // leadChanges SOAP
+        props.connection.apiMode.setValue(APIMode.SOAP);
+        props.inputOperation.setValue(InputOperation.getLeadChanges);
+        props.setExcludeTypes.setValue(false);
+        props.setIncludeTypes.setValue(false);
+        props.refreshLayout(f);
+        assertTrue(f.getWidget(tl_setExcludeTypes).isVisible());
+        assertTrue(f.getWidget(tl_setIncludeTypes).isVisible());
+        assertFalse(f.getWidget(tl_excludeTypes).isVisible());
+        assertFalse(f.getWidget(tl_includeTypes).isVisible());
+        props.setExcludeTypes.setValue(true);
+        props.refreshLayout(f);
+        assertTrue(f.getWidget(tl_setExcludeTypes).isVisible());
+        assertTrue(f.getWidget(tl_setIncludeTypes).isVisible());
+        assertTrue(f.getWidget(tl_excludeTypes).isVisible());
+        assertFalse(f.getWidget(tl_includeTypes).isVisible());
+        props.setIncludeTypes.setValue(true);
+        props.refreshLayout(f);
+        assertTrue(f.getWidget(tl_setExcludeTypes).isVisible());
+        assertTrue(f.getWidget(tl_setIncludeTypes).isVisible());
+        assertTrue(f.getWidget(tl_excludeTypes).isVisible());
+        assertTrue(f.getWidget(tl_includeTypes).isVisible());
+        // leadChanges REST
+        props.connection.apiMode.setValue(APIMode.REST);
+        props.inputOperation.setValue(InputOperation.getLeadChanges);
+        props.refreshLayout(f);
+        assertFalse(f.getWidget(tl_setExcludeTypes).isVisible());
+        assertFalse(f.getWidget(tl_setIncludeTypes).isVisible());
+        assertFalse(f.getWidget(tl_excludeTypes).isVisible());
+        assertFalse(f.getWidget(tl_includeTypes).isVisible());
+    }
+
+    @Test
+    public void testAfterLeadKeyType() throws Exception {
+        Form f = props.getForm(Form.MAIN);
+        props.refreshLayout(f);
+        assertFalse(f.getWidget(props.customLeadKeyType.getName()).isVisible());
+        props.leadKeyTypeREST.setValue(LeadKeyTypeREST.sfdcAccountId);
+        props.afterLeadKeyTypeREST();
+        assertFalse(f.getWidget(props.customLeadKeyType.getName()).isVisible());
+        props.leadKeyTypeREST.setValue(LeadKeyTypeREST.Custom);
+        props.afterLeadKeyTypeREST();
+        assertTrue(f.getWidget(props.customLeadKeyType.getName()).isVisible());
+        props.inputOperation.setValue(InputOperation.getLeadActivity);
+        props.afterLeadKeyTypeREST();
+        assertFalse(f.getWidget(props.leadKeyTypeREST.getName()).isVisible());
+        assertFalse(f.getWidget(props.customLeadKeyType.getName()).isVisible());
+    }
+
 }
