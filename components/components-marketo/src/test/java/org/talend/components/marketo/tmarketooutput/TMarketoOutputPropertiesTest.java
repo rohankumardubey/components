@@ -12,7 +12,10 @@
 // ============================================================================
 package org.talend.components.marketo.tmarketooutput;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
@@ -86,7 +89,6 @@ public class TMarketoOutputPropertiesTest {
         assertEquals(RESTLookupFields.sfdcLeadId, RESTLookupFields.valueOf("sfdcLeadId"));
         assertEquals(RESTLookupFields.sfdcLeadOwnerId, RESTLookupFields.valueOf("sfdcLeadOwnerId"));
         assertEquals(RESTLookupFields.sfdcOpptyId, RESTLookupFields.valueOf("sfdcOpptyId"));
-        assertEquals(RESTLookupFields.Custom, RESTLookupFields.valueOf("Custom"));
 
         assertEquals(CustomObjectDeleteBy.idField, CustomObjectDeleteBy.valueOf("idField"));
         assertEquals(CustomObjectDeleteBy.dedupeFields, CustomObjectDeleteBy.valueOf("dedupeFields"));
@@ -258,20 +260,4 @@ public class TMarketoOutputPropertiesTest {
         assertFalse(props.postDeserialize(0, null, false));
     }
 
-    @Test
-    public void testAfterLookupField() throws Exception {
-        Form f = props.getForm(Form.MAIN);
-        props.refreshLayout(f);
-        assertFalse(f.getWidget(props.customLookupField.getName()).isVisible());
-        props.lookupField.setValue(RESTLookupFields.sfdcAccountId);
-        props.afterLookupField();
-        assertFalse(f.getWidget(props.customLookupField.getName()).isVisible());
-        props.lookupField.setValue(RESTLookupFields.Custom);
-        props.afterLookupField();
-        assertTrue(f.getWidget(props.customLookupField.getName()).isVisible());
-        props.outputOperation.setValue(OutputOperation.deleteLeads);
-        props.afterOutputOperation();
-        assertFalse(f.getWidget(props.lookupField.getName()).isVisible());
-        assertFalse(f.getWidget(props.customLookupField.getName()).isVisible());
-    }
 }

@@ -93,8 +93,7 @@ public class TMarketoInputProperties extends MarketoComponentWizardBasePropertie
         sfdcContactId,
         sfdcLeadId,
         sfdcLeadOwnerId,
-        sfdcOpptyId,
-        Custom
+        sfdcOpptyId
     }
 
     public enum LeadKeyTypeSOAP {
@@ -262,8 +261,6 @@ public class TMarketoInputProperties extends MarketoComponentWizardBasePropertie
 
     public Property<LeadKeyTypeSOAP> leadKeyTypeSOAP = newEnum("leadKeyTypeSOAP", LeadKeyTypeSOAP.class);
 
-    public Property<String> customLeadKeyType = newString("customLeadKeyType");
-
     public Property<String> leadKeyValue = newString("leadKeyValue");
 
     public Property<String> leadKeyValues = newString("leadKeyValues");
@@ -349,7 +346,6 @@ public class TMarketoInputProperties extends MarketoComponentWizardBasePropertie
         leadSelectorSOAP.setValue(LeadSelector.LeadKeySelector);
         leadSelectorREST.setPossibleValues(LeadSelector.LeadKeySelector, LeadSelector.StaticListSelector);
         leadSelectorREST.setValue(LeadSelector.LeadKeySelector);
-        customLeadKeyType.setValue("");
         setIncludeTypes.setValue(false);
         includeTypes.type.setPossibleValues((Object[]) IncludeExcludeFieldsREST.values());
         setExcludeTypes.setValue(false);
@@ -412,7 +408,6 @@ public class TMarketoInputProperties extends MarketoComponentWizardBasePropertie
         mainForm.addRow(leadSelectorREST);
         mainForm.addColumn(leadKeyTypeREST);
         mainForm.addColumn(leadKeyTypeSOAP);
-        mainForm.addColumn(customLeadKeyType);
         mainForm.addColumn(leadKeyValue);
         mainForm.addColumn(leadKeyValues);
         //
@@ -451,7 +446,6 @@ public class TMarketoInputProperties extends MarketoComponentWizardBasePropertie
             form.getWidget(leadSelectorREST.getName()).setVisible(false);
             form.getWidget(leadKeyTypeSOAP.getName()).setVisible(false);
             form.getWidget(leadKeyTypeREST.getName()).setVisible(false);
-            form.getWidget(customLeadKeyType.getName()).setVisible(false);
             form.getWidget(leadKeyValue.getName()).setVisible(false);
             form.getWidget(leadKeyValues.getName()).setVisible(false);
             form.getWidget(listParam.getName()).setVisible(false);
@@ -492,9 +486,6 @@ public class TMarketoInputProperties extends MarketoComponentWizardBasePropertie
                     form.getWidget(leadKeyTypeSOAP.getName()).setVisible(true);
                 } else {
                     form.getWidget(leadKeyTypeREST.getName()).setVisible(true);
-                    if (LeadKeyTypeREST.Custom.equals(leadKeyTypeREST.getValue())) {
-                        form.getWidget(customLeadKeyType.getName()).setVisible(true);
-                    }
                 }
             }
             // getMultipleLeads
@@ -526,9 +517,6 @@ public class TMarketoInputProperties extends MarketoComponentWizardBasePropertie
                     switch (leadSelectorREST.getValue()) {
                     case LeadKeySelector:
                         form.getWidget(leadKeyTypeREST.getName()).setVisible(true);
-                        if (LeadKeyTypeREST.Custom.equals(leadKeyTypeREST.getValue())) {
-                            form.getWidget(customLeadKeyType.getName()).setVisible(true);
-                        }
                         form.getWidget(leadKeyValues.getName()).setVisible(true);
                         break;
                     case StaticListSelector:
@@ -729,10 +717,6 @@ public class TMarketoInputProperties extends MarketoComponentWizardBasePropertie
     }
 
     public void afterListParam() {
-        refreshLayout(getForm(Form.MAIN));
-    }
-
-    public void afterLeadKeyTypeREST() {
         refreshLayout(getForm(Form.MAIN));
     }
 
