@@ -12,11 +12,11 @@
 // ============================================================================
 package org.talend.components.marketo;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import static org.talend.daikon.properties.property.PropertyFactory.newEnum;
 
-import org.apache.avro.Schema;
+import java.util.LinkedHashMap;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.Connector;
@@ -27,6 +27,7 @@ import org.talend.components.common.SchemaProperties;
 import org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProperties;
 import org.talend.components.marketo.tmarketoconnection.TMarketoConnectionProperties.APIMode;
 import org.talend.daikon.properties.presentation.Form;
+import org.talend.daikon.properties.property.Property;
 
 public abstract class MarketoComponentProperties extends FixedConnectorsComponentProperties
         implements MarketoProvideConnectionProperties {
@@ -95,38 +96,7 @@ public abstract class MarketoComponentProperties extends FixedConnectorsComponen
     }
 
     public List<String> getSchemaFields() {
-        return getSchemaFields(schemaInput.schema.getValue());
-    }
-
-    public List<String> getSchemaFields(Schema schema) {
-        List<String> fieldNames = new ArrayList<>();
-        for (Schema.Field f : schema.getFields()) {
-            fieldNames.add(f.name());
-        }
-        return fieldNames;
-    }
-
-    public Schema newSchema(Schema metadataSchema, String newSchemaName, List<Schema.Field> moreFields) {
-        Schema newSchema = Schema.createRecord(newSchemaName, metadataSchema.getDoc(), metadataSchema.getNamespace(),
-                metadataSchema.isError());
-
-        List<Schema.Field> copyFieldList = new ArrayList<>();
-        for (Schema.Field se : metadataSchema.getFields()) {
-            Schema.Field field = new Schema.Field(se.name(), se.schema(), se.doc(), se.defaultVal(), se.order());
-            field.getObjectProps().putAll(se.getObjectProps());
-            for (Map.Entry<String, Object> entry : se.getObjectProps().entrySet()) {
-                field.addProp(entry.getKey(), entry.getValue());
-            }
-            copyFieldList.add(field);
-        }
-        copyFieldList.addAll(moreFields);
-
-        newSchema.setFields(copyFieldList);
-        for (Map.Entry<String, Object> entry : metadataSchema.getObjectProps().entrySet()) {
-            newSchema.addProp(entry.getKey(), entry.getValue());
-        }
-
-        return newSchema;
+        return MarketoUtils.getSchemaFields(schemaInput.schema.getValue());
     }
 
     @Override
@@ -142,4 +112,36 @@ public abstract class MarketoComponentProperties extends FixedConnectorsComponen
         return APIMode.REST.equals(getConnectionProperties().apiMode.getValue());
     }
 
+    protected <T extends Enum<T>> Property<T> checkForInvalidStoredEnumProperty(Property<T> property, Class<T> fixEnum) {
+        String name = property.getName();
+        Object o;
+        String value = null;
+        LinkedHashMap ov;
+        if (property.getStoredValue() instanceof Enum && fixEnum.getCanonicalName().equals(property.getType())) {
+            return property;
+        }
+        o = property.getStoredValue();
+        if (o instanceof LinkedHashMap) {
+            ov = (LinkedHashMap) o;
+            value = String.valueOf(ov.get("name"));
+        }
+        if (o instanceof String || o instanceof Enum) {
+            value = String.valueOf(o);
+        }
+        if (value == null) {
+            LOG.warn("[checkForInvalidStoredEnumProperty] Cannot determine value for enum {} stored value: {} ({}).", name, o,
+                    o.getClass().getCanonicalName());
+            return property;
+        }
+        try {
+            LOG.warn("[checkForInvalidStoredEnumProperty] Fixing enum {} value: {}", name, value);
+            property = newEnum(name, fixEnum);
+            property.setValue(Enum.valueOf(fixEnum, value));
+            property.setStoredValue(Enum.valueOf(fixEnum, value));
+            property.setPossibleValues(fixEnum.getEnumConstants());
+        } catch (Exception e) {
+            LOG.error("[checkForInvalidStoredEnumProperty] Error during {} fix: {}.", name, e);
+        }
+        return property;
+    }
 }

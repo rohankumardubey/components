@@ -12,13 +12,12 @@
 // ============================================================================
 package org.talend.components.marketo.runtime.client;
 
-import static java.util.Arrays.asList;
-import static org.talend.components.marketo.MarketoConstants.FIELD_ERROR_MSG;
-import static org.talend.components.marketo.MarketoConstants.FIELD_STATUS;
+import static org.talend.components.marketo.MarketoConstants.FIELD_MARKETO_GUID;
 import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.LeadSelector.LeadKeySelector;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,18 +26,18 @@ import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
 import org.apache.avro.generic.GenericData.Record;
 import org.apache.avro.generic.IndexedRecord;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.marketo.runtime.client.rest.response.DescribeFieldsResult;
 import org.talend.components.marketo.runtime.client.rest.response.LeadActivitiesResult;
 import org.talend.components.marketo.runtime.client.rest.response.LeadChangesResult;
 import org.talend.components.marketo.runtime.client.rest.response.LeadResult;
+import org.talend.components.marketo.runtime.client.rest.response.PaginateResult;
 import org.talend.components.marketo.runtime.client.rest.response.StaticListResult;
-import org.talend.components.marketo.runtime.client.rest.response.SyncResult;
 import org.talend.components.marketo.runtime.client.rest.type.FieldDescription;
 import org.talend.components.marketo.runtime.client.rest.type.LeadActivityRecord;
 import org.talend.components.marketo.runtime.client.rest.type.LeadChangeRecord;
-import org.talend.components.marketo.runtime.client.rest.type.ListRecord;
 import org.talend.components.marketo.runtime.client.type.ListOperationParameters;
 import org.talend.components.marketo.runtime.client.type.MarketoException;
 import org.talend.components.marketo.runtime.client.type.MarketoRecordResult;
@@ -48,6 +47,7 @@ import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties;
 import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.IncludeExcludeFieldsREST;
 import org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.ListParam;
 import org.talend.components.marketo.tmarketooutput.TMarketoOutputProperties;
+import org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties.InputOperation;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -90,6 +90,8 @@ public class MarketoLeadClient extends MarketoBaseRESTClient implements MarketoC
     public static final String FIELD_PRIMARY_ATTRIBUTE_VALUE = "primaryAttributeValue";
 
     public static final String FIELD_PRIMARY_ATTRIBUTE_VALUE_ID = "primaryAttributeValueId";
+
+    public static final String FIELD_CAMPAIGN_ID = "campaignId";
 
     public static final String API_PATH_LIST = "/v1/list/";
 
@@ -175,10 +177,10 @@ public class MarketoLeadClient extends MarketoBaseRESTClient implements MarketoC
         };
     }
 
-    public List<IndexedRecord> convertLeadRecords(List<Map<String, String>> recordList, Schema schema,
+    public List<IndexedRecord> convertLeadRecords(List<Map<String, String>> records, Schema schema,
             Map<String, String> mappings) {
         List<IndexedRecord> results = new ArrayList<>();
-        for (Map<String, String> input : recordList) {
+        for (Map<String, String> input : records) {
             IndexedRecord record = new Record(schema);
             for (Field f : schema.getFields()) {
                 String col = mappings.get(f.name());
@@ -195,26 +197,39 @@ public class MarketoLeadClient extends MarketoBaseRESTClient implements MarketoC
     public List<IndexedRecord> convertLeadActivityRecords(List<LeadActivityRecord> recordList, Schema schema,
             Map<String, String> mappings) {
         List<IndexedRecord> results = new ArrayList<>();
-
         for (LeadActivityRecord input : recordList) {
             IndexedRecord record = new Record(schema);
             for (Field f : schema.getFields()) {
                 String col = mappings.get(f.name());
-                if (col.equals(FIELD_ID)) {
+                switch (col) {
+                case FIELD_ID:
                     record.put(f.pos(), input.getId());
-                } else if (col.equals(FIELD_LEAD_ID)) {
+                    break;
+                case FIELD_MARKETO_GUID:
+                    record.put(f.pos(), input.getMarketoGUID());
+                    break;
+                case FIELD_LEAD_ID:
                     record.put(f.pos(), input.getLeadId());
-                } else if (col.equals(FIELD_ACTIVITY_DATE)) {
-                    record.put(f.pos(), input.getActivityDate());
-                } else if (col.equals(FIELD_ACTIVITY_TYPE_ID)) {
+                    break;
+                case FIELD_ACTIVITY_DATE:
+                    record.put(f.pos(), input.getActivityDate().getTime());
+                    break;
+                case FIELD_ACTIVITY_TYPE_ID:
                     record.put(f.pos(), input.getActivityTypeId());
-                } else if (col.equals(FIELD_ACTIVITY_TYPE_VALUE)) {
+                    break;
+                case FIELD_ACTIVITY_TYPE_VALUE:
                     record.put(f.pos(), getActivityTypeNameById(input.getActivityTypeId()));
-                } else if (col.equals(FIELD_PRIMARY_ATTRIBUTE_VALUE_ID)) {
+                    break;
+                case FIELD_PRIMARY_ATTRIBUTE_VALUE_ID:
                     record.put(f.pos(), input.getPrimaryAttributeValueId());
-                } else if (col.equals(FIELD_PRIMARY_ATTRIBUTE_VALUE)) {
+                    break;
+                case FIELD_PRIMARY_ATTRIBUTE_VALUE:
                     record.put(f.pos(), input.getPrimaryAttributeValue());
-                } else {
+                    break;
+                case FIELD_CAMPAIGN_ID:
+                    record.put(f.pos(), input.getCampaignId());
+                    break;
+                default:
                     String attr = input.getMktoAttributes().get(col);
                     if (attr != null) {
                         record.put(f.pos(), attr);
@@ -230,24 +245,36 @@ public class MarketoLeadClient extends MarketoBaseRESTClient implements MarketoC
             Map<String, String> mappings) {
         List<IndexedRecord> results = new ArrayList<>();
         Gson gson = new Gson();
-
         for (LeadChangeRecord input : recordList) {
             IndexedRecord record = new Record(schema);
             for (Field f : schema.getFields()) {
                 String col = mappings.get(f.name());
-                if (col.equals(FIELD_ID)) {
+                switch (col) {
+                case FIELD_ID:
                     record.put(f.pos(), input.getId());
-                } else if (col.equals(FIELD_LEAD_ID)) {
+                    break;
+                case FIELD_MARKETO_GUID:
+                    record.put(f.pos(), input.getMarketoGUID());
+                    break;
+                case FIELD_LEAD_ID:
                     record.put(f.pos(), input.getLeadId());
-                } else if (col.equals(FIELD_ACTIVITY_DATE)) {
-                    record.put(f.pos(), input.getActivityDate());
-                } else if (col.equals(FIELD_ACTIVITY_TYPE_ID)) {
+                    break;
+                case FIELD_ACTIVITY_DATE:
+                    record.put(f.pos(), input.getActivityDate().getTime());
+                    break;
+                case FIELD_ACTIVITY_TYPE_ID:
                     record.put(f.pos(), input.getActivityTypeId());
-                } else if (col.equals(FIELD_ACTIVITY_TYPE_VALUE)) {
+                    break;
+                case FIELD_ACTIVITY_TYPE_VALUE:
                     record.put(f.pos(), getActivityTypeNameById(input.getActivityTypeId()));
-                } else if (col.equals(FIELD_FIELDS)) {
+                    break;
+                case FIELD_FIELDS:
                     record.put(f.pos(), gson.toJson(input.getFields()));
-                } else {
+                    break;
+                case FIELD_CAMPAIGN_ID:
+                    record.put(f.pos(), input.getCampaignId());
+                    break;
+                default:
                     String attr = input.getMktoAttributes().get(col);
                     if (attr != null) {
                         record.put(f.pos(), attr);
@@ -268,18 +295,66 @@ public class MarketoLeadClient extends MarketoBaseRESTClient implements MarketoC
         if (getResponse == null) {
             throw new MarketoException(REST, messages.getMessage("error.response.null"));
         }
-        if (getResponse != null && getResponse.isSuccess()) {
-            if (getResponse.getResult().size() > 0) {
-                for (ListRecord listObject : getResponse.getResult()) {
-                    return listObject.getId();
-                }
-            } else {
-                throw new MarketoException(REST, "No list match `" + listName + "`.");
-            }
-        } else if (!getResponse.isSuccess()) {
+        if (!getResponse.isSuccess()) {
             throw new MarketoException(REST, getResponse.getErrors().toString());
         }
-        return null;
+        if (getResponse.getResult().isEmpty()) {
+            throw new MarketoException(REST, "No list match `" + listName + "`.");
+        }
+        return getResponse.getResult().get(0).getId();
+    }
+
+    public MarketoRecordResult getRecordResultForLead(InputOperation operation, String requestParams, int limit, Schema schema,
+            Map<String, String> mappings) {
+        MarketoRecordResult mkto = new MarketoRecordResult();
+        try {
+            PaginateResult result = null;
+            switch (operation) {
+            case getLead:
+            case getMultipleLeads:
+                result = executeFakeGetRequestForLead(requestParams);
+                break;
+            case getLeadActivity:
+                result = (LeadActivitiesResult) executeGetRequest(LeadActivitiesResult.class);
+                break;
+            case getLeadChanges:
+                result = (LeadChangesResult) executeGetRequest(LeadChangesResult.class);
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid operation for getRecordResultForLead: " + operation);
+            }
+            mkto.setSuccess(result.isSuccess());
+            if (mkto.isSuccess()) {
+                mkto.setRecordCount(result.getResult().isEmpty() ? 0 : result.getResult().size());
+                mkto.setRemainCount((result.getNextPageToken() != null) ? limit : 0);
+                mkto.setStreamPosition(result.getNextPageToken());
+                if (mkto.getRecordCount() > 0) {
+                    switch (operation) {
+                    case getLead:
+                    case getMultipleLeads:
+                        mkto.setRecords(convertLeadRecords(((LeadResult) result).getResult(), schema, mappings));
+                        break;
+                    case getLeadActivity:
+                        mkto.setRecords(
+                                convertLeadActivityRecords(((LeadActivitiesResult) result).getResult(), schema, mappings));
+                        break;
+                    case getLeadChanges:
+                        mkto.setRecords(convertLeadChangesRecords(((LeadChangesResult) result).getResult(), schema, mappings));
+                        break;
+                    default:
+                        throw new IllegalArgumentException("Invalid operation for getRecordResultForLead: " + operation);
+                    }
+                }
+            } else {
+                mkto.setErrors(result.getErrors());
+            }
+        } catch (MarketoException e) {
+            LOG.error("Error {}.", e.toString());
+            mkto.setSuccess(false);
+            mkto.setErrors(Collections.singletonList(e.toMarketoError()));
+        }
+
+        return mkto;
     }
 
     @Override
@@ -290,42 +365,24 @@ public class MarketoLeadClient extends MarketoBaseRESTClient implements MarketoC
                 .toArray(new String[] {});
         int batchLimit = parameters.batchSize.getValue() > REST_API_BATCH_LIMIT ? REST_API_BATCH_LIMIT
                 : parameters.batchSize.getValue();
-        MarketoRecordResult mkto = new MarketoRecordResult();
-        LeadResult result;
-        try {
-            current_uri = new StringBuilder(basicPath) //
-                    .append(API_PATH_LEADS)//
-                    .append(fmtParams(FIELD_ACCESS_TOKEN, accessToken, true));
-            StringBuilder input = new StringBuilder();
-            input.append(FIELD_FILTER_TYPE + "=" + filter);
-            input.append(fmtParams(FIELD_FILTER_VALUES, filterValue));
-            input.append(fmtParams(FIELD_BATCH_SIZE, batchLimit));
-            if (offset != null && offset.length() > 0) {
-                input.append(fmtParams(FIELD_NEXT_PAGE_TOKEN, offset));
-            }
-            if (fields != null && fields.length > 0) {
-                input.append(fmtParams(FIELD_FIELDS, csvString(fields)));
-            }
-            LOG.debug("getLead: {} body : {}", current_uri, input);
-            result = executeFakeGetRequestForLead(input.toString());
-            mkto.setSuccess(result.isSuccess());
-            if (mkto.isSuccess()) {
-                mkto.setRecordCount(result.getResult().isEmpty() ? 0 : result.getResult().size());
-                mkto.setRemainCount((result.getNextPageToken() != null) ? batchLimit : 0);
-                mkto.setStreamPosition(result.getNextPageToken());
-                if (mkto.getRecordCount() > 0) {
-                    mkto.setRecords(convertLeadRecords(result.getResult(), parameters.schemaInput.schema.getValue(),
-                            parameters.mappingInput.getNameMappingsForMarketo()));
-                }
-            } else {
-                mkto.setErrors(Arrays.asList(result.getErrors().get(0)));
-            }
-        } catch (MarketoException e) {
-            LOG.error("Lead error {}.", e.toString());
-            mkto.setSuccess(false);
-            mkto.setErrors(Arrays.asList(e.toMarketoError()));
+
+        current_uri = new StringBuilder(basicPath) //
+                .append(API_PATH_LEADS)//
+                .append(fmtParams(FIELD_ACCESS_TOKEN, accessToken, true));
+        StringBuilder input = new StringBuilder();
+        input.append(FIELD_FILTER_TYPE + "=" + filter);
+        input.append(fmtParams(FIELD_FILTER_VALUES, filterValue));
+        input.append(fmtParams(FIELD_BATCH_SIZE, batchLimit));
+        if (offset != null && offset.length() > 0) {
+            input.append(fmtParams(FIELD_NEXT_PAGE_TOKEN, offset));
         }
-        return mkto;
+        if (fields != null && fields.length > 0) {
+            input.append(fmtParams(FIELD_FIELDS, csvString(fields)));
+        }
+        LOG.debug("getLead: {} body : {}", current_uri, input);
+
+        return getRecordResultForLead(parameters.inputOperation.getValue(), input.toString(), batchLimit,
+                parameters.schemaInput.schema.getValue(), parameters.mappingInput.getNameMappingsForMarketo());
     }
 
     @Override
@@ -336,71 +393,59 @@ public class MarketoLeadClient extends MarketoBaseRESTClient implements MarketoC
                 .toArray(new String[] {});
         int batchLimit = parameters.batchSize.getValue() > REST_API_BATCH_LIMIT ? REST_API_BATCH_LIMIT
                 : parameters.batchSize.getValue();
-        MarketoRecordResult mkto = new MarketoRecordResult();
-        LeadResult result;
-        try {
-            StringBuilder input = new StringBuilder();
+        StringBuilder input = new StringBuilder();
 
-            if (parameters.leadSelectorREST.getValue().equals(LeadKeySelector)) {
-                filter = parameters.leadKeyTypeREST.getValue().toString();
-                filterValues = parameters.leadKeyValues.getValue().split(",");
-                current_uri = new StringBuilder(basicPath)//
-                        .append(MarketoRESTClient.API_PATH_LEADS) //
-                        .append(fmtParams(FIELD_ACCESS_TOKEN, accessToken, true));
+        if (parameters.leadSelectorREST.getValue().equals(LeadKeySelector)) {
+            filter = parameters.leadKeyTypeREST.getValue().toString();
+            filterValues = parameters.leadKeyValues.getValue().split(",");
+            current_uri = new StringBuilder(basicPath)//
+                    .append(API_PATH_LEADS) //
+                    .append(fmtParams(FIELD_ACCESS_TOKEN, accessToken, true));
 
-                input.append(FIELD_FILTER_TYPE + "=" + filter);
-                if (fields != null && fields.length > 0) {
-                    input.append(fmtParams(FIELD_FIELDS, csvString(fields)));
-                }
-                if (filterValues != null && filterValues.length > 0) {
-                    input.append(fmtParams(FIELD_FILTER_VALUES, csvString(filterValues)));
-                }
-                input.append(fmtParams(FIELD_BATCH_SIZE, batchLimit));
-                if (offset != null && offset.length() > 0) {
-                    input.append(fmtParams(FIELD_NEXT_PAGE_TOKEN, offset));
-                }
-                LOG.debug("MultipleLeads: {} body{}", current_uri, input);
-                result = executeFakeGetRequestForLead(input.toString());
-            } else {
-                int listId;
-                if (parameters.listParam.getValue().equals(ListParam.STATIC_LIST_NAME)) {
+            input.append(FIELD_FILTER_TYPE + "=" + filter);
+            if (fields != null && fields.length > 0) {
+                input.append(fmtParams(FIELD_FIELDS, csvString(fields)));
+            }
+            if (filterValues != null && filterValues.length > 0) {
+                input.append(fmtParams(FIELD_FILTER_VALUES, csvString(filterValues)));
+            }
+            input.append(fmtParams(FIELD_BATCH_SIZE, batchLimit));
+            if (offset != null && offset.length() > 0) {
+                input.append(fmtParams(FIELD_NEXT_PAGE_TOKEN, offset));
+            }
+            LOG.debug("MultipleLeads: {} body{}", current_uri, input);
+        } else {
+            int listId;
+            if (parameters.listParam.getValue().equals(ListParam.STATIC_LIST_NAME)) {
+                try {
                     listId = getListIdByName(parameters.listParamListName.getValue());
-                } else {
-                    listId = parameters.listParamListId.getValue();
-                }
-                current_uri = new StringBuilder(basicPath) //
-                        .append(API_PATH_LIST)//
-                        .append(listId)//
-                        .append(API_PATH_LEADS_JSON)//
-                        .append(fmtParams(FIELD_ACCESS_TOKEN, accessToken, true));
-                if (fields != null && fields.length > 0) {
-                    input.append(fmtParams(FIELD_FIELDS, csvString(fields)));
-                }
-                input.append(fmtParams(FIELD_BATCH_SIZE, batchLimit));
-                if (offset != null) {
-                    input.append(fmtParams(FIELD_NEXT_PAGE_TOKEN, offset));
-                }
-                LOG.debug("LeadsByList : {} body: {}.", current_uri, input);
-                result = executeFakeGetRequestForLead(input.toString());
-            }
-            mkto.setSuccess(result.isSuccess());
-            if (mkto.isSuccess()) {
-                mkto.setRecordCount(result.getResult().isEmpty() ? 0 : result.getResult().size());
-                mkto.setRemainCount((result.getNextPageToken() != null) ? batchLimit : 0);
-                mkto.setStreamPosition(result.getNextPageToken());
-                if (mkto.getRecordCount() > 0) {
-                    mkto.setRecords(convertLeadRecords(result.getResult(), parameters.schemaInput.schema.getValue(),
-                            parameters.mappingInput.getNameMappingsForMarketo()));
+                } catch (MarketoException e) {
+                    LOG.error("getListIdByName Error: `{}`.", e.toString());
+                    MarketoRecordResult mkto = new MarketoRecordResult();
+                    mkto.setSuccess(false);
+                    mkto.setErrors(Collections.singletonList(e.toMarketoError()));
+                    return mkto;
                 }
             } else {
-                mkto.setErrors(Arrays.asList(result.getErrors().get(0)));
+                listId = parameters.listParamListId.getValue();
             }
-        } catch (MarketoException e) {
-            LOG.error("MultipleLeads error {}.", e.toString());
-            mkto.setSuccess(false);
-            mkto.setErrors(Arrays.asList(e.toMarketoError()));
+            current_uri = new StringBuilder(basicPath) //
+                    .append(API_PATH_LIST)//
+                    .append(listId)//
+                    .append(API_PATH_LEADS_JSON)//
+                    .append(fmtParams(FIELD_ACCESS_TOKEN, accessToken, true));
+            if (fields != null && fields.length > 0) {
+                input.append(fmtParams(FIELD_FIELDS, csvString(fields)));
+            }
+            input.append(fmtParams(FIELD_BATCH_SIZE, batchLimit));
+            if (offset != null) {
+                input.append(fmtParams(FIELD_NEXT_PAGE_TOKEN, offset));
+            }
+            LOG.debug("LeadsByList : {} body: {}.", current_uri, input);
         }
-        return mkto;
+
+        return getRecordResultForLead(parameters.inputOperation.getValue(), input.toString(), batchLimit,
+                parameters.schemaInput.schema.getValue(), parameters.mappingInput.getNameMappingsForMarketo());
     }
 
     @Override
@@ -411,6 +456,7 @@ public class MarketoLeadClient extends MarketoBaseRESTClient implements MarketoC
                 : new ArrayList<String>();
         int batchLimit = parameters.batchSize.getValue() > REST_API_BATCH_LIMIT ? REST_API_BATCH_LIMIT
                 : parameters.batchSize.getValue();
+        String pgOffset = offset;
         List<Integer> activityTypeIds = new ArrayList<>();
         // no activity provided, we take all
         if (incs.isEmpty()) {
@@ -424,57 +470,36 @@ public class MarketoLeadClient extends MarketoBaseRESTClient implements MarketoC
                 }
             }
         }
-        // remove unwanted activities
-        if (!excs.isEmpty()) {
-            for (String s : excs) {
-                if (incs.contains(s)) {
-                    incs.remove(s);
-                }
-            }
-        }
         // translate into ids
         for (String i : incs) {
             activityTypeIds.add(IncludeExcludeFieldsREST.valueOf(i).fieldVal);
         }
-        MarketoRecordResult mkto = new MarketoRecordResult();
-        LeadActivitiesResult result;
-        try {
-            if (offset == null) {
-                offset = getPageToken(sinceDateTime);
+        if (pgOffset == null) {
+            try {
+                pgOffset = getPageToken(sinceDateTime);
+            } catch (MarketoException e) {
+                LOG.error("getPageToken Error: `{}`.", e.toString());
+                MarketoRecordResult mkto = new MarketoRecordResult();
+                mkto.setSuccess(false);
+                mkto.setErrors(Collections.singletonList(e.toMarketoError()));
+                return mkto;
             }
-            // Marketo API in SOAP and REST return a false estimation of remainCount. Watch out !!!
-            current_uri = new StringBuilder(basicPath) //
-                    .append(API_PATH_ACTIVITIES) //
-                    .append(fmtParams(FIELD_ACCESS_TOKEN, accessToken, true));
-            if (offset != null && offset.length() > 0) {
-                current_uri.append(fmtParams(FIELD_NEXT_PAGE_TOKEN, offset));
-            }
-            if (activityTypeIds != null) {
-                current_uri.append(fmtParams(FIELD_ACTIVITY_TYPE_IDS, csvString(activityTypeIds.toArray())));
-            }
-            current_uri.append(fmtParams(FIELD_BATCH_SIZE, batchLimit));
-            // if (listId != null) { webClient.query(FIELD_LISTID, listId);}
-            // if (leadIds != null) { webClient.query(FIELD_LEADIDS, csvString(leadIds)); }
-            LOG.debug("Activities: {}.", current_uri);
-            result = (LeadActivitiesResult) executeGetRequest(LeadActivitiesResult.class);
-            mkto.setSuccess(result.isSuccess());
-            if (mkto.isSuccess()) {
-                mkto.setRecordCount(result.getResult() == null ? 0 : result.getResult().size());
-                mkto.setRemainCount((result.getNextPageToken() != null && result.isMoreResult()) ? batchLimit : 0);
-                mkto.setStreamPosition(result.getNextPageToken());
-                if (mkto.getRecordCount() > 0) {
-                    mkto.setRecords(convertLeadActivityRecords(result.getResult(), parameters.schemaInput.schema.getValue(),
-                            parameters.mappingInput.getNameMappingsForMarketo()));
-                }
-            } else {
-                mkto.setErrors(Arrays.asList(result.getErrors().get(0)));
-            }
-        } catch (MarketoException e) {
-            LOG.error("LeadActivities error {}.", e.toString());
-            mkto.setSuccess(false);
-            mkto.setErrors(Arrays.asList(e.toMarketoError()));
         }
-        return mkto;
+        // Marketo API in SOAP and REST return a false estimation of remainCount. Watch out !!!
+        current_uri = new StringBuilder(basicPath) //
+                .append(API_PATH_ACTIVITIES) //
+                .append(fmtParams(FIELD_ACCESS_TOKEN, accessToken, true));
+        if (!StringUtils.isEmpty(pgOffset)) {
+            current_uri.append(fmtParams(FIELD_NEXT_PAGE_TOKEN, pgOffset));
+        }
+        if (activityTypeIds != null) {
+            current_uri.append(fmtParams(FIELD_ACTIVITY_TYPE_IDS, csvString(activityTypeIds.toArray())));
+        }
+        current_uri.append(fmtParams(FIELD_BATCH_SIZE, batchLimit));
+        LOG.debug("Activities: {}.", current_uri);
+
+        return getRecordResultForLead(parameters.inputOperation.getValue(), null, batchLimit,
+                parameters.schemaInput.schema.getValue(), parameters.mappingInput.getNameMappingsForMarketo());
     }
 
     @Override
@@ -483,45 +508,32 @@ public class MarketoLeadClient extends MarketoBaseRESTClient implements MarketoC
         int batchLimit = parameters.batchSize.getValue() > REST_API_BATCH_LIMIT ? REST_API_BATCH_LIMIT
                 : parameters.batchSize.getValue();
         String[] fields = parameters.fieldList.getValue().split(",");
-        MarketoRecordResult mkto = new MarketoRecordResult();
-        LeadChangesResult result;
-        try {
-            if (offset == null) {
-                offset = getPageToken(sinceDateTime);
+        String pgOffset = offset;
+        if (pgOffset == null) {
+            try {
+                pgOffset = getPageToken(sinceDateTime);
+            } catch (MarketoException e) {
+                LOG.error("getPageToken Error: `{}`.", e.toString());
+                MarketoRecordResult mkto = new MarketoRecordResult();
+                mkto.setSuccess(false);
+                mkto.setErrors(Collections.singletonList(e.toMarketoError()));
+                return mkto;
             }
-
-            current_uri = new StringBuilder(basicPath)//
-                    .append(API_PATH_ACTIVITIES_LEADCHANGES)//
-                    .append(fmtParams(FIELD_ACCESS_TOKEN, accessToken, true));
-            if (offset != null && offset.length() > 0) {
-                current_uri.append(fmtParams(FIELD_NEXT_PAGE_TOKEN, offset));
-            }
-            current_uri.append(fmtParams(FIELD_BATCH_SIZE, batchLimit));
-            // if (listId != null) { webClient.query(FIELD_LISTID, listId); }
-            // if (leadIds != null) { webClient.query(FIELD_LEADIDS, csvString(leadIds)); }
-            if (fields != null && fields.length > 0) {
-                current_uri.append(fmtParams(FIELD_FIELDS, csvString(fields)));
-            }
-            LOG.debug("Changes: {}.", current_uri);
-            result = (LeadChangesResult) executeGetRequest(LeadChangesResult.class);
-            mkto.setSuccess(result.isSuccess());
-            if (mkto.isSuccess()) {
-                mkto.setRecordCount(result.getResult().isEmpty() ? 0 : result.getResult().size());
-                mkto.setRecords(convertLeadChangesRecords(result.getResult(), parameters.schemaInput.schema.getValue(),
-                        parameters.mappingInput.getNameMappingsForMarketo()));
-                if (result.isMoreResult()) {
-                    mkto.setRemainCount(mkto.getRecordCount());// cannot know how many remain...
-                    mkto.setStreamPosition(result.getNextPageToken());
-                }
-            } else {
-                mkto.setErrors(Arrays.asList(result.getErrors().get(0)));
-            }
-        } catch (MarketoException e) {
-            LOG.error("LeadChanges error {}.", e.toString());
-            mkto.setSuccess(false);
-            mkto.setErrors(Arrays.asList(e.toMarketoError()));
         }
-        return mkto;
+        current_uri = new StringBuilder(basicPath)//
+                .append(API_PATH_ACTIVITIES_LEADCHANGES)//
+                .append(fmtParams(FIELD_ACCESS_TOKEN, accessToken, true));
+        if (!StringUtils.isEmpty(pgOffset)) {
+            current_uri.append(fmtParams(FIELD_NEXT_PAGE_TOKEN, pgOffset));
+        }
+        current_uri.append(fmtParams(FIELD_BATCH_SIZE, batchLimit));
+        if (fields != null && fields.length > 0) {
+            current_uri.append(fmtParams(FIELD_FIELDS, csvString(fields)));
+        }
+        LOG.debug("Changes: {}.", current_uri);
+
+        return getRecordResultForLead(parameters.inputOperation.getValue(), null, batchLimit,
+                parameters.schemaInput.schema.getValue(), parameters.mappingInput.getNameMappingsForMarketo());
     }
     /*
      *
@@ -538,7 +550,6 @@ public class MarketoLeadClient extends MarketoBaseRESTClient implements MarketoC
                 .append(fmtParams(FIELD_ACCESS_TOKEN, accessToken, true))//
                 .append(fmtParams(FIELD_ID, csvString(parameters.getLeadIdsValues())))
                 .append(fmtParams(QUERY_METHOD, QUERY_METHOD_POST));
-
         JsonArray json = new JsonArray();
         for (Integer leadId : parameters.getLeadIdsValues()) {
             JsonObject leadKey = new JsonObject();
@@ -547,34 +558,13 @@ public class MarketoLeadClient extends MarketoBaseRESTClient implements MarketoC
         }
         JsonObject jsonObj = new JsonObject();
         jsonObj.add(FIELD_INPUT, json);
-
         LOG.debug("addTo: {}.", current_uri);
-        SyncResult result = null;
-        MarketoSyncResult mkto = new MarketoSyncResult();
-        try {
-            result = (SyncResult) executePostRequest(SyncResult.class, jsonObj);
-            mkto.setSuccess(result.isSuccess());
-            if (mkto.isSuccess()) {
-                mkto.setRecordCount(result.getResult().isEmpty() ? 0 : result.getResult().size());
-                mkto.setRecords(result.getResult());
-                if (result.isMoreResult()) {
-                    mkto.setRemainCount(mkto.getRecordCount());// cannot know how many remain...
-                    mkto.setStreamPosition(result.getNextPageToken());
-                }
-            } else {
-                mkto.setErrors(result.getErrors());
-            }
-        } catch (MarketoException e) {
-            LOG.error("addToList error: {}.", e.toString());
-            mkto.setSuccess(false);
-            mkto.setErrors(asList(e.toMarketoError()));
-        }
-        return mkto;
+
+        return getSyncResultFromRequest(true, jsonObj);
     }
 
     @Override
     public MarketoSyncResult removeFromList(ListOperationParameters parameters) {
-
         current_uri = new StringBuilder(basicPath)//
                 .append(API_PATH_LISTS)//
                 .append(parameters.getListId())//
@@ -590,32 +580,12 @@ public class MarketoLeadClient extends MarketoBaseRESTClient implements MarketoC
         JsonObject jsonObj = new JsonObject();
         jsonObj.add(FIELD_INPUT, json);
         LOG.debug("removeFrom: {}{}", current_uri, jsonObj);
-        SyncResult result = null;
-        MarketoSyncResult mkto = new MarketoSyncResult();
-        try {
-            result = (SyncResult) executePostRequest(SyncResult.class, jsonObj);
-            mkto.setSuccess(result.isSuccess());
-            if (mkto.isSuccess()) {
-                mkto.setRecordCount(result.getResult().isEmpty() ? 0 : result.getResult().size());
-                mkto.setRecords(result.getResult());
-                if (result.isMoreResult()) {
-                    mkto.setRemainCount(mkto.getRecordCount());// cannot know how many remain...
-                    mkto.setStreamPosition(result.getNextPageToken());
-                }
-            } else {
-                mkto.setErrors(result.getErrors());
-            }
-        } catch (MarketoException e) {
-            LOG.error("removeFromList error: {}.", e.toString());
-            mkto.setSuccess(false);
-            mkto.setErrors(asList(e.toMarketoError()));
-        }
-        return mkto;
+
+        return getSyncResultFromRequest(true, jsonObj);
     }
 
     @Override
     public MarketoSyncResult isMemberOfList(ListOperationParameters parameters) {
-
         current_uri = new StringBuilder(basicPath)//
                 .append(API_PATH_LISTS)//
                 .append(parameters.getListId())//
@@ -623,27 +593,8 @@ public class MarketoLeadClient extends MarketoBaseRESTClient implements MarketoC
                 .append(fmtParams(FIELD_ACCESS_TOKEN, accessToken, true))//
                 .append(fmtParams(FIELD_ID, csvString(parameters.getLeadIdsValues())));
         LOG.debug("isMemberOf: {}.", current_uri);
-        SyncResult result = null;
-        MarketoSyncResult mkto = new MarketoSyncResult();
-        try {
-            result = (SyncResult) executeGetRequest(SyncResult.class);
-            mkto.setSuccess(result.isSuccess());
-            if (mkto.isSuccess()) {
-                mkto.setRecordCount(result.getResult().isEmpty() ? 0 : result.getResult().size());
-                mkto.setRecords(result.getResult());
-                if (result.isMoreResult()) {
-                    mkto.setRemainCount(mkto.getRecordCount());// cannot know how many remain...
-                    mkto.setStreamPosition(result.getNextPageToken());
-                }
-            } else {
-                mkto.setErrors(result.getErrors());
-            }
-        } catch (MarketoException e) {
-            LOG.error("isMemberOfList error: {}.", e.toString());
-            mkto.setSuccess(false);
-            mkto.setErrors(Arrays.asList(e.toMarketoError()));
-        }
-        return mkto;
+
+        return getSyncResultFromRequest(false, null);
     }
     /*
      *
@@ -670,10 +621,6 @@ public class MarketoLeadClient extends MarketoBaseRESTClient implements MarketoC
                 .append(API_PATH_LEADS)//
                 .append(fmtParams(FIELD_ACCESS_TOKEN, accessToken, true));
         JsonObject inputJson = new JsonObject();
-        Gson gson = new Gson();
-        // FIXME no partition or asyncProcessing parameters provided by Studio...
-        // inputJson.addProperty("asyncProcessing", asyncProcessing);
-        // if (partitionName != null) { inputJson.addProperty("partitionName", partitionName); }
         inputJson.addProperty(FIELD_BATCH_SIZE, batchSize);
         if (action != null) {
             inputJson.addProperty(FIELD_ACTION, action);
@@ -681,38 +628,10 @@ public class MarketoLeadClient extends MarketoBaseRESTClient implements MarketoC
         if (lookupField != null) {
             inputJson.addProperty(FIELD_LOOKUP_FIELD, lookupField);
         }
-        List<Map<String, Object>> leadsObjects = new ArrayList<>();
-        for (IndexedRecord r : leads) {
-            Map<String, Object> lead = new HashMap<String, Object>();
-            for (Field f : r.getSchema().getFields()) {
-                // skip status & error fields
-                if (FIELD_STATUS.equals(f.name()) || FIELD_ERROR_MSG.equals(f.name())) {
-                    continue;
-                }
-                lead.put(f.name(), r.get(f.pos()));
-            }
-            leadsObjects.add(lead);
-        }
-        inputJson.add(FIELD_INPUT, gson.toJsonTree(leadsObjects));
-        MarketoSyncResult mkto = new MarketoSyncResult();
-        try {
-            LOG.debug("syncMultipleLeads {}{}.", current_uri, inputJson);
-            SyncResult rs = (SyncResult) executePostRequest(SyncResult.class, inputJson);
-            mkto.setSuccess(rs.isSuccess());
-            if (mkto.isSuccess()) {
-                mkto.setRecordCount(rs.getResult().isEmpty() ? 0 : rs.getResult().size());
-                mkto.setRecords(rs.getResult());
-                if (rs.isMoreResult()) {
-                    mkto.setRemainCount(mkto.getRecordCount());// cannot know how many remain...
-                    mkto.setStreamPosition(rs.getNextPageToken());
-                }
-            }
-        } catch (MarketoException e) {
-            LOG.error("syncMultipleLeads error: {}.", e.toString());
-            mkto.setSuccess(false);
-            mkto.setErrors(Arrays.asList(e.toMarketoError()));
-        }
-        return mkto;
+        inputJson.add(FIELD_INPUT, convertIndexedRecordsToJson(leads));
+        LOG.debug("syncMultipleLeads {}{}.", current_uri, inputJson);
+
+        return getSyncResultFromRequest(true, inputJson);
     }
 
     /*
@@ -721,16 +640,7 @@ public class MarketoLeadClient extends MarketoBaseRESTClient implements MarketoC
      *
      */
 
-    // public Schema getFieldSchema(){
-    // return SchemaBuilder.record("fields").fields()//
-    // .name("fieldId").type().
-    // .endRecord();
-    //
-    //
-    // }
-
     public List<Schema.Field> getAllLeadFields() {
-
         current_uri = new StringBuilder(basicPath)//
                 .append("/v1/leads")//
                 .append(API_PATH_URI_DESCRIBE)//
@@ -749,6 +659,7 @@ public class MarketoLeadClient extends MarketoBaseRESTClient implements MarketoC
         } catch (MarketoException e) {
             LOG.error("describeLeadFields error: {}.", e.toString());
         }
+
         return fields;
     }
 
@@ -757,6 +668,7 @@ public class MarketoLeadClient extends MarketoBaseRESTClient implements MarketoC
         for (IndexedRecord r : leadIds) {
             leads.add((Integer) r.get(0));
         }
+
         return deleteLeads(leads.toArray(new Integer[leads.size()]));
     }
 
@@ -773,26 +685,9 @@ public class MarketoLeadClient extends MarketoBaseRESTClient implements MarketoC
         }
         JsonObject jsonObj = new JsonObject();
         jsonObj.add(FIELD_INPUT, json);
+        LOG.debug("deleteLeads {}{}.", current_uri, jsonObj);
 
-        MarketoSyncResult mkto = new MarketoSyncResult();
-        try {
-            LOG.debug("deleteLeads {}{}.", current_uri, jsonObj);
-            SyncResult rs = (SyncResult) executePostRequest(SyncResult.class, jsonObj);
-            mkto.setSuccess(rs.isSuccess());
-            if (mkto.isSuccess()) {
-                mkto.setRecordCount(rs.getResult().isEmpty() ? 0 : rs.getResult().size());
-                mkto.setRecords(rs.getResult());
-                if (rs.isMoreResult()) {
-                    mkto.setRemainCount(mkto.getRecordCount());// cannot know how many remain...
-                    mkto.setStreamPosition(rs.getNextPageToken());
-                }
-            }
-        } catch (MarketoException e) {
-            LOG.error("syncMultipleLeads error: {}.", e.toString());
-            mkto.setSuccess(false);
-            mkto.setErrors(asList(e.toMarketoError()));
-        }
-        return mkto;
+        return getSyncResultFromRequest(true, jsonObj);
     }
 
 }

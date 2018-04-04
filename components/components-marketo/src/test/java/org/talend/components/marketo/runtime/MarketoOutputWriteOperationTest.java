@@ -30,6 +30,7 @@ public class MarketoOutputWriteOperationTest {
     @Before
     public void setUp() throws Exception {
         TMarketoOutputProperties p = new TMarketoOutputProperties("tests");
+        p.init();
         MarketoSink sink = new MarketoSink();
         sink.initialize(null, p);
         wop = new MarketoWriteOperation(sink);

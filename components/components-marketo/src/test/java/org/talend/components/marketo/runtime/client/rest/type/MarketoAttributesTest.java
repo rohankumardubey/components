@@ -34,6 +34,7 @@ public class MarketoAttributesTest {
         assertEquals(Integer.valueOf(36356713), activity.getId());
         assertEquals(Integer.valueOf(5278339), activity.getLeadId());
         assertEquals(Integer.valueOf(13), activity.getActivityTypeId());
+        assertEquals("36356713", activity.getMarketoGUID());
         assertEquals("null", activity.getMktoAttributes().get("Old_Value"));
         assertEquals("USD", activity.getMktoAttributes().get("New_Value"));
         assertEquals("Synched from salesforce.com Lead ID 00Q2F0000025kWvUAI", activity.getMktoAttributes().get("Reason"));
@@ -46,7 +47,9 @@ public class MarketoAttributesTest {
         assertEquals(Integer.valueOf(36356713), activity.getId());
         assertEquals(Integer.valueOf(5278339), activity.getLeadId());
         assertEquals(Integer.valueOf(13), activity.getActivityTypeId());
+        assertEquals("36356713", activity.getMarketoGUID());
         assertEquals("[{New Value=2017-45, Attribute Name=Business Week, Old Value=2017-44}]",
                 activity.getMktoAttributes().get("Data_Value_Changes"));
     }
+
 }

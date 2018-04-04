@@ -23,6 +23,7 @@ import static org.apache.avro.generic.GenericData.Record;
 import static org.apache.commons.codec.binary.Hex.encodeHex;
 import static org.slf4j.LoggerFactory.getLogger;
 import static org.talend.components.marketo.MarketoConstants.FIELD_ERROR_MSG;
+import static org.talend.components.marketo.MarketoConstants.FIELD_MARKETO_GUID;
 import static org.talend.components.marketo.MarketoConstants.FIELD_STATUS;
 import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.LeadSelector.LastUpdateAtSelector;
 import static org.talend.components.marketo.tmarketoinput.TMarketoInputProperties.LeadSelector.LeadKeySelector;
@@ -37,7 +38,6 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -45,6 +45,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.regex.Pattern;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -86,7 +87,6 @@ import com.marketo.mktows.ForeignSysType;
 import com.marketo.mktows.LastUpdateAtSelector;
 import com.marketo.mktows.LeadChangeRecord;
 import com.marketo.mktows.LeadKey;
-import com.marketo.mktows.LeadKeyRef;
 import com.marketo.mktows.LeadKeySelector;
 import com.marketo.mktows.LeadRecord;
 import com.marketo.mktows.LeadStatus;
@@ -117,7 +117,7 @@ import com.marketo.mktows.SuccessSyncMultipleLeads;
 
 public class MarketoSOAPClient extends MarketoClient {
 
-    private transient static final Logger LOG = getLogger(MarketoSOAPClient.class);
+    private static final Logger LOG = getLogger(MarketoSOAPClient.class);
 
     public static final String SOAP = "SOAP";
 
@@ -147,53 +147,64 @@ public class MarketoSOAPClient extends MarketoClient {
 
     public static final String FIELD_FOREIGN_SYS_ORG_ID = "ForeignSysOrgId";
 
+    private static final String MESSAGE_REQUEST_RETURNED_0_MATCHING_LEADS = "Request returned 0 matching leads.";
+
+    private static final String MESSAGE_NO_LEADS_FOUND = "No leads found.";
+
     private MktowsPort port;
 
     private AuthenticationHeader header;
 
     private ObjectFactory objectFactory;
 
-    public MarketoSOAPClient(TMarketoConnectionProperties connection) throws MarketoException {
+    public MarketoSOAPClient(TMarketoConnectionProperties connection) {
+        LOG.debug("Marketo SOAP Client initialization.");
+        endpoint = connection.endpoint.getValue();
+        userId = connection.clientAccessId.getValue();
+        secretKey = connection.secretKey.getValue();
+        objectFactory = new ObjectFactory();
+    }
+
+    public MarketoSOAPClient connect() throws MarketoException {
         try {
-            LOG.debug("Marketo SOAP Client initialization.");
-            objectFactory = new ObjectFactory();
-            endpoint = connection.endpoint.getValue();
-            userId = connection.clientAccessId.getValue();
-            secretKey = connection.secretKey.getValue();
-
-            URL marketoSoapEndPoint = null;
-            marketoSoapEndPoint = new URL(endpoint + "?WSDL");
-
-            QName serviceName = new QName("http://www.marketo.com/mktows/", "MktMktowsApiService");
-            MktMktowsApiService service = new MktMktowsApiService(marketoSoapEndPoint, serviceName);
-            port = service.getMktowsApiSoapPort();
-            // Create Signature
-            DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
-            String text = df.format(new Date());
-            String requestTimestamp = text.substring(0, 22) + ":" + text.substring(22);
-            String encryptString = requestTimestamp + userId;
-            SecretKeySpec secretKeySpec = new SecretKeySpec(secretKey.getBytes(), "HmacSHA1");
-            Mac mac = getInstance("HmacSHA1");
-            mac.init(secretKeySpec);
-            byte[] rawHmac = mac.doFinal(encryptString.getBytes());
-            char[] hexChars = encodeHex(rawHmac);
-            String signature = new String(hexChars);
-            // Set Authentication Header
-            header = new AuthenticationHeader();
-            header.setMktowsUserId(userId);
-            header.setRequestTimestamp(requestTimestamp);
-            header.setRequestSignature(signature);
+            port = getMktowsApiSoapPort();
+            LOG.debug("Marketo SOAP Client :: port.");
+            header = getAuthentificationHeader();
+            LOG.debug("Marketo SOAP Client initialization :: AuthHeader.");
             // bug/TDI-38439_MarketoWizardConnection : make a dummy call to check auth and not just URL.
-            port.listMObjects(new ParamsListMObjects(), header);
-        } catch (MalformedURLException | NoSuchAlgorithmException | InvalidKeyException e) {
-            // LOG.error("Client connection error : {}.", e.getMessage());
-            throw new MarketoException(SOAP, e.getMessage());
-        } catch (WebServiceException e) {
-            // TODO manage connection reset and socket closed error with timeout and retry properties.
-            // String socket_close = "Socket closed";
-            // String connection_reset = "Connection reset";
+            getPort().listMObjects(new ParamsListMObjects(), header);
+        } catch (MalformedURLException | NoSuchAlgorithmException | InvalidKeyException | WebServiceException e) {
             throw new MarketoException(SOAP, e.getMessage());
         }
+        return this;
+    }
+
+    public AuthenticationHeader getAuthentificationHeader() throws NoSuchAlgorithmException, InvalidKeyException {
+        // Create Signature
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+        String text = df.format(new Date());
+        String requestTimestamp = text.substring(0, 22) + ":" + text.substring(22);
+        String encryptString = requestTimestamp + userId;
+        SecretKeySpec secretKeySpec = new SecretKeySpec(secretKey.getBytes(), "HmacSHA1");
+        Mac mac = getInstance("HmacSHA1");
+        mac.init(secretKeySpec);
+        byte[] rawHmac = mac.doFinal(encryptString.getBytes());
+        char[] hexChars = encodeHex(rawHmac);
+        String signature = new String(hexChars);
+        // Set Authentication Header
+        AuthenticationHeader hdr = new AuthenticationHeader();
+        hdr.setMktowsUserId(userId);
+        hdr.setRequestTimestamp(requestTimestamp);
+        hdr.setRequestSignature(signature);
+        return hdr;
+    }
+
+    public MktowsPort getMktowsApiSoapPort() throws MalformedURLException {
+        URL marketoSoapEndPoint = null;
+        marketoSoapEndPoint = new URL(endpoint + "?WSDL");
+        QName serviceName = new QName("http://www.marketo.com/mktows/", "MktMktowsApiService");
+        MktMktowsApiService service = new MktMktowsApiService(marketoSoapEndPoint, serviceName);
+        return service.getMktowsApiSoapPort();
     }
 
     @Override
@@ -216,24 +227,35 @@ public class MarketoSOAPClient extends MarketoClient {
                     LOG.warn("[converLeadRecord] Couldn't find mapping for column {}.", f.name());
                     continue;
                 }
-                if (col.equals(FIELD_ID)) {
-                    record.put(f.pos(), input.getId().getValue());
-                } else if (col.equals(FIELD_EMAIL)) {
-                    record.put(f.pos(), input.getEmail().getValue());
-                } else if (col.equals(FIELD_FOREIGN_SYS_PERSON_ID)) {
-                    record.put(f.pos(), input.getForeignSysPersonId().getValue());
-                } else if (col.equals(FIELD_FOREIGN_SYS_TYPE)) {
-                    record.put(f.pos(), input.getForeignSysType().getValue());
-                } else {
+                switch (col) {
+                case FIELD_ID:
+                    record.put(f.pos(), input.getId() != null ? input.getId().getValue() : null);
+                    break;
+                case FIELD_EMAIL:
+                    record.put(f.pos(), input.getEmail() != null ? input.getEmail().getValue() : null);
+                    break;
+                case FIELD_FOREIGN_SYS_PERSON_ID:
+                    record.put(f.pos(), input.getForeignSysPersonId() != null ? input.getForeignSysPersonId().getValue() : null);
+                    break;
+                case FIELD_FOREIGN_SYS_TYPE:
+                    record.put(f.pos(),
+                            input.getForeignSysType() != null && input.getForeignSysType().getValue() != null
+                                    ? input.getForeignSysType().getValue().value()
+                                    : null);
+                    break;
+                default:
+                    if (!input.getLeadAttributeList().isNil()) {
                     for (Attribute attr : input.getLeadAttributeList().getValue().getAttributes()) {
                         if (attr.getAttrName().equals(col)) {
                             record.put(f.pos(), attr.getAttrValue());
+                            }
                         }
                     }
                 }
             }
             results.add(record);
         }
+
         return results;
     }
 
@@ -249,31 +271,49 @@ public class MarketoSOAPClient extends MarketoClient {
                     LOG.warn("[convertLeadActivityRecords] Couldn't find mapping for column {}.", f.name());
                     continue;
                 }
-                if (col.equals(FIELD_ID)) {
-                    record.put(f.pos(), input.getId());
-                } else if (col.equals(FIELD_ACTIVITY_DATE_TIME)) {
-                    record.put(f.pos(), input.getActivityDateTime().toGregorianCalendar().getTime());
-                    //
-                } else if (col.equals(FIELD_ACTIVITY_TYPE)) {
+                switch (col) {
+                case FIELD_ID:
+                    record.put(f.pos(), input.getId() != null ? input.getId().getValue() : null);
+                    break;
+                case FIELD_MARKETO_GUID:
+                    record.put(f.pos(), input.getMarketoGUID());
+                    break;
+                case FIELD_ACTIVITY_DATE_TIME:
+                    record.put(f.pos(),
+                            input.getActivityDateTime() != null
+                                    ? input.getActivityDateTime().toGregorianCalendar().getTimeInMillis()
+                                    : null);
+                    break;
+                case FIELD_ACTIVITY_TYPE:
                     record.put(f.pos(), input.getActivityType());
-                } else if (col.equals(FIELD_MKTG_ASSET_NAME)) {
+                    break;
+                case FIELD_MKTG_ASSET_NAME:
                     record.put(f.pos(), input.getMktgAssetName());
-                } else if (col.equals(FIELD_MKT_PERSON_ID)) {
+                    break;
+                case FIELD_MKT_PERSON_ID:
                     record.put(f.pos(), input.getMktPersonId());
-                } else if (col.equals(FIELD_CAMPAIGN)) {
-                    record.put(f.pos(), input.getCampaign().getValue());
-                } else if (col.equals(FIELD_FOREIGN_SYS_ID)) {
-                    record.put(f.pos(), input.getForeignSysId().getValue());
-                } else if (col.equals(FIELD_PERSON_NAME)) {
-                    record.put(f.pos(), input.getPersonName().getValue());
-                } else if (col.equals(FIELD_ORG_NAME)) {
-                    record.put(f.pos(), input.getOrgName().getValue());
-                } else if (col.equals(FIELD_FOREIGN_SYS_ORG_ID)) {
-                    record.put(f.pos(), input.getForeignSysOrgId().getValue());
-                } else {
+                    break;
+                case FIELD_CAMPAIGN:
+                    record.put(f.pos(), input.getCampaign() != null ? input.getCampaign().getValue() : null);
+                    break;
+                case FIELD_FOREIGN_SYS_ID:
+                    record.put(f.pos(), input.getForeignSysId() != null ? input.getForeignSysId().getValue() : null);
+                    break;
+                case FIELD_PERSON_NAME:
+                    record.put(f.pos(), input.getPersonName() != null ? input.getPersonName().getValue() : null);
+                    break;
+                case FIELD_ORG_NAME:
+                    record.put(f.pos(), input.getOrgName() != null ? input.getOrgName().getValue() : null);
+                    break;
+                case FIELD_FOREIGN_SYS_ORG_ID:
+                    record.put(f.pos(), input.getForeignSysOrgId() != null ? input.getForeignSysOrgId().getValue() : null);
+                    break;
+                default:
+                    if (!input.getActivityAttributes().isNil()) {
                     for (Attribute attr : input.getActivityAttributes().getValue().getAttributes()) {
                         if (attr.getAttrName().equals(col)) {
                             record.put(f.pos(), attr.getAttrValue());
+                            }
                         }
                     }
                 }
@@ -296,28 +336,44 @@ public class MarketoSOAPClient extends MarketoClient {
                     LOG.warn("[convertLeadChangeRecords] Couldn't find mapping for column {}.", f.name());
                     continue;
                 }
-                if (col.equals(FIELD_ID)) {
-                    record.put(f.pos(), input.getId());
-                } else if (col.equals(FIELD_ACTIVITY_DATE_TIME)) {
-                    record.put(f.pos(), input.getActivityDateTime().toGregorianCalendar().getTime());
-                } else if (col.equals(FIELD_ACTIVITY_TYPE)) {
+                switch (col) {
+                case FIELD_ID:
+                    record.put(f.pos(), input.getId().getValue());
+                    break;
+                case FIELD_MARKETO_GUID:
+                    record.put(f.pos(), input.getMarketoGUID());
+                    break;
+                case FIELD_ACTIVITY_DATE_TIME:
+                    record.put(f.pos(),
+                            input.getActivityDateTime() != null
+                                    ? input.getActivityDateTime().toGregorianCalendar().getTimeInMillis()
+                                    : null);
+                    break;
+                case FIELD_ACTIVITY_TYPE:
                     record.put(f.pos(), input.getActivityType());
-                } else if (col.equals(FIELD_MKTG_ASSET_NAME)) {
-                    record.put(f.pos(), input.getMktgAssetName().getValue());
-                } else if (col.equals(FIELD_MKT_PERSON_ID)) {
+                    break;
+                case FIELD_MKTG_ASSET_NAME:
+                    record.put(f.pos(), input.getMktgAssetName() != null ? input.getMktgAssetName().getValue() : null);
+                    break;
+                case FIELD_MKT_PERSON_ID:
                     record.put(f.pos(), input.getMktPersonId());
-                } else if (col.equals(FIELD_CAMPAIGN)) {
+                    break;
+                case FIELD_CAMPAIGN:
                     record.put(f.pos(), input.getCampaign());
-                } else {
+                    break;
+                default:
+                    if (!input.getActivityAttributes().isNil()) {
                     for (Attribute attr : input.getActivityAttributes().getValue().getAttributes()) {
                         if (attr.getAttrName().equals(col)) {
                             record.put(f.pos(), attr.getAttrValue());
+                            }
                         }
                     }
                 }
             }
             results.add(record);
         }
+
         return results;
     }
 
@@ -325,8 +381,6 @@ public class MarketoSOAPClient extends MarketoClient {
     public MarketoRecordResult getLead(TMarketoInputProperties parameters, String offset) {
         LOG.debug("MarketoSOAPClient.getLead with selector:{} key:{} value:{}.", parameters.leadSelectorSOAP.getValue(),
                 parameters.leadKeyTypeSOAP.getValue(), parameters.leadKeyValue.getValue());
-
-        List<IndexedRecord> results = new ArrayList<>();
         String leadKeyType = parameters.leadKeyTypeSOAP.getValue().toString();
         String leadKeyValue = parameters.leadKeyValue.getValue();
         Schema schema = parameters.schemaInput.schema.getValue();
@@ -334,7 +388,7 @@ public class MarketoSOAPClient extends MarketoClient {
         // Create Request
         ParamsGetLead request = new ParamsGetLead();
         LeadKey key = new LeadKey();
-        key.setKeyType(LeadKeyRef.valueOf(leadKeyType));
+        key.setKeyType(valueOf(leadKeyType));
         key.setKeyValue(leadKeyValue);
         request.setLeadKey(key);
         //
@@ -342,21 +396,23 @@ public class MarketoSOAPClient extends MarketoClient {
         SuccessGetLead result = null;
         MarketoRecordResult mkto = new MarketoRecordResult();
         try {
-            result = port.getLead(request, header);
+            result = getPort().getLead(request, header);
         } catch (Exception e) {
             LOG.error("Lead not found : {}.", e.getMessage());
             mkto.setSuccess(false);
             mkto.setRecordCount(0);
             mkto.setRemainCount(0);
-            mkto.setErrors(Arrays.asList(new MarketoError(SOAP, e.getMessage())));
+            mkto.setErrors(Collections.singletonList(new MarketoError(SOAP, e.getMessage())));
+            return mkto;
         }
-        if (result == null || !(result.getResult().getCount() > 0)) {
-            LOG.debug("Request returned 0 matching lead.");
-            mkto.setErrors(Arrays.asList(new MarketoError(SOAP, "No leads found.")));
+        if (result == null || result.getResult().getCount() == 0) {
+            LOG.debug(MESSAGE_REQUEST_RETURNED_0_MATCHING_LEADS);
+            mkto.setErrors(Collections.singletonList(new MarketoError(SOAP, MESSAGE_NO_LEADS_FOUND)));
             mkto.setSuccess(true);
         } else {
             int counted = result.getResult().getCount();
-            results = convertLeadRecords(result.getResult().getLeadRecordList().getValue().getLeadRecords(), schema, mappings);
+            List<IndexedRecord> results = convertLeadRecords(result.getResult().getLeadRecordList().getValue().getLeadRecords(),
+                    schema, mappings);
 
             mkto.setRecordCount(counted);
             mkto.setRemainCount(0);
@@ -373,9 +429,6 @@ public class MarketoSOAPClient extends MarketoClient {
     @Override
     public MarketoRecordResult getMultipleLeads(TMarketoInputProperties parameters, String offset) {
         LOG.debug("MarketoSOAPClient.getMultipleLeadsJSON with {}", parameters.leadSelectorSOAP.getValue());
-
-        List<IndexedRecord> results = new ArrayList<>();
-
         Schema schema = parameters.schemaInput.schema.getValue();
         Map<String, String> mappings = parameters.mappingInput.getNameMappingsForMarketo();
         int bSize = parameters.batchSize.getValue();
@@ -396,7 +449,6 @@ public class MarketoSOAPClient extends MarketoClient {
             String[] keys = parameters.leadKeyValues.getValue().split("(,|;|\\s)");
             for (String s : keys) {
                 LOG.debug("Adding leadKeyValue : {}.", s);
-                // if (!s.isEmpty())
                 aos.getStringItems().add(s);
             }
             keySelector.setKeyValues(aos);
@@ -407,13 +459,11 @@ public class MarketoSOAPClient extends MarketoClient {
         //
 
         if (parameters.leadSelectorSOAP.getValue().equals(LastUpdateAtSelector)) {
-            LOG.info("LastUpdateAtSelector - since {} to  {}.", parameters.oldestUpdateDate.getValue(),
+            LOG.debug("LastUpdateAtSelector - since {} to  {}.", parameters.oldestUpdateDate.getValue(),
                     parameters.latestUpdateDate.getValue());
-
             LastUpdateAtSelector leadSelector = new LastUpdateAtSelector();
             try {
                 DatatypeFactory factory = newInstance();
-                ObjectFactory objectFactory = new ObjectFactory();
                 Date oldest = MarketoUtils.parseDateString(parameters.oldestUpdateDate.getValue());
                 Date latest = MarketoUtils.parseDateString(parameters.latestUpdateDate.getValue());
                 GregorianCalendar gc = new GregorianCalendar();
@@ -438,7 +488,6 @@ public class MarketoSOAPClient extends MarketoClient {
                     parameters.listParamListName.getValue());
 
             StaticListSelector staticListSelector = new StaticListSelector();
-            ObjectFactory objectFactory = new ObjectFactory();
             if (parameters.listParam.getValue().equals(STATIC_LIST_NAME)) {
                 JAXBElement<String> listName = objectFactory
                         .createStaticListSelectorStaticListName(parameters.listParamListName.getValue());
@@ -464,7 +513,7 @@ public class MarketoSOAPClient extends MarketoClient {
         // attributes
         // curiously we have to put some basic fields like Email in attributes if we have them feed...
         ArrayOfString attributes = new ArrayOfString();
-        for (String s : mappings.keySet()) {
+        for (String s : mappings.values()) {
             attributes.getStringItems().add(s);
         }
         attributes.getStringItems().add("Company");
@@ -483,20 +532,19 @@ public class MarketoSOAPClient extends MarketoClient {
         //
         SuccessGetMultipleLeads result = null;
         MarketoRecordResult mkto = new MarketoRecordResult();
-        LOG.debug("Sending request to server...");
         try {
-            result = port.getMultipleLeads(request, header);
+            result = getPort().getMultipleLeads(request, header);
         } catch (Exception e) {
             LOG.error("Lead not found : {}.", e.getMessage());
             mkto.setSuccess(false);
-            mkto.setErrors(Arrays.asList(new MarketoError(SOAP, e.getMessage())));
+            mkto.setErrors(Collections.singletonList(new MarketoError(SOAP, e.getMessage())));
             return mkto;
         }
 
-        if (result == null || !(result.getResult().getReturnCount() > 0)) {
-            LOG.debug("Request returned 0 matching leads.");
+        if (result == null || result.getResult().getReturnCount() == 0) {
+            LOG.debug(MESSAGE_REQUEST_RETURNED_0_MATCHING_LEADS);
             mkto.setSuccess(true);
-            mkto.setErrors(Arrays.asList(new MarketoError(SOAP, "No leads found.")));
+            mkto.setErrors(Collections.singletonList(new MarketoError(SOAP, MESSAGE_NO_LEADS_FOUND)));
             mkto.setRecordCount(0);
             mkto.setRemainCount(0);
             return mkto;
@@ -507,7 +555,8 @@ public class MarketoSOAPClient extends MarketoClient {
             int remainCount = result.getResult().getRemainingCount();
 
             // Process results
-            results = convertLeadRecords(result.getResult().getLeadRecordList().getValue().getLeadRecords(), schema, mappings);
+            List<IndexedRecord> results = convertLeadRecords(result.getResult().getLeadRecordList().getValue().getLeadRecords(),
+                    schema, mappings);
 
             return new MarketoRecordResult(true, streamPos, recordCount, remainCount, results);
         }
@@ -516,9 +565,6 @@ public class MarketoSOAPClient extends MarketoClient {
     @Override
     public MarketoRecordResult getLeadActivity(TMarketoInputProperties parameters, String offset) {
         LOG.debug("MarketoSOAPClient.getLeadActivity with {}", parameters.leadKeyTypeSOAP.getValue());
-
-        List<IndexedRecord> results = new ArrayList<>();
-
         Schema schema = parameters.schemaInput.schema.getValue();
         Map<String, String> mappings = parameters.mappingInput.getNameMappingsForMarketo();
         int bSize = parameters.batchSize.getValue();
@@ -536,7 +582,7 @@ public class MarketoSOAPClient extends MarketoClient {
         request.setLeadKey(key);
         // attributes
         ArrayOfString attributes = new ArrayOfString();
-        for (String s : mappings.keySet()) {
+        for (String s : mappings.values()) {
             attributes.getStringItems().add(s);
         }
         // Activity filter
@@ -557,7 +603,6 @@ public class MarketoSOAPClient extends MarketoClient {
             filter.setExcludeTypes(excludes);
         }
 
-        ObjectFactory objectFactory = new ObjectFactory();
         JAXBElement<ActivityTypeFilter> typeFilter = objectFactory.createParamsGetLeadActivityActivityFilter(filter);
         request.setActivityFilter(typeFilter);
         // batch size
@@ -575,34 +620,33 @@ public class MarketoSOAPClient extends MarketoClient {
         // Request execution
         //
         SuccessGetLeadActivity result = null;
-        LOG.debug("Sending request to server...");
+
         MarketoRecordResult mkto = new MarketoRecordResult();
         try {
-            result = port.getLeadActivity(request, header);
+            result = getPort().getLeadActivity(request, header);
             mkto.setSuccess(true);
         } catch (Exception e) {
             LOG.error("getLeadActivity error : {}.", e.getMessage());
             mkto.setSuccess(false);
             mkto.setRecordCount(0);
             mkto.setRemainCount(0);
-            mkto.setErrors(Arrays.asList(new MarketoError(SOAP, e.getMessage())));
+            mkto.setErrors(Collections.singletonList(new MarketoError(SOAP, e.getMessage())));
             return mkto;
         }
 
-        if (result == null || !(result.getLeadActivityList().getReturnCount() > 0)) {
-            LOG.debug("Request returned 0 matching leads.");
-            mkto.setErrors(Arrays.asList(new MarketoError(SOAP, "No leads found.")));
+        if (result == null || result.getLeadActivityList().getReturnCount() == 0) {
+            LOG.debug(MESSAGE_REQUEST_RETURNED_0_MATCHING_LEADS);
+            mkto.setErrors(Collections.singletonList(new MarketoError(SOAP, MESSAGE_NO_LEADS_FOUND)));
             return mkto;
         }
 
-        // todo correct stream position
         String streamPos = result.getLeadActivityList().getNewStartPosition().getOffset().getValue();
         int recordCount = result.getLeadActivityList().getReturnCount();
         int remainCount = result.getLeadActivityList().getRemainingCount();
 
         // Process results
-        results = convertLeadActivityRecords(result.getLeadActivityList().getActivityRecordList().getValue().getActivityRecords(),
-                schema, mappings);
+        List<IndexedRecord> results = convertLeadActivityRecords(
+                result.getLeadActivityList().getActivityRecordList().getValue().getActivityRecords(), schema, mappings);
 
         mkto.setRecordCount(recordCount);
         mkto.setRemainCount(remainCount);
@@ -614,19 +658,15 @@ public class MarketoSOAPClient extends MarketoClient {
 
     @Override
     public MarketoRecordResult getLeadChanges(TMarketoInputProperties parameters, String offset) {
-        LOG.debug("MarketoSOAPClient.getLeadChangesJSON - since {} to  {}.", parameters.oldestCreateDate.getValue(),
-                parameters.latestCreateDate.getValue());
-
-        List<IndexedRecord> results = new ArrayList<>();
         Schema schema = parameters.schemaInput.schema.getValue();
         Map<String, String> mappings = parameters.mappingInput.getNameMappingsForMarketo();
         int bSize = parameters.batchSize.getValue() > 100 ? 100 : parameters.batchSize.getValue();
         String sOldest = parameters.oldestCreateDate.getValue();
         String sLatest = parameters.latestCreateDate.getValue();
+        LOG.debug("LeadChanges - from {} to {}.", sOldest, sLatest);
         //
         // Create Request
         //
-        LOG.info("LeadChanges - from {} to {}.", sOldest, sLatest);
         ParamsGetLeadChanges request = new ParamsGetLeadChanges();
         LastUpdateAtSelector leadSelector = new LastUpdateAtSelector();
         try {
@@ -635,7 +675,6 @@ public class MarketoSOAPClient extends MarketoClient {
             GregorianCalendar gc = new GregorianCalendar();
             gc.setTime(latest);
             DatatypeFactory factory = newInstance();
-            ObjectFactory objectFactory = new ObjectFactory();
             JAXBElement<XMLGregorianCalendar> until = objectFactory
                     .createLastUpdateAtSelectorLatestUpdatedAt(factory.newXMLGregorianCalendar(gc));
             GregorianCalendar since = new GregorianCalendar();
@@ -661,7 +700,7 @@ public class MarketoSOAPClient extends MarketoClient {
 
         // attributes
         ArrayOfString attributes = new ArrayOfString();
-        for (String s : mappings.keySet()) {
+        for (String s : mappings.values()) {
             attributes.getStringItems().add(s);
         }
         // Activity filter
@@ -682,7 +721,6 @@ public class MarketoSOAPClient extends MarketoClient {
             filter.setExcludeTypes(excludes);
         }
 
-        ObjectFactory objectFactory = new ObjectFactory();
         JAXBElement<ActivityTypeFilter> typeFilter = objectFactory.createParamsGetLeadActivityActivityFilter(filter);
         request.setActivityFilter(typeFilter);
         // batch size
@@ -693,34 +731,33 @@ public class MarketoSOAPClient extends MarketoClient {
         // Request execution
         //
         SuccessGetLeadChanges result = null;
-        LOG.debug("Sending request to server...");
+
         MarketoRecordResult mkto = new MarketoRecordResult();
         try {
-            result = port.getLeadChanges(request, header);
+            result = getPort().getLeadChanges(request, header);
             mkto.setSuccess(true);
         } catch (Exception e) {
             LOG.error("getLeadChanges error: {}.", e.getMessage());
             mkto.setSuccess(false);
             mkto.setRecordCount(0);
             mkto.setRemainCount(0);
-            mkto.setErrors(Arrays.asList(new MarketoError(SOAP, e.getMessage())));
+            mkto.setErrors(Collections.singletonList(new MarketoError(SOAP, e.getMessage())));
             return mkto;
         }
 
-        if (result == null || !(result.getResult().getReturnCount() > 0)) {
-            LOG.debug("Request returned 0 matching leads.");
-            mkto.setErrors(Arrays.asList(new MarketoError(SOAP, "No leads found.")));
+        if (result == null || result.getResult().getReturnCount() == 0) {
+            LOG.debug(MESSAGE_REQUEST_RETURNED_0_MATCHING_LEADS);
+            mkto.setErrors(Collections.singletonList(new MarketoError(SOAP, MESSAGE_NO_LEADS_FOUND)));
             return mkto;
         }
 
-        // todo correct stream position
         String streamPos = result.getResult().getNewStartPosition().getOffset().getValue();
         int recordCount = result.getResult().getReturnCount();
         int remainCount = result.getResult().getRemainingCount();
 
         // Process results
-        results = convertLeadChangeRecords(result.getResult().getLeadChangeRecordList().getValue().getLeadChangeRecords(), schema,
-                mappings);
+        List<IndexedRecord> results = convertLeadChangeRecords(
+                result.getResult().getLeadChangeRecordList().getValue().getLeadChangeRecords(), schema, mappings);
 
         mkto.setRecordCount(recordCount);
         mkto.setRemainCount(remainCount);
@@ -742,7 +779,7 @@ public class MarketoSOAPClient extends MarketoClient {
         ArrayOfLeadKey leadKeys = new ArrayOfLeadKey();
         for (String lkv : parameters.getLeadKeyValues()) {
             LeadKey lk = new LeadKey();
-            lk.setKeyType(LeadKeyRef.valueOf(parameters.getLeadKeyType()));
+            lk.setKeyType(valueOf(parameters.getLeadKeyType()));
             lk.setKeyValue(lkv);
             leadKeys.getLeadKeies().add(lk);
         }
@@ -751,7 +788,7 @@ public class MarketoSOAPClient extends MarketoClient {
         MarketoSyncResult mkto = new MarketoSyncResult();
         mkto.setRequestId(SOAP + "::" + operationType.name());
         try {
-            SuccessListOperation result = port.listOperation(paramsListOperation, header);
+            SuccessListOperation result = getPort().listOperation(paramsListOperation, header);
             if (LOG.isDebugEnabled()) {
                 try {
                     JAXBContext context = JAXBContext.newInstance(SuccessListOperation.class);
@@ -791,7 +828,7 @@ public class MarketoSOAPClient extends MarketoClient {
         } catch (Exception e) {
             LOG.error("[{}] error: {}", operationType.name(), e.getMessage());
             mkto.setSuccess(false);
-            mkto.setErrors(Arrays.asList(new MarketoError(SOAP, e.toString())));
+            mkto.setErrors(Collections.singletonList(new MarketoError(SOAP, e.toString())));
         }
         return mkto;
     }
@@ -862,8 +899,13 @@ public class MarketoSOAPClient extends MarketoClient {
                     continue;
                 }
                 Attribute attr = new Attribute();
+                Object value = record.get(f.pos());
                 attr.setAttrName(col);
-                attr.setAttrValue((String) record.get(f.pos()));
+                if (MarketoClientUtils.isDateTypeField(f) && value != null) {
+                    attr.setAttrValue(MarketoClientUtils.formatLongToDateString(Long.valueOf(String.valueOf(value))));
+                } else {
+                    attr.setAttrValue(String.valueOf(value));
+                }
                 aoa.getAttributes().add(attr);
             }
         }
@@ -898,13 +940,12 @@ public class MarketoSOAPClient extends MarketoClient {
         MarketoSyncResult mkto = new MarketoSyncResult();
         try {
             ParamsSyncLead request = new ParamsSyncLead();
-            // fixme managed or not ?
             request.setReturnLead(false);
             //
             request.setLeadRecord(convertToLeadRecord(lead, parameters.mappingInput.getNameMappingsForMarketo()));
             MktowsContextHeader headerContext = new MktowsContextHeader();
             headerContext.setTargetWorkspace("default");
-            SuccessSyncLead result = port.syncLead(request, header, headerContext);
+            SuccessSyncLead result = getPort().syncLead(request, header, headerContext);
             //
             if (LOG.isDebugEnabled()) {
                 try {
@@ -922,14 +963,14 @@ public class MarketoSOAPClient extends MarketoClient {
             if (mkto.isSuccess()) {
                 mkto.setRecordCount(1);
                 SyncStatus resultStatus = new SyncStatus(status.getLeadId(), status.getStatus().value());
-                mkto.setRecords(Arrays.asList(resultStatus));
+                mkto.setRecords(Collections.singletonList(resultStatus));
             } else {
-                mkto.setErrors(Arrays.asList(new MarketoError(SOAP, status.getError().getValue())));
+                mkto.setErrors(Collections.singletonList(new MarketoError(SOAP, status.getError().getValue())));
             }
         } catch (Exception e) {
             LOG.error(e.toString());
             mkto.setSuccess(false);
-            mkto.setErrors(Arrays.asList(new MarketoError(SOAP, e.getMessage())));
+            mkto.setErrors(Collections.singletonList(new MarketoError(SOAP, e.getMessage())));
         }
         return mkto;
     }
@@ -947,7 +988,7 @@ public class MarketoSOAPClient extends MarketoClient {
                     .createParamsSyncMultipleLeadsDedupEnabled(parameters.deDupeEnabled.getValue());
             request.setDedupEnabled(dedup);
             request.setLeadRecordList(leadRecords);
-            SuccessSyncMultipleLeads result = port.syncMultipleLeads(request, header);
+            SuccessSyncMultipleLeads result = getPort().syncMultipleLeads(request, header);
             //
             if (LOG.isDebugEnabled()) {
                 try {
@@ -971,8 +1012,74 @@ public class MarketoSOAPClient extends MarketoClient {
         } catch (Exception e) {
             LOG.error(e.toString());
             mkto.setSuccess(false);
-            mkto.setErrors(Arrays.asList(new MarketoError(SOAP, e.getMessage())));
+            mkto.setErrors(Collections.singletonList(new MarketoError(SOAP, e.getMessage())));
         }
         return mkto;
+    }
+
+    public MktowsPort getPort() {
+        return port;
+    }
+
+    /**
+     * Check if one of errors is due to AuthentificationHeader expiration
+     * 
+     * @param errors
+     * @return
+     */
+    public boolean isAuthentificationHeaderExpired(List<MarketoError> errors) {
+        if (errors != null) {
+            for (MarketoError error : errors) {
+                if (error.getMessage().contains("20016")) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Renew Authentification Header
+     * 
+     * @throws InvalidKeyException
+     * @throws NoSuchAlgorithmException
+     */
+    public void refreshAuthentificationHeader() throws InvalidKeyException, NoSuchAlgorithmException {
+        header = getAuthentificationHeader();
+    }
+
+    /**
+     * Returns true if error is recoverable (we can retry operation).
+     *
+     * param error : Error string coming from a MarketoError.
+     *
+     * Potential recoverable errors returned by API:
+     *
+     * <li>10001 Internal Error Severe system failure</li>
+     * <li>20011 Internal Error API service failure</li>
+     * <li>20016 Request Expired Request signature is too old. The given timestamp and request signature are in the past and
+     * are no longer valid. Request can be retried with a newly generated timestamp and signature.</li>
+     * <li>20023 Rate Limit Exceeded The number of calls in the past 20 seconds was greater than 100</li>
+     * <li>20024 Concurrency Limit Exceeded The number of concurrent calls was greater than 10</li>
+     */
+    @Override
+    public boolean isErrorRecoverable(List<MarketoError> errors) {
+        if (isAuthentificationHeaderExpired(errors)) {
+            try {
+                // refresh token : the only action we have a possibility to act by ourselves.
+                refreshAuthentificationHeader();
+                return true;
+            } catch (Exception e) {
+                // retry until retry count is reached.
+                return true;
+            }
+        }
+        final Pattern pattern = Pattern.compile(".*(10001|20011|20023|20024).*");
+        for (MarketoError error : errors) {
+            if (pattern.matcher(error.getMessage()).matches()) {
+                return true;
+            }
+        }
+        return false;
     }
 }

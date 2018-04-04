@@ -17,7 +17,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -46,6 +45,7 @@ import org.apache.avro.generic.IndexedRecord;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
+import org.talend.components.marketo.MarketoUtils;
 import org.talend.components.marketo.runtime.MarketoSource;
 import org.talend.components.marketo.runtime.client.rest.type.SyncStatus;
 import org.talend.components.marketo.runtime.client.type.ListOperationParameters;
@@ -218,7 +218,7 @@ public class MarketoSOAPClientTestIT extends MarketoClientTestIT {
         MarketoRecordResult result = client.getMultipleLeads(inputProperties, null);
         LOG.debug("{}", result);
         List<IndexedRecord> records = result.getRecords();
-        assertEquals(4, records.size());
+        assertTrue(records.size() >= 4);
     }
 
     @Test
@@ -297,7 +297,7 @@ public class MarketoSOAPClientTestIT extends MarketoClientTestIT {
             counted += result.getRecordCount();
         }
         LOG.debug(result.getRecords().get(0).getSchema().toString());
-        assertEquals("long", result.getRecords().get(0).getSchema().getField("Id").schema().getTypes().get(0).getName());
+        assertEquals("int", result.getRecords().get(0).getSchema().getField("Id").schema().getTypes().get(0).getName());
         assertTrue(counted > 4);
     }
 
@@ -339,7 +339,7 @@ public class MarketoSOAPClientTestIT extends MarketoClientTestIT {
         MarketoRecordResult result = client.getMultipleLeads(inputProperties, null);
         LOG.debug("{}", result);
         assertTrue(result.isSuccess());
-        assertNull(result.getErrors());
+        assertTrue(result.getErrors().isEmpty());
         assertNotEquals(0, result.getRecordCount());
         assertNotEquals(0, result.getRemainCount());
         assertTrue(result.getRecordCount() > 4);
@@ -360,7 +360,7 @@ public class MarketoSOAPClientTestIT extends MarketoClientTestIT {
         //
         MarketoRecordResult result = client.getMultipleLeads(inputProperties, null);
         LOG.debug("{}", result);
-        assertTrue(result.isSuccess()); // but not leads
+        assertFalse(result.isSuccess()); // but not leads
         assertNotNull(result.getErrors());
         assertEquals(0, result.getRecordCount());
         assertEquals(0, result.getRemainCount());
@@ -721,7 +721,7 @@ public class MarketoSOAPClientTestIT extends MarketoClientTestIT {
         outProperties.updateSchemaRelated();
         outProperties.afterOutputOperation();
         outProperties.beforeMappingInput();
-        MarketoSOAPClient client = new MarketoSOAPClient(outProperties.connection);
+        MarketoSOAPClient client = new MarketoSOAPClient(outProperties.connection).connect();
         IndexedRecord record = new GenericData.Record(outProperties.schemaInput.schema.getValue());
         record.put(0, 10);
         record.put(1, "undx@undx.net");
@@ -735,7 +735,7 @@ public class MarketoSOAPClientTestIT extends MarketoClientTestIT {
         fields.add(field);
         field = new Schema.Field("LastName", Schema.create(Schema.Type.STRING), null, (Object) null);
         fields.add(field);
-        Schema s = outProperties.newSchema(outProperties.schemaInput.schema.getValue(), "leadAttribute", fields);
+        Schema s = MarketoUtils.newSchema(outProperties.schemaInput.schema.getValue(), "leadAttribute", fields);
         record = new GenericData.Record(s);
         record.put(0, 10);
         record.put(1, "undx@undx.net");
@@ -796,7 +796,7 @@ public class MarketoSOAPClientTestIT extends MarketoClientTestIT {
         fields.add(field);
         field = new Schema.Field("AccountType", Schema.create(Schema.Type.STRING), null, (Object) null);
         fields.add(field);
-        Schema s = outProperties.newSchema(outProperties.schemaInput.schema.getValue(), "leadAttribute", fields);
+        Schema s = MarketoUtils.newSchema(outProperties.schemaInput.schema.getValue(), "leadAttribute", fields);
         IndexedRecord record = new GenericData.Record(s);
         record.put(0, null);
         record.put(1, "undx@undx.net");
@@ -823,7 +823,7 @@ public class MarketoSOAPClientTestIT extends MarketoClientTestIT {
         List<Field> fields = new ArrayList<>();
         Field field = new Schema.Field("AccountType", Schema.create(Schema.Type.STRING), null, (Object) null);
         fields.add(field);
-        Schema s = outProperties.newSchema(outProperties.schemaInput.schema.getValue(), "leadAttribute", fields);
+        Schema s = MarketoUtils.newSchema(outProperties.schemaInput.schema.getValue(), "leadAttribute", fields);
         outProperties.schemaInput.schema.setValue(s);
         outProperties.beforeMappingInput();
         List<IndexedRecord> records = new ArrayList<>();

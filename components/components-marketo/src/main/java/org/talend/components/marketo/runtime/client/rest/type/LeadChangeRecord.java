@@ -18,6 +18,10 @@ public class LeadChangeRecord extends MarketoAttributes {
 
     private List<Map<String, String>> fields;
 
+    private String marketoGUID;
+
+    private Integer campaignId;
+
     public void setId(Integer id) {
         this.id = id;
     }
@@ -64,6 +68,22 @@ public class LeadChangeRecord extends MarketoAttributes {
 
     public List<Map<String, String>> getFields() {
         return this.fields;
+    }
+
+    public String getMarketoGUID() {
+        return marketoGUID;
+    }
+
+    public void setMarketoGUID(String marketoGUID) {
+        this.marketoGUID = marketoGUID;
+    }
+
+    public Integer getCampaignId() {
+        return campaignId;
+    }
+
+    public void setCampaignId(Integer campaignId) {
+        this.campaignId = campaignId;
     }
 
     @Override

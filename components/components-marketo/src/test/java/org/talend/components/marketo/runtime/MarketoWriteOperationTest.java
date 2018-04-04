@@ -13,6 +13,7 @@
 package org.talend.components.marketo.runtime;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
@@ -46,8 +47,14 @@ public class MarketoWriteOperationTest {
     public void testCreateWriter() throws Exception {
         MarketoSink sink = new MarketoSink();
         TMarketoListOperationProperties plist = new TMarketoListOperationProperties("test");
+        plist.init();
         TMarketoOutputProperties pout = new TMarketoOutputProperties("test");
+        pout.init();
         TMarketoInputProperties pin = new TMarketoInputProperties("test");
+        pin.init();
+        sink.initialize(null, null);
+        wop = new MarketoWriteOperation(sink);
+        assertNull(wop.createWriter(null));
         sink.initialize(null, plist);
         wop = new MarketoWriteOperation(sink);
         assertEquals(MarketoListOperationWriter.class, wop.createWriter(null).getClass());

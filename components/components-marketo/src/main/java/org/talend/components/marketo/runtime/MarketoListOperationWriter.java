@@ -63,7 +63,7 @@ public class MarketoListOperationWriter extends MarketoWriter {
     public void open(String uId) throws IOException {
         super.open(uId);
 
-        properties = (TMarketoListOperationProperties) sink.properties;
+        properties = (TMarketoListOperationProperties) sink.getProperties();
         inputSchema = properties.schemaInput.schema.getValue();
         flowSchema = properties.schemaFlow.schema.getValue();
         rejectSchema = properties.schemaReject.schema.getValue();
@@ -108,18 +108,40 @@ public class MarketoListOperationWriter extends MarketoWriter {
         if (!listOpeParms.isValid()) {
             return;
         }
+        MarketoSyncResult mktoResult = new MarketoSyncResult();
         // process the list operation
-        switch (operation) {
-        case addTo:
-            processResult(client.addToList(listOpeParms));
-            break;
-        case isMemberOf:
-            processResult(client.isMemberOfList(listOpeParms));
-            break;
-        case removeFrom:
-            processResult(client.removeFromList(listOpeParms));
-            break;
+        for (int i = 0; i < getRetryAttemps(); i++) {
+            result.apiCalls++;
+            switch (operation) {
+            case addTo:
+                mktoResult = client.addToList(listOpeParms);
+                break;
+            case isMemberOf:
+                mktoResult = client.isMemberOfList(listOpeParms);
+                break;
+            case removeFrom:
+                mktoResult = client.removeFromList(listOpeParms);
+                break;
+            }
+            //
+            if (!mktoResult.isSuccess()) {
+                if (dieOnError) {
+                    throw new MarketoRuntimeException(mktoResult.getErrorsString());
+                }
+                // is recoverable error
+                if (client.isErrorRecoverable(mktoResult.getErrors())) {
+                    LOG.debug("Recoverable error during operation : `{}`. Retrying...", mktoResult.getErrorsString());
+                    waitForRetryAttempInterval();
+                    continue;
+                } else {
+                    LOG.error("Unrecoverable error : `{}`.", mktoResult.getErrorsString());
+                    break;
+                }
+            } else {
+                break;
+            }
         }
+        processResult(mktoResult);
         // clear the list
         listOpeParms.reset();
     }
@@ -186,7 +208,7 @@ public class MarketoListOperationWriter extends MarketoWriter {
                 record.put(f.pos(), listOpeParms.getLeadKeyType());
             }
             if (f.name().equals(FIELD_LEAD_KEY_VALUE)) {
-                record.put(f.pos(), status.getId());
+                record.put(f.pos(), String.valueOf(status.getId()));
             }
             if (f.name().equals(FIELD_LIST_ID)) {
                 record.put(f.pos(), listOpeParms.getListId());
@@ -210,11 +232,7 @@ public class MarketoListOperationWriter extends MarketoWriter {
     private void processResult(MarketoSyncResult mktoResult) {
         successfulWrites.clear();
         rejectedWrites.clear();
-        result.apiCalls++;
         if (!mktoResult.isSuccess()) {
-            if (dieOnError) {
-                throw new MarketoRuntimeException(mktoResult.getErrorsString());
-            }
             // build a SyncStatus for record which failed
             SyncStatus status = new SyncStatus();
             status.setStatus("failed");

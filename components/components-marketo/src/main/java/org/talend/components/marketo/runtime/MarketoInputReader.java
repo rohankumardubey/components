@@ -65,6 +65,10 @@ public class MarketoInputReader extends AbstractBoundedReader<IndexedRecord> {
 
     private int activitiesListIndex = 0;
 
+    protected int retryAttemps = 1;
+
+    protected int retryInterval;
+
     private static final Logger LOG = LoggerFactory.getLogger(MarketoInputReader.class);
 
     private static final I18nMessages messages = GlobalI18N.getI18nMessageProvider().getI18nMessages(MarketoInputReader.class);
@@ -90,17 +94,24 @@ public class MarketoInputReader extends AbstractBoundedReader<IndexedRecord> {
         if (properties.isApiREST() && InputOperation.getLeadActivity.equals(properties.inputOperation.getValue())) {
             useActivitiesList = true;
             // include all activities
+            List<String> tmp;
             if (!properties.setIncludeTypes.getValue()) {
-                List<String> tmp = new ArrayList<>();
+                tmp = new ArrayList<>();
                 for (IncludeExcludeFieldsREST a : IncludeExcludeFieldsREST.values()) {
                     tmp.add(a.name());
                 }
-                activities = splitList(tmp, 10);
             } else {
-                activities = splitList(properties.includeTypes.type.getValue(), 10);
+                tmp = properties.includeTypes.type.getValue();
             }
+            if (properties.setExcludeTypes.getValue()) {
+                tmp.removeAll(properties.excludeTypes.type.getValue());
+            }
+            activities = splitList(tmp, 10);
             LOG.debug("activities to process = {}.", activities);
         }
+
+        retryAttemps = this.properties.getConnectionProperties().maxReconnAttemps.getValue();
+        retryInterval = this.properties.getConnectionProperties().attemptsIntervalTime.getValue();
     }
 
     public void adaptSchemaToDynamic() throws IOException {
@@ -137,47 +148,74 @@ public class MarketoInputReader extends AbstractBoundedReader<IndexedRecord> {
     }
 
     public MarketoRecordResult executeOperation(String position) throws IOException {
-        switch (properties.inputOperation.getValue()) {
-        case getLead:
-            if (isDynamic) {
-                adaptSchemaToDynamic();
-            }
-            return client.getLead(properties, position);
-        case getMultipleLeads:
-            if (isDynamic) {
-                adaptSchemaToDynamic();
-            }
-            return client.getMultipleLeads(properties, position);
-        case getLeadActivity:
-            return client.getLeadActivity(properties, position);
-        case getLeadChanges:
-            return client.getLeadChanges(properties, position);
-        case CustomObject:
-            switch (properties.customObjectAction.getValue()) {
-            case describe:
-                return ((MarketoRESTClient) client).describeCustomObject(properties);
-            case list:
-                return ((MarketoRESTClient) client).listCustomObjects(properties);
-            case get:
+        MarketoRecordResult mkto = new MarketoRecordResult();
+        for (int i = 0; i < getRetryAttemps(); i++) {
+            apiCalls++;
+            switch (properties.inputOperation.getValue()) {
+            case getLead:
                 if (isDynamic) {
                     adaptSchemaToDynamic();
                 }
-                return ((MarketoRESTClient) client).getCustomObjects(properties, position);
+                mkto = client.getLead(properties, position);
+                break;
+            case getMultipleLeads:
+                if (isDynamic) {
+                    adaptSchemaToDynamic();
+                }
+                mkto = client.getMultipleLeads(properties, position);
+                break;
+            case getLeadActivity:
+                mkto = client.getLeadActivity(properties, position);
+                break;
+            case getLeadChanges:
+                mkto = client.getLeadChanges(properties, position);
+                break;
+            case CustomObject:
+                switch (properties.customObjectAction.getValue()) {
+                case describe:
+                    mkto = ((MarketoRESTClient) client).describeCustomObject(properties);
+                    break;
+                case list:
+                    mkto = ((MarketoRESTClient) client).listCustomObjects(properties);
+                    break;
+                case get:
+                    if (isDynamic) {
+                        adaptSchemaToDynamic();
+                    }
+                    mkto = ((MarketoRESTClient) client).getCustomObjects(properties, position);
+                    break;
+                default:
+                    throw new IOException(messages.getMessage("error.reader.invalid.operation"));
+                }
+                break;
+            default:
+                throw new IOException(messages.getMessage("error.reader.invalid.operation"));
             }
-            break;
+            //
+            if (!mkto.isSuccess()) {
+                if (properties.dieOnError.getValue()) {
+                    throw new MarketoRuntimeException(mkto.getErrorsString());
+                }
+                // is recoverable error
+                if (client.isErrorRecoverable(mkto.getErrors())) {
+                    LOG.debug("Recoverable error during operation : `{}`. Retrying...", mkto.getErrorsString());
+                    waitForRetryAttempInterval();
+                    continue;
+                } else {
+                    LOG.error("Unrecoverable error : `{}`.", mkto.getErrorsString());
+                    break;
+                }
+            } else {
+                break;
+            }
         }
-        throw new IOException(messages.getMessage("error.reader.invalid.operation"));
+        return mkto;
     }
 
-    public boolean checkResult(MarketoRecordResult mkto) throws IOException {
-        apiCalls++;
+    public boolean checkResult(MarketoRecordResult mkto) {
         boolean result;
         if (!mkto.isSuccess()) {
             result = false;
-            if (properties.dieOnError.getValue()) {
-                LOG.debug("mkto = {}.", mkto);
-                throw new IOException(mktoResult.getErrorsString());
-            }
         } else {
             result = mktoResult.getRecordCount() > 0;
         }
@@ -265,6 +303,25 @@ public class MarketoInputReader extends AbstractBoundedReader<IndexedRecord> {
         res.put(RETURN_NB_CALL, apiCalls);
         res.put(RETURN_ERROR_MESSAGE, errorMessage);
         return res;
+    }
+
+    public int getRetryAttemps() {
+        return retryAttemps;
+    }
+
+    public int getRetryInterval() {
+        return retryInterval;
+    }
+
+    /**
+     * Sleeps for retryInterval time
+     *
+     */
+    protected void waitForRetryAttempInterval() {
+        try {
+            Thread.sleep(getRetryInterval());
+        } catch (InterruptedException e) {
+        }
     }
 
 }

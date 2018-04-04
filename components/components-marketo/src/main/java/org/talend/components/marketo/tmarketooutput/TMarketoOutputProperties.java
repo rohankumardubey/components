@@ -26,7 +26,6 @@ import static org.talend.daikon.properties.property.PropertyFactory.newString;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -38,6 +37,7 @@ import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.ISchemaListener;
 import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.marketo.MarketoConstants;
+import org.talend.components.marketo.MarketoUtils;
 import org.talend.components.marketo.helpers.MarketoColumnMappingsTable;
 import org.talend.components.marketo.wizard.MarketoComponentWizardBaseProperties;
 import org.talend.daikon.avro.SchemaConstants;
@@ -392,8 +392,8 @@ public class TMarketoOutputProperties extends MarketoComponentWizardBaseProperti
             f.addProp(SchemaConstants.TALEND_IS_LOCKED, "true");
             rejectFields.add(f);
         }
-        Schema flowSchema = newSchema(inputSchema, "schemaFlow", flowFields);
-        Schema rejectSchema = newSchema(inputSchema, "schemaReject", rejectFields);
+        Schema flowSchema = MarketoUtils.newSchema(inputSchema, "schemaFlow", flowFields);
+        Schema rejectSchema = MarketoUtils.newSchema(inputSchema, "schemaReject", rejectFields);
         schemaFlow.schema.setValue(flowSchema);
         schemaReject.schema.setValue(rejectSchema);
     }
@@ -410,18 +410,13 @@ public class TMarketoOutputProperties extends MarketoComponentWizardBaseProperti
             migrated = super.postDeserialize(version, setup, persistent);
         } catch (ClassCastException cce) {
             migrated = super.postDeserialize(version, setup, false); // don't initLayout
-            LinkedHashMap value = (LinkedHashMap) outputOperation.getStoredValue();
-            String io = String.valueOf(value.get("name"));
-            // re-affect correct values
-            outputOperation.setPossibleValues(OutputOperation.values());
-            outputOperation.setValue(OutputOperation.valueOf(io));
-            value = (LinkedHashMap) customObjectSyncAction.getStoredValue();
-            io = String.valueOf(value.get("name"));
-            // re-affect correct values
-            customObjectSyncAction.setPossibleValues(CustomObjectSyncAction.values());
-            customObjectSyncAction.setValue(CustomObjectSyncAction.valueOf(io));
         }
+        checkForInvalidStoredProperties();
         return migrated;
     }
 
+    private void checkForInvalidStoredProperties() {
+        outputOperation = checkForInvalidStoredEnumProperty(outputOperation, OutputOperation.class);
+        customObjectSyncAction = checkForInvalidStoredEnumProperty(customObjectSyncAction, CustomObjectSyncAction.class);
+    }
 }

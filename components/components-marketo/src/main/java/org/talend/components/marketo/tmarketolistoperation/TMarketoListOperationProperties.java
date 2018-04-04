@@ -36,8 +36,10 @@ import org.talend.daikon.properties.ValidationResultMutable;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.property.PropertyFactory;
+import org.talend.daikon.serialize.PostDeserializeSetup;
+import org.talend.daikon.serialize.migration.SerializeSetVersion;
 
-public class TMarketoListOperationProperties extends MarketoComponentProperties {
+public class TMarketoListOperationProperties extends MarketoComponentProperties implements SerializeSetVersion {
 
     public Property<Boolean> dieOnError = newBoolean("dieOnError");
 
@@ -167,4 +169,19 @@ public class TMarketoListOperationProperties extends MarketoComponentProperties 
         }
     }
 
+    @Override
+    public int getVersionNumber() {
+        return 1;
+    }
+    @Override
+    public boolean postDeserialize(int version, PostDeserializeSetup setup, boolean persistent) {
+        boolean migrated;
+        try {
+            migrated = super.postDeserialize(version, setup, persistent);
+        } catch (ClassCastException cce) {
+            migrated = super.postDeserialize(version, setup, false); // don't initLayout
+        }
+        listOperation = checkForInvalidStoredEnumProperty(listOperation, ListOperation.class);
+        return migrated;
+    }
 }

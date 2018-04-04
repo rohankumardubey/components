@@ -18,6 +18,10 @@ public class LeadActivityRecord extends MarketoAttributes {
 
     private String primaryAttributeValue;
 
+    private String marketoGUID;
+
+    private Integer campaignId;
+
     public Integer getId() {
         return id;
     }
@@ -72,6 +76,23 @@ public class LeadActivityRecord extends MarketoAttributes {
 
     public void setPrimaryAttributeValue(String primaryAttributeValue) {
         this.primaryAttributeValue = primaryAttributeValue;
+    }
+
+
+    public String getMarketoGUID() {
+        return marketoGUID;
+    }
+
+    public void setMarketoGUID(String marketoGUID) {
+        this.marketoGUID = marketoGUID;
+    }
+
+    public Integer getCampaignId() {
+        return campaignId;
+    }
+
+    public void setCampaignId(Integer campaignId) {
+        this.campaignId = campaignId;
     }
 
     @Override

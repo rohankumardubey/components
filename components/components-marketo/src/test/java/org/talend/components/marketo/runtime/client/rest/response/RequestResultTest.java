@@ -12,7 +12,11 @@
 // ============================================================================
 package org.talend.components.marketo.runtime.client.rest.response;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 import java.util.List;
@@ -24,6 +28,7 @@ import org.talend.components.marketo.runtime.client.type.MarketoError;
 public class RequestResultTest {
 
     RequestResult r;
+
     @Before
     public void setUp() throws Exception {
         r = new RequestResult() {
@@ -92,6 +97,15 @@ public class RequestResultTest {
     public void testToString() throws Exception {
         String s = "{requestId='REST::666', success=true, errors=[MarketoError{api='REST', code='', message=''}], result=null, moreResult=true}";
         assertEquals(s, r.toString());
+    }
+
+    @Test
+    public void testGetErrorsString() throws Exception {
+        assertNotNull(r.getErrorsString());
+        r.setErrors(Arrays.asList(new MarketoError("REST", "404", "not found¿")));
+        assertNotNull(r.getErrorsString());
+        r.setErrors(null);
+        assertNotNull(r.getErrorsString());
     }
 
 }
