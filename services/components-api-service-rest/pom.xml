@@ -6,13 +6,13 @@
     <parent>
         <groupId>org.talend.daikon</groupId>
         <artifactId>service-parent</artifactId>
-        <version>0.23.1-SNAPSHOT</version>
+        <version>0.23.1</version>
         <relativePath></relativePath>
     </parent>
 
     <groupId>org.talend.components</groupId>
     <artifactId>components-api-service-rest</artifactId>
-    <version>0.23.1-SNAPSHOT</version>
+    <version>0.23.1</version>
 
     <name>Component REST API</name>
     <properties>
