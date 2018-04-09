@@ -130,13 +130,14 @@ public class UgiFileSinkBase<K, V> extends ConfigurableHDFSFileSink<K, V> {
         return new UgiWriteOperation.UgiWriter<>(writeOperation, path);
     }
 
-    protected boolean mergeOutput(FileSystem fs, String sourceFolder, String targetFile) {
+    protected void mergeOutput(FileSystem fs, String sourceFolder, String targetFile) throws IOException {
         // implement how to merge files, different between format
         try {
-            return copyMerge(fs, new Path(sourceFolder), fs, new Path(targetFile), fs.getConf());
+            boolean success = copyMerge(fs, new Path(sourceFolder), fs, new Path(targetFile), fs.getConf());
+            if (!success)
+                throw new IOException("Not a directory: " + sourceFolder);
         } catch (Exception e) {
-            LOG.error("Error when merging files in {}.\n{}", sourceFolder, e.getMessage());
-            return false;
+            throw new IOException("Error when merging files in " + sourceFolder, e);
         }
     }
 
@@ -148,7 +149,7 @@ public class UgiFileSinkBase<K, V> extends ConfigurableHDFSFileSink<K, V> {
             return false;
 
         // Unlike org.apache.hadoop.fs.FileUtil#copyMerge, make sure that we list the contents of the input directory
-        // BEFORE creating the destination file.  Otherwise we might end in a loop that generates an output file of
+        // BEFORE creating the destination file. Otherwise we might end in a loop that generates an output file of
         // infinite size when the dstFile is in the srcDir.
         FileStatus contents[] = srcFS.listStatus(srcDir);
         OutputStream out = dstFS.create(dstFile);
@@ -193,8 +194,8 @@ public class UgiFileSinkBase<K, V> extends ConfigurableHDFSFileSink<K, V> {
         }
 
         @Override
-        protected boolean mergeOutput(FileSystem fs, String sourceFolder, String targetFile) {
-            return this.sink.mergeOutput(fs, sourceFolder, targetFile);
+        protected void mergeOutput(FileSystem fs, String sourceFolder, String targetFile) throws IOException {
+            this.sink.mergeOutput(fs, sourceFolder, targetFile);
         }
 
         protected void ugiDoAsFinalize(Iterable<String> writerResults, PipelineOptions options) throws Exception {
