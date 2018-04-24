@@ -50,9 +50,13 @@ public class SalesforceConnectionProperties extends ComponentPropertiesImpl
 
     public static final String DEFAULT_API_VERSION = "39.0";
 
-    public static final String URL = "https://www.salesforce.com/services/Soap/u/" + DEFAULT_API_VERSION;
+    public static final String RETIRED_ENDPOINT = "www.salesforce.com";
 
-    public static final String OAUTH_URL = "https://login.salesforce.com/services/oauth2";
+    public static final String ACTIVE_ENDPOINT = "login.salesforce.com";
+
+    public static final String URL = "https://" + ACTIVE_ENDPOINT + "/services/Soap/u/" + DEFAULT_API_VERSION;
+
+    public static final String OAUTH_URL = "https://" + ACTIVE_ENDPOINT + "/services/oauth2";
 
     public Property<String> endpoint = newString("endpoint").setRequired();
 
