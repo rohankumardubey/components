@@ -4,10 +4,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericData;
@@ -46,6 +43,8 @@ public class AggregateCombineFn
         if (accumulator.outputRecordSchemaStr == null) {
             accumulator.outputRecordSchemaStr =
                     AggregateUtils.genOutputRecordSchema(inputRecord.getSchema(), properties).toString();
+            if (accumulator.outputRecordSchemaStr!=null)
+                AggregateAccumulator.mapOutputSchemaStrPerProperties.put(accumulator.aggProperties.toString(), accumulator.outputRecordSchemaStr);
         }
         for (AccumulatorElement accumulatorElement : accumulator.accumulatorElements) {
             accumulatorElement.addInput(inputRecord);
@@ -72,7 +71,13 @@ public class AggregateCombineFn
     @Override
     public IndexedRecord extractOutput(AggregateAccumulator accumulator) {
         Schema.Parser parser = new Schema.Parser();
-        Schema outputRecordSchema = parser.parse(accumulator.outputRecordSchemaStr);
+        String outputRecordSchemaStr = accumulator.outputRecordSchemaStr;
+        if (outputRecordSchemaStr == null) {
+            outputRecordSchemaStr =
+                    AggregateAccumulator.mapOutputSchemaStrPerProperties.get(accumulator.aggProperties.toString());
+        }
+
+        Schema outputRecordSchema = parser.parse(outputRecordSchemaStr);
         IndexedRecord outputRecord = new GenericData.Record(outputRecordSchema);
         for (AccumulatorElement accumulatorElement : accumulator.accumulatorElements) {
                 IndexedRecord outputFieldRecord = accumulatorElement.extractOutput();
@@ -87,12 +92,17 @@ public class AggregateCombineFn
     public static class AggregateAccumulator implements Serializable {
 
         // for merge the final output record, init by first coming record
-        private static String outputRecordSchemaStr;
+        private /*static*/ String outputRecordSchemaStr;
+
+        static Map<String, String> mapOutputSchemaStrPerProperties = new HashMap<String, String>();
+
+        AggregateProperties aggProperties;
 
         // based on the defined operationType group
         private List<AccumulatorElement> accumulatorElements;
 
         public AggregateAccumulator(AggregateProperties properties) {
+            aggProperties = properties;
             List<AccumulatorElement> accs = new ArrayList();
             for (AggregateOperationProperties funcProps : properties.filteredOperations()) {
                 accs.add(new AccumulatorElement(funcProps));
