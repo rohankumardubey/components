@@ -74,9 +74,11 @@ public class AggregateCombineFn
         Schema outputRecordSchema = parser.parse(accumulator.outputRecordSchemaStr);
         IndexedRecord outputRecord = new GenericData.Record(outputRecordSchema);
         for (AccumulatorElement accumulatorElement : accumulator.accumulatorElements) {
-            IndexedRecord outputFieldRecord = accumulatorElement.extractOutput();
-            if (outputFieldRecord != null) {
-                outputRecord = KeyValueUtils.mergeIndexedRecord(outputFieldRecord, outputRecord, outputRecordSchema);
+            if (accumulatorElement.outputFieldSchemaStr != null) {
+                IndexedRecord outputFieldRecord = accumulatorElement.extractOutput();
+                if (outputFieldRecord != null) {
+                    outputRecord = KeyValueUtils.mergeIndexedRecord(outputFieldRecord, outputRecord, outputRecordSchema);
+                }
             }
         }
         return outputRecord;
@@ -86,7 +88,7 @@ public class AggregateCombineFn
     public static class AggregateAccumulator implements Serializable {
 
         // for merge the final output record, init by first coming record
-        private String outputRecordSchemaStr;
+        private static String outputRecordSchemaStr;
 
         // based on the defined operationType group
         private List<AccumulatorElement> accumulatorElements;
@@ -113,7 +115,7 @@ public class AggregateCombineFn
         // init by first coming record
         AccumulatorFn accumulatorFn;
 
-        String outputFieldSchemaStr;
+        public String outputFieldSchemaStr;
 
         public AccumulatorElement(AggregateOperationProperties optProps) {
             this.optProps = optProps;
