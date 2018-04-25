@@ -7,6 +7,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericData;
@@ -74,12 +75,10 @@ public class AggregateCombineFn
         Schema outputRecordSchema = parser.parse(accumulator.outputRecordSchemaStr);
         IndexedRecord outputRecord = new GenericData.Record(outputRecordSchema);
         for (AccumulatorElement accumulatorElement : accumulator.accumulatorElements) {
-            if (accumulatorElement.outputFieldSchemaStr != null) {
                 IndexedRecord outputFieldRecord = accumulatorElement.extractOutput();
                 if (outputFieldRecord != null) {
                     outputRecord = KeyValueUtils.mergeIndexedRecord(outputFieldRecord, outputRecord, outputRecordSchema);
                 }
-            }
         }
         return outputRecord;
     }
@@ -116,6 +115,8 @@ public class AggregateCombineFn
         AccumulatorFn accumulatorFn;
 
         public String outputFieldSchemaStr;
+        public static Map<String, String> mapOutputSchemasStr = new java.util.HashMap<String, String>();
+        public static Map<String, Schema> mapInputFieldSchemas = new java.util.HashMap<String, Schema>();
 
         public AccumulatorElement(AggregateOperationProperties optProps) {
             this.optProps = optProps;
@@ -128,6 +129,7 @@ public class AggregateCombineFn
             if (this.outputFieldSchemaStr == null) {
                 this.outputFieldSchemaStr =
                         AggregateUtils.genOutputFieldSchema(inputRecord.getSchema(), optProps).toString();
+                mapOutputSchemasStr.put(optProps.toString(), this.outputFieldSchemaStr);
             }
             GenericData.Record inputField = KeyValueUtils.getField(inputFieldPath, inputRecord);
             if (accumulatorFn == null) {
@@ -135,6 +137,7 @@ public class AggregateCombineFn
                         .retrieveFieldFromJsonPath(inputRecord.getSchema(), this.inputFieldPath)
                         .schema();
                 accumulatorFn = getProperCombineFn(inputFieldSchema, operationType);
+                mapInputFieldSchemas.put(optProps.toString(), inputFieldSchema);
                 accumulatorFn.createAccumulator();
             }
             accumulatorFn.addInput(inputField);
@@ -148,9 +151,11 @@ public class AggregateCombineFn
                     AccumulatorElement next = iterator.next();
                     if (this.outputFieldSchemaStr == null) {
                         this.outputFieldSchemaStr = next.outputFieldSchemaStr;
+                        mapOutputSchemasStr.put(optProps.toString(), this.outputFieldSchemaStr);
                     }
                     if (this.accumulatorFn == null) {
                         this.accumulatorFn = next.accumulatorFn;
+                   //     mapInputFieldSchemas.put(optProps.toString(), this.accumulatorFn);
                         continue;
                     }
                     accs.add(next.accumulatorFn.getAccumulators());
@@ -161,9 +166,19 @@ public class AggregateCombineFn
 
         public IndexedRecord extractOutput() {
             Schema.Parser parser = new Schema.Parser();
-            Schema outputFieldSchema = parser.parse(outputFieldSchemaStr);
+            Schema outputFieldSchema = parser.parse(outputFieldSchemaStr == null ? mapOutputSchemasStr.get(optProps.toString()): outputFieldSchemaStr);
             GenericData.Record outputFieldRecord = new GenericData.Record(outputFieldSchema);
-            AggregateUtils.setField(outputFieldPath, this.accumulatorFn.extractOutput(), outputFieldRecord);
+            AccumulatorFn acc = null;
+            if (this.accumulatorFn != null)
+                acc = this.accumulatorFn;
+            else {
+                Schema inputFieldSchema = mapInputFieldSchemas.get(optProps.toString());
+                if (inputFieldSchema != null) {
+                    acc = getProperCombineFn(inputFieldSchema, operationType);
+                    if (acc!=null) acc.createAccumulator();
+                }
+            }
+            if (acc!=null) AggregateUtils.setField(outputFieldPath, acc.extractOutput(), outputFieldRecord);
             return outputFieldRecord;
         }
 
@@ -317,6 +332,11 @@ public class AggregateCombineFn
     public static class SumDoubleAccumulatorFn extends AccumulatorFnAbstract<Double> {
 
         @Override
+        public void createAccumulator() {
+            accs = 0.0;
+        }
+
+        @Override
         public Double convertFromObject(Object inputValue) {
             return Double.valueOf(String.valueOf(inputValue));
         }
@@ -329,6 +349,11 @@ public class AggregateCombineFn
     }
 
     public static class SumLongAccumulatorFn extends AccumulatorFnAbstract<Long> {
+
+        @Override
+        public void createAccumulator() {
+            accs = 0L;
+        }
 
         @Override
         public Long convertFromObject(Object inputValue) {
