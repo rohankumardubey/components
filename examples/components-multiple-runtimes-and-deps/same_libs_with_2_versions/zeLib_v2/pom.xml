@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.talend.test</groupId>
 	<artifactId>zeLibV2</artifactId>
-	<version>0.21.3</version>
+	<version>0.21.4-SNAPSHOT</version>
 	<name>zeLib V2</name>
 	
 	<properties>
