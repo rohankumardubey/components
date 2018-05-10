@@ -84,9 +84,11 @@ public class TSalesforceInputProperties extends SalesforceConnectionModuleProper
 
     public static final int DEFAULT_JOB_TIME_OUT = 0; // Default : no timeout to wait until the job fails or is in success
 
-    public Property<Integer> jobTimeOut = newInteger("jobTimeOut");
-
     public Property<Boolean> safetySwitch = newBoolean("safetySwitch", true);
+
+    public Property<Boolean> returnNullValue = newBoolean("returnNullValue", false);
+
+    public Property<Integer> jobTimeOut = newInteger("jobTimeOut");
 
     public Property<Boolean> pkChunking = newBoolean("pkChunking", false);
 
@@ -143,8 +145,9 @@ public class TSalesforceInputProperties extends SalesforceConnectionModuleProper
         mainForm.addRow(includeDeleted);
 
         Form advancedForm = getForm(Form.ADVANCED);
-        advancedForm.addRow(jobTimeOut);
         advancedForm.addRow(safetySwitch);
+        advancedForm.addRow(returnNullValue);
+        advancedForm.addRow(jobTimeOut);
         advancedForm.addRow(pkChunking);
         advancedForm.addRow(chunkSize);
         advancedForm.addRow(chunkSleepTime);
@@ -248,8 +251,9 @@ public class TSalesforceInputProperties extends SalesforceConnectionModuleProper
         }
         if (Form.ADVANCED.equals(form.getName())) {
             boolean isBulkQuery = queryMode.getValue().equals(QueryMode.Bulk);
-            form.getWidget(jobTimeOut.getName()).setVisible(isBulkQuery);
             form.getWidget(safetySwitch.getName()).setVisible(isBulkQuery);
+            form.getWidget(returnNullValue.getName()).setVisible(isBulkQuery);
+            form.getWidget(jobTimeOut.getName()).setVisible(isBulkQuery);
             form.getWidget(pkChunking.getName()).setVisible(isBulkQuery);
             form.getWidget(chunkSize.getName()).setVisible(isBulkQuery && pkChunking.getValue());
             form.getWidget(chunkSleepTime.getName()).setVisible(isBulkQuery && pkChunking.getValue());
