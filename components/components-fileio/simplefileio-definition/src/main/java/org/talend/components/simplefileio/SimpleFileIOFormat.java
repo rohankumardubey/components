@@ -17,6 +17,7 @@ package org.talend.components.simplefileio;
  * Possible file formats for the simplefileio family of components.
  */
 public enum SimpleFileIOFormat {
+    AUTO_DETECT,
     CSV,
     // JSON,
     EXCEL,

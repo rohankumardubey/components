@@ -106,7 +106,7 @@ public class S3DatasetProperties extends PropertiesImpl implements DatasetProper
     @Override
     public void setupProperties() {
         super.setupProperties();
-        format.setValue(SimpleFileIOFormat.CSV);
+        format.setValue(SimpleFileIOFormat.AUTO_DETECT);
         excelFormat.setValue(ExcelFormat.EXCEL2007);
     }
 

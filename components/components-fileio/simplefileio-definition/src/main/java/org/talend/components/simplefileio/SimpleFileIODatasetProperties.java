@@ -73,7 +73,7 @@ public class SimpleFileIODatasetProperties extends PropertiesImpl implements Dat
     @Override
     public void setupProperties() {
         super.setupProperties();
-        format.setValue(SimpleFileIOFormat.CSV);
+        format.setValue(SimpleFileIOFormat.AUTO_DETECT);
         excelFormat.setValue(ExcelFormat.EXCEL2007);
     }
 
