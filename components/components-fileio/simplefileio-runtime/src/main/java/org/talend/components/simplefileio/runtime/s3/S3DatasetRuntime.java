@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import org.talend.components.adapter.beam.BeamLocalRunnerOption;
 import org.talend.components.adapter.beam.transform.DirectConsumerCollector;
 import org.talend.components.api.container.RuntimeContainer;
+import org.talend.components.simplefileio.runtime.SchemaConstant;
 import org.talend.components.simplefileio.s3.S3DatasetProperties;
 import org.talend.components.simplefileio.s3.input.S3InputProperties;
 import org.talend.components.simplefileio.s3.runtime.IS3DatasetRuntime;
@@ -62,7 +63,7 @@ public class S3DatasetRuntime implements IS3DatasetRuntime {
         // Simple schema container.
         final Schema[] s = new Schema[1];
         // Try to get one record and determine its schema in a callback.
-        getSample(1, new Consumer<IndexedRecord>() {
+        getSample(SchemaConstant.ONLY_FETCH_SCHEMA_SIGN, new Consumer<IndexedRecord>() {
 
             @Override
             public void accept(IndexedRecord in) {
