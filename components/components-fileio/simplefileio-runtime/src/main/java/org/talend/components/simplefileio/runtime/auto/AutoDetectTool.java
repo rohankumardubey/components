@@ -42,16 +42,16 @@ public class AutoDetectTool {
             return mt.parameters().get(AutoDetectConstants.RECORD_SEPARATOR_PARAMETER).get(0);
         }
         
-        public String getCSV_delimiter() {
-            return mt.parameters().get(AutoDetectConstants.DELIMITER_PARAMETER).get(0);
+        public char getCSV_delimiter() {
+            return mt.parameters().get(AutoDetectConstants.DELIMITER_PARAMETER).get(0).charAt(0);
         }
         
-        public String getCSV_text_enclosure_char() {
-            return mt.parameters().get(AutoDetectConstants.TEXT_ENCLOSURE_CHAR).get(0);
+        public char getCSV_text_enclosure_char() {
+            return mt.parameters().get(AutoDetectConstants.TEXT_ENCLOSURE_CHAR).get(0).charAt(0);
         }
         
-        public String getCSV_escape_char() {
-            return mt.parameters().get(AutoDetectConstants.ESCAPE_CHAR).get(0);
+        public char getCSV_escape_char() {
+            return mt.parameters().get(AutoDetectConstants.ESCAPE_CHAR).get(0).charAt(0);
         }
         
         //Excel 2007 and Excel 97

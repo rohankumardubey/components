@@ -19,9 +19,9 @@ public class SchemaDetection {
     
     public SchemaDetection() {
         try {
-            schemaDetectionImpl = Class.forName("org.talend.daikon.schema.SchemaDetection");
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException("class not found : " + e.getMessage());
+            schemaDetectionImpl = Class.forName("org.talend.daikon.schema.SchemaDetection").newInstance();
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+            throw new RuntimeException(e.getClass() + " : " +  e.getMessage());
         }
     }
 
@@ -41,26 +41,28 @@ public class SchemaDetection {
         }
     }
 
-    //register the csv and excel implement
+    //register the csv and excel implement 
     public void registerDetectors() {
         try {
-            Object cd = Class.forName("org.talend.daikon.schema.csv.CsvDetector");
-            Object ed = Class.forName("org.talend.daikon.schema.xls.ExcelDetector");
-            schemaDetectionImpl.getClass().getMethod("registerDetector", cd.getClass()).invoke(schemaDetectionImpl, cd);
-            schemaDetectionImpl.getClass().getMethod("registerDetector", ed.getClass()).invoke(schemaDetectionImpl, ed);
-        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException | ClassNotFoundException e) {
-            throw new RuntimeException(e.getMessage());
+            Class methodParameterType = Class.forName("org.talend.daikon.schema.Detector");
+            Object cd = Class.forName("org.talend.daikon.schema.csv.CsvDetector").newInstance();
+            Object ed = Class.forName("org.talend.daikon.schema.xls.ExcelDetector").newInstance();
+            schemaDetectionImpl.getClass().getMethod("registerDetector", methodParameterType).invoke(schemaDetectionImpl, cd);
+            schemaDetectionImpl.getClass().getMethod("registerDetector", methodParameterType).invoke(schemaDetectionImpl, ed);
+        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException | ClassNotFoundException | InstantiationException e) {
+            throw new RuntimeException(e.getClass() + " : " + e.getMessage());
         }
     }
 
     //register the csv and excel implement
     public void registerParsers() {
         try {
-            Object cpf = Class.forName("org.talend.daikon.schema.csv.parser.CsvParserFactory");
-            Object epf = Class.forName("org.talend.daikon.schema.xls.parser.ExcelParserFactory");
-            schemaDetectionImpl.getClass().getMethod("registerParser", cpf.getClass()).invoke(schemaDetectionImpl, cpf);
-            schemaDetectionImpl.getClass().getMethod("registerParser", epf.getClass()).invoke(schemaDetectionImpl, epf);
-        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException | ClassNotFoundException e) {
+            Class methodParameterType = Class.forName("org.talend.daikon.schema.DatasetParserFactory");
+            Object cpf = Class.forName("org.talend.daikon.schema.csv.parser.CsvParserFactory").newInstance();
+            Object epf = Class.forName("org.talend.daikon.schema.xls.parser.ExcelParserFactory").newInstance();
+            schemaDetectionImpl.getClass().getMethod("registerParser", methodParameterType).invoke(schemaDetectionImpl, cpf);
+            schemaDetectionImpl.getClass().getMethod("registerParser", methodParameterType).invoke(schemaDetectionImpl, epf);
+        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException | ClassNotFoundException | InstantiationException e) {
             throw new RuntimeException(e.getMessage());
         }
     }
