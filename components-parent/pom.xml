@@ -23,7 +23,7 @@
         <sonar.jacoco.itReportPath>${coverage.sonar.reportRoot}/target/jacoco-it.exec</sonar.jacoco.itReportPath>
 
         <components.version>0.24.0</components.version>
-        <daikon.version>0.24.0</daikon.version>
+        <daikon.version>0.25.0</daikon.version>
 
         <tycho-p2-extras-plugin.version>0.26.0</tycho-p2-extras-plugin.version>
         <docker-maven-plugin.version>0.20.1</docker-maven-plugin.version>
