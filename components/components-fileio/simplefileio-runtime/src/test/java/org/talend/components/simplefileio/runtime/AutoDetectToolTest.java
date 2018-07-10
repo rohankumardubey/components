@@ -17,5 +17,32 @@ public class AutoDetectToolTest {
              System.out.println(result.getFormatType());
          }
      }
+     
+     @Test
+     public void testExcel97DetectBasic() throws IOException {
+         try(InputStream is = this.getClass().getResourceAsStream("basic.xls")) {
+             AutoDetectTool adt = new AutoDetectTool();
+             DetectResult result = adt.detect(is);
+             System.out.println(result.getFormatType());
+         }
+     }
+     
+     @Test
+     public void testExcel2007DetectBasic() throws IOException {
+         try(InputStream is = this.getClass().getResourceAsStream("basic.xlsx")) {
+             AutoDetectTool adt = new AutoDetectTool();
+             DetectResult result = adt.detect(is);
+             System.out.println(result.getFormatType());
+         }
+     }
+     
+     @Test
+     public void testExcelHtmlDetectBasic() throws IOException {
+         try(InputStream is = this.getClass().getResourceAsStream("sales-force.html")) {
+             AutoDetectTool adt = new AutoDetectTool();
+             DetectResult result = adt.detect(is);
+             System.out.println(result.getFormatType());
+         }
+     }
     
 }

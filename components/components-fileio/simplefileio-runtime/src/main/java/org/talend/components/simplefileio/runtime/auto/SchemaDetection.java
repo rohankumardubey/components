@@ -21,7 +21,7 @@ public class SchemaDetection {
         try {
             schemaDetectionImpl = Class.forName("org.talend.daikon.schema.SchemaDetection").newInstance();
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
-            throw new RuntimeException(e.getClass() + " : " +  e.getMessage());
+            throw new RuntimeException(e.getClass() + " : " +  e.getMessage() + " : " + e.getCause());
         }
     }
 
@@ -29,7 +29,7 @@ public class SchemaDetection {
         try {
             return (MediaType) schemaDetectionImpl.getClass().getMethod("detect", byte[].class).invoke(schemaDetectionImpl, inputFirstBytes);
         } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
-            throw new IOException(e.getMessage());
+            throw new IOException(e.getClass() + " : " +  e.getMessage() + " : " + e.getCause());
         }
     }
 
@@ -37,7 +37,7 @@ public class SchemaDetection {
         try {
             return (MediaType) schemaDetectionImpl.getClass().getMethod("detect", InputStream.class).invoke(schemaDetectionImpl, input);
         } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
-            throw new IOException(e.getMessage());
+            throw new IOException(e.getClass() + " : " +  e.getMessage() + " : " + e.getCause());
         }
     }
 
@@ -50,7 +50,7 @@ public class SchemaDetection {
             schemaDetectionImpl.getClass().getMethod("registerDetector", methodParameterType).invoke(schemaDetectionImpl, cd);
             schemaDetectionImpl.getClass().getMethod("registerDetector", methodParameterType).invoke(schemaDetectionImpl, ed);
         } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException | ClassNotFoundException | InstantiationException e) {
-            throw new RuntimeException(e.getClass() + " : " + e.getMessage());
+            throw new RuntimeException(e.getClass() + " : " +  e.getMessage() + " : " + e.getCause());
         }
     }
 
@@ -63,7 +63,7 @@ public class SchemaDetection {
             schemaDetectionImpl.getClass().getMethod("registerParser", methodParameterType).invoke(schemaDetectionImpl, cpf);
             schemaDetectionImpl.getClass().getMethod("registerParser", methodParameterType).invoke(schemaDetectionImpl, epf);
         } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException | ClassNotFoundException | InstantiationException e) {
-            throw new RuntimeException(e.getMessage());
+            throw new RuntimeException(e.getClass() + " : " +  e.getMessage() + " : " + e.getCause());
         }
     }
 
@@ -90,7 +90,7 @@ public class SchemaDetection {
                 result.add(fieldName);
             }
         } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
-            throw new RuntimeException(e.getMessage());
+            throw new RuntimeException(e.getClass() + " : " +  e.getMessage() + " : " + e.getCause());
         }
         return result;
     }

@@ -40,6 +40,11 @@ public class StreamingWorkbook implements Workbook, AutoCloseable {
         throw new UnsupportedOperationException();
     }
 
+    @Override
+    public int addOlePackage(byte[] oleData, String label, String fileName, String command) throws IOException {
+        return 0;
+    }
+
     /* Supported */
 
     /**
@@ -213,15 +218,6 @@ public class StreamingWorkbook implements Workbook, AutoCloseable {
      */
     @Override
     public Font createFont() {
-        throw new UnsupportedOperationException();
-    }
-
-    /**
-     * Not supported
-     */
-    @Override
-    public Font findFont(short boldWeight, short color, short fontHeight, String name, boolean italic, boolean strikeout,
-            short typeOffset, byte underline) {
         throw new UnsupportedOperationException();
     }
 
@@ -454,6 +450,16 @@ public class StreamingWorkbook implements Workbook, AutoCloseable {
         throw new UnsupportedOperationException();
     }
 
+    @Override
+    public SheetVisibility getSheetVisibility(int sheetIx) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void setSheetVisibility(int sheetIx, SheetVisibility visibility) {
+        throw new UnsupportedOperationException();
+    }
+
     /**
      * Not supported
      */
@@ -496,21 +502,6 @@ public class StreamingWorkbook implements Workbook, AutoCloseable {
 
     @Override
     public void removeName(Name name) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public SheetVisibility getSheetVisibility(int sheetIx) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void setSheetVisibility(int sheetIx, SheetVisibility visibility) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public int addOlePackage(byte[] oleData, String label, String fileName, String command) throws IOException {
         throw new UnsupportedOperationException();
     }
 }

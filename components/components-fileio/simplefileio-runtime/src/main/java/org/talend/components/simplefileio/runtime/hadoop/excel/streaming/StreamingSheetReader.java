@@ -134,7 +134,7 @@ public class StreamingSheetReader implements Iterable<Row> {
                 if (firstRowIndex == -1) {
                     firstRowIndex = Integer.parseInt(rowIndex.getValue());
                 }
-                currentRow = new StreamingRow(Integer.parseInt(rowIndex.getValue()) - 1);
+                currentRow = new StreamingRow(Integer.parseInt(rowIndex.getValue()) - 1, false);
             } else if ("cols".equals(tagLocalName)) {
                 parsingCols = true;
             } else if ("col".equals(tagLocalName) && parsingCols) {
@@ -143,7 +143,7 @@ public class StreamingSheetReader implements Iterable<Row> {
                 Attribute ref = startElement.getAttributeByName(new QName("r"));
 
                 String[] coord = ref.getValue().split("(?<=\\D)(?=\\d)|(?<=\\d)(?=\\D)");
-                currentCell = new StreamingCell(CellReference.convertColStringToIndex(coord[0]), Integer.parseInt(coord[1]) - 1);
+                currentCell = new StreamingCell(CellReference.convertColStringToIndex(coord[0]), Integer.parseInt(coord[1]) - 1, false);
                 setFormatString(startElement, currentCell);
 
                 Attribute type = startElement.getAttributeByName(new QName("t"));

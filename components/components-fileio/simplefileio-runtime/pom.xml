@@ -19,10 +19,7 @@
         <hadoop.aws.artifactId>hadoop-aws-tlnd</hadoop.aws.artifactId>
         <hadoop.aws.version>2.7.3.1</hadoop.aws.version>
         <parquet.version>1.9.0</parquet.version>
-        <!--
-        <poi.version>3.16</poi.version>
-        -->
-        <tika.version>1.15</tika.version>
+        <tika.version>1.18</tika.version>
         <coverage.sonar.reportRoot>${project.basedir}/..</coverage.sonar.reportRoot>
     </properties>
 
@@ -219,22 +216,23 @@
         </dependency>
         
         <!-- Excel format support -->
-        <!-- tika introduce poi, so not necessary
-        <dependency>
-            <groupId>org.apache.poi</groupId>
-			<artifactId>poi</artifactId>
-			<version>${poi.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.poi</groupId>
-			<artifactId>poi-ooxml</artifactId>
-			<version>${poi.version}</version>
-        </dependency>
+        <!-- the commons-compress 1.16.1(this is not same with the align one in the parent pom in current project) 
+        is used in daikon-ee excel detect and parse, we load the daikon-ee classes dynamic.
+         And daikon-ee no dependency list file for getting all the dependencies, so write here now as a workaround.
+         In fact, now we have some duplicated code for excel support, should remove them and use the one in daikon-ee, that's TODO,
+         after the issues are all fixed, we can remove the tika, xlsx-streamer, poi, commons-compress dependencies here.
         -->
+         
+        <!-- this may can't work in the components rest service, but 1.8.1 version miss some class/method which is used in tika, TODO check it-->
+        <dependency>
+             <groupId>org.apache.commons</groupId>
+             <artifactId>commons-compress</artifactId>
+             <version>1.16.1</version>
+        </dependency>
         <dependency>
 	    	<groupId>com.monitorjbl</groupId>
 		    <artifactId>xlsx-streamer</artifactId>
-		    <version>1.0.0</version>
+		    <version>1.2.0</version>
 		    <exclusions>
                 <exclusion>
 		      		<groupId>org.apache.poi</groupId>

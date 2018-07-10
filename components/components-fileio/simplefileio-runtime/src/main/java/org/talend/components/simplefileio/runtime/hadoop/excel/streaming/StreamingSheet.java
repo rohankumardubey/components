@@ -501,14 +501,6 @@ public class StreamingSheet implements Sheet {
      * Not supported
      */
     @Override
-    public void setZoom(int numerator, int denominator) {
-        throw new UnsupportedOperationException();
-    }
-
-    /**
-     * Not supported
-     */
-    @Override
     public short getTopRow() {
         throw new UnsupportedOperationException();
     }
@@ -758,14 +750,6 @@ public class StreamingSheet implements Sheet {
      */
     @Override
     public void autoSizeColumn(int column, boolean useMergedCells) {
-        throw new UnsupportedOperationException();
-    }
-
-    /**
-     * Not supported
-     */
-    @Override
-    public Comment getCellComment(int row, int column) {
         throw new UnsupportedOperationException();
     }
 
