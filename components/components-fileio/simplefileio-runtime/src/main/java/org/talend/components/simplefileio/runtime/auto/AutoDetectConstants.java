@@ -25,6 +25,8 @@ public interface AutoDetectConstants {
     String ESCAPE_CHAR = "escape_char";
   
     //EXCEL
+    MediaType EXCEL2007 = MediaType.create("application", "vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+    
     String PAGE_NAME_PARAMETER = "page";
   
     String HEADER_SIZE_PARAMETER = "header";

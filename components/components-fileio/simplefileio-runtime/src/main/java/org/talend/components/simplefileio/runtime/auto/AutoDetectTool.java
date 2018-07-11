@@ -2,6 +2,7 @@ package org.talend.components.simplefileio.runtime.auto;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -39,19 +40,39 @@ public class AutoDetectTool {
         }
         
         public String getCSV_record_separator() {
-            return mt.parameters().get(AutoDetectConstants.RECORD_SEPARATOR_PARAMETER).get(0);
+            String rs = mt.parameters().get(AutoDetectConstants.RECORD_SEPARATOR_PARAMETER).get(0);
+            if(rs == null || rs.isEmpty()) {
+                return "\n";
+            }
+            return rs.substring(1, rs.length()-1);
         }
         
         public char getCSV_delimiter() {
-            return mt.parameters().get(AutoDetectConstants.DELIMITER_PARAMETER).get(0).charAt(0);
+            String delimiter = mt.parameters().get(AutoDetectConstants.DELIMITER_PARAMETER).get(0);
+            if(delimiter == null || delimiter.isEmpty()) {
+                return ';';
+            }
+            return delimiter.charAt(1);
         }
         
         public char getCSV_text_enclosure_char() {
-            return mt.parameters().get(AutoDetectConstants.TEXT_ENCLOSURE_CHAR).get(0).charAt(0);
+            String tec = mt.parameters().get(AutoDetectConstants.TEXT_ENCLOSURE_CHAR).get(0);
+            if(tec == null || tec.isEmpty()) {
+                return '\"';
+            }
+            return tec.charAt(1);
         }
         
         public char getCSV_escape_char() {
-            return mt.parameters().get(AutoDetectConstants.ESCAPE_CHAR).get(0).charAt(0);
+            String ec = mt.parameters().get(AutoDetectConstants.ESCAPE_CHAR).get(0);
+            if(ec == null || ec.isEmpty()) {
+                return '\\';
+            }
+            return ec.charAt(1);
+        }
+        
+        public Charset getCSV_charset() {
+            return mt.charset().get();
         }
         
         //Excel 2007 and Excel 97
@@ -90,26 +111,22 @@ public class AutoDetectTool {
             result.setFormatType(FileFormat.CSV);
         }
         
-        /*
-        //Excel
-        if("application".equals(mt.type())) {
-            String subtype = mt.subtype();
-            //Excel 2007
+        //Excel 2007
+        if(mt.is(AutoDetectConstants.EXCEL2007)) {
             result.setFormatType(FileFormat.EXCEL2007);
-            
-            //Excel 97
-            result.setFormatType(FileFormat.EXCEL97);
-            
-            //Excel HTML
-            result.setFormatType(FileFormat.EXCELHTML);
         }
         
+        //Excel 97
+        if(mt.is(MediaType.MICROSOFT_EXCEL)) {
+            result.setFormatType(FileFormat.EXCEL97);
+        }
+        
+        
         //AVRO
-        result.setFormatType(FileFormat.AVRO);
+        //result.setFormatType(FileFormat.AVRO);
         
         //PARQUET
-        result.setFormatType(FileFormat.PARQUET);
-        */
+        //result.setFormatType(FileFormat.PARQUET);
         
         return result;
     }
