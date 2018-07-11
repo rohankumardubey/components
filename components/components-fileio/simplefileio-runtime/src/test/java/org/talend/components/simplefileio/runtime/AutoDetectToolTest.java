@@ -22,6 +22,9 @@ public class AutoDetectToolTest {
              
              //TODO no guess in fact,only return "\n\r", how to use it in csv reader for csv split support and also encoding?
              //so seems need to change the reader
+             //In fact, is not difficult to guess the row separator is "\r" or "\n", "\r\n" after get the encoding, that is a improvement,
+             //only need to check the "\r" or "\n" or "\r\n" appear sometimes, then it's the row separator, but the risk is no them in the file as other separator, that is a little risk,
+             //the risk for performance to fetch to the end can be fixed by only read 10000 bytes for example
              System.out.println(result.getCSV_record_separator());
              
              //only support to check if the first line is header
