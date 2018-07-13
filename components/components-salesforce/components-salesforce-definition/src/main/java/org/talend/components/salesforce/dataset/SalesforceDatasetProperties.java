@@ -182,7 +182,8 @@ public class SalesforceDatasetProperties extends PropertiesImpl
 
     @Override
     public void setupProperties() {
-        sourceType.setValue(SourceType.MODULE_SELECTION);
+        // SOQL by default since we're hiding Module Selection.
+        sourceType.setValue(SourceType.SOQL_QUERY);
     }
 
     @Override
@@ -195,6 +196,9 @@ public class SalesforceDatasetProperties extends PropertiesImpl
         mainForm.addRow(Widget.widget(moduleName).setWidgetType(Widget.DATALIST_WIDGET_TYPE));
         mainForm.addRow(Widget.widget(selectColumnIds).setWidgetType(Widget.MULTIPLE_VALUE_SELECTOR_WIDGET_TYPE));
         mainForm.addRow(condition);
+
+        // With this widget hidden, Module Selection can't be picked.
+        mainForm.getWidget(sourceType).setVisible(false);
     }
 
     /**
