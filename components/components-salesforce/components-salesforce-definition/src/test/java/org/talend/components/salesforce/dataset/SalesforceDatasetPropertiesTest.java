@@ -71,7 +71,8 @@ public class SalesforceDatasetPropertiesTest extends SalesforceTestBase {
     public void testSetupProperties() {
         properties.setupProperties();
 
-        assertEquals(SalesforceDatasetProperties.SourceType.MODULE_SELECTION, properties.sourceType.getValue());
+        // TODO: Restore when Module Selection is reactivated.
+        // assertEquals(SalesforceDatasetProperties.SourceType.MODULE_SELECTION, properties.sourceType.getValue());
     }
 
     @Test
@@ -81,15 +82,16 @@ public class SalesforceDatasetPropertiesTest extends SalesforceTestBase {
         Form mainForm = properties.getForm(Form.MAIN);
         assertNotNull(mainForm);
         assertNotNull(mainForm.getWidget(properties.sourceType.getName()));
-        assertEquals(SalesforceDatasetProperties.SourceType.MODULE_SELECTION, properties.sourceType.getValue());
-        assertNotNull(mainForm.getWidget(properties.query.getName()));
-        assertFalse(mainForm.getWidget(properties.query.getName()).isVisible());
-        assertNotNull(mainForm.getWidget(properties.moduleName.getName()));
-        assertTrue(mainForm.getWidget(properties.moduleName.getName()).isVisible());
-        assertNotNull(mainForm.getWidget(properties.selectColumnIds.getName()));
-        assertFalse(mainForm.getWidget(properties.selectColumnIds.getName()).isVisible());
-        assertNotNull(mainForm.getWidget(properties.condition.getName()));
-        assertFalse(mainForm.getWidget(properties.condition.getName()).isVisible());
+        // TODO: Restore when Module Selection is reactivated.
+        // assertEquals(SalesforceDatasetProperties.SourceType.MODULE_SELECTION, properties.sourceType.getValue());
+        // assertNotNull(mainForm.getWidget(properties.query.getName()));
+        // assertFalse(mainForm.getWidget(properties.query.getName()).isVisible());
+        // assertNotNull(mainForm.getWidget(properties.moduleName.getName()));
+        // assertTrue(mainForm.getWidget(properties.moduleName.getName()).isVisible());
+        // assertNotNull(mainForm.getWidget(properties.selectColumnIds.getName()));
+        // assertFalse(mainForm.getWidget(properties.selectColumnIds.getName()).isVisible());
+        // assertNotNull(mainForm.getWidget(properties.condition.getName()));
+        // assertFalse(mainForm.getWidget(properties.condition.getName()).isVisible());
     }
 
     @Test
@@ -104,8 +106,7 @@ public class SalesforceDatasetPropertiesTest extends SalesforceTestBase {
 
             properties.setDatastoreProperties(datastoreProperties);
 
-            assertThat((Iterable<String>) properties.moduleName.getPossibleValues(),
-                    containsInAnyOrder("Account", "Customer"));
+            assertThat((Iterable<String>) properties.moduleName.getPossibleValues(), containsInAnyOrder("Account", "Customer"));
 
             assertThat(properties.selectColumnIds.getPossibleValues(), empty());
 
@@ -127,8 +128,7 @@ public class SalesforceDatasetPropertiesTest extends SalesforceTestBase {
 
             properties.setDatastoreProperties(datastoreProperties);
 
-            assertThat((Iterable<String>) properties.moduleName.getPossibleValues(),
-                    containsInAnyOrder("Account", "Customer"));
+            assertThat((Iterable<String>) properties.moduleName.getPossibleValues(), containsInAnyOrder("Account", "Customer"));
 
             assertThat((Iterable<NamedThing>) properties.selectColumnIds.getPossibleValues(),
                     contains((NamedThing) new SimpleNamedThing("Id", "Id"), new SimpleNamedThing("Name", "Name")));
@@ -147,8 +147,7 @@ public class SalesforceDatasetPropertiesTest extends SalesforceTestBase {
 
             properties.sourceType.setValue(SalesforceDatasetProperties.SourceType.MODULE_SELECTION);
 
-            when(testFixture.runtimeSourceOrSink.getSchemaNames(any(RuntimeContainer.class)))
-                    .thenThrow(new IOException("ERROR"));
+            when(testFixture.runtimeSourceOrSink.getSchemaNames(any(RuntimeContainer.class))).thenThrow(new IOException("ERROR"));
 
             properties.setDatastoreProperties(datastoreProperties);
 
@@ -252,8 +251,7 @@ public class SalesforceDatasetPropertiesTest extends SalesforceTestBase {
 
             propertiesService.afterProperty("sourceType", properties);
 
-            assertThat((Iterable<String>) properties.moduleName.getPossibleValues(),
-                    containsInAnyOrder("Account", "Customer"));
+            assertThat((Iterable<String>) properties.moduleName.getPossibleValues(), containsInAnyOrder("Account", "Customer"));
 
             assertNull(properties.moduleName.getValue());
             assertNull(properties.selectColumnIds.getValue());
@@ -283,8 +281,7 @@ public class SalesforceDatasetPropertiesTest extends SalesforceTestBase {
 
             propertiesService.afterProperty("moduleName", properties);
 
-            assertThat((Iterable<String>) properties.moduleName.getPossibleValues(),
-                    containsInAnyOrder("Account", "Customer"));
+            assertThat((Iterable<String>) properties.moduleName.getPossibleValues(), containsInAnyOrder("Account", "Customer"));
 
             assertNotNull(properties.moduleName.getValue());
             assertNull(properties.selectColumnIds.getValue());
