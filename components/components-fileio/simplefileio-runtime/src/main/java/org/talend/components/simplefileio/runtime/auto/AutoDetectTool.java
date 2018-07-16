@@ -1,6 +1,5 @@
 package org.talend.components.simplefileio.runtime.auto;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 
@@ -102,33 +101,39 @@ public class AutoDetectTool {
         sd.registerParsers();
     }
     
-    public DetectResult detect(InputStream in) throws IOException {
-        MediaType mt = sd.detect(in);
-        DetectResult result = new DetectResult(mt);
-        
-        //CSV
-        if(mt.is(AutoDetectConstants.CSV)) {
-            result.setFormatType(FileFormat.CSV);
+    public DetectResult detect(InputStream in) {
+        try {
+            MediaType mt = sd.detect(in);
+            DetectResult result = new DetectResult(mt);
+            
+            //CSV
+            if(mt.is(AutoDetectConstants.CSV)) {
+                result.setFormatType(FileFormat.CSV);
+            }
+            
+            //Excel 2007
+            if(mt.is(AutoDetectConstants.EXCEL2007)) {
+                result.setFormatType(FileFormat.EXCEL2007);
+            }
+            
+            //Excel 97
+            if(mt.is(MediaType.MICROSOFT_EXCEL)) {
+                result.setFormatType(FileFormat.EXCEL97);
+            }
+            
+            //TODO Excel HTML
+            //result.setFormatType(FileFormat.EXCELHTML);
+            
+            //TODO AVRO
+            //result.setFormatType(FileFormat.AVRO);
+            
+            //TODO PARQUET
+            //result.setFormatType(FileFormat.PARQUET);
+            
+            return result;
+        } catch (Exception e) {
+             throw new RuntimeException("can't guess the file format, now support csv, excel 97 and 2007 format : " + e.getClass() + " : " + e.getMessage() + " : " + e.getCause());
         }
-        
-        //Excel 2007
-        if(mt.is(AutoDetectConstants.EXCEL2007)) {
-            result.setFormatType(FileFormat.EXCEL2007);
-        }
-        
-        //Excel 97
-        if(mt.is(MediaType.MICROSOFT_EXCEL)) {
-            result.setFormatType(FileFormat.EXCEL97);
-        }
-        
-        
-        //AVRO
-        //result.setFormatType(FileFormat.AVRO);
-        
-        //PARQUET
-        //result.setFormatType(FileFormat.PARQUET);
-        
-        return result;
     }
     
 }

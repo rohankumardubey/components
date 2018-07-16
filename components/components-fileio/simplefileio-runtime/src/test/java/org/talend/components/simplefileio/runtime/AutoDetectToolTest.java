@@ -25,7 +25,7 @@ public class AutoDetectToolTest {
              //In fact, is not difficult to guess the row separator is "\r" or "\n", "\r\n" after get the encoding, that is a improvement,
              //only need to check the "\r" or "\n" or "\r\n" appear sometimes, then it's the row separator, but the risk is no them in the file as other separator, that is a little risk,
              //the risk for performance to fetch to the end can be fixed by only read 10000 bytes for example
-             System.out.println(result.getCSV_record_separator());
+             System.out.println(result.getCSV_record_separator().equals("\n\r"));
              
              //only support to check if the first line is header
              System.out.println(result.getCSV_header_present());
@@ -64,7 +64,7 @@ public class AutoDetectToolTest {
          }
      }
      
-     //TODO there is a bug in daikon-ee for file detect, if pass this file, will throw a exception, will fix it in daikon-ee
+     //TODO there is a bug in daikon-ee for file detect, if pass this file, will throw a exception, will fix it in daikon-ee, not support now
      @Ignore
      @Test
      public void testExcelHtmlDetectBasic() throws IOException {
@@ -75,7 +75,7 @@ public class AutoDetectToolTest {
          }
      }
      
-     //TODO the api don't support detect avro, will support it in daikon-ee
+     //TODO the api don't support detect avro, will support it in daikon-ee, not support now
      @Ignore
      @Test
      public void testAvroDetectBasic() throws IOException {
@@ -86,7 +86,7 @@ public class AutoDetectToolTest {
          }
      }
      
-     //TODO the api don't support detect parquet, will support it in daikon-ee
+     //TODO the api don't support detect parquet, will support it in daikon-ee, not support now
      @Ignore
      @Test
      public void testParquetDetectBasic() throws IOException {
