@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.talend.daikon</groupId>
         <artifactId>service-parent</artifactId>
-        <version>0.24.0-dss-summer2018</version>
+        <version>0.24.0</version>
     </parent>
 
     <groupId>org.talend.components</groupId>
