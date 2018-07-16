@@ -494,7 +494,7 @@
                                     <goal>build</goal>
                                 </goals>
                                 <configuration>
-                                    <autoPull>once</autoPull>
+                                    <autoPull>off</autoPull>
                                     <images>
                                         <image>
                                             <name>
