@@ -62,9 +62,15 @@ public class CSVFileRecordReader extends RecordReader<LongWritable, BytesWritabl
   }
 
   public CSVFileRecordReader(String recordDelimiter, String encoding, Character textEnclosure, Character escapeChar) throws UnsupportedEncodingException {
-    this.recordDelimiter = recordDelimiter;
-    if (recordDelimiter != null) {
-      this.recordDelimiterBytes = recordDelimiter.getBytes(encoding);
+    //auto detect api don't detect the encoding rightly in fact, it only return "\n\r", 
+    //so do like that now to allow parse the csv with all : \r,\n,\r\n
+    if((recordDelimiter == null) || recordDelimiter.isEmpty() || "\n\r".equals(recordDelimiter)) {
+        this.recordDelimiter = "\n";
+    } else {
+        this.recordDelimiter = recordDelimiter;
+        if (recordDelimiter != null) {
+          this.recordDelimiterBytes = recordDelimiter.getBytes(encoding);
+        }
     }
     this.encoding = encoding;
 
