@@ -66,10 +66,14 @@ public class SimpleFileIODatasetDefinition extends I18nDefinition implements Dat
     @Override
     public RuntimeInfo getRuntimeInfo(SimpleFileIODatasetProperties properties) {
         try {
-            return new JarRuntimeInfo(new URL(SimpleFileIOComponentFamilyDefinition.MAVEN_DEFAULT_RUNTIME_URI),
+            CustomJarRuntimeInfo runtimeInfo = new CustomJarRuntimeInfo(new URL(SimpleFileIOComponentFamilyDefinition.MAVEN_DEFAULT_RUNTIME_URI),
                     DependenciesReader.computeDependenciesFilePath(SimpleFileIOComponentFamilyDefinition.MAVEN_GROUP_ID,
                             SimpleFileIOComponentFamilyDefinition.MAVEN_DEFAULT_RUNTIME_ARTIFACT_ID),
                     RUNTIME, IS_CLASSLOADER_REUSABLE);
+            runtimeInfo.addCustomDependencies("mvn:org.talend.daikon-ee/format-detection-core");
+            runtimeInfo.addCustomDependencies("mvn:org.talend.daikon-ee/format-detection-csv");
+            runtimeInfo.addCustomDependencies("mvn:org.talend.daikon-ee/format-detection-xls");
+            return runtimeInfo;
         } catch (MalformedURLException e) {
             throw new ComponentException(e);
         }

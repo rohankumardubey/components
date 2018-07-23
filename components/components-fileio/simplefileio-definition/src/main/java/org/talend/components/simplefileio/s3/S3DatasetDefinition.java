@@ -17,9 +17,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.talend.components.api.component.runtime.DependenciesReader;
-import org.talend.components.api.component.runtime.JarRuntimeInfo;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.common.dataset.DatasetDefinition;
+import org.talend.components.simplefileio.CustomJarRuntimeInfo;
 import org.talend.components.simplefileio.SimpleFileIOComponentFamilyDefinition;
 import org.talend.daikon.definition.DefinitionImageType;
 import org.talend.daikon.definition.I18nDefinition;
@@ -59,9 +59,13 @@ public class S3DatasetDefinition extends I18nDefinition implements DatasetDefini
     @Override
     public RuntimeInfo getRuntimeInfo(S3DatasetProperties properties) {
         try {
-            return new JarRuntimeInfo(new URL(SimpleFileIOComponentFamilyDefinition.MAVEN_DEFAULT_RUNTIME_URI),
+            CustomJarRuntimeInfo runtimeInfo = new CustomJarRuntimeInfo(new URL(SimpleFileIOComponentFamilyDefinition.MAVEN_DEFAULT_RUNTIME_URI),
                     DependenciesReader.computeDependenciesFilePath(SimpleFileIOComponentFamilyDefinition.MAVEN_GROUP_ID,
                             SimpleFileIOComponentFamilyDefinition.MAVEN_DEFAULT_RUNTIME_ARTIFACT_ID), RUNTIME);
+            runtimeInfo.addCustomDependencies("mvn:org.talend.daikon-ee/format-detection-core");
+            runtimeInfo.addCustomDependencies("mvn:org.talend.daikon-ee/format-detection-csv");
+            runtimeInfo.addCustomDependencies("mvn:org.talend.daikon-ee/format-detection-xls");
+            return runtimeInfo;
         } catch (MalformedURLException e) {
             throw new ComponentException(e);
         }
