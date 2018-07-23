@@ -21,6 +21,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.talend.components.adapter.beam.transform.ConvertToIndexedRecord;
 import org.talend.components.simplefileio.SimpleFileIOErrorCode;
+import org.talend.components.simplefileio.SimpleFileIOFormat;
 import org.talend.components.simplefileio.input.SimpleFileIOInputProperties;
 import org.talend.components.test.BeamDirectTestResource;
 import org.talend.components.test.MiniDfsResource;
@@ -55,6 +56,7 @@ public class SimpleFileIOInputErrorTest {
 
         // Configure the component.
         SimpleFileIOInputProperties inputProps = SimpleFileIOInputRuntimeTest.createInputComponentProperties();
+        inputProps.getDatasetProperties().format.setValue(SimpleFileIOFormat.CSV);
         inputProps.getDatasetProperties().path.setValue(fileSpec);
         inputProps.getDatasetProperties().getDatastoreProperties().userName.setValue("baduser");
 

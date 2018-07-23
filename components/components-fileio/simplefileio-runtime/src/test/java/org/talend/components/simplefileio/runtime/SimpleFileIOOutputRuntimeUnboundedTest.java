@@ -83,6 +83,7 @@ public class SimpleFileIOOutputRuntimeUnboundedTest {
 
         // Configure the component.
         SimpleFileIOOutputProperties props = createOutputComponentProperties();
+        props.getDatasetProperties().format.setValue(SimpleFileIOFormat.CSV);
         props.getDatasetProperties().path.setValue(fileSpec);
 
         // Create the runtime.

@@ -652,5 +652,61 @@ public class SimpleFileIODatasetRuntimeTest {
         assertThat("gaoyan", equalTo(actual.get(0).get(1)));
         assertThat("Shunyi", equalTo(actual.get(0).get(2)));
     }
+    
+    @Test
+    public void testGetSampleAutoDetectCSV() throws Exception {
+        RecordSet rs = getSimpleTestData(0);
+        writeRandomCsvFile(mini.getFs(), "/user/test/auto1.csv", rs, "UTF-8");
+        String fileSpec = mini.getFs().getUri().resolve("/user/test/auto1.csv").toString();
+
+        // Configure the component.
+        SimpleFileIODatasetProperties props = createDatasetProperties();
+        props.format.setValue(SimpleFileIOFormat.AUTO_DETECT);
+        props.path.setValue(fileSpec);
+
+        final List<IndexedRecord> actual = getSample(props,100);
+
+        // Check the expected values match.
+        assertThat(actual, hasSize(10));
+        // assertThat(actual, (Matcher) equalTo(rs.getAllData()));
+    }
+    
+    @Test
+    public void testGetSampleAutoDetectExcel2007() throws Exception {
+        String fileSpec = sourceFilePrepare("basic.xlsx");
+  
+        SimpleFileIODatasetProperties props = createDatasetProperties();
+        props.format.setValue(SimpleFileIOFormat.AUTO_DETECT);
+        props.path.setValue(fileSpec);
+  
+        final List<IndexedRecord> actual = getSample(props,100);
+  
+        assertThat(actual, hasSize(2));
+        List<Field> fields = actual.get(0).getSchema().getFields();
+        assertThat(fields, hasSize(3));
+        
+        assertThat("2", equalTo(actual.get(0).get(0)));
+        assertThat("gaoyan", equalTo(actual.get(0).get(1)));
+        assertThat("Shunyi", equalTo(actual.get(0).get(2)));
+    }
+    
+    @Test
+    public void testGetSampleAutoDetectExcel97() throws Exception {
+        String fileSpec = sourceFilePrepare("basic.xls");
+  
+        SimpleFileIODatasetProperties props = createDatasetProperties();
+        props.format.setValue(SimpleFileIOFormat.AUTO_DETECT);
+        props.path.setValue(fileSpec);
+  
+        final List<IndexedRecord> actual = getSample(props,100);
+  
+        assertThat(actual, hasSize(2));
+        List<Field> fields = actual.get(0).getSchema().getFields();
+        assertThat(fields, hasSize(3));
+        
+        assertThat("2", equalTo(actual.get(0).get(0)));
+        assertThat("gaoyan", equalTo(actual.get(0).get(1)));
+        assertThat("Shunyi", equalTo(actual.get(0).get(2)));
+    }
 
 }

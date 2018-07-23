@@ -30,6 +30,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.talend.components.adapter.beam.transform.ConvertToIndexedRecord;
 import org.talend.components.simplefileio.SimpleFileIOErrorCode;
+import org.talend.components.simplefileio.SimpleFileIOFormat;
 import org.talend.components.simplefileio.output.SimpleFileIOOutputProperties;
 import org.talend.components.test.BeamDirectTestResource;
 import org.talend.components.test.MiniDfsResource;
@@ -72,6 +73,7 @@ public class SimpleFileIOOutputErrorTest {
         try {
             // Configure the component.
             SimpleFileIOOutputProperties props = SimpleFileIOOutputRuntimeTest.createOutputComponentProperties();
+            props.getDatasetProperties().format.setValue(SimpleFileIOFormat.CSV);
             props.getDatasetProperties().path.setValue(fileSpec);
 
             // Create the runtime.
@@ -121,6 +123,7 @@ public class SimpleFileIOOutputErrorTest {
         try {
             // Configure the component.
             SimpleFileIOOutputProperties props = SimpleFileIOOutputRuntimeTest.createOutputComponentProperties();
+            props.getDatasetProperties().format.setValue(SimpleFileIOFormat.CSV);
             props.getDatasetProperties().path.setValue(fileSpec);
             props.overwrite.setValue(true);
 
@@ -166,6 +169,7 @@ public class SimpleFileIOOutputErrorTest {
         try {
             // Configure the component.
             SimpleFileIOOutputProperties props = SimpleFileIOOutputRuntimeTest.createOutputComponentProperties();
+            props.getDatasetProperties().format.setValue(SimpleFileIOFormat.CSV);
             props.getDatasetProperties().path.setValue(fileSpec);
 
             // Create the runtime.

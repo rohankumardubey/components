@@ -39,7 +39,7 @@ public class S3DatasetPropertiesTest {
     /**
      * Useful constant listing all of the fields in the properties.
      */
-    public static final Iterable<String> ALL = Arrays.asList("format", "recordDelimiter", "fieldDelimiter");
+    public static final Iterable<String> ALL = Arrays.asList("format");
 
     /**
      * Instance to test. A new instance is created for each test.
@@ -64,7 +64,9 @@ public class S3DatasetPropertiesTest {
      */
     @Test
     public void testDefaultProperties() {
-        assertThat(properties.format.getValue(), is(SimpleFileIOFormat.CSV));
+        assertThat(properties.format.getValue(), is(SimpleFileIOFormat.AUTO_DETECT));
+        
+        //other default which is hide or not hide
         assertThat(properties.recordDelimiter.getValue(), is(RecordDelimiterType.LF));
         assertThat(properties.specificRecordDelimiter.getValue(), is("\\n"));
         assertThat(properties.fieldDelimiter.getValue(), is(FieldDelimiterType.SEMICOLON));
@@ -198,6 +200,17 @@ public class S3DatasetPropertiesTest {
                 properties.afterEncoding();
                 assertThat(main.getWidget("specificEncoding").isVisible(), is(true));
                 break;
+            case AUTO_DETECT:
+                assertThat(main.getWidget("recordDelimiter").isVisible(), is(false));
+                assertThat(main.getWidget("fieldDelimiter").isVisible(), is(false));
+                
+                assertThat(main.getWidget("encoding").isVisible(), is(false));
+                assertThat(main.getWidget("specificEncoding").isVisible(), is(false));
+                assertThat(main.getWidget("setHeaderLine").isVisible(), is(false));
+                assertThat(main.getWidget("headerLine").isVisible(), is(false));
+                assertThat(main.getWidget("textEnclosureCharacter").isVisible(), is(false));
+                assertThat(main.getWidget("escapeCharacter").isVisible(), is(false));
+                break;
             default:
                 throw new RuntimeException("Missing test case for " + format);
             }
@@ -241,6 +254,8 @@ public class S3DatasetPropertiesTest {
                 assertThat(main.getWidget("fieldDelimiter").isVisible(), is(false));
                 break;
             case EXCEL:
+                break;
+            case AUTO_DETECT:
                 break;
             default:
                 throw new RuntimeException("Missing test case for " + format);

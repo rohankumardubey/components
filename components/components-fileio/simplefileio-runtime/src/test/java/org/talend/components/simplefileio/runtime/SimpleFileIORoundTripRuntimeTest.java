@@ -138,6 +138,7 @@ public class SimpleFileIORoundTripRuntimeTest {
 
         // Configure the components.
         SimpleFileIOOutputProperties outputProps = createOutputComponentProperties();
+        outputProps.getDatasetProperties().format.setValue(SimpleFileIOFormat.CSV);
         outputProps.getDatasetProperties().path.setValue(fileSpec);
         SimpleFileIOInputProperties inputProps = createInputComponentProperties();
         inputProps.setDatasetProperties(outputProps.getDatasetProperties());

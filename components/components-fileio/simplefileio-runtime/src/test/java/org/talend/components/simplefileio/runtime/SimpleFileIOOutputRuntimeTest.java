@@ -84,6 +84,7 @@ public class SimpleFileIOOutputRuntimeTest {
 
         // Configure the component.
         SimpleFileIOOutputProperties props = createOutputComponentProperties();
+        props.getDatasetProperties().format.setValue(SimpleFileIOFormat.CSV);
         props.getDatasetProperties().path.setValue(fileSpec);
 
         // Create the runtime.
@@ -125,6 +126,7 @@ public class SimpleFileIOOutputRuntimeTest {
 
         // Configure the component.
         SimpleFileIOOutputProperties props = createOutputComponentProperties();
+        props.getDatasetProperties().format.setValue(SimpleFileIOFormat.CSV);
         props.getDatasetProperties().path.setValue(fileSpec);
 
         // Create the runtime.
@@ -237,6 +239,7 @@ public class SimpleFileIOOutputRuntimeTest {
         try {
             // Configure the component.
             SimpleFileIOOutputProperties props = SimpleFileIOOutputRuntimeTest.createOutputComponentProperties();
+            props.getDatasetProperties().format.setValue(SimpleFileIOFormat.CSV);
             props.getDatasetProperties().path.setValue(fileSpec);
             props.overwrite.setValue(true);
 

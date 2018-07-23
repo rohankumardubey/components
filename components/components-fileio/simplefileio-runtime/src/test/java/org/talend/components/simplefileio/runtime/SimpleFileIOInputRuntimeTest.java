@@ -92,6 +92,7 @@ public class SimpleFileIOInputRuntimeTest {
 
         // Configure the component.
         SimpleFileIOInputProperties inputProps = createInputComponentProperties();
+        inputProps.getDatasetProperties().format.setValue(SimpleFileIOFormat.CSV);
         inputProps.getDatasetProperties().path.setValue(fileSpec);
         inputProps.getDatasetProperties().headerLine.setValue(0);
 
@@ -124,6 +125,7 @@ public class SimpleFileIOInputRuntimeTest {
 
         // Configure the component.
         SimpleFileIOInputProperties inputProps = createInputComponentProperties();
+        inputProps.getDatasetProperties().format.setValue(SimpleFileIOFormat.CSV);
         inputProps.getDatasetProperties().path.setValue(fileSpec);
         inputProps.getDatasetProperties().recordDelimiter.setValue(RecordDelimiterType.CRLF);
         inputProps.getDatasetProperties().fieldDelimiter.setValue(FieldDelimiterType.SPACE);
@@ -158,6 +160,7 @@ public class SimpleFileIOInputRuntimeTest {
 
         // Configure the component.
         SimpleFileIOInputProperties inputProps = createInputComponentProperties();
+        inputProps.getDatasetProperties().format.setValue(SimpleFileIOFormat.CSV);
         inputProps.getDatasetProperties().path.setValue(fileSpec);
         inputProps.getDatasetProperties().recordDelimiter.setValue(RecordDelimiterType.CR);
         inputProps.getDatasetProperties().fieldDelimiter.setValue(FieldDelimiterType.TABULATION);
@@ -219,6 +222,7 @@ public class SimpleFileIOInputRuntimeTest {
 
         // Configure the component.
         SimpleFileIOInputProperties inputProps = createInputComponentProperties();
+        inputProps.getDatasetProperties().format.setValue(SimpleFileIOFormat.CSV);
         inputProps.getDatasetProperties().path.setValue(fileSpec);
         inputProps.limit.setValue(2);
         inputProps.getDatasetProperties().headerLine.setValue(0);
@@ -251,6 +255,7 @@ public class SimpleFileIOInputRuntimeTest {
 
         // Configure the component.
         SimpleFileIOInputProperties inputProps = createInputComponentProperties();
+        inputProps.getDatasetProperties().format.setValue(SimpleFileIOFormat.CSV);
         inputProps.getDatasetProperties().path.setValue(fileSpec);
         inputProps.getDatasetProperties().recordDelimiter.setValue(RecordDelimiterType.OTHER);
         inputProps.getDatasetProperties().specificRecordDelimiter.setValue("---");
@@ -298,6 +303,7 @@ public class SimpleFileIOInputRuntimeTest {
 
         // Configure the component.
         SimpleFileIOInputProperties inputProps = createInputComponentProperties();
+        inputProps.getDatasetProperties().format.setValue(SimpleFileIOFormat.CSV);
         inputProps.getDatasetProperties().path.setValue(fileSpec);
         //the default text enclosure is null as it make the CSV content can't be split if not null.
         inputProps.getDatasetProperties().textEnclosureCharacter.setValue("\"");
@@ -360,6 +366,7 @@ public class SimpleFileIOInputRuntimeTest {
 
         // Configure the component.
         SimpleFileIOInputProperties inputProps = createInputComponentProperties();
+        inputProps.getDatasetProperties().format.setValue(SimpleFileIOFormat.CSV);
         inputProps.getDatasetProperties().path.setValue(fileSpec);
 
         // Create the runtime.

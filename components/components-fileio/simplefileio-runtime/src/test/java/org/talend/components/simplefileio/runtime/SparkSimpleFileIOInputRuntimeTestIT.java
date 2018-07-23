@@ -33,6 +33,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.talend.components.adapter.beam.transform.ConvertToIndexedRecord;
+import org.talend.components.simplefileio.SimpleFileIOFormat;
 import org.talend.components.simplefileio.input.SimpleFileIOInputProperties;
 import org.talend.components.test.SparkIntegrationTestResource;
 
@@ -89,6 +90,7 @@ public class SparkSimpleFileIOInputRuntimeTestIT {
 
         // Configure the component.
         SimpleFileIOInputProperties inputProps = SimpleFileIOInputRuntimeTest.createInputComponentProperties();
+        inputProps.getDatasetProperties().format.setValue(SimpleFileIOFormat.CSV);
         inputProps.getDatasetProperties().path.setValue(fileSpec);
         inputProps.getDatasetProperties().headerLine.setValue(0);
 
