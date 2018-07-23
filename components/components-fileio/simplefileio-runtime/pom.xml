@@ -224,6 +224,7 @@
         -->
          
         <!-- this may can't work in the components rest service, but 1.8.1 version miss some class/method which is used in tika, TODO check it-->
+        <!-- after a test in component rest service all components, it will introdyce 1.8.1 and 1.16.1 both to .m2, so it's ok here -->
         <dependency>
              <groupId>org.apache.commons</groupId>
              <artifactId>commons-compress</artifactId>
