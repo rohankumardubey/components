@@ -14,9 +14,10 @@ public class AutoDetectToolTest {
 
      @Test
      public void testCSVDetectBasic() throws IOException {
+         AutoDetectTool adt = new AutoDetectTool();
+         DetectResult result = new DetectResult(null);
          try(InputStream is = this.getClass().getResourceAsStream("invalidColumnNumber.txt")) {
-             AutoDetectTool adt = new AutoDetectTool();
-             DetectResult result = adt.detect(is);
+             result = adt.detect(is);
              Assert.assertEquals(FileFormat.CSV,result.getFormatType());
              System.out.println(result.getCSV_delimiter());
              
@@ -38,29 +39,43 @@ public class AutoDetectToolTest {
              
              System.out.println(result.getCSV_charset());
          }
+         
+         try(InputStream is = this.getClass().getResourceAsStream("invalidColumnNumber.txt")) {
+             System.out.println(adt.getSchema(result, is));
+         }
      }
      
      @Test
      public void testExcel97DetectBasic() throws IOException {
+         AutoDetectTool adt = new AutoDetectTool();
+         DetectResult result = new DetectResult(null);
          try(InputStream is = this.getClass().getResourceAsStream("basic.xls")) {
-             AutoDetectTool adt = new AutoDetectTool();
-             DetectResult result = adt.detect(is);
+             result = adt.detect(is);
              Assert.assertEquals(FileFormat.EXCEL97,result.getFormatType());
              System.out.println(result.getExcel_sheet());
              System.out.println(result.getExcel_header_size());
              System.out.println(result.getExcel_number_of_columns());
          }
+         
+         try(InputStream is = this.getClass().getResourceAsStream("basic.xls")) {
+             System.out.println(adt.getSchema(result, is));
+         }
      }
      
      @Test
      public void testExcel2007DetectBasic() throws IOException {
+         AutoDetectTool adt = new AutoDetectTool();
+         DetectResult result = new DetectResult(null);
          try(InputStream is = this.getClass().getResourceAsStream("basic.xlsx")) {
-             AutoDetectTool adt = new AutoDetectTool();
-             DetectResult result = adt.detect(is);
+             result = adt.detect(is);
              Assert.assertEquals(FileFormat.EXCEL2007,result.getFormatType());
              System.out.println(result.getExcel_sheet());
              System.out.println(result.getExcel_header_size());
              System.out.println(result.getExcel_number_of_columns());
+         }
+         
+         try(InputStream is = this.getClass().getResourceAsStream("basic.xlsx")) {
+             System.out.println(adt.getSchema(result, is));
          }
      }
      

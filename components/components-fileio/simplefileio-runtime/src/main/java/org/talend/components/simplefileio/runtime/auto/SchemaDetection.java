@@ -3,6 +3,7 @@ package org.talend.components.simplefileio.runtime.auto;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -75,12 +76,18 @@ public class SchemaDetection {
                 return result;
             }
             
-            Object schema = parser.getClass().getMethod("getSchema").invoke(parser);
+            Method method = parser.getClass().getMethod("getSchema");
+            method.setAccessible(true);
+            Object schema = method.invoke(parser);
+            method.setAccessible(false);
             if(schema == null) {
                 return result;
             }
             
-            List<Object> fields = (List<Object>) parser.getClass().getMethod("getColumnsMetadata").invoke(schema);
+            method = schema.getClass().getMethod("getColumnsMetadata");
+            method.setAccessible(true);
+            List<Object> fields = (List<Object>) method.invoke(schema);
+            method.setAccessible(false);
             if(fields == null) {
                 return result;
             }

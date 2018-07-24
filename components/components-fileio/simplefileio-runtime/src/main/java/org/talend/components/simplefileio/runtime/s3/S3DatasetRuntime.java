@@ -63,7 +63,7 @@ public class S3DatasetRuntime implements IS3DatasetRuntime {
         // Simple schema container.
         final Schema[] s = new Schema[1];
         // Try to get one record and determine its schema in a callback.
-        getSample(SchemaConstant.ONLY_FETCH_SCHEMA_SIGN, new Consumer<IndexedRecord>() {
+        getSample(1, new Consumer<IndexedRecord>() {
 
             @Override
             public void accept(IndexedRecord in) {

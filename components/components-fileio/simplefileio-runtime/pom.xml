@@ -231,6 +231,13 @@
              <version>1.16.1</version>
         </dependency>
         <dependency>
+	        <groupId>org.apache.commons</groupId>
+	        <artifactId>commons-csv</artifactId>
+	        <version>1.5</version>
+        </dependency>
+        
+        
+        <dependency>
 	    	<groupId>com.monitorjbl</groupId>
 		    <artifactId>xlsx-streamer</artifactId>
 		    <version>1.2.0</version>
@@ -341,7 +348,8 @@
             </exclusions>
   		</dependency>
   		
-  		<!-- TODO remove daikon-ee dependency-->  
+  		<!-- TODO remove daikon-ee dependency-->
+		<!-- 
   		<dependency>
             <groupId>org.talend.daikon-ee</groupId>
 			<artifactId>format-detection-core</artifactId>
@@ -357,6 +365,7 @@
 			<artifactId>format-detection-xls</artifactId>
 			<version>0.12.0-SNAPSHOT</version>
         </dependency>
+		-->
     </dependencies>
     <build>
         <plugins>

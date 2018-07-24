@@ -2,6 +2,8 @@ package org.talend.components.simplefileio.runtime.auto;
 
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -25,6 +27,10 @@ public class AutoDetectTool {
             this.mt = mt;
         }
         
+        public MediaType getMediaType() {
+            return this.mt;
+        }
+        
         public FileFormat getFormatType() {
             return format;
         }
@@ -32,7 +38,7 @@ public class AutoDetectTool {
         public void setFormatType(FileFormat format) {
             this.format = format;
         }
-      
+        
         //CSV
         public boolean getCSV_header_present() {
             return "present".equals(mt.parameters().get(AutoDetectConstants.HEADER_PARAMETER));
@@ -104,6 +110,7 @@ public class AutoDetectTool {
     public DetectResult detect(InputStream in) {
         try {
             MediaType mt = sd.detect(in);
+            
             DetectResult result = new DetectResult(mt);
             
             //CSV
@@ -135,5 +142,17 @@ public class AutoDetectTool {
              throw new RuntimeException("can't guess the file format, now support csv, excel 97 and 2007 format : " + e.getClass() + " : " + e.getMessage() + " : " + e.getCause());
         }
     }
+    
+    public List<String> getSchema(DetectResult detect_result, InputStream in) {
+      List<String> result = new ArrayList<String>();
+      try {
+          MediaType mt = detect_result.getMediaType();
+          result = sd.parse(in, mt);
+      } catch (Exception e) {
+           throw new RuntimeException("can't guess the file schema, now support csv, excel 97 and 2007 format : " + e.getClass() + " : " + e.getMessage() + " : " + e.getCause());
+      }
+      
+      return result;
+  }
     
 }
