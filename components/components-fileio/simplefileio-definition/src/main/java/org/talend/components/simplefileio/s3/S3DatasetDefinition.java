@@ -62,9 +62,9 @@ public class S3DatasetDefinition extends I18nDefinition implements DatasetDefini
             CustomJarRuntimeInfo runtimeInfo = new CustomJarRuntimeInfo(new URL(SimpleFileIOComponentFamilyDefinition.MAVEN_DEFAULT_RUNTIME_URI),
                     DependenciesReader.computeDependenciesFilePath(SimpleFileIOComponentFamilyDefinition.MAVEN_GROUP_ID,
                             SimpleFileIOComponentFamilyDefinition.MAVEN_DEFAULT_RUNTIME_ARTIFACT_ID), RUNTIME);
-            runtimeInfo.addCustomDependencies("mvn:org.talend.daikon-ee/format-detection-core");
-            runtimeInfo.addCustomDependencies("mvn:org.talend.daikon-ee/format-detection-csv");
-            runtimeInfo.addCustomDependencies("mvn:org.talend.daikon-ee/format-detection-xls");
+            runtimeInfo.addCustomDependencies("mvn:org.talend.daikon-ee/format-detection-core/0.12.0-SNAPSHOT/jar");
+            runtimeInfo.addCustomDependencies("mvn:org.talend.daikon-ee/format-detection-csv/0.12.0-SNAPSHOT/jar");
+            runtimeInfo.addCustomDependencies("mvn:org.talend.daikon-ee/format-detection-xls/0.12.0-SNAPSHOT/jar");
             return runtimeInfo;
         } catch (MalformedURLException e) {
             throw new ComponentException(e);
