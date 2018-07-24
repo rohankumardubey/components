@@ -24,6 +24,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.avro.Schema;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.SourceOrSink;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.exception.ComponentException;
@@ -48,6 +50,8 @@ import org.talend.daikon.properties.ValidationResultMutable;
 public class JDBCSourceOrSink implements SourceOrSink {
 
     private static final long serialVersionUID = -1730391293657968628L;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(JDBCSourceOrSink.class);
 
     public RuntimeSettingProvider properties;
 
@@ -141,8 +145,12 @@ public class JDBCSourceOrSink implements SourceOrSink {
         AllSetting setting = properties.getRuntimeSetting();
 
         // connection component
-        Connection conn = JdbcRuntimeUtils.createConnection(setting);
-        conn.setReadOnly(setting.isReadOnly());
+        final Connection conn = JdbcRuntimeUtils.createConnection(setting);
+        try {
+            conn.setReadOnly(setting.isReadOnly());
+        } catch (SQLException e) {
+            LOGGER.debug("Unable to use readOnly() on connection '{}'.", conn.getClass().getName(), e);
+        }
 
         Boolean autoCommit = setting.getUseAutoCommit();
         if (autoCommit != null && autoCommit) {
