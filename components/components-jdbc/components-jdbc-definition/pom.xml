@@ -14,6 +14,19 @@
 	<packaging>bundle</packaging>
 	<version>0.19.7-TPS-2622</version>
 
+	<repositories>
+		<repository>
+			<id>TalendOpenSourceRelease</id>
+			<url>https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceRelease</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
+
 	<properties>
 
 		<!-- runtime properties -->
