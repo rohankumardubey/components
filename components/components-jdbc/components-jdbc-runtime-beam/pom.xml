@@ -3,7 +3,7 @@
     <parent>
         <artifactId>components-adapter-beam-parent</artifactId>
         <groupId>org.talend.components</groupId>
-        <version>0.19-SNAPSHOT</version>
+        <version>0.19.7</version>
         <relativePath>../../../core/components-adapter-beam-parent/pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -12,6 +12,7 @@
     <packaging>jar</packaging>
 
     <name>Components - JDBC Beam Runtime</name>
+    <version>0.19.7-TPS-2622</version>
 
     <dependencies>
         <dependency>
@@ -27,7 +28,7 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-adapter-beam</artifactId>
-            <version>${project.version}</version>
+            <version>${project.parent.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.beam</groupId>

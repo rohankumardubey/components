@@ -3,7 +3,7 @@
     <parent>
         <artifactId>components-parent</artifactId>
         <groupId>org.talend.components</groupId>
-        <version>0.19-SNAPSHOT</version>
+        <version>0.19.7</version>
         <relativePath>../../../components-parent/pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -12,6 +12,7 @@
 
     <name>Components - JDBC Integration Tests</name>
     <packaging>jar</packaging>
+    <version>0.19.7-TPS-2622</version>
 
     <properties>
         <!-- skip the deployment for integration tests, not necessary -->

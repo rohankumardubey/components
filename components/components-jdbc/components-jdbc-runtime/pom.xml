@@ -4,13 +4,14 @@
     <parent>
         <groupId>org.talend.components</groupId>
         <artifactId>components-parent</artifactId>
-        <version>0.19-SNAPSHOT</version>
+        <version>0.19.7</version>
         <relativePath>../../../components-parent/pom.xml</relativePath>
     </parent>
 
     <name>Components - JDBC - Runtime</name>
     <artifactId>components-jdbc-runtime</artifactId>
     <packaging>bundle</packaging>
+    <version>0.19.7-TPS-2622</version>
 
     <dependencies>
     	<dependency>
