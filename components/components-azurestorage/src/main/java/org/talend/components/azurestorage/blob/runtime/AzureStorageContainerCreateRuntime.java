@@ -26,7 +26,7 @@ import com.microsoft.azure.storage.blob.CloudBlobContainer;
 /**
  * Runtime implementation for Azure storage container create feature.<br/>
  * These methods are called only on Driver node in following order: <br/>
- * 1) {@link this#initialize(RuntimeContainer, TAzureStorageContainerCreateProperties)} <br/>
+ * 1) {@link this#initialize(RuntimeContainer, ComponentProperties)} <br/>
  * 2) {@link this#runAtDriver(RuntimeContainer)} <br/>
  * <b>Instances of this class should not be serialized and sent on worker nodes</b>
  */
@@ -67,16 +67,8 @@ public class AzureStorageContainerCreateRuntime extends AzureStorageContainerRun
         try {
             boolean containerCreated;
             CloudBlobContainer cloudBlobContainer = getAzureStorageBlobContainerReference(runtimeContainer, containerName);
-            containerCreated = createContainerIfNotExist(cloudBlobContainer);
-            // Manage accessControl
-            if (AccessControl.Public.equals(access) && containerCreated) {
-                // Create a permissions object.
-                BlobContainerPermissions containerPermissions = new BlobContainerPermissions();
-                // Include public access in the permissions object.
-                containerPermissions.setPublicAccess(BlobContainerPublicAccessType.CONTAINER);
-                // Set the permissions on the container.
-                cloudBlobContainer.uploadPermissions(containerPermissions);
-            }
+            final BlobContainerPublicAccessType accessType = AccessControl.Public.equals(access) ? BlobContainerPublicAccessType.CONTAINER : BlobContainerPublicAccessType.OFF ;
+            containerCreated = createContainerIfNotExist(cloudBlobContainer, accessType);
             if (!containerCreated) {
                 LOGGER.warn(messages.getMessage("warn.ContainerExists", containerName));
             }
@@ -88,10 +80,10 @@ public class AzureStorageContainerCreateRuntime extends AzureStorageContainerRun
         }
     }
 
-    private boolean createContainerIfNotExist(CloudBlobContainer cloudBlobContainer) throws StorageException {
+    private boolean createContainerIfNotExist(CloudBlobContainer cloudBlobContainer, final BlobContainerPublicAccessType accessType) throws StorageException {
         boolean containerCreated;
         try {
-            containerCreated = cloudBlobContainer.createIfNotExists();
+            containerCreated = cloudBlobContainer.createIfNotExists(accessType, null, null);
         } catch (StorageException e) {
             if (!e.getErrorCode().equals(StorageErrorCodeStrings.CONTAINER_BEING_DELETED)) {
                 throw e;
@@ -106,7 +98,7 @@ public class AzureStorageContainerCreateRuntime extends AzureStorageContainerRun
                 LOGGER.error(messages.getMessage("error.InterruptedException"));
                 throw new ComponentException(eint);
             }
-            containerCreated = cloudBlobContainer.createIfNotExists();
+            containerCreated = cloudBlobContainer.createIfNotExists(accessType, null, null);
             LOGGER.debug(messages.getMessage("debug.ContainerCreated", containerName));
         }
 
