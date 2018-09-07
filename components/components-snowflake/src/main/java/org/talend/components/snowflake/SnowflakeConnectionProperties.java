@@ -129,7 +129,7 @@ public class SnowflakeConnectionProperties extends ComponentPropertiesImpl imple
         mainForm.addRow(warehouse);
         mainForm.addRow(schemaName);
         mainForm.addRow(db);
-        wizardForm.addRow(jdbcParameters);
+        mainForm.addRow(jdbcParameters);
 
         Form advancedForm = Form.create(this, Form.ADVANCED);
         advancedForm.addRow(loginTimeout);
