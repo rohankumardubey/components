@@ -32,6 +32,7 @@ import org.talend.daikon.properties.ValidationResultMutable;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
+import org.talend.daikon.properties.property.PropertyFactory;
 import org.talend.daikon.serialize.PostDeserializeSetup;
 import org.talend.daikon.serialize.migration.SerializeSetVersion;
 
@@ -84,6 +85,8 @@ public class SnowflakeConnectionProperties extends ComponentPropertiesImpl imple
     public Property<String> role = newString("role"); //$NON-NLS-1$
 
     public Property<Tracing> tracing = newEnum("tracing", Tracing.class); //$NON-NLS-1$
+    
+    public Property<String> jdbcParameters  =  newString("jdbcParameters");
 
     // Presentation items
     public PresentationItem testConnection = new PresentationItem("testConnection", "Test connection");
@@ -115,6 +118,8 @@ public class SnowflakeConnectionProperties extends ComponentPropertiesImpl imple
         wizardForm.addRow(warehouse);
         wizardForm.addRow(schemaName);
         wizardForm.addRow(db);
+        wizardForm.addRow(jdbcParameters);
+        
         wizardForm.addRow(widget(advanced).setWidgetType(Widget.BUTTON_WIDGET_TYPE));
         wizardForm.addColumn(widget(testConnection).setLongRunning(true).setWidgetType(Widget.BUTTON_WIDGET_TYPE));
 
@@ -124,6 +129,7 @@ public class SnowflakeConnectionProperties extends ComponentPropertiesImpl imple
         mainForm.addRow(warehouse);
         mainForm.addRow(schemaName);
         mainForm.addRow(db);
+        wizardForm.addRow(jdbcParameters);
 
         Form advancedForm = Form.create(this, Form.ADVANCED);
         advancedForm.addRow(loginTimeout);
@@ -150,6 +156,7 @@ public class SnowflakeConnectionProperties extends ComponentPropertiesImpl imple
         form.getWidget(warehouse.getName()).setHidden(hidden);
         form.getWidget(schemaName.getName()).setHidden(hidden);
         form.getWidget(db.getName()).setHidden(hidden);
+        form.getWidget(jdbcParameters.getName()).setHidden(hidden);
     }
 
     @Override
@@ -246,6 +253,14 @@ public class SnowflakeConnectionProperties extends ComponentPropertiesImpl imple
         appendProperty("role", role, stringBuilder);
         appendProperty("tracing", tracing, stringBuilder);
 
+        String jdbcParameters = this.jdbcParameters.getStringValue();
+        if(jdbcParameters!=null && !jdbcParameters.isEmpty() && !"\"\"".equals(jdbcParameters)) {
+            if(stringBuilder.length() > 0) {
+                stringBuilder.append("&");
+            }
+            stringBuilder.append(jdbcParameters);
+        }
+        
         return new StringBuilder().append("jdbc:snowflake://").append(account).append(".snowflakecomputing.com").append("/?")
                 .append(stringBuilder).toString();
     }
