@@ -25,7 +25,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- Used for Docker images name -->
         <git_branch>local</git_branch>
-        <docker_tag_suffix>${maven.build.timestamp}</docker_tag_suffix>
         <talend_docker_registry>registry.datapwn.com</talend_docker_registry>
     </properties>
     <dependencies>
@@ -294,11 +293,13 @@
                                     <autoPull>once</autoPull>
                                     <images>
                                         <image>
-                                            <name>${talend_docker_registry}/talend/tcomp-${project.artifactId}-${git_branch}</name>
+                                            <name>
+                                                ${talend_docker_registry}/talend/tcomp-${project.artifactId}
+                                            </name>
                                             <build>
                                                 <from>${talend_docker_registry}/talend/microservices-base:1.latest</from>
                                                 <tags>
-                                                    <tag>${project.version}-${docker_tag_suffix}</tag>
+                                                    <tag>${project.version}-${maven.build.timestamp}</tag>
                                                 </tags>
                                                 <ports>
                                                     <port>8989</port>
