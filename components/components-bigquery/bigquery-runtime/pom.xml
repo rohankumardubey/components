@@ -134,7 +134,6 @@
                         <bigquery.gcp.temp.folder>${bigquery.gcp.temp.folder}
                         </bigquery.gcp.temp.folder>
                     </systemPropertyVariables>
-                    <skipITs>true</skipITs>
                 </configuration>
             </plugin>
         </plugins>
