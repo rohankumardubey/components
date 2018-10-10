@@ -276,7 +276,7 @@
                                             <port>11210:11210</port>
                                         </ports>
                                         <wait>
-                                            <time>10000</time>
+                                            <time>30000</time>
                                         </wait>
                                     </run>
                                 </image>
