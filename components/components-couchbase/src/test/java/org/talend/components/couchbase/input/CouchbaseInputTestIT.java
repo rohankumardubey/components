@@ -67,17 +67,11 @@ public class CouchbaseInputTestIT {
             bootstrapNodes = props.getProperty("bootstrapNodes");
         }
 
-        bucketName = System.getProperty("couchbase.bucketName");
-        if (StringUtils.isEmpty(bucketName)) {
-            // Bucket name not specified, get from properties
-            bucketName = props.getProperty("bucket");
-        }
+        // Bucket name not specified, get from properties
+        bucketName = props.getProperty("bucket");
 
-        password = System.getProperty("couchbase.password");
-        if (password == null) { // Password can be empty, so check for null only
-            // Password not specified, get from properties
-            password = props.getProperty("password");
-        }
+        // Password not specified, get from properties
+        password = props.getProperty("password");
     }
 
     @After
