@@ -67,11 +67,17 @@ public class CouchbaseInputTestIT {
             bootstrapNodes = props.getProperty("bootstrapNodes");
         }
 
-        // Bucket name not specified, get from properties
-        bucketName = props.getProperty("bucket");
+        bucketName = System.getProperty("couchbase.bucketName");
+        if (StringUtils.isEmpty(bucketName)) {
+            // Bucket name not specified, get from properties
+            bucketName = props.getProperty("bucket");
+        }
 
-        // Password not specified, get from properties
-        password = props.getProperty("password");
+        password = System.getProperty("couchbase.password");
+        if (password == null) { // Password can be empty, so check for null only
+            // Password not specified, get from properties
+            password = props.getProperty("password");
+        }
     }
 
     @After
@@ -93,6 +99,7 @@ public class CouchbaseInputTestIT {
                 .socketConnectTimeout(60000)
                 .connectTimeout(60000)
                 .keepAliveInterval(60000)
+                .kvTimeout(60000)
                 .build();
         CouchbaseCluster cluster = CouchbaseCluster.create(env, bootstrapNodes);
         Bucket bucket = cluster.openBucket(bucketName, password);
