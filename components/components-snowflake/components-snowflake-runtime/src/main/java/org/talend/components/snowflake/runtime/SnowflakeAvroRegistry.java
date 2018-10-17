@@ -14,6 +14,7 @@ package org.talend.components.snowflake.runtime;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Collections;
 
 import org.apache.avro.LogicalTypes;
 import org.apache.avro.Schema;
@@ -24,6 +25,7 @@ import org.talend.components.api.exception.ComponentException;
 import org.talend.components.common.avro.JDBCAvroRegistry;
 import org.talend.daikon.avro.AvroNamesValidationHelper;
 import org.talend.daikon.avro.AvroUtils;
+import org.talend.daikon.avro.NameUtil;
 import org.talend.daikon.avro.SchemaConstants;
 
 public class SnowflakeAvroRegistry extends JDBCAvroRegistry {
@@ -69,7 +71,7 @@ public class SnowflakeAvroRegistry extends JDBCAvroRegistry {
         }
         Field field = null;
         Schema schema = null;
-        name = AvroNamesValidationHelper.getAvroCompatibleName(dbColumnName);
+        name = AvroNamesValidationHelper.getAvroCompatibleName(NameUtil.correct(dbColumnName, 0, Collections.<String>emptySet()));
         switch (dbtype) {
         case java.sql.Types.VARCHAR:
         case java.sql.Types.LONGVARCHAR:
