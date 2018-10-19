@@ -1,10 +1,7 @@
 package org.talend.components.snowflake.runtime;
 
-import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Time;
-import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.Map;
 
@@ -17,8 +14,6 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.talend.components.api.exception.ComponentException;
-import org.talend.components.common.avro.JDBCAvroRegistry.JDBCConverter;
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
 
@@ -28,6 +23,7 @@ import com.google.common.collect.ImmutableMap;
  * Unit-tests for {@link SnowflakeAvroRegistry} class
  */
 public class SnowflakeAvroRegistryTest {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(SnowflakeAvroRegistryTest.class);
 
     private static final String TALEND_EXPECTED_DATE_PATTERN = "yyyy-MM-dd";
@@ -48,9 +44,9 @@ public class SnowflakeAvroRegistryTest {
 
     private boolean nullable;
 
-    private Map<Integer, Schema> testPairsForAvroTypes = ImmutableMap.of(Types.VARCHAR, AvroUtils._string(), Types.DECIMAL,
-            AvroUtils._decimal(), Types.DOUBLE, AvroUtils._double(), Types.BOOLEAN, AvroUtils._boolean(), Types.JAVA_OBJECT,
-            AvroUtils._string());
+    private Map<Integer, Schema> testPairsForAvroTypes = ImmutableMap
+            .of(Types.VARCHAR, AvroUtils._string(), Types.DECIMAL, AvroUtils._decimal(), Types.DOUBLE, AvroUtils._double(), Types.BOOLEAN, AvroUtils._boolean(), Types.JAVA_OBJECT,
+                    AvroUtils._string());
 
     @Before
     public void setUp() throws Exception {
@@ -151,66 +147,6 @@ public class SnowflakeAvroRegistryTest {
     public void testGetConverterForDate() throws SQLException {
         Integer dayIntValue = 17_331;
         ResultSet rs = Mockito.mock(ResultSet.class);
-        Mockito.when(rs.getObject(0)).thenReturn(dayIntValue);
-        Mockito.when(rs.getInt(0)).thenReturn(dayIntValue);
-        Schema.Field field = snowflakeAvroRegistry
-                .sqlType2Avro(size, scale, Types.DATE, nullable, FIELD_NAME, DB_COLUMN_NAME, null);
-        JDBCConverter dateJDBCConverter = snowflakeAvroRegistry.getConverter(field);
-        Assert.assertEquals(dayIntValue, dateJDBCConverter.convertToAvro(rs));
-    }
 
-    @Test
-    public void testGetConverterForNullDate() throws SQLException {
-        Object date = null;
-        ResultSet rs = Mockito.mock(ResultSet.class);
-        Mockito.when(rs.getObject(0)).thenReturn(date);
-        Schema.Field field = snowflakeAvroRegistry
-                .sqlType2Avro(size, scale, Types.DATE, nullable, FIELD_NAME, DB_COLUMN_NAME, null);
-        JDBCConverter dateJDBCConverter = snowflakeAvroRegistry.getConverter(field);
-        Assert.assertEquals(date, dateJDBCConverter.convertToAvro(rs));
-    }
-
-    @Test
-    public void testGetConverterForMillis() throws SQLException {
-        Integer millisIntValue = 49_435_000;
-        Time time = new Time(millisIntValue);
-        ResultSet rs = Mockito.mock(ResultSet.class);
-        Mockito.when(rs.getTime(0)).thenReturn(time);
-        Schema.Field field = snowflakeAvroRegistry
-                .sqlType2Avro(size, scale, Types.TIME, nullable, FIELD_NAME, DB_COLUMN_NAME, null);
-        JDBCConverter dateJDBCConverter = snowflakeAvroRegistry.getConverter(field);
-        Assert.assertEquals(millisIntValue, dateJDBCConverter.convertToAvro(rs));
-    }
-
-    @Test
-    public void testGetConverterForTimeStamp() throws SQLException {
-        Long millisIntValue = 49_435_000L;
-        Timestamp timestamp = new Timestamp(millisIntValue);
-        ResultSet rs = Mockito.mock(ResultSet.class);
-        Mockito.when(rs.getTimestamp(0)).thenReturn(timestamp);
-        Schema.Field field = snowflakeAvroRegistry
-                .sqlType2Avro(size, scale, Types.TIMESTAMP, nullable, FIELD_NAME, DB_COLUMN_NAME, null);
-        JDBCConverter dateJDBCConverter = snowflakeAvroRegistry.getConverter(field);
-        Assert.assertEquals(millisIntValue, dateJDBCConverter.convertToAvro(rs));
-    }
-
-    @Test(expected = ComponentException.class)
-    public void testGetConverterWithThrownException() throws SQLException {
-        ResultSet rs = Mockito.mock(ResultSet.class);
-        Mockito.when(rs.getTimestamp(0)).thenThrow(new SQLException("Can't get timestamp value from RS"));
-        Schema.Field field = snowflakeAvroRegistry
-                .sqlType2Avro(size, scale, Types.TIMESTAMP, nullable, FIELD_NAME, DB_COLUMN_NAME, null);
-        snowflakeAvroRegistry.getConverter(field).convertToAvro(rs);
-    }
-
-    @Test
-    public void testGetConverterForInt() throws SQLException {
-        BigDecimal value = new BigDecimal(49);
-        ResultSet rs = Mockito.mock(ResultSet.class);
-        Mockito.when(rs.getBigDecimal(0)).thenReturn(value);
-        Schema.Field field = snowflakeAvroRegistry
-                .sqlType2Avro(size, scale, Types.INTEGER, nullable, FIELD_NAME, DB_COLUMN_NAME, null);
-        JDBCConverter dateJDBCConverter = snowflakeAvroRegistry.getConverter(field);
-        Assert.assertEquals(value, dateJDBCConverter.convertToAvro(rs));
     }
 }
