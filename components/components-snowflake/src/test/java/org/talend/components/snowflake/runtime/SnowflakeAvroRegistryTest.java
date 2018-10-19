@@ -28,6 +28,7 @@ import com.google.common.collect.ImmutableMap;
  * Unit-tests for {@link SnowflakeAvroRegistry} class
  */
 public class SnowflakeAvroRegistryTest {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(SnowflakeAvroRegistryTest.class);
 
     private static final String TALEND_EXPECTED_DATE_PATTERN = "yyyy-MM-dd";
@@ -48,9 +49,9 @@ public class SnowflakeAvroRegistryTest {
 
     private boolean nullable;
 
-    private Map<Integer, Schema> testPairsForAvroTypes = ImmutableMap.of(Types.VARCHAR, AvroUtils._string(), Types.DECIMAL,
-            AvroUtils._decimal(), Types.DOUBLE, AvroUtils._double(), Types.BOOLEAN, AvroUtils._boolean(), Types.JAVA_OBJECT,
-            AvroUtils._string());
+    private Map<Integer, Schema> testPairsForAvroTypes = ImmutableMap
+            .of(Types.VARCHAR, AvroUtils._string(), Types.DECIMAL, AvroUtils._decimal(), Types.DOUBLE, AvroUtils._double(),
+                    Types.BOOLEAN, AvroUtils._boolean(), Types.JAVA_OBJECT, AvroUtils._string());
 
     @Before
     public void setUp() throws Exception {
@@ -94,30 +95,6 @@ public class SnowflakeAvroRegistryTest {
         Assert.assertEquals(-1, field.pos());
         Assert.assertEquals(TALEND_EXPECTED_DATE_PATTERN, field.getObjectProp(SchemaConstants.TALEND_COLUMN_PATTERN));
         Assert.assertEquals(java.sql.Types.DATE, field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_TYPE));
-        Assert.assertEquals(DB_COLUMN_NAME, field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME));
-        Assert.assertEquals(DEFAULT_VALUE, field.getObjectProp(SchemaConstants.TALEND_COLUMN_DEFAULT));
-
-        LOGGER.debug(field.getObjectProps().toString());
-
-    }
-
-    /**
-     * Checks {@link SnowflakeAvroRegistry#sqlType2Avro(int, int, int, boolean, String, String, Object)}
-     * returns the {@link org.apache.avro.Schema.Field} with logical TIMESTAMP type
-     */
-    @Test
-    public void testSqlType2AvroTimestamp() throws Exception {
-        final int dbtype = java.sql.Types.TIMESTAMP;
-
-        Schema.Field field = snowflakeAvroRegistry
-                .sqlType2Avro(size, scale, dbtype, nullable, FIELD_NAME, DB_COLUMN_NAME, DEFAULT_VALUE);
-
-        LOGGER.debug("field: " + field.toString());
-
-        Assert.assertEquals(FIELD_NAME, field.name());
-        Assert.assertEquals(-1, field.pos());
-        Assert.assertEquals(TALEND_EXPECTED_TIMESTAMP_PATTERN, field.getObjectProp(SchemaConstants.TALEND_COLUMN_PATTERN));
-        Assert.assertEquals(java.sql.Types.TIMESTAMP, field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_TYPE));
         Assert.assertEquals(DB_COLUMN_NAME, field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME));
         Assert.assertEquals(DEFAULT_VALUE, field.getObjectProp(SchemaConstants.TALEND_COLUMN_DEFAULT));
 
@@ -200,5 +177,29 @@ public class SnowflakeAvroRegistryTest {
                 .sqlType2Avro(size, scale, Types.INTEGER, nullable, FIELD_NAME, DB_COLUMN_NAME, null);
         JDBCConverter dateJDBCConverter = snowflakeAvroRegistry.getConverter(field);
         Assert.assertEquals(value, dateJDBCConverter.convertToAvro(rs));
+    }
+
+    /**
+     * Checks {@link SnowflakeAvroRegistry#sqlType2Avro(int, int, int, boolean, String, String, Object)}
+     * returns the {@link org.apache.avro.Schema.Field} with logical TIMESTAMP type
+     */
+    @Test
+    public void testSqlType2AvroTimestamp() throws Exception {
+        final int dbtype = java.sql.Types.TIMESTAMP;
+
+        Schema.Field field = snowflakeAvroRegistry
+                .sqlType2Avro(size, scale, dbtype, nullable, FIELD_NAME, DB_COLUMN_NAME, DEFAULT_VALUE);
+
+        LOGGER.debug("field: " + field.toString());
+
+        Assert.assertEquals(FIELD_NAME, field.name());
+        Assert.assertEquals(-1, field.pos());
+        Assert.assertEquals(TALEND_EXPECTED_TIMESTAMP_PATTERN, field.getObjectProp(SchemaConstants.TALEND_COLUMN_PATTERN));
+        Assert.assertEquals(java.sql.Types.TIMESTAMP, field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_TYPE));
+        Assert.assertEquals(DB_COLUMN_NAME, field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME));
+        Assert.assertEquals(DEFAULT_VALUE, field.getObjectProp(SchemaConstants.TALEND_COLUMN_DEFAULT));
+
+        LOGGER.debug(field.getObjectProps().toString());
+
     }
 }
