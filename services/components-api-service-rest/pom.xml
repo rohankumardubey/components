@@ -22,7 +22,9 @@
         <!-- Used for Docker images name -->
         <git_branch>local</git_branch>
         <talend_docker_registry>registry.datapwn.com</talend_docker_registry>
-
+        <spring-boot.version>1.5.17.RELEASE</spring-boot.version> <!-- this pom hierarchy is really broken -->
+        <spring.version>4.3.20.RELEASE</spring.version>
+        <jetty.version>9.4.11.v20180605</jetty.version>
         <biz.aQute.bnd.annotation.version>2.4.0</biz.aQute.bnd.annotation.version>
         <commons-io.version>2.5</commons-io.version>
         <derby.version>10.12.1.1</derby.version>
@@ -33,7 +35,7 @@
         <httpcore-nio.version>4.4.5</httpcore-nio.version>
         <httpcore.version>4.4.9</httpcore.version>
         <jackson.version.annotations>2.9.0</jackson.version.annotations>
-        <jackson.version>2.9.5</jackson.version>
+        <jackson.version>2.9.7</jackson.version>
         <org.talend.libraries.mysql.version>6.0.0</org.talend.libraries.mysql.version>
         <pax-url-aethe.version>2.4.7</pax-url-aethe.version>
         <rest-assured.version>2.6.0</rest-assured.version>
@@ -52,10 +54,22 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-jetty</artifactId>
+            <version>${spring-boot.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+            <version>${spring-boot.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-core</artifactId>
+            <version>${spring.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
+            <version>${spring-boot.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>
@@ -71,10 +85,6 @@
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
 
         <!-- talend dependencies -->
@@ -120,6 +130,7 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
+            <version>${spring-boot.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -218,6 +229,7 @@
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
+
             <artifactId>jackson-databind</artifactId>
             <version>${jackson.version}</version>
         </dependency>
