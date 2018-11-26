@@ -499,8 +499,6 @@ public abstract class NetSuiteClientService<PortT> {
     private <R> R executeUsingRequestLevelCredentials(PortOperation<R, PortT> op) throws NetSuiteException {
         lock.lock();
         try {
-            relogin();
-
             R result = null;
             for (int i = 0; i < getRetryCount(); i++) {
                 try {
@@ -517,7 +515,6 @@ public abstract class NetSuiteClientService<PortT> {
                 }
             }
             return result;
-
         } finally {
             lock.unlock();
         }
@@ -783,8 +780,23 @@ public abstract class NetSuiteClientService<PortT> {
      * @param port port
      * @throws NetSuiteException if an error occurs during performing of operation
      */
-    protected void remoteLoginHeaders(PortT port) throws NetSuiteException {
-        removeHeader(port, new QName(getPlatformMessageNamespaceUri(), "applicationInfo"));
+    protected void updateLoginHeaders(PortT port) throws NetSuiteException {
+        if (!isUseRequestLevelCredentials()) {
+            removeHeader(port, new QName(getPlatformMessageNamespaceUri(), "applicationInfo"));
+        } else {
+            Object passport = createNativePassport(credentials);
+            try {
+                if (passport != null) {
+                    Header passportHeader = new Header(
+                            new QName(getPlatformMessageNamespaceUri(), "passport"),
+                            passport, new JAXBDataBinding(passport.getClass()));
+                    setHeader(port, passportHeader);
+                }
+            } catch (JAXBException e) {
+                throw new NetSuiteException(new NetSuiteErrorCode(NetSuiteErrorCode.INTERNAL_ERROR),
+                        NetSuiteRuntimeI18n.MESSAGES.getMessage("error.binding"), e);
+            }
+        }
     }
 
     /**
