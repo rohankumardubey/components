@@ -84,6 +84,8 @@ public class NetSuiteConnectionProperties extends ComponentPropertiesImpl implem
      * custom fields which are exposed for components.
      */
     public final Property<Boolean> customizationEnabled = newBoolean("customizationEnabled");
+    
+    public final Property<Boolean> useRequestLevelCredentials = newBoolean("useRequestLevelCredentials");
 
     public final PresentationItem testConnection = new PresentationItem("testConnection", "Test connection");
 
@@ -112,6 +114,7 @@ public class NetSuiteConnectionProperties extends ComponentPropertiesImpl implem
         account.setValue("");
         applicationId.setValue("");
         customizationEnabled.setValue(true);
+        useRequestLevelCredentials.setValue(false);
     }
 
     @Override
@@ -129,6 +132,7 @@ public class NetSuiteConnectionProperties extends ComponentPropertiesImpl implem
 
         Form advForm = new Form(this, Form.ADVANCED);
         advForm.addRow(customizationEnabled);
+        advForm.addRow(useRequestLevelCredentials);
 
         // A form for a reference to a connection
         Form refForm = Form.create(this, Form.REFERENCE);
@@ -168,6 +172,7 @@ public class NetSuiteConnectionProperties extends ComponentPropertiesImpl implem
 
         } else if (form.getName().equals(Form.ADVANCED)) {
             form.getWidget(customizationEnabled.getName()).setHidden(refConnectionUsed);
+            form.getWidget(useRequestLevelCredentials.getName()).setHidden(refConnectionUsed);
         }
     }
 

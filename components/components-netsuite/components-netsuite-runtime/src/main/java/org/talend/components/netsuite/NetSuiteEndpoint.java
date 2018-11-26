@@ -140,6 +140,7 @@ public class NetSuiteEndpoint {
                 connectionConfig.setBodyFieldsOnly(((NetSuiteInputProperties) properties).bodyFieldsOnly.getValue());
             }
             connectionConfig.setCustomizationEnabled(customizationEnabled);
+            connectionConfig.setUseRequestLevelCredentials(connProps.useRequestLevelCredentials.getValue());
             return connectionConfig;
         } catch (MalformedURLException e) {
             throw new NetSuiteException(new NetSuiteErrorCode(NetSuiteErrorCode.CLIENT_ERROR),
@@ -193,6 +194,7 @@ public class NetSuiteEndpoint {
         clientService.setEndpointUrl(connectionConfig.getEndpointUrl().toString());
         clientService.setCredentials(connectionConfig.getCredentials());
         clientService.setBodyFieldsOnly(connectionConfig.isBodyFieldsOnly());
+        clientService.setUseRequestLevelCredentials(connectionConfig.isUseRequestLevelCredentials());
         MetaDataSource metaDataSource = clientService.getMetaDataSource();
         metaDataSource.setCustomizationEnabled(connectionConfig.isCustomizationEnabled());
 
@@ -210,6 +212,8 @@ public class NetSuiteEndpoint {
         private NetSuiteCredentials credentials;
         private boolean bodyFieldsOnly = true;
         private boolean customizationEnabled;
+        private boolean useRequestLevelCredentials;
+        private String referenceComponentId;
 
         public ConnectionConfig() {
         }
@@ -258,6 +262,18 @@ public class NetSuiteEndpoint {
 
         public void setCustomizationEnabled(boolean customizationEnabled) {
             this.customizationEnabled = customizationEnabled;
+        }
+
+        public boolean isUseRequestLevelCredentials() {
+            return useRequestLevelCredentials;
+        }
+
+        public void setUseRequestLevelCredentials(boolean useRequestLevelCredentials) {
+            this.useRequestLevelCredentials = useRequestLevelCredentials;
+        }
+
+        public void setReferenceComponentId(String referenceComponentId) {
+            this.referenceComponentId = referenceComponentId;
         }
 
         @Override
