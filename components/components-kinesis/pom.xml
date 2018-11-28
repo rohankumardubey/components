@@ -4,7 +4,7 @@
 
     <groupId>org.talend.components</groupId>
     <artifactId>components-kinesis-aggregator</artifactId>
-    <version>0.21.4-SNAPSHOT</version>
+    <version>0.21.4</version>
 
     <name>Components - Kinesis Aggregator</name>
     <packaging>pom</packaging>
