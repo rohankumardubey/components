@@ -394,7 +394,7 @@ public class NetSuiteClientServiceImpl extends NetSuiteClientService<NetSuitePor
             }
 
             if (i != getRetryCount() - 1) {
-                waitForRetryInterval();
+                waitForRetryInterval(i);
             }
         }
 
