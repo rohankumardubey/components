@@ -79,6 +79,19 @@ public class KinesisDatasetRuntime implements IKinesisDatasetRuntime {
         inputProperties.maxReadTime.setValue(10000l);
         inputProperties.position.setValue(KinesisInputProperties.OffsetType.EARLIEST);
         inputRuntime.initialize(null, inputProperties);
+
+        // Create a pipeline using the input component to get records.
+        DirectOptions options = BeamLocalRunnerOption.getOptions();
+        final Pipeline p = Pipeline.create(options);
+
+        try (DirectConsumerCollector<IndexedRecord> collector = DirectConsumerCollector.of(consumer)) {
+            // Collect a sample of the input records.
+            p
+                    .apply(inputRuntime) //
+                    .apply(Sample.<IndexedRecord> any(limit))
+                    .apply(collector);
+            p.run().waitUntilFinish();
+        }
     }
 
     @Override
