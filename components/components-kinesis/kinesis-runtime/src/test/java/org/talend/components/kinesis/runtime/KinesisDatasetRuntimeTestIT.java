@@ -123,7 +123,7 @@ public class KinesisDatasetRuntimeTestIT {
     public void getSampleCsv() {
         runtime.initialize(null, getDatasetForCsv(getLocalDatastore(), streamCsv, fieldDelimited));
         final List<IndexedRecord> actual = new ArrayList<>();
-        runtime.getSample(10, new Consumer<IndexedRecord>() {
+        runtime.getSample(Integer.MAX_VALUE, new Consumer<IndexedRecord>() {
 
             @Override
             public void accept(IndexedRecord indexedRecord) {

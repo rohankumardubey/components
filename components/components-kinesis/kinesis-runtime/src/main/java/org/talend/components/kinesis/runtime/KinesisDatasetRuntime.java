@@ -88,7 +88,6 @@ public class KinesisDatasetRuntime implements IKinesisDatasetRuntime {
             // Collect a sample of the input records.
             p
                     .apply(inputRuntime) //
-                    .apply(Sample.<IndexedRecord> any(limit))
                     .apply(collector);
             p.run().waitUntilFinish();
         }
