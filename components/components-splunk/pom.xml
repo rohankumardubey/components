@@ -24,8 +24,10 @@
 
         <!-- Annotation processing -->
         <dependency>
-            <groupId>biz.aQute.bnd</groupId>
-            <artifactId>annotation</artifactId>
+            <groupId>org.osgi</groupId>
+            <artifactId>osgi.cmpn</artifactId>
+            <version>${osgi.core.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.google.auto.service</groupId>
@@ -134,7 +136,7 @@
                             <instructions>
                                 <Bundle-SymbolicName>org.talend.components.splunk</Bundle-SymbolicName>
                                 <Service-Component>*</Service-Component>
-                                <Import-Package>*,aQute.bnd.annotation.component</Import-Package>
+                                <Import-Package>*</Import-Package>
                                 <Embed-Dependency>
                                     *;scope=compile|runtime;inline=false;artifactId=!components*|auto-service
                                 </Embed-Dependency>

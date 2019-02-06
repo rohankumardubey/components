@@ -109,6 +109,10 @@
             <version>${marklogic.mlcp.version}</version>
             <exclusions>
                 <exclusion>
+                    <groupId>jdk.tools</groupId>
+                    <artifactId>jdk.tools</artifactId>
+                </exclusion>
+                <exclusion>
                     <groupId>com.sun.jersey.contribs</groupId>
                     <artifactId>jersey-guice</artifactId>
                 </exclusion>

@@ -40,8 +40,10 @@
             <artifactId>components-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>biz.aQute.bnd</groupId>
-            <artifactId>annotation</artifactId>
+            <groupId>org.osgi</groupId>
+            <artifactId>osgi.cmpn</artifactId>
+            <version>${osgi.core.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- Shared component properties such as Use/Password or Schema -->

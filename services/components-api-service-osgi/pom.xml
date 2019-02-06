@@ -32,8 +32,10 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>biz.aQute.bnd</groupId>
-            <artifactId>annotation</artifactId>
+            <groupId>org.osgi</groupId>
+            <artifactId>osgi.cmpn</artifactId>
+            <version>${osgi.core.version}</version>
+            <scope>provided</scope>
         </dependency>
         <!-- the following dependencies may be removed once we get rid off the
             spring implementation and create a specific project for that. -->

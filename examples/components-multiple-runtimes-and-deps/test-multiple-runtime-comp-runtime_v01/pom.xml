@@ -46,8 +46,10 @@
             <artifactId>components-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>biz.aQute.bnd</groupId>
-            <artifactId>annotation</artifactId>
+            <groupId>org.osgi</groupId>
+            <artifactId>osgi.cmpn</artifactId>
+            <version>${osgi.core.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- Shared component properties such as Use/Password or Schema -->
@@ -109,7 +111,7 @@
                             <instructions>
                                 <Bundle-SymbolicName>org.talend.multiruntime.testv1</Bundle-SymbolicName>
                                 <Service-Component>*</Service-Component>
-                                <Import-Package>*,aQute.bnd.annotation.component</Import-Package>
+                                <Import-Package>*</Import-Package>
                                 <Embed-Dependency>*;scope=compile|runtime;inline=false;artifactId=!components*</Embed-Dependency>
                                 <Include-Resource>{maven-resources},META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt=target/classes/META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt</Include-Resource>
                                 <Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>

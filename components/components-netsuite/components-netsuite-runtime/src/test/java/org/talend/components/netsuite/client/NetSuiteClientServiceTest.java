@@ -29,11 +29,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.commons.lang3.time.StopWatch;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentMatcher;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.talend.components.netsuite.NetSuiteMockTestBase;
 import org.talend.components.netsuite.client.model.TypeDesc;
-import org.talend.components.netsuite.test.AssertMatcher;
 import org.talend.components.netsuite.test.NetSuitePortTypeMockAdapterImpl;
 import org.talend.components.netsuite.test.client.TestNetSuiteClientService;
 
@@ -113,16 +113,17 @@ public class NetSuiteClientServiceTest extends NetSuiteMockTestBase {
     public void testLogin() throws Exception {
         clientService.login();
 
-        verify(port, times(1)).login(argThat(new AssertMatcher<LoginRequest>() {
-
+        final LoginRequest argThat = argThat(new ArgumentMatcher<LoginRequest>() {
             @Override
-            protected void doAssert(LoginRequest request) throws Exception {
+            public boolean matches(LoginRequest request) {
                 assertNotNull(request);
 
                 Passport passport = request.getPassport();
                 assertNotNull(passport);
+                return true;
             }
-        }));
+        });
+        verify(port, times(1)).login(argThat);
 
         // Verify that logging in not performed for already logged in client
 

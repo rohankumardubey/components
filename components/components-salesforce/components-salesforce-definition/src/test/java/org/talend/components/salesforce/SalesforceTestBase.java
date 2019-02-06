@@ -33,6 +33,7 @@ import java.util.Set;
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
 import org.hamcrest.Matcher;
+import org.mockito.ArgumentMatcher;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.talend.components.api.container.RuntimeContainer;
@@ -124,7 +125,8 @@ public class SalesforceTestBase {
 
             doReturn(runtimeSourceOrSink).when(sandboxedInstance).getInstance();
 
-            when(runtimeSourceOrSink.initialize(any(RuntimeContainer.class), argThat(propertiesMatcher)))
+            when(runtimeSourceOrSink.initialize(any(RuntimeContainer.class), argThat(
+                    componentProperties -> propertiesMatcher.matches(componentProperties))))
                     .thenReturn(ValidationResult.OK);
 
             when(runtimeSourceOrSink.validate(any(RuntimeContainer.class)))

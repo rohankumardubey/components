@@ -67,14 +67,6 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
         </dependency>
-        <!-- the following dependencies may be removed once we get rid off the
-            spring implementation and create a specific project for that. -->
-        <!-- SWAGGER DEPENDENCIES -->
-        <dependency>
-            <groupId>biz.aQute.bnd</groupId>
-            <artifactId>annotation</artifactId>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
     <build>
         <plugins>
