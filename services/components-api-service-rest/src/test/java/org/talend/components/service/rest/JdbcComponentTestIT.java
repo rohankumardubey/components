@@ -13,12 +13,15 @@
 
 package org.talend.components.service.rest;
 
-import static com.jayway.restassured.RestAssured.given;
+import static io.restassured.RestAssured.given;
 import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
+
+import io.restassured.RestAssured;
+import io.restassured.response.Response;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -61,8 +64,6 @@ import org.talend.daikon.properties.test.PropertiesTestUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.type.TypeFactory;
-import com.jayway.restassured.RestAssured;
-import com.jayway.restassured.response.Response;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class, webEnvironment = RANDOM_PORT)
@@ -120,9 +121,8 @@ public class JdbcComponentTestIT {
                 .replace("{jdbc_url}", dbUrl);
 
         // when
-        given().content(payload).contentType(APPLICATION_JSON_UTF8_VALUE) //
-                .expect().statusCode(200).log().ifError() //
-                .put(getVersionPrefix() + "/runtimes/data");
+        given().body(payload).contentType(APPLICATION_JSON_UTF8_VALUE).put(getVersionPrefix() + "/runtimes/data")
+                .then().statusCode(200).log().ifError();
 
         // then
         Statement statement = db.getConnection().createStatement();
@@ -152,17 +152,16 @@ public class JdbcComponentTestIT {
         String dataSetDefinitionName = "JDBCDataset";
 
         // when
-        Response schemaResponse = given().content(propertiesDto).contentType(APPLICATION_JSON_UTF8_VALUE) //
-                .accept(APPLICATION_JSON_UTF8_VALUE) //
-                .expect().statusCode(200).log().ifError() //
-                .post(getVersionPrefix() + "/runtimes/schema");
+        Response schemaResponse = given().body(propertiesDto).contentType(APPLICATION_JSON_UTF8_VALUE) //
+                                         .accept(APPLICATION_JSON_UTF8_VALUE) //
+                                         .post(getVersionPrefix() + "/runtimes/schema");
+        schemaResponse.then().statusCode(200).log().ifError();
 
         Schema schema = new Schema.Parser().parse(schemaResponse.asInputStream());
 
-        Response response = given().content(propertiesDto).contentType(APPLICATION_JSON_UTF8_VALUE) //
-                .accept(RuntimesController.AVRO_BINARY_MIME_TYPE_OFFICIAL_INVALID) //
-                .expect().statusCode(200).log().ifError() //
-                .post(getVersionPrefix() + "/runtimes/data");
+        Response response = given().body(propertiesDto).contentType(APPLICATION_JSON_UTF8_VALUE) //
+                .accept(RuntimesController.AVRO_BINARY_MIME_TYPE_OFFICIAL_INVALID).post(getVersionPrefix() + "/runtimes/data"); //
+        response.then().statusCode(200).log().ifError();
 
         // then
         GenericDatumReader<GenericRecord> reader = new GenericDatumReader<>(schema);
@@ -180,18 +179,17 @@ public class JdbcComponentTestIT {
 
         String dataSetDefinitionName = "JDBCDataset";
 
-        Response schemaResponse = given().content(propertiesDto).contentType(APPLICATION_JSON_UTF8_VALUE) //
-                .accept(APPLICATION_JSON_UTF8_VALUE) //
-                .expect().statusCode(200).log().ifError() //
-                .post(getVersionPrefix() + "/runtimes/schema");
+        Response schemaResponse = given().body(propertiesDto).contentType(APPLICATION_JSON_UTF8_VALUE) //
+                .accept(APPLICATION_JSON_UTF8_VALUE).post(getVersionPrefix() + "/runtimes/schema");
+        schemaResponse.then().statusCode(200).log().ifError();
 
         Schema schema = new Schema.Parser().parse(schemaResponse.asInputStream());
 
         // when
-        Response response = given().content(propertiesDto).contentType(APPLICATION_JSON_UTF8_VALUE) //
-                .accept(RuntimesController.AVRO_JSON_MIME_TYPE_OFFICIAL_INVALID) //
-                .expect().statusCode(200).log().ifError() //
+        Response response = given().body(propertiesDto).contentType(APPLICATION_JSON_UTF8_VALUE) //
+                .accept(RuntimesController.AVRO_JSON_MIME_TYPE_OFFICIAL_INVALID)
                 .post(getVersionPrefix() + "/runtimes/data");
+        response.then().statusCode(200).log().ifError();
 
         // then
         GenericDatumReader<GenericRecord> reader = new GenericDatumReader<>(schema);
@@ -243,10 +241,9 @@ public class JdbcComponentTestIT {
         String dataSetDefinitionName = "JDBCDataset";
 
         // when
-        Response response = given().content(propertiesDto).contentType(APPLICATION_JSON_UTF8_VALUE) //
-                .accept(APPLICATION_JSON_UTF8_VALUE) //
-                .expect().statusCode(200).log().ifError() //
-                .post(getVersionPrefix() + "/runtimes/schema");
+        Response response = given().body(propertiesDto).contentType(APPLICATION_JSON_UTF8_VALUE) //
+                .accept(APPLICATION_JSON_UTF8_VALUE).post(getVersionPrefix() + "/runtimes/schema");
+        response.then().statusCode(200).log().ifError();
 
         // then
         ObjectNode result = getResponseAsObjectNode(response);
@@ -265,10 +262,12 @@ public class JdbcComponentTestIT {
         String dataSetDefinitionName = "JDBCDataset";
 
         // when
-        ApiError response = given().content(datasetConnectionInfo).contentType(APPLICATION_JSON_UTF8_VALUE) //
-                .accept(APPLICATION_JSON_UTF8_VALUE) //
-                .expect().statusCode(400).log().ifValidationFails() //
-                .post(getVersionPrefix() + "/runtimes/schema").as(ApiError.class);
+        final Response responseApiError = given().body(datasetConnectionInfo)
+                                     .contentType(APPLICATION_JSON_UTF8_VALUE) //
+                                     .accept(APPLICATION_JSON_UTF8_VALUE)
+                                     .post(getVersionPrefix() + "/runtimes/schema");
+        responseApiError.then().statusCode(400).log().ifValidationFails();
+        ApiError response = responseApiError.as(ApiError.class);
 
         // then
         assertEquals("TCOMP_JDBC_SQL_SYNTAX_ERROR", response.getCode());
@@ -282,10 +281,9 @@ public class JdbcComponentTestIT {
         properties.setProperties(getJdbcDataStoreProperties());
 
         // when
-        Response response = given().content(properties).contentType(ServiceConstants.UI_SPEC_CONTENT_TYPE) //
-                .accept(ServiceConstants.UI_SPEC_CONTENT_TYPE) //
-                .expect().statusCode(200).log().ifError() //
-                .post(getVersionPrefix() + "/properties/dataset");
+        Response response = given().body(properties).contentType(ServiceConstants.UI_SPEC_CONTENT_TYPE) //
+                .accept(ServiceConstants.UI_SPEC_CONTENT_TYPE).post(getVersionPrefix() + "/properties/dataset");
+        response.then().statusCode(200).log().ifError();
 
         // then
         ObjectNode dataSetProperties = mapper.readerFor(ObjectNode.class).readValue(response.asInputStream());
@@ -299,10 +297,10 @@ public class JdbcComponentTestIT {
         properties.setProperties(getJdbcDataStoreProperties());
 
         // when
-        given().content(properties).contentType(APPLICATION_JSON_UTF8_VALUE) //
+        given().body(properties).contentType(APPLICATION_JSON_UTF8_VALUE) //
                 .accept(APPLICATION_JSON_UTF8_VALUE) //
-                .expect().statusCode(200).log().ifError() //
-                .post(getVersionPrefix() + "/runtimes/check");
+                .post(getVersionPrefix() + "/runtimes/check")//
+                .then().statusCode(200).log().ifError();
     }
 
     private ObjectNode getJdbcDataStoreProperties() throws java.io.IOException {
@@ -321,10 +319,10 @@ public class JdbcComponentTestIT {
         properties.setProperties(getFileAsObjectNode("jdbc_data_store_properties.json"));
 
         // when
-        Response response = given().content(properties).contentType(ServiceConstants.UI_SPEC_CONTENT_TYPE) //
+        Response response = given().body(properties).contentType(ServiceConstants.UI_SPEC_CONTENT_TYPE) //
                 .accept(ServiceConstants.UI_SPEC_CONTENT_TYPE) //
-                .expect().statusCode(200).log().ifError() //
                 .post(getVersionPrefix() + "/properties/trigger/{trigger}/{property}", triggerName, triggerProperty);
+        response.then().statusCode(200).log().ifError();
 
         ObjectNode jdbcPropertiesAfterTrigger = getResponseAsObjectNode(response);
 
@@ -340,8 +338,8 @@ public class JdbcComponentTestIT {
     public void getJdbcProperties() throws java.io.IOException {
         // when
         Response response = given().accept(ServiceConstants.UI_SPEC_CONTENT_TYPE) //
-                .expect().statusCode(200).log().ifError() //
-                .get(getVersionPrefix() + "/properties/{definitionName}", DATA_STORE_DEFINITION_NAME);
+                                   .get(getVersionPrefix() + "/properties/{definitionName}", DATA_STORE_DEFINITION_NAME);
+        response.then().statusCode(200).log().ifError();
 
         // then
         ObjectNode jdbcProperties = mapper.readerFor(ObjectNode.class).readValue(response.asInputStream());
@@ -359,10 +357,10 @@ public class JdbcComponentTestIT {
         propDto.setProperties(new JDBCDatastoreProperties("").init().toSerialized());
 
         // when
-        Response response = given().content(propDto).contentType(ServiceConstants.JSONIO_CONTENT_TYPE) //
+        Response response = given().body(propDto).contentType(ServiceConstants.JSONIO_CONTENT_TYPE) //
                 .accept(ServiceConstants.UI_SPEC_CONTENT_TYPE) //
-                .expect().statusCode(200).log().ifError() //
                 .post(getVersionPrefix() + "/properties/uispec");
+        response.then().statusCode(200).log().ifError();
 
         // then
         ObjectNode jdbcProperties = mapper.readerFor(ObjectNode.class).readValue(response.asInputStream());
@@ -381,10 +379,10 @@ public class JdbcComponentTestIT {
         propDto.setDependencies(singletonList(new JDBCDatastoreProperties("").init().toSerialized()));
 
         // when
-        Response response = given().content(propDto).contentType(ServiceConstants.JSONIO_CONTENT_TYPE) //
+        Response response = given().body(propDto).contentType(ServiceConstants.JSONIO_CONTENT_TYPE) //
                 .accept(ServiceConstants.UI_SPEC_CONTENT_TYPE) //
-                .expect().statusCode(200).log().ifError() //
                 .post(getVersionPrefix() + "/properties/uispec");
+        response.then().statusCode(200).log().ifError();
 
         // then
         ObjectNode jdbcProperties = mapper.readerFor(ObjectNode.class).readValue(response.asInputStream());
@@ -397,10 +395,10 @@ public class JdbcComponentTestIT {
     @Test
     public void getJdbcDefinition() throws java.io.IOException {
         // when
-        Response response = given().accept(APPLICATION_JSON_UTF8_VALUE) //
-                .expect() //
-                .statusCode(200).log().ifError() //
-                .get(getVersionPrefix() + "/definitions/DATA_STORE");
+        Response response = given()
+                .accept(APPLICATION_JSON_UTF8_VALUE).get(getVersionPrefix() + "/definitions/DATA_STORE");
+        response.then()
+                .statusCode(200).log().ifError();
 
         // then
         List<DefinitionDTO> definitions = mapper

@@ -23,6 +23,7 @@
         <git_branch>local</git_branch>
         <talend_docker_registry>registry.datapwn.com</talend_docker_registry>
 
+        <groovy.version>2.5.6</groovy.version> <!-- spring boot sucks with its bom -->
         <osgi.core.version>6.0.0</osgi.core.version>
         <commons-io.version>2.5</commons-io.version>
         <derby.version>10.12.1.1</derby.version>
@@ -36,7 +37,7 @@
         <jackson.version>2.9.5</jackson.version>
         <org.talend.libraries.mysql.version>6.0.0</org.talend.libraries.mysql.version>
         <pax-url-aethe.version>2.4.7</pax-url-aethe.version>
-        <rest-assured.version>2.6.0</rest-assured.version>
+        <rest-assured.version>3.3.0</rest-assured.version>
         <slf4.version>1.7.25</slf4.version>
         <!-- Aligned with component-parent -->
         <docker-maven-plugin.version>0.26.0</docker-maven-plugin.version>
@@ -51,6 +52,16 @@
         <dependency>
             <groupId>javax.activation</groupId>
             <artifactId>activation</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+            <version>2.3.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-impl</artifactId>
+            <version>2.3.1</version>
         </dependency>
 
         <!-- spring dependencies -->
@@ -136,11 +147,25 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.jayway.restassured</groupId>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy-all</artifactId>
+            <version>2.5.6</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.rest-assured</groupId>
             <artifactId>rest-assured</artifactId>
             <version>${rest-assured.version}</version>
             <scope>test</scope>
             <exclusions>
+                <exclusion>
+                    <groupId>org.codehaus.groovy</groupId>
+                    <artifactId>groovy</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.codehaus.groovy</groupId>
+                    <artifactId>groovy-xml</artifactId>
+                </exclusion>
                 <exclusion>
                     <groupId>org.apache.httpcomponents</groupId>
                     <artifactId>httpclient</artifactId>
