@@ -18,8 +18,10 @@ import org.apache.avro.generic.IndexedRecord;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.rules.TestRule;
 import org.talend.daikon.java8.Consumer;
 
 import com.google.cloud.bigquery.BigQuery;
@@ -33,6 +35,8 @@ import com.google.cloud.bigquery.TableId;
 import com.google.cloud.bigquery.TableInfo;
 
 public class BigQueryDatasetRuntimeTestIT {
+    @ClassRule
+    public static final TestRule DISABLE_IF_NEEDED = new DisableIfMissingConfig("bigquery.project");
 
     final static String uuid = UUID.randomUUID().toString().replace("-", "_");
 
