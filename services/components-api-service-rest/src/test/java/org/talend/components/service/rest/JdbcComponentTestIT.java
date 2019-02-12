@@ -69,6 +69,11 @@ import com.fasterxml.jackson.databind.type.TypeFactory;
 @SpringBootTest(classes = Application.class, webEnvironment = RANDOM_PORT)
 @TestPropertySource(properties = { "server.contextPath=" })
 public class JdbcComponentTestIT {
+    static {
+        if (System.getProperty("sun.boot.class.path") == null) {
+            System.setProperty("sun.boot.class.path", System.getProperty("java.class.path"));
+        }
+    }
 
     private static final Logger log = LoggerFactory.getLogger(JdbcComponentTestIT.class);
 
@@ -259,7 +264,6 @@ public class JdbcComponentTestIT {
         datasetConnectionInfo.setProperties(mapper.readValue(
                 getClass().getResourceAsStream("jdbc_data_set_properties_no_schema_wrong_table_name.json"), ObjectNode.class));
         datasetConnectionInfo.setDependencies(singletonList(getJdbcDataStoreProperties()));
-        String dataSetDefinitionName = "JDBCDataset";
 
         // when
         final Response responseApiError = given().body(datasetConnectionInfo)

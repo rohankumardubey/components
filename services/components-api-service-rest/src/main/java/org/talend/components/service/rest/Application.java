@@ -33,7 +33,7 @@ public class Application {
 
     private static void daikonWorkaround() {
         if (System.getProperty("sun.boot.class.path") == null) {
-            System.setProperty("sun.boot.class.path", "");
+            System.setProperty("sun.boot.class.path", System.getProperty("java.class.path"));
         }
     }
 }

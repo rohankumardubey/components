@@ -62,6 +62,11 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 @SpringBootTest(classes = Application.class, webEnvironment = RANDOM_PORT)
 @TestPropertySource(properties = { "server.contextPath=" })
 public abstract class AbstractSpringIntegrationTests {
+    static {
+        if (System.getProperty("sun.boot.class.path") == null) {
+            System.setProperty("sun.boot.class.path", System.getProperty("java.class.path"));
+        }
+    }
 
     @LocalServerPort
     protected int localServerPort;

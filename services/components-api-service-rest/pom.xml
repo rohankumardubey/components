@@ -150,6 +150,7 @@
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy-all</artifactId>
             <version>2.5.6</version>
+            <type>pom</type>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -158,6 +159,10 @@
             <version>${rest-assured.version}</version>
             <scope>test</scope>
             <exclusions>
+                <exclusion>
+                    <groupId>com.sun.xml.bind</groupId>
+                    <artifactId>jaxb-osgi</artifactId>
+                </exclusion>
                 <exclusion>
                     <groupId>org.codehaus.groovy</groupId>
                     <artifactId>groovy</artifactId>
@@ -192,6 +197,12 @@
             <groupId>org.hamcrest</groupId>
             <artifactId>hamcrest-all</artifactId>
             <version>${hamcrest.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.talend.components</groupId>
+            <artifactId>components-jdbc-runtime</artifactId>
+            <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -296,6 +307,21 @@
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpcore-nio</artifactId>
             <version>${httpcore-nio.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-mapper-asl</artifactId>
+            <version>1.9.14-TALEND</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-core-asl</artifactId>
+            <version>1.9.14-TALEND</version>
+        </dependency>
+        <dependency>
+            <groupId>org.talend.daikon</groupId>
+            <artifactId>daikon</artifactId>
+            <version>${daikon.version}</version>
         </dependency>
     </dependencies>
 
@@ -459,6 +485,7 @@
                     classpath -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
+                <version>3.0.0-M3</version>
                 <executions>
                     <execution>
                         <goals>
@@ -467,8 +494,7 @@
                         </goals>
                         <configuration>
                             <classpathDependencyExcludes>
-                                <classpathDependencyExclude>org.talend.components:components-jdbc-runtime
-                                </classpathDependencyExclude>
+                                <classpathDependencyExclude>org.talend.components:components-jdbc-runtime</classpathDependencyExclude>
                             </classpathDependencyExcludes>
                         </configuration>
                     </execution>
