@@ -29,10 +29,12 @@ import java.util.Set;
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
 import org.apache.avro.generic.IndexedRecord;
+import org.junit.ClassRule;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.junit.rules.TestRule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.ComponentDefinition;
@@ -49,6 +51,7 @@ import org.talend.components.api.wizard.ComponentWizardDefinition;
 import org.talend.components.api.wizard.WizardImageType;
 import org.talend.components.api.wizard.WizardNameComparator;
 import org.talend.components.common.CommonTestUtils;
+import org.talend.components.salesforce.DisableIfMissingConfig;
 import org.talend.components.salesforce.SalesforceConnectionProperties;
 import org.talend.components.salesforce.SalesforceConnectionProperties.LoginType;
 import org.talend.components.salesforce.SalesforceConnectionWizardDefinition;
@@ -73,6 +76,8 @@ import org.talend.daikon.properties.service.Repository;
 import org.talend.daikon.properties.test.PropertiesTestUtils;
 
 public abstract class SalesforceComponentTestIT extends SalesforceTestBase {
+    @ClassRule
+    public static final TestRule DISABLE_IF_NEEDED = new DisableIfMissingConfig();
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SalesforceComponentTestIT.class);
 

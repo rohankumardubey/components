@@ -125,19 +125,19 @@ public class SalesforceTestBase {
 
             doReturn(runtimeSourceOrSink).when(sandboxedInstance).getInstance();
 
-            when(runtimeSourceOrSink.initialize(any(RuntimeContainer.class), argThat(
+            when(runtimeSourceOrSink.initialize(any(), argThat(
                     componentProperties -> propertiesMatcher.matches(componentProperties))))
                     .thenReturn(ValidationResult.OK);
 
-            when(runtimeSourceOrSink.validate(any(RuntimeContainer.class)))
+            when(runtimeSourceOrSink.validate(any()))
                     .thenReturn(ValidationResult.OK);
 
             List<NamedThing> moduleNames = testDataset.getModuleNamesAsNamedThings();
 
-            when(runtimeSourceOrSink.getSchemaNames(any(RuntimeContainer.class)))
+            when(runtimeSourceOrSink.getSchemaNames(any()))
                     .thenReturn(moduleNames);
 
-            when(runtimeSourceOrSink.getEndpointSchema(any(RuntimeContainer.class), anyString()))
+            when(runtimeSourceOrSink.getEndpointSchema(any(), anyString()))
                     .thenAnswer(new Answer<Schema>() {
 
                         @Override

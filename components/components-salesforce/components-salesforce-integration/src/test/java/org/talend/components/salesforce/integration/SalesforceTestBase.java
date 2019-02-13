@@ -29,8 +29,10 @@ import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.IndexedRecord;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.rules.ErrorCollector;
+import org.junit.rules.TestRule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.BoundedReader;
@@ -43,6 +45,7 @@ import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.service.common.ComponentServiceImpl;
 import org.talend.components.api.service.common.DefinitionRegistry;
 import org.talend.components.api.test.AbstractComponentTest;
+import org.talend.components.salesforce.DisableIfMissingConfig;
 import org.talend.components.salesforce.SalesforceConnectionModuleProperties;
 import org.talend.components.salesforce.SalesforceConnectionProperties;
 import org.talend.components.salesforce.SalesforceFamilyDefinition;
@@ -63,6 +66,8 @@ import org.talend.daikon.properties.test.PropertiesTestUtils;
 
 @SuppressWarnings("nls")
 public class SalesforceTestBase extends AbstractComponentTest {
+    @ClassRule
+    public static final TestRule DISABLE_IF_NEEDED = new DisableIfMissingConfig();
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SalesforceTestBase.class);
 
