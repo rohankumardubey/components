@@ -47,8 +47,7 @@
         </dependency>
         <dependency>
             <groupId>org.osgi</groupId>
-            <artifactId>osgi.cmpn</artifactId>
-            <version>${osgi.core.version}</version>
+            <artifactId>org.osgi.service.component.annotations</artifactId>
             <scope>provided</scope>
         </dependency>
 
@@ -92,6 +91,9 @@
                         </goals>
                         <configuration>
                             <instructions>
+                                <_dsannotations-options>nocapabilities,norequirements,version;minimum=1.2.0</_dsannotations-options>
+                                <_noee>true</_noee>
+                                <Require-Capability>osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version=1.7))"</Require-Capability>
                                 <Bundle-SymbolicName>org.talend.multiruntime.testv1.lib</Bundle-SymbolicName>
                                 <Bundle-Name>${project.name} lib</Bundle-Name>
                                 <Include-Resource>{maven-resources},META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt=target/classes/META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt</Include-Resource>
@@ -109,6 +111,9 @@
                         <configuration>
                             <classifier>bundle</classifier>
                             <instructions>
+                                <_dsannotations-options>nocapabilities,norequirements,version;minimum=1.2.0</_dsannotations-options>
+                                <_noee>true</_noee>
+                                <Require-Capability>osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version=1.7))"</Require-Capability>
                                 <Bundle-SymbolicName>org.talend.multiruntime.testv1</Bundle-SymbolicName>
                                 <Service-Component>*</Service-Component>
                                 <Import-Package>*</Import-Package>

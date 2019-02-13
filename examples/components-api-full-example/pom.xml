@@ -24,8 +24,7 @@
 		<!-- Annotation processing -->
 		<dependency>
 			<groupId>org.osgi</groupId>
-			<artifactId>osgi.cmpn</artifactId>
-			<version>${osgi.core.version}</version>
+			<artifactId>org.osgi.service.component.annotations</artifactId>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -68,6 +67,9 @@
 						</goals>
 						<configuration>
 							<instructions>
+								<_dsannotations-options>nocapabilities,norequirements,version;minimum=1.2.0</_dsannotations-options>
+								<_noee>true</_noee>
+								<Require-Capability>osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version=1.7))"</Require-Capability>
 								<Bundle-SymbolicName>org.talend.components.fullexample.lib</Bundle-SymbolicName>
 								<Bundle-Name>${project.name} lib</Bundle-Name>
                                 <Include-Resource>
@@ -88,6 +90,9 @@
 							<classifier>tests</classifier>
 							<outputDirectory>unexisting_ouput_directory_to_avoid_classes_to_be_embedded</outputDirectory>
 							<instructions>
+								<_dsannotations-options>nocapabilities,norequirements,version;minimum=1.2.0</_dsannotations-options>
+								<_noee>true</_noee>
+								<Require-Capability>osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version=1.7))"</Require-Capability>
 								<Import-Package>!*internal,org.talend*,org.slf4j*,javax.xml.namespace,org.junit*</Import-Package>
 								<Bundle-SymbolicName>org.talend.components.fullexample.test</Bundle-SymbolicName>
 								<Bundle-Name>Test Fragment for ${project.name}</Bundle-Name>
@@ -109,6 +114,9 @@
 						<configuration>
 							<classifier>bundle</classifier>
 							<instructions>
+								<_dsannotations-options>nocapabilities,norequirements,version;minimum=1.2.0</_dsannotations-options>
+								<_noee>true</_noee>
+								<Require-Capability>osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version=1.7))"</Require-Capability>
 								<Bundle-SymbolicName>org.talend.components.fullexample</Bundle-SymbolicName>
 								<Service-Component>*</Service-Component>
 								<Import-Package>*</Import-Package>

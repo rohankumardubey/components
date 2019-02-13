@@ -35,8 +35,7 @@
         <!-- Annotation processing -->
         <dependency>
             <groupId>org.osgi</groupId>
-            <artifactId>osgi.cmpn</artifactId>
-            <version>${osgi.core.version}</version>
+            <artifactId>org.osgi.service.component.annotations</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -76,6 +75,9 @@
                         </goals>
                         <configuration>
                             <instructions>
+                                <_dsannotations-options>nocapabilities,norequirements,version;minimum=1.2.0</_dsannotations-options>
+                                <_noee>true</_noee>
+                                <Require-Capability>osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version=1.7))"</Require-Capability>
                                 <Bundle-SymbolicName>org.talend.components.api.service.common</Bundle-SymbolicName>
                                 <Bundle-Name>${project.name}</Bundle-Name>
                             </instructions>
@@ -92,6 +94,9 @@
                             <!-- removes the main classes we only want test classes -->
                             <outputDirectory>unexisting_ouput_directory_to_avoid_classes_to_be_embedded</outputDirectory>
                             <instructions>
+                                <_dsannotations-options>nocapabilities,norequirements,version;minimum=1.2.0</_dsannotations-options>
+                                <_noee>true</_noee>
+                                <Require-Capability>osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version=1.7))"</Require-Capability>
                                 <Service-Component>*</Service-Component>
                                 <Import-Package>!*internal,org.talend*,javax.xml.namespace,org.junit*,org.hamcrest*</Import-Package>
                                 <Bundle-SymbolicName>org.talend.components.api.service.common.test</Bundle-SymbolicName>

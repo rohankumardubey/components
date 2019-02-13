@@ -40,7 +40,7 @@ public class ComponentsPaxExamOptions {
         }
         return options(mavenBundle("org.apache.felix", "org.apache.felix.scr"), //
                 linkBundle("org.slf4j-slf4j-api"), //
-                linkBundle("org.slf4j-slf4j-simple").noStart(), //
+                bundle("mvn:org.slf4j/slf4j-simple/1.7.25").noStart(), //
                 linkBundle("com.fasterxml.jackson.core-jackson-annotations"), //
                 linkBundle("com.fasterxml.jackson.core-jackson-core"), //
                 linkBundle("com.cedarsoftware-json-io"), //
@@ -55,12 +55,12 @@ public class ComponentsPaxExamOptions {
                 linkBundle("org.eclipse.jetty.orbit-javax.servlet"), //
                 linkBundle("org.talend.daikon-daikon-bundle"), //
                 linkBundle("org.talend.daikon-daikon-tests").noStart(), //
+                linkBundle("org.ops4j.pax.url-pax-url-aether"),
+                linkBundle("org.talend.components-components-api-bundle"), //
                 linkBundle("org.talend.components-components-api-service-osgi").start(), //
                 linkBundle("org.talend.components-components-api-service-osgi-tests").noStart(), //
-                linkBundle("org.talend.components-components-api-bundle"), //
                 linkBundle("org.talend.components-components-api-tests").noStart(),
                 linkBundle("org.apache.servicemix.bundles-org.apache.servicemix.bundles.hamcrest"), //
-                linkBundle("org.ops4j.pax.url-pax-url-aether"),
                 // this is copied from junitBundles() to remove the default pax-exam hamcrest bundle that does
                 // not contains all the nice hamcrest Matchers
                 new DefaultCompositeOption(new JUnitBundlesOption(), systemProperty("pax.exam.invoker").value("junit"),

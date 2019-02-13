@@ -183,6 +183,9 @@
                     <extensions>true</extensions>
                     <configuration>
                         <instructions>
+                            <_dsannotations-options>nocapabilities,norequirements,version;minimum=1.2.0</_dsannotations-options>
+                            <_noee>true</_noee>
+                            <Require-Capability>osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version=1.7))"</Require-Capability>
                             <DynamicImport-Package>org.talend.daikon.*</DynamicImport-Package>
                         </instructions>
                     </configuration>

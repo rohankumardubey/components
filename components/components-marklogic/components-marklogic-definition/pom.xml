@@ -42,8 +42,7 @@
         <!-- Annotation processing -->
         <dependency>
             <groupId>org.osgi</groupId>
-            <artifactId>osgi.cmpn</artifactId>
-            <version>${osgi.core.version}</version>
+            <artifactId>org.osgi.service.component.annotations</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -171,6 +170,9 @@
                         </goals>
                         <configuration>
                             <instructions>
+                                <_dsannotations-options>nocapabilities,norequirements,version;minimum=1.2.0</_dsannotations-options>
+                                <_noee>true</_noee>
+                                <Require-Capability>osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version=1.7))"</Require-Capability>
                                 <Bundle-SymbolicName>org.talend.components.marklogic.definition.lib
                                 </Bundle-SymbolicName>
                                 <Service-Component>*</Service-Component>
@@ -194,6 +196,9 @@
                         <configuration>
                             <classifier>bundle</classifier>
                             <instructions>
+                                <_dsannotations-options>nocapabilities,norequirements,version;minimum=1.2.0</_dsannotations-options>
+                                <_noee>true</_noee>
+                                <Require-Capability>osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version=1.7))"</Require-Capability>
                                 <Bundle-SymbolicName>org.talend.components.marklogic.definition</Bundle-SymbolicName>
                                 <Import-Package>
                                     !*internal,org.talend*,org.slf4j*,javax.xml.namespace,org.apache.commons*,org.apache.avro.*,org.apache.oltu.oauth2.client.response,org.codehaus.jackson*

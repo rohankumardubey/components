@@ -12,7 +12,9 @@
 // ============================================================================
 package org.talend.components.api.component.runtime;
 
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -25,7 +27,6 @@ import java.util.Objects;
 import org.ops4j.pax.url.mvn.MavenResolver;
 import org.ops4j.pax.url.mvn.MavenResolvers;
 import org.ops4j.pax.url.mvn.ServiceConstants;
-import org.ops4j.pax.url.mvn.internal.Connection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.daikon.exception.TalendRuntimeException;
@@ -110,6 +111,29 @@ public class JarRuntimeInfo implements RuntimeInfo, SandboxControl {
 
         if (System.getProperty("sun.boot.class.path") == null) { // j11 workaround due to daikon
             System.setProperty("sun.boot.class.path", System.getProperty("java.class.path"));
+        }
+    }
+
+    private static class Connection extends URLConnection { // forked cause not exposed through OSGi meta
+        private static final Logger LOG = LoggerFactory.getLogger(Connection.class);
+
+        private final MavenResolver resolver;
+
+        private Connection(final URL url, final MavenResolver resolver) {
+            super( url );
+            this.resolver = resolver;
+        }
+
+        @Override
+        public void connect() {
+            // do nothing
+        }
+
+        @Override
+        public InputStream getInputStream() throws IOException {
+            connect();
+            LOG.debug( "Resolving [" + url.toExternalForm() + "]" );
+            return new FileInputStream(resolver.resolve(url.toExternalForm()));
         }
     }
 
