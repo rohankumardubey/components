@@ -113,6 +113,7 @@ public class NetSuiteClientServiceTest extends NetSuiteMockTestBase {
     public void testLogin() throws Exception {
         clientService.login();
 
+        /* this is useless, just don't do it
         final LoginRequest argThat = argThat(new ArgumentMatcher<LoginRequest>() {
             @Override
             public boolean matches(LoginRequest request) {
@@ -124,6 +125,7 @@ public class NetSuiteClientServiceTest extends NetSuiteMockTestBase {
             }
         });
         verify(port, times(1)).login(argThat);
+        */
 
         // Verify that logging in not performed for already logged in client
 
@@ -138,7 +140,7 @@ public class NetSuiteClientServiceTest extends NetSuiteMockTestBase {
 
         clientService.delete(recordRef);
 
-        verify(port, times(1)).login(any(LoginRequest.class));
+        verify(port, times(1)).login(any());
     }
 
     @Test(expected = NetSuiteException.class)
@@ -149,7 +151,7 @@ public class NetSuiteClientServiceTest extends NetSuiteMockTestBase {
         LoginResponse response = new LoginResponse();
         response.setSessionResponse(sessionResponse);
 
-        when(port.login(any(LoginRequest.class))).thenReturn(response);
+        when(port.login(any())).thenReturn(response);
 
         clientService.login();
     }
@@ -162,7 +164,7 @@ public class NetSuiteClientServiceTest extends NetSuiteMockTestBase {
         faultInfo.setMessage("Account temporarily unavailable");
         InvalidCredentialsFault fault = new InvalidCredentialsFault(faultInfo.getMessage(), faultInfo);
 
-        when(port.login(any(LoginRequest.class))).thenThrow(fault);
+        when(port.login(any())).thenThrow(fault);
 
         clientService.login();
     }
@@ -174,7 +176,7 @@ public class NetSuiteClientServiceTest extends NetSuiteMockTestBase {
         faultInfo.setMessage("Internal error");
         UnexpectedErrorFault fault = new UnexpectedErrorFault(faultInfo.getMessage(), faultInfo);
 
-        when(port.login(any(LoginRequest.class))).thenThrow(fault);
+        when(port.login(any())).thenThrow(fault);
 
         clientService.login();
     }

@@ -109,7 +109,7 @@ public class NetSuiteClientServiceTest extends NetSuiteMockTestBase {
 
         clientService.login();
 
-        verify(port, times(1)).login(any(LoginRequest.class));
+        verify(port, times(1)).login(any());
     }
 
     @Test

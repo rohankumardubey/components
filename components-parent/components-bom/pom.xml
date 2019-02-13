@@ -163,7 +163,7 @@
         <oro.version>2.0.8</oro.version>
         <paranamer.version>2.7</paranamer.version>
         <pax-url-aether.version>2.4.7</pax-url-aether.version>
-        <powermock-api-mockito.version>1.7.4</powermock-api-mockito.version>
+        <powermock-api-mockito.version>2.0.0</powermock-api-mockito.version>
         <powermock-module-junit4.version>${powermock-api-mockito.version}</powermock-module-junit4.version>
         <protobuf-java.version>3.3.0</protobuf-java.version>
         <scala.version>2.11.11</scala.version>
@@ -1004,7 +1004,7 @@
             </dependency>
             <dependency>
                 <groupId>org.powermock</groupId>
-                <artifactId>powermock-api-mockito</artifactId>
+                <artifactId>powermock-api-mockito2</artifactId>
                 <version>${powermock-api-mockito.version}</version>
                 <scope>test</scope>
             </dependency>

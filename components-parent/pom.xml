@@ -275,6 +275,9 @@
                 <version>3.0.0-M3</version>
                 <configuration>
                     <trimStackTrace>false</trimStackTrace>
+                    <environmentVariables>
+                        <LC_ALL>en_US.UTF-8</LC_ALL>
+                    </environmentVariables>
                 </configuration>
             </plugin>
             <plugin>
