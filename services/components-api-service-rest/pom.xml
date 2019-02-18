@@ -493,6 +493,7 @@
                             <goal>verify</goal>
                         </goals>
                         <configuration>
+                            <trimStackTrace>false</trimStackTrace>
                             <classpathDependencyExcludes>
                                 <classpathDependencyExclude>org.talend.components:components-jdbc-runtime</classpathDependencyExclude>
                             </classpathDependencyExcludes>

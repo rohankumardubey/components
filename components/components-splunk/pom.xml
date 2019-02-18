@@ -161,6 +161,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <configuration>
+                    <trimStackTrace>false</trimStackTrace>
                     <systemPropertyVariables>
                         <splunk.ec.address>http://${docker.host.address}:${splunk.ec.port}</splunk.ec.address>
                     </systemPropertyVariables>

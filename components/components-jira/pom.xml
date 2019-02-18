@@ -249,6 +249,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <configuration>
+                    <trimStackTrace>false</trimStackTrace>
                     <systemPropertyVariables>
                         <jira.host>http://${docker.host.address}:${jira.port}/</jira.host>
                     </systemPropertyVariables>

@@ -310,6 +310,7 @@
                             <goal>integration-test</goal>
                         </goals>
                         <configuration>
+                            <trimStackTrace>false</trimStackTrace>
                             <argLine>-Dorg.ops4j.pax.url.mvn.localRepository=${project.basedir}/target/mvn-repo/.m2
                             </argLine>
                         </configuration>

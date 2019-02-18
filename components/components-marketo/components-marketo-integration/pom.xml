@@ -110,6 +110,7 @@
                     </execution>
                 </executions>
                 <configuration>
+                    <trimStackTrace>false</trimStackTrace>
                     <skipITs>true</skipITs>
                     <argLine>-Xms512m -Xmx1024m ${jacoco.agent.it.argLine}</argLine>
                     <systemPropertyVariables>

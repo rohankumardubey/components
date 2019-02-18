@@ -119,6 +119,7 @@
                 <configuration>
                     <systemPropertyVariables>
                     </systemPropertyVariables>
+                    <trimStackTrace>false</trimStackTrace>
                 </configuration>
             </plugin>
             <plugin>
