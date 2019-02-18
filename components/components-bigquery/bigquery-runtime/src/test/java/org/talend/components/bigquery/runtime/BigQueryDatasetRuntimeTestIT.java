@@ -28,6 +28,7 @@ import com.google.cloud.bigquery.BigQuery;
 import com.google.cloud.bigquery.DatasetId;
 import com.google.cloud.bigquery.DatasetInfo;
 import com.google.cloud.bigquery.Field;
+import com.google.cloud.bigquery.LegacySQLTypeName;
 import com.google.cloud.bigquery.Schema;
 import com.google.cloud.bigquery.StandardTableDefinition;
 import com.google.cloud.bigquery.TableDefinition;
@@ -57,7 +58,7 @@ public class BigQueryDatasetRuntimeTestIT {
 
         for (String table : tables) {
             TableDefinition tableDefinition =
-                    StandardTableDefinition.of(Schema.of(Field.of("test", Field.Type.string())));
+                    StandardTableDefinition.of(Schema.of(Field.of("test", LegacySQLTypeName.STRING)));
             TableId tableId = TableId.of(BigQueryTestConstants.PROJECT, datasets.get(0), table);
             bigquery.create(TableInfo.of(tableId, tableDefinition));
         }
