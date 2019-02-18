@@ -64,7 +64,6 @@ public class GSRoundTripRuntimeTestIT {
 
     @Before
     public void prepare() {
-
         // DataflowPipelineOptions dataflowPO = pipelineOptions.as(DataflowPipelineOptions.class);
         // dataflowPO.setRunner(DataflowRunner.class);
 
