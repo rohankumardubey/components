@@ -45,7 +45,6 @@ import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.service.common.ComponentServiceImpl;
 import org.talend.components.api.service.common.DefinitionRegistry;
 import org.talend.components.api.test.AbstractComponentTest;
-import org.talend.components.salesforce.DisableIfMissingConfig;
 import org.talend.components.salesforce.SalesforceConnectionModuleProperties;
 import org.talend.components.salesforce.SalesforceConnectionProperties;
 import org.talend.components.salesforce.SalesforceFamilyDefinition;

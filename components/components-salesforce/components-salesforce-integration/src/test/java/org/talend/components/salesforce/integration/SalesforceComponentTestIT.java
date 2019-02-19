@@ -51,7 +51,6 @@ import org.talend.components.api.wizard.ComponentWizardDefinition;
 import org.talend.components.api.wizard.WizardImageType;
 import org.talend.components.api.wizard.WizardNameComparator;
 import org.talend.components.common.CommonTestUtils;
-import org.talend.components.salesforce.DisableIfMissingConfig;
 import org.talend.components.salesforce.SalesforceConnectionProperties;
 import org.talend.components.salesforce.SalesforceConnectionProperties.LoginType;
 import org.talend.components.salesforce.SalesforceConnectionWizardDefinition;

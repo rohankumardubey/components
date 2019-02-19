@@ -21,7 +21,7 @@ import org.junit.Test;
 import org.junit.rules.TestRule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.talend.components.salesforce.DisableIfMissingConfig;
+import org.talend.components.salesforce.integration.DisableIfMissingConfig;
 import org.talend.components.salesforce.SalesforceModuleProperties;
 import org.talend.daikon.properties.ValidationResult;
 

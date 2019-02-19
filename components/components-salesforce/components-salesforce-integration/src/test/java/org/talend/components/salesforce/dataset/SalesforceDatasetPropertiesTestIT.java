@@ -8,7 +8,7 @@ import org.junit.Assert;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.rules.TestRule;
-import org.talend.components.salesforce.DisableIfMissingConfig;
+import org.talend.components.salesforce.integration.DisableIfMissingConfig;
 import org.talend.components.salesforce.dataset.SalesforceDatasetProperties.SourceType;
 import org.talend.components.salesforce.datastore.SalesforceDatastoreProperties;
 import org.talend.components.salesforce.integration.SalesforceTestBase;
