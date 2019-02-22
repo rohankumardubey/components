@@ -324,7 +324,7 @@ public class SalesforceConnectionProperties extends ComponentPropertiesImpl
     @Override
     public boolean postDeserialize(int version, PostDeserializeSetup setup, boolean persistent) {
         boolean migrated = super.postDeserialize(version, setup, persistent);
-        if(version < this.getVersionNumber()){
+        if(version < 4){ // the audience is added in version 4
             if(oauth2JwtFlow.audience.getValue() == null || oauth2JwtFlow.audience.getValue().isEmpty()) {
                 oauth2JwtFlow.audience.setValue("\"https://login.salesforce.com\"");
                 migrated = true;
