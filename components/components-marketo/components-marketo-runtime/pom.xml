@@ -19,8 +19,8 @@
     <dependencies>
         <dependency>
             <groupId>org.apache.servicemix.specs</groupId>
-            <artifactId>org.apache.servicemix.specs.jaxws-api-2.1</artifactId>
-            <version>2.9.0</version>
+            <artifactId>org.apache.servicemix.specs.jaxws-api-2.3</artifactId>
+            <version>2.3_1</version>
         </dependency>
         <dependency>
             <groupId>javax.xml.bind</groupId>
