@@ -5,10 +5,23 @@
         <groupId>org.talend.components</groupId>
         <artifactId>components-parent</artifactId>
         <version>0.25.3</version>
-        <relativePath>../../../components-parent/pom.xml</relativePath>
     </parent>
 
+    <repositories>
+        <repository>
+            <id>releases</id>
+            <url>https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceRelease/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
     <artifactId>components-snowflake-integration</artifactId>
+    <version>0.25.4</version>
 
     <name>Components - Snowflake Integration Tests</name>
     <packaging>jar</packaging>

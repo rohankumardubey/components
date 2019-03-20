@@ -6,11 +6,24 @@
         <groupId>org.talend.components</groupId>
         <artifactId>components-parent</artifactId>
         <version>0.25.3</version>
-        <relativePath>../../../components-parent/pom.xml</relativePath>
     </parent>
+
+    <repositories>
+        <repository>
+            <id>releases</id>
+            <url>https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceRelease/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
 
     <name>Components - Snowflake Definition</name>
     <artifactId>components-snowflake-definition</artifactId>
+    <version>0.25.4</version>
     <packaging>bundle</packaging>
     <dependencies>
         <dependency>
