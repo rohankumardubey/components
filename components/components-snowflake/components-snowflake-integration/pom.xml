@@ -21,7 +21,6 @@
     </repositories>
 
     <artifactId>components-snowflake-integration</artifactId>
-    <version>0.25.4</version>
 
     <name>Components - Snowflake Integration Tests</name>
     <packaging>jar</packaging>

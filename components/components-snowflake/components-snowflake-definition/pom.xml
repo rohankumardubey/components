@@ -23,7 +23,6 @@
 
     <name>Components - Snowflake Definition</name>
     <artifactId>components-snowflake-definition</artifactId>
-    <version>0.25.4</version>
     <packaging>bundle</packaging>
     <dependencies>
         <dependency>

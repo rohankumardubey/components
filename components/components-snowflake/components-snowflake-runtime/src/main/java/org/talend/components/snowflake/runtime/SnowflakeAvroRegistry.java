@@ -107,16 +107,6 @@ public class SnowflakeAvroRegistry extends JDBCAvroRegistry {
             schema = AvroUtils._int();
             LogicalTypes.timeMillis().addToSchema(schema);
             field = wrap(name, schema, nullable, defaultValue);
-            field.addProp(SchemaConstants.TALEND_COLUMN_PATTERN, SnowflakeConstants.TALEND_DAFEULT_TIME_PATTERN);
-            /** tell Avro converter how to process Original Avro logical type time
-             * if value is "TALEND_DATE", it mean use Talend Date, if not, will use Talend Integer like before
-             * we add this only one purpose : for the old job(before current commit), we keep Talend Integer, for new job, we use Talend Date
-             * 
-             * this affect the studio and DI model level which will affect the expected assign value type from input component(snowflakeinput)
-             * and the expected passed value type to output component(snowflakeoutput),
-             * and we adjust snowflake runtime to make it can process the DATE and INTEGER both for input/output
-             * */
-            field.addProp(SnowflakeConstants.LOGICAL_TIME_TYPE_AS, SnowflakeConstants.AS_TALEND_DATE);
             break;
         case java.sql.Types.TIMESTAMP:
             schema = AvroUtils._long();
