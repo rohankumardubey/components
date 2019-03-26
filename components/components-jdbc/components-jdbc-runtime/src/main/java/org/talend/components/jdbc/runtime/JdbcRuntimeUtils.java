@@ -23,6 +23,7 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
+import java.util.Properties;
 
 import javax.sql.DataSource;
 
@@ -52,7 +53,7 @@ public class JdbcRuntimeUtils {
      * @throws ClassNotFoundException
      * @throws SQLException
      */
-    public static Connection createConnection(AllSetting setting) throws ClassNotFoundException, SQLException {
+    public static Connection createConnection(final AllSetting setting) throws ClassNotFoundException, SQLException {
         if (!valid(setting.getJdbcUrl())) {
             throw new RuntimeException("JDBC URL should not be empty, please set it");
         }
@@ -62,7 +63,18 @@ public class JdbcRuntimeUtils {
         }
 
         java.lang.Class.forName(setting.getDriverClass());
-        return java.sql.DriverManager.getConnection(setting.getJdbcUrl(), setting.getUsername(), setting.getPassword());
+        final Properties properties = new Properties(){{
+            if(setting.getUsername() != null) {
+                setProperty("user", setting.getUsername());
+            }
+            if(setting.getPassword() != null) {
+                setProperty("password", setting.getPassword());
+            }
+            // Security Issues with LOAD DATA LOCAL https://jira.talendforge.org/browse/TDI-42006
+            setProperty("allowLoadLocalInfile", "false"); // MySQL
+            setProperty("allowLocalInfile", "false"); // MariaDB
+        }};
+        return java.sql.DriverManager.getConnection(setting.getJdbcUrl(), properties);
     }
 
     private static boolean valid(String value) {
@@ -204,30 +216,4 @@ public class JdbcRuntimeUtils {
 
         return conn;
     }
-
-//    /**
-//     * Transforms the query of the {@see AllSetting} given in parameter to take the limit statement into account.
-//     *
-//     * @param setting   the JDBC dataset settings
-//     * @param readLimit the number of records to read
-//     * @return the original query if the limit is less than 1, else the transformed query
-//     */
-//    public static String getQueryToExecute(AllSetting setting, int readLimit) {
-//        String query = setting.getSql();
-//        if (readLimit > 0) {
-//            String driverClass = setting.getDriverClass();
-//            // MySQL and AzureSQL don't use limit.
-//            if (driverClass != null && driverClass.equals("net.sourceforge.jtds.jdbc.Driver")) {
-//                return "SELECT TOP "+readLimit+" * FROM ( "+query+") AS derived";
-//            }
-//
-//            String limitStatement = "LIMIT " + readLimit;
-//            if (driverClass != null && driverClass.toLowerCase().contains("derby")) {
-//                // different behaviour for the derby database, where the LIMIT statement does not exist.
-//                limitStatement = "FETCH FIRST " + (readLimit == 1 ? "ROW ONLY" : readLimit + " ROWS ONLY");
-//            }
-//            query = "SELECT * FROM (" + query + ") AS derived " + limitStatement;
-//        }
-//        return query;
-//    }
 }
