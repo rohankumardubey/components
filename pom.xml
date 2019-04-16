@@ -32,6 +32,7 @@
         <module>examples</module>
         <module>components</module>
         <module>services</module>
+        <module>snowflake-poc</module>
     </modules>
     <build>
         <plugins>
