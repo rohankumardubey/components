@@ -5,12 +5,13 @@
     <parent>
         <groupId>org.talend.components</groupId>
         <artifactId>components-parent</artifactId>
-        <version>0.25.5-SNAPSHOT</version>
-        <relativePath>../../components-parent/pom.xml</relativePath>
+        <version>0.25.3</version>
+<!--        <relativePath>../../components-parent/pom.xml</relativePath> -->
     </parent>
 
     <name>Components - Couchbase</name>
     <artifactId>components-couchbase</artifactId>
+    <version>0.25.4</version>
     <packaging>bundle</packaging>
 
     <properties>
@@ -23,13 +24,28 @@
         <couchbase.docker.image.name>talend/components-integration-test-couchbase-server:5.1.1-20181005144600</couchbase.docker.image.name>
         <talend_docker_registry>registry.datapwn.com</talend_docker_registry>
         <docker.host.address>localhost</docker.host.address>
+        <components.version>0.25.3</components.version>
     </properties>
+    
+    <repositories>
+        <repository>
+            <id>releases</id>
+            <url>https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceRelease/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
 
     <dependencies>
         <!-- APIs for all Components -->
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api</artifactId>
+            <version>${components.version}</version>
         </dependency>
         <dependency>
             <groupId>biz.aQute.bnd</groupId>
@@ -40,10 +56,12 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-common</artifactId>
+            <version>${components.version}</version>
         </dependency>
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-common</artifactId>
+            <version>${components.version}</version>
             <classifier>bundle</classifier>
             <scope>test</scope>
         </dependency>
@@ -52,6 +70,7 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api</artifactId>
+            <version>${components.version}</version>
             <classifier>tests</classifier>
             <scope>test</scope>
         </dependency>
@@ -59,12 +78,14 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api-service-rest</artifactId>
+            <version>${components.version}</version>
             <classifier>lib</classifier>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api-service-rest</artifactId>
+            <version>${components.version}</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
@@ -72,6 +93,7 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-osgitest</artifactId>
+            <version>${components.version}</version>
             <scope>test</scope>
         </dependency>
 
