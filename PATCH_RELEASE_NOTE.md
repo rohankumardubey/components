@@ -9,8 +9,8 @@ product:
 
 | Info             | Value |
 | ---------------- | ---------------- |
-| Patch Name       | Patch\_20190530\_TPS-3154\_v1-7.1.1 |
-| Release Date     | 2019-05-30 |
+| Patch Name       | Patch\_20190703\_TPS-3154\_v1-7.1.1 |
+| Release Date     | 2019-07-03 |
 | Target Version   | Talend-Studio-20181026\_1147-V7.1.1 |
 | Product affected | Talend Studio |
 
