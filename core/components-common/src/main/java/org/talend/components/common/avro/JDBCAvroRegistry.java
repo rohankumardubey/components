@@ -472,6 +472,23 @@ public class JDBCAvroRegistry extends AvroRegistry {
                 }
 
             };
+        } else if (AvroUtils.isSameType(basicSchema, AvroUtils._bytes())) {
+            return new JDBCConverter() {
+
+                @Override
+                public Object convertToAvro(ResultSet value) {
+                    try {
+                        Object result = value.getBytes(index);
+                        if(value.wasNull()) {
+                        	return null;
+                        }
+                        return result;
+                    } catch (SQLException e) {
+                        throw new ComponentException(e);
+                    }
+                }
+
+            };
         } else if (isObject(basicSchema)) {
             return new JDBCConverter() {
   
@@ -766,6 +783,23 @@ public class JDBCAvroRegistry extends AvroRegistry {
                         }
 
                         return value.getByte(index);
+                    } catch (SQLException e) {
+                        throw new ComponentException(e);
+                    }
+                }
+
+            };
+        } else if (AvroUtils.isSameType(basicSchema, AvroUtils._bytes())) {
+            return new JDBCSPConverter() {
+
+                @Override
+                public Object convertToAvro(CallableStatement value) {
+                    try {
+                    	Object result = value.getBytes(index);
+                        if(value.wasNull()) {
+                        	return null;
+                        }
+                        return result;
                     } catch (SQLException e) {
                         throw new ComponentException(e);
                     }
