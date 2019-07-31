@@ -80,6 +80,10 @@ public class JDBCAvroRegistry extends AvroRegistry {
         });
     }
 
+    //TODO remove all the methods for infer schema, as now :
+    //1. we use another class for infer schema for dataprep, and another class for studio, not this
+    //2. only snowflake extends current class for infer schema, should adjust snowflake part
+    //so will remove it after adjust snowflake runtime
     protected Schema inferSchemaResultSetMetaData(ResultSetMetaData metadata) throws SQLException {
         List<Field> fields = new ArrayList<>();
 
@@ -155,6 +159,7 @@ public class JDBCAvroRegistry extends AvroRegistry {
         return result;
     }
 
+    //TODO move it as no any place to use it now
     protected Field sqlType2Avro(int size, int scale, int dbtype, boolean nullable, String name, String dbColumnName,
             Object defaultValue, boolean isKey) {
         Field field = null;
