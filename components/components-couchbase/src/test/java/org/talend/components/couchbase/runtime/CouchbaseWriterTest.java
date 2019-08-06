@@ -125,7 +125,7 @@ public class CouchbaseWriterTest {
 
         assertEquals(1, result.totalCount);
         // Verifying mock calls.
-        Mockito.verify(connection, Mockito.times(1)).insertJsonDocument(Mockito.anyString(), Mockito.any());
+        Mockito.verify(connection, Mockito.times(1)).insertJsonDocument(Mockito.anyString(), (JsonObject) Mockito.any());
         Mockito.verify(connection, Mockito.times(1)).increment();
         Mockito.verify(connection, Mockito.times(1)).decrement();
     }

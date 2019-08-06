@@ -106,7 +106,7 @@
             <dependency>
                 <groupId>org.talend.components</groupId>
                 <artifactId>components-bom</artifactId>
-                <version>${project.version}</version>
+                <version>0.25.3</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>

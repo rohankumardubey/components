@@ -12,6 +12,7 @@
     <name>Components - Couchbase</name>
     <artifactId>components-couchbase</artifactId>
     <packaging>bundle</packaging>
+    <version>0.25.5</version>
 
     <properties>
         <couchbase-core.version>1.6.2</couchbase-core.version>
