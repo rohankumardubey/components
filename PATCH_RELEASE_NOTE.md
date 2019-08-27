@@ -9,8 +9,8 @@ product:
 
 | Info             | Value |
 | ---------------- | ---------------- |
-| Patch Name       | Patch\_20190806\_TPS-3284\_v1-7.1.1 |
-| Release Date     | 2019-08-06 |
+| Patch Name       | Patch\_20190827\_TPS-3284\_v1-7.1.1 |
+| Release Date     | 2019-08-27 |
 | Target Version   | Talend-Studio-20181026\_1147-V7.1.1 |
 | Product affected | Talend Studio |
 
@@ -34,6 +34,7 @@ This is the second patch of 7.1.1 and contains the following fixes:
 Consider the following requirements for your system:
 
 - Talend Studio 7.1.1 must be installed.
+- Patch TPS-3362 must be installed.
 
 
 ## Installation <!-- mandatory -->
