@@ -16,7 +16,7 @@ product:
 
 ## Introduction
 
-This is a self-contained patch.
+This patch is cumulative.
 
 **NOTE**: For information on how to obtain this patch, reach out to your Support contact at Talend.
 
@@ -25,6 +25,7 @@ This is a self-contained patch.
 This patch contains the following fixes:
 
 - TPS-3366 [7.1.1] tJDBCOutput does not work with BLOB dataType (TDI-42747)
+- TPS-3316 [7.1.1]The data exceeds the max capacity for the data type value = 'null' even though it is not null(TDI-41611)
 
 ## Prerequisites
 
