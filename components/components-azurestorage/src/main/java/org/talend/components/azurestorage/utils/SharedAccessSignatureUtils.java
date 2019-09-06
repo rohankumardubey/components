@@ -30,18 +30,21 @@ public class SharedAccessSignatureUtils {
 
     String service;
 
+    String suffix;
+
     String token;
 
-    private static final String SAS_PATTERN = "(http.?)?://(.*)\\.(blob|file|queue|table)\\.core\\.windows\\.net\\/(.*)";
+    private static final String SAS_PATTERN = "(http.?)?://(.*)\\.(blob|file|queue|table)\\.(.*)/(.*)";
 
     private static final I18nMessages i18nMessages = GlobalI18N.getI18nMessageProvider()
             .getI18nMessages(SharedAccessSignatureUtils.class);
 
-    public SharedAccessSignatureUtils(String sas, String protocol, String account, String service, String sap) {
+    public SharedAccessSignatureUtils(String sas, String protocol, String account, String service, String suffix, String sap) {
         this.sharedAccessSignature = sas;
         this.protocol = protocol;
         this.account = account;
         this.service = service;
+        this.suffix = suffix;
         this.token = sap;
     }
 
@@ -51,7 +54,7 @@ public class SharedAccessSignatureUtils {
             throw new InvalidKeyException(i18nMessages.getMessage("error.InvalidSAS"));
         }
 
-        return new SharedAccessSignatureUtils(sas, m.group(1), m.group(2), m.group(3), m.group(4));
+        return new SharedAccessSignatureUtils(sas, m.group(1), m.group(2), m.group(3), m.group(4), m.group(5));
     }
 
     public URI getURI() throws Throwable {
@@ -76,6 +79,10 @@ public class SharedAccessSignatureUtils {
 
     public String getToken() {
         return token;
+    }
+
+    public String getSuffix() {
+        return suffix;
     }
 
     @Override

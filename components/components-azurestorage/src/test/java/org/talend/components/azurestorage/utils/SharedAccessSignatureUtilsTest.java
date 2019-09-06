@@ -78,7 +78,7 @@ public class SharedAccessSignatureUtilsTest {
 
     @Before
     public void setUp() throws Exception {
-        sharedAccessSignatureUtils = new SharedAccessSignatureUtils(sas, protocol, account, service, sap);
+        sharedAccessSignatureUtils = new SharedAccessSignatureUtils(sas, protocol, account, service,null, sap);
     }
 
     /**

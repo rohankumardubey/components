@@ -99,7 +99,7 @@ public class AzureStorageRuntime implements RuntimableRuntime<ComponentPropertie
             SharedAccessSignatureUtils sas = SharedAccessSignatureUtils
                     .getSharedAccessSignatureUtils(conn.sharedAccessSignature.getValue());
             StorageCredentials credentials = new StorageCredentialsSharedAccessSignature(sas.getSharedAccessSignature());
-            account = new CloudStorageAccount(credentials, true, null, sas.getAccount());
+            account = new CloudStorageAccount(credentials, true, sas.getSuffix(), sas.getAccount());
 
         } else {
             StringBuilder connectionString = new StringBuilder();
