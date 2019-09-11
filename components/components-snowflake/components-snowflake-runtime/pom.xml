@@ -17,7 +17,7 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-snowflake-definition</artifactId>
-            <version>${project.version}</version>
+            <version>0.25.3</version>
         </dependency>
         <dependency>
             <groupId>net.snowflake</groupId>
