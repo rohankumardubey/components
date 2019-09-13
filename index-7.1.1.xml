@@ -1,0 +1,19 @@
+<components>
+  <component name="Snowflake"
+    version="0.25.4"
+    product="tedi_bd,tedi_pe,teesb_ce,tp_dq_bd,tedq_ce,ds_ce_dq,ds_bd_dq,tp_ce,tp_bd,tsc,tsc_dq,tsc_bdrt,tc_di,tc_bd,tcp_bd,tcp_dm,tcp_rtbd"
+    mvn_uri="mvn:org.talend.components/components-snowflake/0.25.4/zip"
+    image_mvn_uri=""
+    bundle_id="org.talend.components.snowflake.definition"
+    description="tSnowflakeOutput Dynamic column does not work when additional static columns are added (TDI-42854) TPS-3367"
+    license_uri=""
+    types="tcompv0"
+    categories=""
+    degradable="false"
+    compatibleStudioVersion="7.1.1.20190906_1140-patch"
+    license="">
+    <description>
+      tSnowflakeOutput Dynamic column does not work when additional static columns are added (TDI-42854) TPS-3367
+    </description>
+  </component>
+</components>
