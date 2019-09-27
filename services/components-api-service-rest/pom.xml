@@ -39,7 +39,7 @@
         <org.talend.libraries.mysql.version>6.0.0</org.talend.libraries.mysql.version>
         <pax-url-aethe.version>2.4.7</pax-url-aethe.version>
         <rest-assured.version>3.3.0</rest-assured.version>
-        <slf4.version>1.7.25</slf4.version>
+        <slf4.version>1.8.0-beta4</slf4.version>
         <!-- Aligned with component-parent -->
         <docker-maven-plugin.version>0.26.0</docker-maven-plugin.version>
     </properties>
