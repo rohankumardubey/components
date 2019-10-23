@@ -36,6 +36,7 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.talend.components.api.component.runtime.Result;
+import org.talend.components.api.container.DefaultComponentRuntimeContainerImpl;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.common.tableaction.TableAction;
@@ -48,8 +49,6 @@ import net.snowflake.client.jdbc.internal.joda.time.DateTime;
 import net.snowflake.client.loader.LoaderFactory;
 import net.snowflake.client.loader.LoaderProperty;
 import net.snowflake.client.loader.StreamLoader;
-
-import static org.mockito.Matchers.anyObject;
 
 /**
  * Unit tests for {@link SnowflakeWriter} class
@@ -75,7 +74,8 @@ public class SnowflakeWriterTest {
         sink = Mockito.mock(SnowflakeSink.class);
         Mockito.when(sink.getSnowflakeOutputProperties()).thenReturn(properties);
         writeOperation = new SnowflakeWriteOperation(sink);
-        writer = new SnowflakeWriter(writeOperation, null);
+        RuntimeContainer container = new DefaultComponentRuntimeContainerImpl();
+        writer = new SnowflakeWriter(writeOperation, container);
 
         Schema schema = SchemaBuilder.record("record").fields().name("id")
                 .prop(SchemaConstants.TALEND_COLUMN_IS_KEY, Boolean.TRUE.toString())
@@ -83,7 +83,7 @@ public class SnowflakeWriterTest {
                 .requiredString("field").endRecord();
         schema.getField("column").addProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "column");
         schema.getField("field").addProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "field");
-        Mockito.when(sink.createConnection(null)).thenReturn(Mockito.mock(Connection.class));
+        Mockito.when(sink.createConnection(container)).thenReturn(Mockito.mock(Connection.class));
         Mockito.when(sink.getRuntimeSchema(Mockito.any(SchemaResolver.class), Mockito.eq(properties.tableAction.getValue())))
                 .thenReturn(schema);
         properties.table.main.schema.setValue(schema);
@@ -96,7 +96,6 @@ public class SnowflakeWriterTest {
         loader = Mockito.mock(StreamLoader.class);
         Mockito.when(LoaderFactory.createLoader(Mockito.anyMapOf(LoaderProperty.class, Object.class),
                 Mockito.any(Connection.class), Mockito.any(Connection.class))).thenReturn(loader);
-
     }
 
     @Test

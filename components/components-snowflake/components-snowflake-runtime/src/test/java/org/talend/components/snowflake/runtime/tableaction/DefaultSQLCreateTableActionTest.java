@@ -14,6 +14,8 @@ package org.talend.components.snowflake.runtime.tableaction;
 
 import static org.junit.Assert.assertEquals;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +32,17 @@ import org.talend.daikon.avro.SchemaConstants;
  * Tests Snowflake Create table SQL queries
  */
 public class DefaultSQLCreateTableActionTest {
+
+    // TODO improve it (probably with real mapping_*.xml file
+    private static URL DUMMY_URL;
+
+    static {
+        try {
+            DUMMY_URL = new URL("file://nonexistentdir");
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+    }
 
     /**
      * Checks that CREATE TABLE IF NOT EXISTS query creation sets length and precision only in case db type
@@ -56,7 +69,7 @@ public class DefaultSQLCreateTableActionTest {
         String[] tableName = new String[]{"TEST_TABLE"};
         DefaultSQLCreateTableAction action =
                 new DefaultSQLCreateTableAction(tableName, schema, true, false, false);
-        TableActionConfig conf = new SnowflakeTableActionConfig(true);
+        TableActionConfig conf = new SnowflakeTableActionConfig(DUMMY_URL, true);
         action.setConfig(conf);
 
         List<String> queries = action.getQueries();
@@ -78,7 +91,7 @@ public class DefaultSQLCreateTableActionTest {
         String[] tableName = new String[]{"TEST_TABLE"};
         DefaultSQLCreateTableAction action =
                 new DefaultSQLCreateTableAction(tableName, schema, true, false, false);
-        TableActionConfig conf = new SnowflakeTableActionConfig(true);
+        TableActionConfig conf = new SnowflakeTableActionConfig(DUMMY_URL, true);
         action.setConfig(conf);
 
         Map<String, String> dbTypeMapping = new HashMap<>();
@@ -104,7 +117,7 @@ public class DefaultSQLCreateTableActionTest {
         String[] tableName = new String[]{"TEST_TABLE"};
         DefaultSQLCreateTableAction action =
                 new DefaultSQLCreateTableAction(tableName, schema, true, false, false);
-        TableActionConfig conf = new SnowflakeTableActionConfig(true);
+        TableActionConfig conf = new SnowflakeTableActionConfig(DUMMY_URL, true);
         action.setConfig(conf);
 
         Map<String, String> dbTypeMapping = new HashMap<>();
@@ -130,7 +143,7 @@ public class DefaultSQLCreateTableActionTest {
         String[] tableName = new String[]{"TEST_TABLE"};
         DefaultSQLCreateTableAction action =
                 new DefaultSQLCreateTableAction(tableName, schema, true, false, false);
-        TableActionConfig conf = new SnowflakeTableActionConfig(true);
+        TableActionConfig conf = new SnowflakeTableActionConfig(DUMMY_URL, true);
         action.setConfig(conf);
 
         Map<String, String> dbTypeMapping = new HashMap<>();
@@ -156,7 +169,7 @@ public class DefaultSQLCreateTableActionTest {
         String[] tableName = new String[]{"TEST_TABLE"};
         DefaultSQLCreateTableAction action =
                 new DefaultSQLCreateTableAction(tableName, schema, true, false, false);
-        TableActionConfig conf = new SnowflakeTableActionConfig(true);
+        TableActionConfig conf = new SnowflakeTableActionConfig(DUMMY_URL, true);
         action.setConfig(conf);
 
         Map<String, String> dbTypeMapping = new HashMap<>();
@@ -182,7 +195,7 @@ public class DefaultSQLCreateTableActionTest {
         String[] tableName = new String[]{"TEST_TABLE"};
         DefaultSQLCreateTableAction action =
                 new DefaultSQLCreateTableAction(tableName, schema, true, false, false);
-        TableActionConfig conf = new SnowflakeTableActionConfig(true);
+        TableActionConfig conf = new SnowflakeTableActionConfig(DUMMY_URL, true);
         action.setConfig(conf);
 
         Map<String, String> dbTypeMapping = new HashMap<>();
@@ -208,7 +221,7 @@ public class DefaultSQLCreateTableActionTest {
         String[] tableName = new String[]{"TEST_TABLE"};
         DefaultSQLCreateTableAction action =
                 new DefaultSQLCreateTableAction(tableName, schema, true, false, false);
-        TableActionConfig conf = new SnowflakeTableActionConfig(true);
+        TableActionConfig conf = new SnowflakeTableActionConfig(DUMMY_URL, true);
         action.setConfig(conf);
 
         Map<String, String> dbTypeMapping = new HashMap<>();
@@ -234,7 +247,7 @@ public class DefaultSQLCreateTableActionTest {
         String[] tableName = new String[]{"TEST_TABLE"};
         DefaultSQLCreateTableAction action =
                 new DefaultSQLCreateTableAction(tableName, schema, true, false, false);
-        TableActionConfig conf = new SnowflakeTableActionConfig(true);
+        TableActionConfig conf = new SnowflakeTableActionConfig(DUMMY_URL, true);
         action.setConfig(conf);
 
         Map<String, String> dbTypeMapping = new HashMap<>();
@@ -255,7 +268,7 @@ public class DefaultSQLCreateTableActionTest {
         String[] tableName = new String[]{"TEST_TABLE"};
         DefaultSQLCreateTableAction action =
                 new DefaultSQLCreateTableAction(tableName, schema, true, false, false);
-        TableActionConfig conf = new SnowflakeTableActionConfig(true);
+        TableActionConfig conf = new SnowflakeTableActionConfig(DUMMY_URL, true);
         action.setConfig(conf);
 
         Map<String, String> dbTypeMapping = new HashMap<>();
@@ -281,7 +294,7 @@ public class DefaultSQLCreateTableActionTest {
         String[] tableName = new String[]{"TEST_TABLE"};
         DefaultSQLCreateTableAction action =
                 new DefaultSQLCreateTableAction(tableName, schema, true, false, false);
-        TableActionConfig conf = new SnowflakeTableActionConfig(true);
+        TableActionConfig conf = new SnowflakeTableActionConfig(DUMMY_URL, true);
         action.setConfig(conf);
 
         Map<String, String> dbTypeMapping = new HashMap<>();
@@ -307,7 +320,7 @@ public class DefaultSQLCreateTableActionTest {
         String[] tableName = new String[]{"TEST_TABLE"};
         DefaultSQLCreateTableAction action =
                 new DefaultSQLCreateTableAction(tableName, schema, true, false, false);
-        TableActionConfig conf = new SnowflakeTableActionConfig(true);
+        TableActionConfig conf = new SnowflakeTableActionConfig(DUMMY_URL, true);
         action.setConfig(conf);
 
         Map<String, String> dbTypeMapping = new HashMap<>();

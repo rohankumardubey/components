@@ -15,6 +15,7 @@ package org.talend.components.snowflake.runtime;
 import static org.talend.components.snowflake.tsnowflakeoutput.TSnowflakeOutputProperties.OutputAction.UPSERT;
 
 import java.io.IOException;
+import java.net.URL;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -29,10 +30,12 @@ import org.apache.avro.Schema.Field;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.IndexedRecord;
 import org.apache.commons.lang3.StringUtils;
+import org.talend.components.api.Constants;
 import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.component.runtime.WriterWithFeedback;
 import org.talend.components.api.container.RuntimeContainer;
+import org.talend.components.common.ComponentConstants;
 import org.talend.components.common.runtime.DynamicSchemaUtils;
 import org.talend.components.common.tableaction.TableAction;
 import org.talend.components.common.tableaction.TableAction.TableActionEnum;
@@ -208,7 +211,7 @@ public class SnowflakeWriter implements WriterWithFeedback<Result, IndexedRecord
                     connectionProperties1 = sprops.getConnectionProperties();
                 }
 
-                TableActionConfig conf = new SnowflakeTableActionConfig(sprops.convertColumnsAndTableToUppercase.getValue());
+                TableActionConfig conf = new SnowflakeTableActionConfig(getMappingFilesDir(), sprops.convertColumnsAndTableToUppercase.getValue());
 
                 Schema schemaForCreateTable = getSchemaForTableAction(datum);
 
@@ -222,6 +225,10 @@ public class SnowflakeWriter implements WriterWithFeedback<Result, IndexedRecord
                 throw new IOException(e.getMessage(), e);
             }
         }
+    }
+
+    private URL getMappingFilesDir() {
+        return (URL) container.getComponentData(container.getCurrentComponentId(), "MAPPINGS_URL");
     }
 
     private Schema getSchemaForTableAction(Object datum) {
