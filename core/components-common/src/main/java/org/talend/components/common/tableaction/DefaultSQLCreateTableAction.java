@@ -107,7 +107,7 @@ public class DefaultSQLCreateTableAction extends TableAction {
     }
 
     private StringBuilder buildColumns() {
-        ConvertAvroTypeToSQL convertAvroToSQL = new ConvertAvroTypeToSQL(this.getConfig());
+
         StringBuilder sb = new StringBuilder();
 
         boolean first = true;
@@ -118,12 +118,9 @@ public class DefaultSQLCreateTableAction extends TableAction {
                 sb.append(this.getConfig().SQL_CREATE_TABLE_FIELD_SEP);
             }
 
-
-            String sDBLength = f.getProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH);
             String sDBName = f.getProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME);
-            String sDBType = f.getProp(SchemaConstants.TALEND_COLUMN_DB_TYPE);
+            String sDBType = getDbType(f);
             String sDBDefault = f.getProp(SchemaConstants.TALEND_COLUMN_DEFAULT);
-            String sDBPrecision = f.getProp(SchemaConstants.TALEND_COLUMN_PRECISION);
             boolean sDBIsKey = Boolean.valueOf(f.getProp(SchemaConstants.TALEND_COLUMN_IS_KEY)).booleanValue();
             boolean sDBNullable = isNullable(f.schema());
 
@@ -134,15 +131,6 @@ public class DefaultSQLCreateTableAction extends TableAction {
             sb.append(escape(updateCaseIdentifier(name)));
             sb.append(" ");
 
-            if(isNullOrEmpty(sDBType)){
-                // if SchemaConstants.TALEND_COLUMN_DB_TYPE not set, use given map
-                sDBType = this.getDbTypeMap().get(f.name());
-            }
-
-            if (isNullOrEmpty(sDBType)) {
-                // If DB type not set, try to guess it
-                sDBType = convertAvroToSQL.convertToSQLTypeString(f.schema());
-            }
             sb.append(updateCaseIdentifier(sDBType));
 
             buildLengthPrecision(sb, f, sDBType);
@@ -188,6 +176,26 @@ public class DefaultSQLCreateTableAction extends TableAction {
         }
 
         return sb;
+    }
+
+    private String getDbType(Schema.Field field) {
+        ConvertAvroTypeToSQL convertAvroToSQL = new ConvertAvroTypeToSQL(this.getConfig());
+        // 1st priority is to use db type stored in schema
+        // it doesn't work at the moment as schema editor for Snowflake doesn't have db type column
+        String dbType = field.getProp(SchemaConstants.TALEND_COLUMN_DB_TYPE);
+
+        // 2nd priority is to use mapping table in advanced settings (it works similarly to db type column in schema)
+        if(isNullOrEmpty(dbType)){
+            // if SchemaConstants.TALEND_COLUMN_DB_TYPE not set, use given map
+            dbType = this.getDbTypeMap().get(field.name());
+        }
+
+        // 3rd priority is to use default hardcoded mapping
+        if (isNullOrEmpty(dbType)) {
+            // If DB type not set, try to guess it
+            dbType = convertAvroToSQL.convertToSQLTypeString(field.schema());
+        }
+        return dbType;
     }
 
     /**
