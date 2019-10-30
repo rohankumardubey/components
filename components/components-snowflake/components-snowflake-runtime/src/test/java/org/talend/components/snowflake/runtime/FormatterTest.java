@@ -15,6 +15,11 @@ package org.talend.components.snowflake.runtime;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.TimeZone;
+
 public class FormatterTest {
 
     @Test
@@ -35,5 +40,37 @@ public class FormatterTest {
         Assert.assertNotEquals(f1.getDateFormatter(), f2.getDateFormatter());
         Assert.assertNotEquals(f1.getTimeFormatter(), f2.getTimeFormatter());
         Assert.assertNotEquals(f1.getTimestampFormatter(), f2.getTimestampFormatter());
+    }
+
+    @Test
+    public void testTimeMillis() throws ParseException {
+        String dateTime = "2017-10-15 12:12:12";
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+        Date actualDate = sdf.parse(dateTime);
+        Formatter formatter = new Formatter();
+
+        Date expectedDate = sdf.parse("1970-01-01 12:12:12");
+
+        SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss.SSS");
+        timeFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+        String expected = timeFormat.format(expectedDate);
+        String actual = formatter.formatTimeMillis(actualDate);
+
+        Assert.assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testFormatDateFromInteger() {
+        Formatter formatter = new Formatter();
+
+        // Sydney daylight saving time ended 2017-10-01
+        Assert.assertEquals("2017-09-30", formatter.formatDate(17439));
+        Assert.assertEquals("2017-10-01", formatter.formatDate(17440));
+
+        // Seoul daylight saving time started 1988-05-08
+        Assert.assertEquals("1988-05-07", formatter.formatDate(6701));
+        Assert.assertEquals("1988-05-08", formatter.formatDate(6702));
     }
 }
