@@ -15,11 +15,15 @@ package org.talend.components.common.tableaction;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.avro.Schema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.talend.components.common.config.jdbc.Dbms;
 import org.talend.components.common.config.jdbc.DbmsType;
+import org.talend.components.common.config.jdbc.MappingType;
+import org.talend.components.common.config.jdbc.TalendType;
 import org.talend.daikon.avro.SchemaConstants;
 
 public class DefaultSQLCreateTableAction extends TableAction {
@@ -34,6 +38,13 @@ public class DefaultSQLCreateTableAction extends TableAction {
 
     private boolean createIfNotExists;
     private boolean dropIfExists;
+
+    /**
+     * Cached DB types mapping.
+     * Some databases doesn't have/doesn't support mapping file, so this field may be not present.
+     * null value for this field means that mapping file wasn't requested yet and should be requested.
+     */
+    private Optional<Dbms> dbms;
 
     public DefaultSQLCreateTableAction(final String[] fullTableName, final Schema schema, boolean createIfNotExists, boolean drop,
         boolean dropIfExists) {
@@ -190,12 +201,35 @@ public class DefaultSQLCreateTableAction extends TableAction {
             dbType = this.getDbTypeMap().get(field.name());
         }
 
-        // 3rd priority is to use default hardcoded mapping
+        // 3rd priority is to use default type from mapping file
+        if (getMapping().isPresent()) {
+            Dbms mapping = getMapping().get();
+            String typeName = field.getProp("di.column.talendType"); // TODO add this key to constants
+            MappingType<TalendType, DbmsType> mappingType = mapping.getTalendMapping(typeName);
+            dbType = mappingType.getDefaultType().getName();
+        }
+
+        // 4th priority is to use default hardcoded mapping
         if (isNullOrEmpty(dbType)) {
             // If DB type not set, try to guess it
             dbType = convertAvroToSQL.convertToSQLTypeString(field.schema());
         }
         return dbType;
+    }
+
+    /**
+     * Parses DB types (xml) mapping file for the 1st time.
+     * For next calls returns cached instance
+     *
+     * @return DB types mapping
+     */
+    private Optional<Dbms> getMapping() {
+        // if dbms wasn't requested yet, request it
+        if (dbms == null) {
+            dbms = Optional.ofNullable(getConfig().getMapping());
+        }
+        // return cached dbms
+        return dbms;
     }
 
     /**
