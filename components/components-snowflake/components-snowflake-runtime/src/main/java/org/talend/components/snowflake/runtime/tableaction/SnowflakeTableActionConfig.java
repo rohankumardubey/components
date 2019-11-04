@@ -26,7 +26,7 @@ import java.util.List;
 
 public class SnowflakeTableActionConfig extends TableActionConfig {
 
-    private final static String MAPPING_FILE = "mapping_Snowflake.xml";
+    private final static String MAPPING_FILE = "mapping_snowflake.xml";
 
     /**
      * URL of mapping directory, which contains type mapping files (e.g. mapping_Snowflake.xml)
