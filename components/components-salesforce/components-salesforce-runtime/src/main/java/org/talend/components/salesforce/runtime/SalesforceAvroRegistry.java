@@ -131,6 +131,9 @@ public class SalesforceAvroRegistry extends AvroRegistry {
                 avroField.addProp(SalesforceSchemaConstants.REF_MODULE_NAME, field.getReferenceTo()[0]);
                 avroField.addProp(SalesforceSchemaConstants.REF_FIELD_NAME, field.getRelationshipName());
             }
+            // add original (Salesforce) type. It is useful in case of Dynamic design schema.
+            // It may be used in next component to decide what target type to use
+            avroField.addProp(SchemaConstants.TALEND_COLUMN_DB_TYPE, field.getType().toString());
 
             // pattern will be removed when we have db type for salesforce
             switch (field.getType()) {
