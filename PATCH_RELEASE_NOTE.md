@@ -74,5 +74,5 @@ The following files are installed by this patch:
 - {Talend_Studio_path}/configuration/.m2/repository/org/talend/components/components\-salesforce\-definition/0.25.3/components\-salesforce\-definition\-0.25.3.jar
 - {Talend_Studio_path}/configuration/.m2/repository/org/talend/components/components\-salesforce\-runtime/0.25.3/components\-salesforce\-runtime\-0.25.3.jar
 - {Talend_Studio_path}/configuration/.m2/repository/org/talend/components/components\-common\-oauth/0.25.3/components\-common\-oauth\-0.25.3.jar
-- {Talend_Studio_path}/org.talend.components.common\-oauth_0.25.3.jar
-- {Talend_Studio_path}/org.talend.components.salesforce.definition_0.25.3.jar
+- {Talend_Studio_path}/plugins/org.talend.components.common\-oauth_0.25.3.jar
+- {Talend_Studio_path}/plugins/org.talend.components.salesforce.definition_0.25.3.jar
