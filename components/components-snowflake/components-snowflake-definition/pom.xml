@@ -5,12 +5,13 @@
     <parent>
         <groupId>org.talend.components</groupId>
         <artifactId>components-parent</artifactId>
-        <version>0.25.5-SNAPSHOT</version>
+        <version>0.25.3</version>
         <relativePath>../../../components-parent/pom.xml</relativePath>
     </parent>
 
     <name>Components - Snowflake Definition</name>
     <artifactId>components-snowflake-definition</artifactId>
+    <version>0.25.5</version>
     <packaging>bundle</packaging>
     <dependencies>
         <dependency>
@@ -44,6 +45,7 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-common</artifactId>
+            <version>0.25.5</version>
         </dependency>
         <dependency>
             <groupId>org.talend.components</groupId>

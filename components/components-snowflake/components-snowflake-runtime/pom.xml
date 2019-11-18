@@ -5,12 +5,13 @@
     <parent>
         <groupId>org.talend.components</groupId>
         <artifactId>components-parent</artifactId>
-        <version>0.25.5-SNAPSHOT</version>
+        <version>0.25.3</version>
         <relativePath>../../../components-parent/pom.xml</relativePath>
     </parent>
 
     <name>Components - Snowflake Runtime</name>
     <artifactId>components-snowflake-runtime</artifactId>
+    <version>0.25.5</version>
     <packaging>bundle</packaging>
 
     <properties>
@@ -65,17 +66,20 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-common</artifactId>
+            <version>0.25.5</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-common</artifactId>
+            <version>0.25.5</version>
             <classifier>bundle</classifier>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-common</artifactId>
+            <version>0.25.5</version>
             <classifier>tests</classifier>
             <scope>test</scope>
         </dependency>

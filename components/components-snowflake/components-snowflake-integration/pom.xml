@@ -4,11 +4,12 @@
     <parent>
         <groupId>org.talend.components</groupId>
         <artifactId>components-parent</artifactId>
-        <version>0.25.5-SNAPSHOT</version>
+        <version>0.25.3</version>
         <relativePath>../../../components-parent/pom.xml</relativePath>
     </parent>
 
     <artifactId>components-snowflake-integration</artifactId>
+    <version>0.25.5</version>
 
     <name>Components - Snowflake Integration Tests</name>
     <packaging>jar</packaging>
@@ -47,17 +48,20 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-common</artifactId>
+            <version>0.25.5</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-common</artifactId>
+            <version>0.25.5</version>
             <classifier>bundle</classifier>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-common</artifactId>
+            <version>0.25.5</version>
             <classifier>tests</classifier>
             <scope>test</scope>
         </dependency>

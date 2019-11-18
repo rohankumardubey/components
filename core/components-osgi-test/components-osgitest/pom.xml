@@ -15,6 +15,7 @@
 
     <name>Component API OSGI tests</name>
     <artifactId>components-osgitest</artifactId>
+    <version>0.25.3</version>
 
     <dependencies>
         <dependency>
