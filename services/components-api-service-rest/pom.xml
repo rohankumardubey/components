@@ -43,7 +43,7 @@
         <httpcore.version>4.4.9</httpcore.version>
         <jackson.version.annotations>2.9.0</jackson.version.annotations>
         <jackson.version>2.9.5</jackson.version>
-        <pax-url-aethe.version>2.4.7</pax-url-aethe.version>
+        <pax-url-aethe.version>2.6.2</pax-url-aethe.version>
         <rest-assured.version>3.3.0</rest-assured.version>
         <slf4.version>1.7.25</slf4.version>
         <!-- Aligned with component-parent -->
