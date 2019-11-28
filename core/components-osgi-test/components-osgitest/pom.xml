@@ -42,7 +42,7 @@
 		<dependency>
 			<groupId>org.ops4j.pax.url</groupId>
 			<artifactId>pax-url-link</artifactId>
-			<version>2.4.7</version>
+			<version>2.6.2</version>
 		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
@@ -73,7 +73,6 @@
 			<artifactId>pax-exam-junit4</artifactId>
 			<version>${paxexamversion}</version>
 		</dependency>
-
 		<dependency>
 			<groupId>org.ops4j.pax.exam</groupId>
 			<artifactId>pax-exam-link-mvn</artifactId>
@@ -83,7 +82,7 @@
 		<dependency>
 			<groupId>org.ops4j.pax.url</groupId>
 			<artifactId>pax-url-aether</artifactId>
-			<version>2.5.0</version>
+			<version>2.6.2</version>
 		</dependency>
 
 
