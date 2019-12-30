@@ -73,6 +73,9 @@ public final class SnowflakeWriter implements WriterWithFeedback<Result, Indexed
 
     private transient Schema mainSchema;
 
+    //we need it always for the runtime database column type to decide how to format the date type like : date, time, timestampntz, timestampltz, timestamptz
+    private transient Map<String, Field> dbColumnName2RuntimeField = new HashMap<>();
+
     private transient boolean isFirst = true;
 
     private transient List<Schema.Field> collectedFields;
@@ -104,8 +107,17 @@ public final class SnowflakeWriter implements WriterWithFeedback<Result, Indexed
         uploadConnection = sink.connect(container);
         if (null == mainSchema) {
             mainSchema = sprops.table.main.schema.getValue();
+
+            Schema runtimeSchema = sink.getSchema(container, processingConnection, sprops.table.tableName.getStringValue());
+            if(runtimeSchema != null) {
+                for(Field field : runtimeSchema.getFields()) {
+                    String dbColumnName = field.getProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME);
+                    dbColumnName2RuntimeField.put(dbColumnName, field);
+                }
+            }
+
             if (AvroUtils.isIncludeAllFields(mainSchema)) {
-                mainSchema = sink.getSchema(container, processingConnection, sprops.table.tableName.getStringValue());
+                mainSchema = runtimeSchema;
             } // else schema is fully specified
         }
 
@@ -192,21 +204,42 @@ public final class SnowflakeWriter implements WriterWithFeedback<Result, Indexed
             Schema s = AvroUtils.unwrapIfNullable(remoteTableField.schema());
             if (null == inputValue || inputValue instanceof String) {
                 row[i] = inputValue;
+                continue;
             } else if (AvroUtils.isSameType(s, AvroUtils._date())) {
-                Date date = (Date) inputValue;
-                row[i] = date.getTime();
-            } else if (LogicalTypes.fromSchemaIgnoreInvalid(s) == LogicalTypes.timeMillis()) {
-                row[i] = formatter.formatTimeMillis(inputValue);
-            } else if (LogicalTypes.fromSchemaIgnoreInvalid(s) == LogicalTypes.date()) {
-                row[i] = formatter.formatDate(inputValue);
-            } else if (LogicalTypes.fromSchemaIgnoreInvalid(s) == LogicalTypes.timestampMillis()) {
-                row[i] = formatter.formatTimestampMillis(inputValue);
-            } else {
-                row[i] = inputValue;
+                String dbColumnName = f.getProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME);
+                if(dbColumnName == null){
+                    dbColumnName = f.name();
+                }
+                Field runtimeField = dbColumnName2RuntimeField.get(dbColumnName);
+                
+                if(runtimeField!=null) {
+                    s = AvroUtils.unwrapIfNullable(runtimeField.schema());
+                } else {
+                    //TODO this is the old action, we keep it if can't fetch the type by the schema db column name
+                    //consider to adjust it
+                    Date date = (Date) inputValue;
+                    row[i] = date.getTime();
+                    continue;
+                }
             }
+
+            row[i] = formatIfAnySnowflakeDateType(inputValue, s);
         }
 
         loader.submitRow(row);
+    }
+
+    //only retrieve schema function or dynamic may support logical types below as it runtime to fetch the schema by SnowflakeAvroRegistry
+    private Object formatIfAnySnowflakeDateType(Object inputValue, Schema s) {
+        if (LogicalTypes.fromSchemaIgnoreInvalid(s) == LogicalTypes.timeMillis()) {
+            return formatter.formatTimeMillis(inputValue);
+        } else if (LogicalTypes.fromSchemaIgnoreInvalid(s) == LogicalTypes.date()) {
+            return formatter.formatDate(inputValue);
+        } else if (LogicalTypes.fromSchemaIgnoreInvalid(s) == LogicalTypes.timestampMillis()) {
+            return formatter.formatTimestampMillis(inputValue);
+        } else {
+            return inputValue;
+        }
     }
 
     @Override
