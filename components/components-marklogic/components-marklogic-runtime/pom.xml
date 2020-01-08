@@ -16,10 +16,8 @@
 
     <properties>
         <coverage.sonar.reportRoot>${project.basedir}/..</coverage.sonar.reportRoot>
-        <marklogic-client-api.version>4.0.4</marklogic-client-api.version>
-        <marklogic.mlcp.version>9.0.5</marklogic.mlcp.version>
-        <okio.version>1.14.0</okio.version>
-        <protobuf-java.version>3.3.0</protobuf-java.version>
+        <marklogic-client-api.version>5.0.1</marklogic-client-api.version>
+        <marklogic.mlcp.version>9.0.11</marklogic.mlcp.version>
     </properties>
 
     <repositories>
@@ -59,13 +57,11 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api</artifactId>
-            <version>${project.parent.version}</version>
         </dependency>
         <!-- Jar containing Test utils methods -->
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api</artifactId>
-            <version>${project.parent.version}</version>
             <classifier>tests</classifier>
             <scope>test</scope>
         </dependency>
@@ -73,7 +69,6 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api-service-common</artifactId>
-            <version>${project.parent.version}</version>
             <scope>test</scope>
         </dependency>
         <!-- Java client API for MarkLogic -->
@@ -229,7 +224,6 @@
         <dependency>
             <groupId>com.squareup.okio</groupId>
             <artifactId>okio</artifactId>
-            <version>${okio.version}</version>
         </dependency>
         <dependency>
             <groupId>xerces</groupId>
@@ -246,7 +240,6 @@
         <dependency>
             <groupId>com.google.protobuf</groupId>
             <artifactId>protobuf-java</artifactId>
-            <version>${protobuf-java.version}</version>
         </dependency>
     </dependencies>
 

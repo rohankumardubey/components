@@ -59,7 +59,7 @@ public class TMarkLogicConnectionStandaloneTest {
         PowerMockito.mockStatic(DatabaseClientFactory.class);
         client = Mockito.mock(DatabaseClient.class);
         Mockito.when(DatabaseClientFactory.newClient(Mockito.any(), Mockito.anyInt(), Mockito.any(),
-                Mockito.any())).thenReturn(client);
+                Mockito.any(SecurityContext.class))).thenReturn(client);
         container = Mockito.mock(RuntimeContainer.class);
         connectionProperties = new MarkLogicConnectionProperties("connection");
         connectionProperties.authentication.setValue("BASIC");
