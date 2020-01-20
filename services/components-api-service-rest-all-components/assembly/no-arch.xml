@@ -52,4 +52,16 @@
 			<outputDirectory>${file.separator}.m2</outputDirectory>
 		</fileSet>
 	</fileSets>
+	<files>
+		<!-- Allow the copy of pax.url option to sandbox -->
+		<file>
+			<!-- source>${project.build.directory}${file.separator}external-resources${file.separator}sun.conf</source -->
+			<source>${project.build.directory}${file.separator}external-resources${file.separator}config${file.separator}sun.conf</source>
+			<outputDirectory>${file.separator}config${file.separator}org${file.separator}talend${file.separator}daikon${file.separator}sandbox${file.separator}properties${file.separator}</outputDirectory>
+			<!-- destName/ -->
+			<fileMode>0555</fileMode>
+			<!-- lineEnding/ -->
+			<!-- filtered/ -->
+		</file>
+	</files>
 </assembly>
