@@ -36,7 +36,6 @@
         <httpcore.version>4.4.9</httpcore.version>
         <jackson.version.annotations>2.9.0</jackson.version.annotations>
         <jackson.version>2.9.9</jackson.version>
-        <org.talend.libraries.mysql.version>6.0.0</org.talend.libraries.mysql.version>
         <pax-url-aethe.version>2.4.7</pax-url-aethe.version>
         <rest-assured.version>3.3.0</rest-assured.version>
         <slf4.version>1.7.25</slf4.version>
@@ -207,12 +206,6 @@
             <groupId>org.talend.components</groupId>
             <artifactId>components-jdbc-runtime</artifactId>
             <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.talend.libraries</groupId>
-            <artifactId>mysql-connector-java-5.1.30-bin</artifactId>
-            <version>${org.talend.libraries.mysql.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -616,6 +609,10 @@
     </profiles>
 
     <repositories>
+        <repository>
+            <id>spring-releases</id>
+            <url>https://repo.spring.io/libs-release</url>
+        </repository>
         <repository>
             <id>releases</id>
             <url>https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceRelease/</url>

@@ -160,6 +160,10 @@
 
     <repositories>
         <repository>
+            <id>spring-releases</id>
+            <url>https://repo.spring.io/libs-release</url>
+        </repository>
+        <repository>
             <id>releases</id>
             <url>https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceRelease/</url>
             <releases>
@@ -179,10 +183,6 @@
             <snapshots>
                 <enabled>true</enabled>
             </snapshots>
-        </repository>
-        <repository>
-            <id>talend-update</id>
-            <url>https://talend-update.talend.com/nexus/content/repositories/libraries/</url>
         </repository>
     </repositories>
     <pluginRepositories>
