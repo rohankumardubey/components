@@ -12,35 +12,6 @@
 // ============================================================================
 package org.talend.components.salesforce.runtime;
 
-import com.sforce.async.AsyncApiException;
-import com.sforce.async.AsyncExceptionCode;
-import com.sforce.async.BatchInfo;
-import com.sforce.async.BatchInfoList;
-import com.sforce.async.BatchStateEnum;
-import com.sforce.async.BulkConnection;
-import com.sforce.async.CSVReader;
-import com.sforce.async.ConcurrencyMode;
-import com.sforce.async.ContentType;
-import com.sforce.async.JobInfo;
-import com.sforce.async.JobStateEnum;
-import com.sforce.async.OperationEnum;
-import com.sforce.async.QueryResultList;
-import com.sforce.ws.ConnectionException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.talend.components.api.exception.ComponentException;
-import org.talend.components.salesforce.SalesforceBulkProperties.Concurrency;
-import org.talend.components.salesforce.SalesforceOutputProperties.OutputAction;
-import org.talend.components.salesforce.common.SalesforceErrorCodes;
-import org.talend.components.salesforce.runtime.common.SalesforceRuntimeCommon;
-import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
-import org.talend.daikon.exception.ExceptionContext;
-import org.talend.daikon.exception.TalendRuntimeException;
-import org.talend.daikon.exception.error.DefaultErrorCode;
-import org.talend.daikon.i18n.GlobalI18N;
-import org.talend.daikon.i18n.I18nMessages;
-
-import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -56,6 +27,37 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+
+import javax.servlet.http.HttpServletResponse;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.talend.components.api.exception.ComponentException;
+import org.talend.components.salesforce.SalesforceBulkProperties.Concurrency;
+import org.talend.components.salesforce.SalesforceOutputProperties.OutputAction;
+import org.talend.components.salesforce.common.SalesforceErrorCodes;
+import org.talend.components.salesforce.runtime.common.SalesforceRuntimeCommon;
+import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
+import org.talend.daikon.exception.ExceptionContext;
+import org.talend.daikon.exception.TalendRuntimeException;
+import org.talend.daikon.exception.error.DefaultErrorCode;
+import org.talend.daikon.i18n.GlobalI18N;
+import org.talend.daikon.i18n.I18nMessages;
+
+import com.sforce.async.AsyncApiException;
+import com.sforce.async.AsyncExceptionCode;
+import com.sforce.async.BatchInfo;
+import com.sforce.async.BatchInfoList;
+import com.sforce.async.BatchStateEnum;
+import com.sforce.async.BulkConnection;
+import com.sforce.async.CSVReader;
+import com.sforce.async.ConcurrencyMode;
+import com.sforce.async.ContentType;
+import com.sforce.async.JobInfo;
+import com.sforce.async.JobStateEnum;
+import com.sforce.async.OperationEnum;
+import com.sforce.async.QueryResultList;
+import com.sforce.ws.ConnectionException;
 
 /**
  * This contains process a set of records by creating a job that contains one or more batches. The job specifies which
