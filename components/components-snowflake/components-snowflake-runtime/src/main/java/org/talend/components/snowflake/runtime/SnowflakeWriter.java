@@ -237,7 +237,7 @@ public class SnowflakeWriter implements WriterWithFeedback<Result, IndexedRecord
      */
     private TableActionConfig createTableActionConfig() {
         TableActionConfig conf = new SnowflakeTableActionConfig(sprops.convertColumnsAndTableToUppercase.getValue());
-        if (sprops.useDateMapping.getValue()) {
+        if (sprops.useDateMapping.getValue() && isDynamic(getDesignSchema())) {
             // will map java.util.Date to fake DI_DATE SQL type
             conf.CONVERT_JAVATYPE_TO_SQLTYPE.put("java.util.Date", SnowflakeTableActionConfig.DI_DATE);
             String outputDateType = sprops.dateMapping.getValue().toString();
@@ -245,6 +245,26 @@ public class SnowflakeWriter implements WriterWithFeedback<Result, IndexedRecord
             conf.CUSTOMIZE_SQLTYPE_TYPENAME.put(SnowflakeTableActionConfig.DI_DATE, outputDateType);
         } // else use mapping to SQL type - to Date type as before
         return  conf;
+    }
+
+    /**
+     * Returns Component design schema set by user
+     *
+     * @return design schema
+     */
+    private Schema getDesignSchema() {
+        Schema designSchema = sprops.table.main.schema.getValue();
+        return designSchema;
+    }
+
+    /**
+     * Checks if schema has dynamic column
+     *
+     * @param schema schema to be checked
+     * @return true when schema has dynamic column
+     */
+    private boolean isDynamic(Schema schema) {
+        return AvroUtils.isIncludeAllFields(schema);
     }
 
     protected void tableActionManagement(Object datum) throws IOException {
