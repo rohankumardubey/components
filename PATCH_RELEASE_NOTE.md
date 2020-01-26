@@ -9,8 +9,8 @@ product:
 
 | Info             | Value |
 | ---------------- | ---------------- |
-| Patch Name       | Patch\_20200116\_TPS-3588\_v1-7.1.1 |
-| Release Date     | 2020-01-16 |
+| Patch Name       | Patch\_20200126\_TPS-3588\_v2-7.1.1 |
+| Release Date     | 2020-01-26 |
 | Target Version   | 20181026\_1147-V7.1.1 |
 | Product affected | Talend Studio |
 
@@ -73,7 +73,7 @@ In case this patch cannot be uninstalled, it is your responsibility to define th
 
 The following files are installed by this patch:
 
-- configuration/.m2/repository/org/talend/components/components-snowflake-definition/0.25.4/components-snowflake-definition-0.25.4.jar
-- configuration/.m2/repository/org/talend/components/components-snowflake-ee-runtime/0.25.4/components-snowflake-ee-runtime-0.25.4.jar
-- configuration/.m2/repository/org/talend/components/components-snowflake-runtime/0.25.4/components-snowflake-runtime-0.25.4.jar
-- plugins/org.talend.components.snowflake.definition\_0.25.4.jar
+- {Talend_Studio_path}/configuration/.m2/repository/org/talend/components/components-snowflake-definition/0.25.4/components-snowflake-definition-0.25.4.jar
+- {Talend_Studio_path}/configuration/.m2/repository/org/talend/components/components-snowflake-ee-runtime/0.25.4/components-snowflake-ee-runtime-0.25.4.jar
+- {Talend_Studio_path}/configuration/.m2/repository/org/talend/components/components-snowflake-runtime/0.25.4/components-snowflake-runtime-0.25.4.jar
+- {Talend_Studio_path}/plugins/org.talend.components.snowflake.definition\_0.25.4.jar
