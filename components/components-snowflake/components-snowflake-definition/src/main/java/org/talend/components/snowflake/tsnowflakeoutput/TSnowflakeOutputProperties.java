@@ -31,6 +31,7 @@ import org.talend.components.common.tableaction.TableAction;
 import org.talend.components.snowflake.SnowflakeConnectionTableProperties;
 import org.talend.components.snowflake.SnowflakeDbTypeProperties;
 import org.talend.components.snowflake.SnowflakeTableProperties;
+import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.presentation.Form;
@@ -202,8 +203,9 @@ public class TSnowflakeOutputProperties extends SnowflakeConnectionTableProperti
             if (advForm != null) {
                 advForm.getWidget(dbtypeTable.getName()).setVisible(usePersonalDBType.getValue() && isCreateTableAction);
                 advForm.getWidget(usePersonalDBType.getName()).setVisible(isCreateTableAction);
-                advForm.getWidget(useDateMapping.getName()).setVisible(isCreateTableAction);
-                advForm.getWidget(dateMapping.getName()).setVisible(useDateMapping.getValue() && isCreateTableAction);
+                advForm.getWidget(useDateMapping.getName()).setVisible(isCreateTableAction && isDesignSchemaDynamic());
+                advForm.getWidget(dateMapping.getName()).setVisible(useDateMapping.getValue() && isCreateTableAction
+                        && isDesignSchemaDynamic());
 
                 boolean isUpsert = OutputAction.UPSERT.equals(outputAction.getValue());
                 form.getWidget(upsertKeyColumn.getName()).setHidden(!isUpsert);
@@ -212,6 +214,14 @@ public class TSnowflakeOutputProperties extends SnowflakeConnectionTableProperti
                 }
             }
         }
+    }
+
+    public Schema getDesignSchema() {
+        return table.main.schema.getValue();
+    }
+
+    public boolean isDesignSchemaDynamic() {
+        return AvroUtils.isIncludeAllFields(getDesignSchema());
     }
 
     protected List<String> getFieldNames(Property<?> schema) {
