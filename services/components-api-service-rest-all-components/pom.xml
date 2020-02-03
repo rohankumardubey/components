@@ -11,7 +11,7 @@
     </parent>
 
     <groupId>org.talend.components</groupId>
-    <version>0.27.3</version>
+    <version>0.27.3.1-SNAPSHOT</version>
 
     <artifactId>components-api-service-rest-all-components</artifactId>
 
@@ -43,7 +43,7 @@
             <groupId>org.talend.components</groupId>
             <artifactId>components-api-service-rest</artifactId>
             <type>jar</type>
-            <version>${project.version}</version>
+            <version>0.27.3</version>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
@@ -69,21 +69,21 @@
             <!-- only there for running test app in the IDE for now -->
             <groupId>org.talend.components</groupId>
             <artifactId>components-maven-repo</artifactId>
-            <version>${project.version}</version>
+            <version>0.27.3</version>
             <type>pom</type>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-maven-repo</artifactId>
-            <version>${project.version}</version>
+            <version>0.27.3</version>
             <type>zip</type>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-maven-repo</artifactId>
-            <version>${project.version}</version>
+            <version>0.27.3</version>
             <type>zip</type>
             <classifier>config</classifier>
             <scope>test</scope>
@@ -99,14 +99,14 @@
             <groupId>org.talend.components</groupId>
             <artifactId>components-api-service-rest</artifactId>
             <type>test-jar</type>
-            <version>${project.version}</version>
+            <version>0.27.3</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api</artifactId>
             <classifier>tests</classifier>
-            <version>${project.version}</version>
+            <version>0.27.3</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -151,7 +151,7 @@
             <dependency>
                 <groupId>org.talend.components</groupId>
                 <artifactId>components-bom</artifactId>
-                <version>${project.version}</version>
+                <version>0.27.3</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -244,7 +244,7 @@
                                 <artifactItem>
                                     <groupId>org.talend.components</groupId>
                                     <artifactId>components-api-service-rest</artifactId>
-                                    <version>${project.version}</version>
+                                    <version>0.27.3</version>
                                     <classifier>config</classifier>
                                     <type>zip</type>
                                     <outputDirectory>${project.build.directory}/external-resources</outputDirectory>
