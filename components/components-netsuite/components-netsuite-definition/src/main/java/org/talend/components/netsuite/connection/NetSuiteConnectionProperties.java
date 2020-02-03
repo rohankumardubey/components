@@ -307,8 +307,6 @@ public class NetSuiteConnectionProperties extends ComponentPropertiesImpl
             }
         }
         // Initialize possible values for apiVersion property.
-        if (apiVersion.getPossibleValues().isEmpty()) {
-            apiVersion.setPossibleValues(API_VERSIONS);
-        }
+        apiVersion.setPossibleValues(API_VERSIONS);
     }
 }
