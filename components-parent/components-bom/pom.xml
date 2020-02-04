@@ -11,8 +11,10 @@
     <properties>
         <components.version>0.27.3</components.version>
         <daikon.version>0.31.7</daikon.version>
-        <!-- -->
+        <!-- repositories -->
         <talend_snapshots_deployment>https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceSnapshot/</talend_snapshots_deployment>
+        <talend.snapshots.repo>https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceSnapshot/</talend.snapshots.repo>
+        <talend.releases.repo>https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceRelease/</talend.releases.repo>
         <!-- -->
         <activemq.version>5.14.3</activemq.version>
         <aggdesigner-algorithm.version>6.0</aggdesigner-algorithm.version>
@@ -191,11 +193,11 @@
     <distributionManagement>
         <snapshotRepository>
             <id>talend_nexus_deployment</id>
-            <url>${talend_snapshots_deployment}</url>
+            <url>${talend.snapshots.repo}</url>
         </snapshotRepository>
         <repository>
             <id>talend_nexus_deployment</id>
-            <url>https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceRelease/</url>
+            <url>${talend.releases.repo}</url>
         </repository>
     </distributionManagement>
 
