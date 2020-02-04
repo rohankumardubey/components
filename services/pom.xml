@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.talend.components</groupId>
-    <version>0.27.3.1</version>
+    <version>0.27.3.2-SNAPSHOT</version>
     <artifactId>components-api-service-aggregator</artifactId>
     <packaging>pom</packaging>
 
@@ -12,8 +12,8 @@
     <modules>
         <!-- module>components-api-service-common</module -->
         <!-- module>components-api-service-osgi</module-->
-        <module>components-api-service-rest</module>
-        <module>components-api-service-rest-all-components</module>
+<!--        <module>components-api-service-rest</module>-->
+<!--        <module>components-api-service-rest-all-components</module>-->
         <!-- module>components-api-service-spi</module-->
         <!-- module>components-api-service-spi-test</module-->
         <!-- module>components-maven-repo</module-->

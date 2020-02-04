@@ -11,7 +11,7 @@
     </parent>
 
     <groupId>org.talend.components</groupId>
-    <version>0.27.3.1</version>
+    <version>0.27.3.2-SNAPSHOT</version>
 
     <artifactId>components-api-service-rest-all-components</artifactId>
 
@@ -43,7 +43,7 @@
             <groupId>org.talend.components</groupId>
             <artifactId>components-api-service-rest</artifactId>
             <type>jar</type>
-            <version>0.27.3.1</version>
+            <version>0.27.3.2-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
@@ -99,7 +99,7 @@
             <groupId>org.talend.components</groupId>
             <artifactId>components-api-service-rest</artifactId>
             <type>test-jar</type>
-            <version>0.27.3.1</version>
+            <version>0.27.3.2-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -244,7 +244,7 @@
                                 <artifactItem>
                                     <groupId>org.talend.components</groupId>
                                     <artifactId>components-api-service-rest</artifactId>
-                                    <version>0.27.3.1</version>
+                                    <version>0.27.3.2-SNAPSHOT</version>
                                     <classifier>config</classifier>
                                     <type>zip</type>
                                     <outputDirectory>${project.build.directory}/external-resources</outputDirectory>

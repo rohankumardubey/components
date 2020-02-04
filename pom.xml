@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.talend.components</groupId>
-    <version>0.27.3.1</version>
+    <version>0.27.3.2-SNAPSHOT</version>
     <artifactId>components</artifactId>
     <packaging>pom</packaging>
 
@@ -27,11 +27,11 @@
 	
     <name>Component Aggregator</name>
     <modules>
-        <module>components-parent</module>
+<!--        <module>components-parent</module>-->
         <!-- module>core</module -->
         <!-- module>examples</module -->
         <!-- module>components</module -->
-        <module>services</module>
+<!--        <module>services</module>-->
     </modules>
     <build>
         <plugins>
