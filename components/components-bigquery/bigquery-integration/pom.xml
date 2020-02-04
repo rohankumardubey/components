@@ -23,7 +23,7 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>bigquery-definition</artifactId>
-			<version>${project.version}</version>
+			<version>${components.version}</version>
         </dependency>
 
         <!-- Tests -->
@@ -36,7 +36,7 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>bigquery-runtime</artifactId>
-            <version>${project.version}</version>
+            <version>${components.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

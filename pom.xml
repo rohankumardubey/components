@@ -7,11 +7,28 @@
     <artifactId>components</artifactId>
     <packaging>pom</packaging>
 
+    <properties>
+        <!-- repositories -->
+        <talend.snapshots.repo>https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceSnapshot/</talend.snapshots.repo>
+        <talend.releases.repo>https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceRelease/</talend.releases.repo>
+    </properties>
+
 	<scm>
-		<connection>scm:git:https://github.com/Talend/components.git</connection>
-	  <tag>HEAD</tag>
-  </scm>
-	
+	    <connection>scm:git:https://github.com/Talend/components.git</connection>
+	    <tag>HEAD</tag>
+    </scm>
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>talend_nexus_deployment</id>
+            <url>${talend.snapshots.repo}</url>
+        </snapshotRepository>
+        <repository>
+            <id>talend_nexus_deployment</id>
+            <url>${talend.releases.repo}</url>
+        </repository>
+    </distributionManagement>
+
     <name>Component Aggregator</name>
     <modules>
         <module>components-parent</module>
