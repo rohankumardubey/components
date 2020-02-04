@@ -47,17 +47,17 @@
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-jira</artifactId>
-			<version>${project.version}</version>
+			<version>${components.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>localio-runtime</artifactId>
-			<version>${project.version}</version>
+			<version>${components.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>s3-runtime-di</artifactId>
-			<version>${project.version}</version>
+			<version>${components.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
@@ -67,17 +67,17 @@
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-jdbc-runtime</artifactId>
-			<version>${project.version}</version>
+			<version>${components.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-jdbc-runtime-beam</artifactId>
-			<version>${project.version}</version>
+			<version>${components.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>components-salesforce-runtime</artifactId>
-			<version>${project.version}</version>
+			<version>${components.version}</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.eclipse.jetty</groupId>
@@ -88,27 +88,27 @@
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>kafka-runtime</artifactId>
-			<version>${project.version}</version>
+			<version>${components.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>elasticsearch-runtime_2_4</artifactId>
-			<version>${project.version}</version>
+			<version>${components.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>simplefileio-runtime</artifactId>
-			<version>${project.version}</version>
+			<version>${components.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>processing-runtime</artifactId>
-			<version>${project.version}</version>
+			<version>${components.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>bigquery-runtime</artifactId>
-			<version>${project.version}</version>
+			<version>${components.version}</version>
 			<exclusions>
 				<exclusion>
 					<groupId>javax.servlet</groupId>
@@ -119,12 +119,12 @@
 		<dependency>
 			<groupId>org.talend.components</groupId>
 			<artifactId>pubsub-runtime</artifactId>
-			<version>${project.version}</version>
+			<version>${components.version}</version>
 		</dependency>
 		<dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>kinesis-runtime</artifactId>
-            <version>${project.version}</version>
+            <version>${components.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.derby</groupId>
@@ -132,7 +132,7 @@
             <version>10.12.1.1</version>
         </dependency>
 	</dependencies>
-
+	
 	<dependencyManagement>
 		<dependencies>
 			<!-- Lock guava to the Beam dependency -->
@@ -145,10 +145,6 @@
 	</dependencyManagement>
 
 	<repositories>
-		<repository>
-			<id>talend-update</id>
-			<url>https://talend-update.talend.com/nexus/content/repositories/libraries/</url>
-		</repository>
 		<repository>
 			<id>apache.snapshots</id>
 			<name>Apache Development Snapshot Repository</name>
@@ -222,20 +218,20 @@
 						<configuration>
 							<extraArtifacts>
 								<!-- Components runtime -->
-								<extraArtifact>org.talend.components:components-salesforce-runtime:${project.version}:jar</extraArtifact>
-								<extraArtifact>org.talend.components:components-jira:${project.version}:jar</extraArtifact>
+								<extraArtifact>org.talend.components:components-salesforce-runtime:${components.version}:jar</extraArtifact>
+								<extraArtifact>org.talend.components:components-jira:${components.version}:jar</extraArtifact>
 								<extraArtifact>org.talend.components:jms-runtime_1_1:${project.version}:jar</extraArtifact>
-								<extraArtifact>org.talend.components:localio-runtime:${project.version}:jar</extraArtifact>
-								<extraArtifact>org.talend.components:kafka-runtime:${project.version}:jar</extraArtifact>
-								<extraArtifact>org.talend.components:elasticsearch-runtime_2_4:${project.version}:jar</extraArtifact>
-								<extraArtifact>org.talend.components:simplefileio-runtime:${project.version}:jar</extraArtifact>
-								<extraArtifact>org.talend.components:s3-runtime-di:${project.version}:jar</extraArtifact>
-								<extraArtifact>org.talend.components:components-jdbc-runtime:${project.version}:jar</extraArtifact>
-								<extraArtifact>org.talend.components:components-jdbc-runtime-beam:${project.version}:jar</extraArtifact>
-								<extraArtifact>org.talend.components:processing-runtime:${project.version}:jar</extraArtifact>
-								<extraArtifact>org.talend.components:bigquery-runtime:${project.version}:jar</extraArtifact>
-								<extraArtifact>org.talend.components:pubsub-runtime:${project.version}:jar</extraArtifact>
-                                <extraArtifact>org.talend.components:kinesis-runtime:${project.version}:jar
+								<extraArtifact>org.talend.components:localio-runtime:${components.version}:jar</extraArtifact>
+								<extraArtifact>org.talend.components:kafka-runtime:${components.version}:jar</extraArtifact>
+								<extraArtifact>org.talend.components:elasticsearch-runtime_2_4:${components.version}:jar</extraArtifact>
+								<extraArtifact>org.talend.components:simplefileio-runtime:${components.version}:jar</extraArtifact>
+								<extraArtifact>org.talend.components:s3-runtime-di:${components.version}:jar</extraArtifact>
+								<extraArtifact>org.talend.components:components-jdbc-runtime:${components.version}:jar</extraArtifact>
+								<extraArtifact>org.talend.components:components-jdbc-runtime-beam:${components.version}:jar</extraArtifact>
+								<extraArtifact>org.talend.components:processing-runtime:${components.version}:jar</extraArtifact>
+								<extraArtifact>org.talend.components:bigquery-runtime:${components.version}:jar</extraArtifact>
+								<extraArtifact>org.talend.components:pubsub-runtime:${components.version}:jar</extraArtifact>
+                                <extraArtifact>org.talend.components:kinesis-runtime:${components.version}:jar
                                 </extraArtifact>
 								<!-- JDBC drivers -->
 								<extraArtifact>org.apache.derby:derbyclient:${derby.driver.version}:jar</extraArtifact>
@@ -305,25 +301,25 @@
 								<artifact>
 									<groupId>org.talend.components</groupId>
 									<artifactId>components-jdbc-definition</artifactId>
-									<version>${project.version}</version>
+									<version>${components.version}</version>
 								</artifact>
 
 								<artifact>
 									<groupId>org.talend.components</groupId>
 									<artifactId>simplefileio-definition</artifactId>
-									<version>${project.version}</version>
+									<version>${components.version}</version>
 								</artifact>
 
 								<artifact>
 									<groupId>org.talend.components</groupId>
 									<artifactId>components-salesforce-definition</artifactId>
-									<version>${project.version}</version>
+									<version>${components.version}</version>
 								</artifact>
 
 								<artifact>
 									<groupId>org.talend.components</groupId>
 									<artifactId>localio-definition</artifactId>
-									<version>${project.version}</version>
+									<version>${components.version}</version>
 								</artifact>
 								<artifact>
 									<groupId>org.talend.components</groupId>
@@ -333,37 +329,37 @@
 								<artifact>
 									<groupId>org.talend.components</groupId>
 									<artifactId>kafka-definition</artifactId>
-									<version>${project.version}</version>
+									<version>${components.version}</version>
 								</artifact>
 								<artifact>
 									<groupId>org.talend.components</groupId>
 									<artifactId>elasticsearch-definition</artifactId>
-									<version>${project.version}</version>
+									<version>${components.version}</version>
 								</artifact>
 								<artifact>
 									<groupId>org.talend.components</groupId>
 									<artifactId>components-jira</artifactId>
-									<version>${project.version}</version>
+									<version>${components.version}</version>
 								</artifact>
 								<artifact>
 									<groupId>org.talend.components</groupId>
 									<artifactId>processing-definition</artifactId>
-									<version>${project.version}</version>
+									<version>${components.version}</version>
 								</artifact>
 								<artifact>
 									<groupId>org.talend.components</groupId>
 									<artifactId>bigquery-definition</artifactId>
-									<version>${project.version}</version>
+									<version>${components.version}</version>
 								</artifact>
 								<artifact>
 									<groupId>org.talend.components</groupId>
 									<artifactId>pubsub-definition</artifactId>
-									<version>${project.version}</version>
+									<version>${components.version}</version>
 								</artifact>
                                 <artifact>
                                     <groupId>org.talend.components</groupId>
                                     <artifactId>kinesis-definition</artifactId>
-                                    <version>${project.version}</version>
+                                    <version>${components.version}</version>
                                 </artifact>
 							</artifacts>
 						</configuration>

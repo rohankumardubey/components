@@ -23,7 +23,7 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-jdbc-definition</artifactId>
-            <version>${project.version}</version>
+            <version>${components.version}</version>
 			<scope>test</scope>
         </dependency>
 
@@ -31,7 +31,7 @@
 		<dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-jdbc-runtime</artifactId>
-            <version>${project.version}</version>
+            <version>${components.version}</version>
 			<scope>test</scope>
         </dependency>
 		
@@ -39,7 +39,7 @@
 		<dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-jdbc-runtime</artifactId>
-            <version>${project.version}</version>
+            <version>${components.version}</version>
 			<classifier>tests</classifier>
 			<scope>test</scope>
         </dependency>
