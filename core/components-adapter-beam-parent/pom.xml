@@ -19,6 +19,7 @@
         <beam.version>2.9.0</beam.version>
         <spark.version>2.4.0</spark.version>
         <hadoop.version>2.7.3</hadoop.version>
+        <hadoop-talend.version>2.7.3</hadoop-talend.version>
     </properties>
 
     <!-- Necessary if you want to compile with a SNAPSHOT of beam. -->
