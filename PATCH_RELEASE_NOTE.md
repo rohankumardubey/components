@@ -26,6 +26,7 @@ This is the second patch of Netsuite components for 7.2.1 and it contains the fo
 
 - TPS-3785 [7.2.1] Get error when retrieve custom record types in tNetsuiteInput/tNetsuiteOutput (TDI-43682)
 - TPS-3575 [7.2.1] Unable to retrieve schema for NetsuiteInput/Output (TDI-42556)
+- TDI-43633 NetSuite - migration issue - can't see latest added API versions after importing old job
 
 ## Prerequisites <!-- mandatory -->
 
