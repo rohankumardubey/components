@@ -9,8 +9,8 @@ product:
 
 | Info             | Value |
 | ---------------- | ---------------- |
-| Patch Name       | Patch\_20200310\_TPS-3785\_v2-7.2.1 |
-| Release Date     | 2020-03-10 |
+| Patch Name       | Patch\_20200311\_TPS-3785\_v1-7.2.1 |
+| Release Date     | 2020-03-11 |
 | Target Version   | 20190620\_1446-V7.2.1 |
 | Product affected | Talend Studio |
 
@@ -26,6 +26,7 @@ This is the second patch of Netsuite components for 7.2.1 and it contains the fo
 
 - TPS-3785 [7.2.1] Get error when retrieve custom record types in tNetsuiteInput/tNetsuiteOutput (TDI-43682)
 - TPS-3575 [7.2.1] Unable to retrieve schema for NetsuiteInput/Output (TDI-42556)
+- TDI-43633 NetSuite - migration issue - can't see latest added API versions after importing old job
 
 ## Prerequisites <!-- mandatory -->
 
