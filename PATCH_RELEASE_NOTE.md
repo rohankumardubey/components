@@ -9,8 +9,8 @@ product:
 
 | Info             | Value |
 | ---------------- | ---------------- |
-| Patch Name       | Patch\_20200312\_TPS-3807\_v2-7.1.1 |
-| Release Date     | 2020-03-12 |
+| Patch Name       | Patch\_20200316\_TPS-3807\_v1-7.1.1 |
+| Release Date     | 2020-03-16 |
 | Target Version   | 20181026\_1147-V7.1.1 |
 | Product affected | Talend Studio |
 
@@ -33,6 +33,7 @@ This patch for 7.1.1 contains the following fixes:
 - TPS-3783 [7.1.1] dynamic schema issue in tsnowflakeoutput Component (TDI-43629)
 - TPS-3807 [7.1.1] Problem with retrieving Snowflake tables from Studio (TDI-43612)
 - TDI-41407 Can't create temp table if action on table used in tSnowflakeoutputBulkExec + dyn schema
+- TDI-41534 tSnowflake Case Sensitive doesn't work on 7.2.1
 
 ## Prerequisites <!-- mandatory -->
 
