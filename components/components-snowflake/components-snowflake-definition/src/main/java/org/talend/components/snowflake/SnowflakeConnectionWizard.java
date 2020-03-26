@@ -28,8 +28,9 @@ public class SnowflakeConnectionWizard extends ComponentWizard {
 
     SnowflakeConnectionWizard(ComponentWizardDefinition def, String repositoryLocation) {
         super(def, repositoryLocation);
+        System.out.println("#########SnowflakeConnectionWizard called");
 
-        cProps = new SnowflakeConnectionProperties("connection");
+        cProps = new SnowflakeConnectionProperties("connection").setRepositoryLocation(getRepositoryLocation());
         cProps.init();
         addForm(cProps.getForm(SnowflakeConnectionProperties.FORM_WIZARD));
 

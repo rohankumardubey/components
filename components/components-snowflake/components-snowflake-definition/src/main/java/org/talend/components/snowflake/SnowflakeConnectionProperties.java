@@ -30,6 +30,7 @@ import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.util.Properties;
 
+import org.apache.avro.Schema;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +39,7 @@ import org.talend.components.api.properties.ComponentReferenceProperties;
 import org.talend.components.common.UserPasswordProperties;
 import org.talend.components.snowflake.tsnowflakeconnection.AuthenticationType;
 import org.talend.components.snowflake.tsnowflakeconnection.TSnowflakeConnectionDefinition;
+import org.talend.daikon.NamedThing;
 import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
 import org.talend.daikon.properties.PresentationItem;
@@ -46,6 +48,7 @@ import org.talend.daikon.properties.ValidationResultMutable;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
+import org.talend.daikon.properties.service.Repository;
 import org.talend.daikon.sandbox.SandboxedInstance;
 import org.talend.daikon.serialize.PostDeserializeSetup;
 import org.talend.daikon.serialize.migration.SerializeSetVersion;
@@ -390,8 +393,24 @@ implements SnowflakeProvideConnectionProperties, SerializeSetVersion {
         }
     }
 
+    String repositoryLocation;
+
+    public SnowflakeConnectionProperties setRepositoryLocation(String location) {
+        System.out.println("#########setRepositoryLocation");
+        System.out.println("#########location: "+location);
+        repositoryLocation = location;
+        return this;
+    }
+
+    public ValidationResult afterFormFinishMain(Repository<org.talend.daikon.properties.Properties> repo) throws Exception {
+        System.out.println("#########afterFormFinishMain");
+        repo.storeProperties(this, this.name.getValue(), repositoryLocation, null);
+        return ValidationResult.OK;
+    }
+
     @Override
     public boolean postDeserialize(int version, PostDeserializeSetup setup, boolean persistent) {
+        System.out.println("#########postDeserialize");
         boolean migrated = super.postDeserialize(version, setup, persistent);
         if (version < SPECIFY_LOGIN_TIMEOUT_VERSION_NUMBER && loginTimeout.getValue() == null) {
             loginTimeout.setValue(DEFAULT_LOGIN_TIMEOUT);
