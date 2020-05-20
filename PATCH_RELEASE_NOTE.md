@@ -15,8 +15,7 @@ product:
 | Product affected | Talend Studio |
 
 ## Introduction
-This is a self-contained patch.
-
+This patch is cumulative. It includes all previous generally available patches of Salesforce for Talend Studio 7.2.1.
 
 **NOTE**: For information on how to obtain this patch, reach out to your Support contact at Talend.
 
