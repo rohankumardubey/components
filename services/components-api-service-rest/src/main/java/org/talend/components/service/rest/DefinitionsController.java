@@ -17,21 +17,22 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
 import java.util.List;
 
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Controller;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.talend.components.api.component.runtime.ExecutionEngine;
 import org.talend.components.service.rest.dto.ConnectorTypology;
 import org.talend.components.service.rest.dto.DefinitionDTO;
-import org.talend.daikon.annotation.ApiVersion;
-import org.talend.daikon.annotation.Service;
 
 /**
  * Definition controller..
  */
-@Service(name = "DefinitionsController")
-@RequestMapping("definitions")
-@ApiVersion(ServiceConstants.V0)
+//@Component("DefinitionsController")
+@Controller
+@RequestMapping(ServiceConstants.V0 + "/definitions")
 public interface DefinitionsController {
 
     /**

@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RestController;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.runtime.ExecutionEngine;
 import org.talend.components.api.component.runtime.Sink;
@@ -47,7 +48,6 @@ import org.talend.components.service.rest.RuntimesController;
 import org.talend.components.service.rest.dto.SerPropertiesDto;
 import org.talend.components.service.rest.dto.UiSpecsPropertiesDto;
 import org.talend.components.service.rest.dto.ValidationResultsDto;
-import org.talend.daikon.annotation.ServiceImplementation;
 import org.talend.daikon.exception.TalendRuntimeException;
 import org.talend.daikon.exception.error.CommonErrorCodes;
 import org.talend.daikon.properties.Properties;
@@ -57,7 +57,7 @@ import org.talend.daikon.sandbox.SandboxedInstance;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-@ServiceImplementation
+@RestController
 @SuppressWarnings("unchecked")
 public class RuntimeControllerImpl implements RuntimesController {
 

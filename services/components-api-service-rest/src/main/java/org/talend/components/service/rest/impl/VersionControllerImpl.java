@@ -18,11 +18,11 @@ import static org.slf4j.LoggerFactory.getLogger;
 import java.io.IOException;
 
 import org.slf4j.Logger;
+import org.springframework.web.bind.annotation.RestController;
 import org.talend.components.service.rest.VersionController;
 import org.talend.components.service.rest.dto.VersionDto;
-import org.talend.daikon.annotation.ServiceImplementation;
 
-@ServiceImplementation
+@RestController
 public class VersionControllerImpl implements VersionController {
 
     /** A properties file generated at build time using the Maven git-commit-id-plugin. */

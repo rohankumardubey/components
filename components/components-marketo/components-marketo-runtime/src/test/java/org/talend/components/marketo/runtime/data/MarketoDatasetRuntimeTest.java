@@ -26,7 +26,7 @@ import java.util.ArrayList;
 
 import org.apache.avro.generic.GenericData.Record;
 import org.apache.avro.generic.IndexedRecord;
-import org.apache.commons.lang.RandomStringUtils;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;

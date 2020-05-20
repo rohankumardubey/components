@@ -30,9 +30,9 @@ import javax.inject.Inject;
 
 import org.junit.Before;
 import org.junit.runner.RunWith;
-import org.springframework.boot.context.embedded.LocalServerPort;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.talend.components.common.dataset.DatasetDefinition;
@@ -62,6 +62,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 @SpringBootTest(classes = Application.class, webEnvironment = RANDOM_PORT)
 @TestPropertySource(properties = { "server.contextPath=" })
 public abstract class AbstractSpringIntegrationTests {
+
     static {
         if (System.getProperty("sun.boot.class.path") == null) {
             System.setProperty("sun.boot.class.path", System.getProperty("java.class.path"));

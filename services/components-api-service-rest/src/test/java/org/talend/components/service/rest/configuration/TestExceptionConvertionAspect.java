@@ -8,13 +8,13 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 import org.talend.components.service.rest.AbstractSpringIntegrationTests;
-import org.talend.daikon.annotation.ServiceImplementation;
 import org.talend.daikon.exception.error.CommonErrorCodes;
 
 public class TestExceptionConvertionAspect extends AbstractSpringIntegrationTests {
 
-    @ServiceImplementation
+    @RestController
     public static class RestProcessingExceptionThrowingController implements RestProcessingExceptionThrowingControllerI {
 
         @Override

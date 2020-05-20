@@ -4,9 +4,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.talend.daikon</groupId>
-        <artifactId>service-parent</artifactId>
-        <version>0.31.11</version>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.1.13.RELEASE</version>
         <relativePath />
     </parent>
 
@@ -26,7 +26,7 @@
         <spring.releases.repo>https://repo.spring.io/libs-release/</spring.releases.repo>
 
         <components.version>0.29.0-SNAPSHOT</components.version>
-        <daikon.version>0.31.11</daikon.version>
+        <daikon.version>2.0.5-SNAPSHOT</daikon.version>
         <!-- Used for Docker images name -->
         <git_branch>local</git_branch>
         <talend_docker_registry>registry.datapwn.com</talend_docker_registry>
@@ -56,6 +56,12 @@
     </organization>
 
     <dependencies>
+        <!-- This brings mimetypes -->
+        <dependency>
+            <groupId>io.reactivex</groupId>
+            <artifactId>rxnetty</artifactId>
+            <version>0.5.1</version>
+        </dependency>
         <dependency>
             <groupId>javax.activation</groupId>
             <artifactId>activation</artifactId>
@@ -73,6 +79,10 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-jetty</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-aop</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -338,18 +348,6 @@
                 <version>2.2.4</version>
             </plugin>
 
-            <plugin>
-                <!-- prevent spring plugin to create a big startable jar -->
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <configuration>
-                            <skip>true</skip>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
             <plugin>
                 <!-- generate the maven repo for the service app -->
                 <artifactId>maven-invoker-plugin</artifactId>
@@ -643,4 +641,10 @@
             </snapshots>
         </repository>
     </repositories>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>releases</id>
+            <url>${talend.releases.repo}</url>
+        </pluginRepository>
+    </pluginRepositories>
 </project>

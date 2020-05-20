@@ -25,7 +25,7 @@ import java.util.Map;
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
 import org.apache.avro.generic.IndexedRecord;
-import org.apache.commons.lang.RandomStringUtils;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Test;
 import org.talend.components.azurestorage.table.avro.AzureStorageDTEConverters.DTEConverter;
 import org.talend.components.azurestorage.table.runtime.it.AzureStorageTableBaseTestIT;

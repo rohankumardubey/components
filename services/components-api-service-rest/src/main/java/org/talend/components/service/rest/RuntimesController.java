@@ -22,18 +22,16 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.talend.components.service.rest.dto.SerPropertiesDto;
 import org.talend.components.service.rest.dto.UiSpecsPropertiesDto;
 import org.talend.components.service.rest.dto.ValidationResultsDto;
-import org.talend.daikon.annotation.ApiVersion;
-import org.talend.daikon.annotation.Service;
 
-@Service(name = "RuntimesController")
-@RequestMapping("runtimes")
-@ApiVersion(ServiceConstants.V0)
+@Component("RuntimesController")
+@RequestMapping(ServiceConstants.V0 + "/runtimes")
 public interface RuntimesController {
 
     /**

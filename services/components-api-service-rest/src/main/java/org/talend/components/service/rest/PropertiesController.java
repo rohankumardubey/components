@@ -23,6 +23,7 @@ import java.util.List;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,15 +32,12 @@ import org.talend.components.service.rest.dto.ConnectorDto;
 import org.talend.components.service.rest.dto.SerPropertiesDto;
 import org.talend.components.service.rest.dto.UiSpecsPropertiesDto;
 import org.talend.components.service.rest.dto.ValidationResultsDto;
-import org.talend.daikon.annotation.ApiVersion;
-import org.talend.daikon.annotation.Service;
 import org.talend.daikon.definition.DefinitionImageType;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.serialize.jsonschema.PropertyTrigger;
 
-@Service(name = "PropertiesController")
-@RequestMapping("properties")
-@ApiVersion(ServiceConstants.V0)
+@Component("PropertiesController")
+@RequestMapping(ServiceConstants.V0 + "/properties")
 public interface PropertiesController {
 
     /**

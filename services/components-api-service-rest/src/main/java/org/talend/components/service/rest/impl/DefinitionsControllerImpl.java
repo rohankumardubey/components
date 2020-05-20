@@ -23,6 +23,7 @@ import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RestController;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.runtime.ExecutionEngine;
 import org.talend.components.common.datastore.DatastoreDefinition;
@@ -30,7 +31,6 @@ import org.talend.components.service.rest.DefinitionType;
 import org.talend.components.service.rest.DefinitionsController;
 import org.talend.components.service.rest.dto.ConnectorTypology;
 import org.talend.components.service.rest.dto.DefinitionDTO;
-import org.talend.daikon.annotation.ServiceImplementation;
 import org.talend.daikon.definition.Definition;
 import org.talend.daikon.definition.service.DefinitionRegistryService;
 import org.talend.daikon.i18n.tag.HasTags;
@@ -40,7 +40,7 @@ import org.talend.daikon.i18n.tag.TagUtils;
 /**
  * Definition controller..
  */
-@ServiceImplementation
+@RestController
 public class DefinitionsControllerImpl implements DefinitionsController {
 
     /** This class' logger. */

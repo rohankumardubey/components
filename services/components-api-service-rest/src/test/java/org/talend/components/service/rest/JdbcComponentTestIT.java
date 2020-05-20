@@ -46,8 +46,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.context.embedded.LocalServerPort;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
@@ -69,6 +69,7 @@ import com.fasterxml.jackson.databind.type.TypeFactory;
 @SpringBootTest(classes = Application.class, webEnvironment = RANDOM_PORT)
 @TestPropertySource(properties = { "server.contextPath=" })
 public class JdbcComponentTestIT {
+
     static {
         if (System.getProperty("sun.boot.class.path") == null) {
             System.setProperty("sun.boot.class.path", System.getProperty("java.class.path"));

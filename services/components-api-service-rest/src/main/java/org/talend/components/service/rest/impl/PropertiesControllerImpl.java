@@ -30,6 +30,7 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RestController;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.service.ComponentService;
 import org.talend.components.common.dataset.DatasetProperties;
@@ -41,7 +42,6 @@ import org.talend.components.service.rest.dto.SerPropertiesDto;
 import org.talend.components.service.rest.dto.UiSpecsPropertiesDto;
 import org.talend.components.service.rest.dto.ValidationResultsDto;
 import org.talend.components.service.rest.serialization.JsonSerializationHelper;
-import org.talend.daikon.annotation.ServiceImplementation;
 import org.talend.daikon.definition.Definition;
 import org.talend.daikon.definition.DefinitionImageType;
 import org.talend.daikon.definition.service.DefinitionRegistryService;
@@ -51,7 +51,7 @@ import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.serialize.jsonschema.PropertyTrigger;
 
-@ServiceImplementation
+@RestController
 public class PropertiesControllerImpl implements PropertiesController {
 
     private static final Logger log = getLogger(PropertiesControllerImpl.class);

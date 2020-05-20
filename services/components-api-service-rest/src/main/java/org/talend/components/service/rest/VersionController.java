@@ -15,18 +15,17 @@ package org.talend.components.service.rest;
 
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
+import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.talend.components.service.rest.dto.VersionDto;
-import org.talend.daikon.annotation.ApiVersion;
-import org.talend.daikon.annotation.Service;
 
 /**
  * Definition controller..
  */
-@Service(name = "VersionController")
-@RequestMapping("version")
-@ApiVersion(ServiceConstants.V0)
+@Component("VersionController")
+@RequestMapping(ServiceConstants.V0 + "/version")
+// @ApiVersion(ServiceConstants.V0)
 public interface VersionController {
 
     /**
