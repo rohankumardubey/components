@@ -12,8 +12,10 @@
 // ============================================================================
 package org.talend.components.snowflake.runtime;
 
+import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Set;
 
 import org.apache.avro.LogicalTypes;
 import org.apache.avro.Schema;
@@ -142,4 +144,15 @@ public class SnowflakeAvroRegistry extends JDBCAvroRegistry {
             }
         };
     }
+
+    private  String removeEscapes(String value) {
+        return value.replace("\\_", "_");
+    }
+
+    @Override
+    protected Set<String> getPrimaryKeys(DatabaseMetaData databaseMetdata, String catalogName, String schemaName, String tableName)
+            throws SQLException {
+        return super.getPrimaryKeys(databaseMetdata, catalogName, removeEscapes(schemaName), removeEscapes(tableName));
+    }
+
 }
