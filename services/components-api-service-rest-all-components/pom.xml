@@ -28,7 +28,7 @@
         <talend.releases.repo>https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceRelease/</talend.releases.repo>
         <spring.releases.repo>https://repo.spring.io/libs-release/</spring.releases.repo>
         <!-- Dependency versions -->
-        <components.version>0.24-SNAPSHOT</components.version>
+        <components.version>0.23.5-SNAPSHOT</components.version>
         <daikon.version>0.27.0</daikon.version>
         <!-- Used for Docker images name -->
         <git_branch>local</git_branch>
