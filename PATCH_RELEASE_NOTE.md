@@ -5,12 +5,12 @@ product:
 - https://talend.poolparty.biz/coretaxonomy/23
 ---
 
-# TPS-3873
+# TPS-4131
 
 | Info             | Value |
 | ---------------- | ---------------- |
-| Patch Name       | Patch\_20200618_TPS-3873\_v1-7.0.1 |
-| Release Date     | 2020-06-18 |
+| Patch Name       | Patch\_20200623_TPS-4131\_v1-7.0.1 |
+| Release Date     | 2020-06-23 |
 | Target Version   | 20180411\_1414-V7.0.1 |
 | Product affected | Talend Studio |
 
