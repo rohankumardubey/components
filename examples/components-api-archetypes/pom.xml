@@ -61,6 +61,6 @@
 	</build>
     <modules>
         <module>input-component-archetype</module>
-        <module>poc-bd-archetype</module>
+        <!-- <module>poc-bd-archetype</module> -->
     </modules>
 </project>
