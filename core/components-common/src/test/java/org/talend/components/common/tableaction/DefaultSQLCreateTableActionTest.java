@@ -42,7 +42,6 @@ public class DefaultSQLCreateTableActionTest {
                 .type(Schema.createUnion(AvroUtils._logicalDate(), Schema.create(Schema.Type.NULL)))
                 .noDefault()
                 .name("salary")
-                .prop(SchemaConstants.TALEND_COLUMN_DB_TYPE, "MY_DOUBLE")
                 .prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "38")
                 .prop(SchemaConstants.TALEND_COLUMN_PRECISION, "4")
                 .type(Schema.createUnion(AvroUtils._double(), Schema.create(Schema.Type.NULL)))
@@ -64,7 +63,7 @@ public class DefaultSQLCreateTableActionTest {
             List<String> queries = action.getQueries();
             assertEquals(1, queries.size());
             assertEquals(
-                    "CREATE TABLE MyTable (id INTEGER, name VARCHAR(255) DEFAULT \"ok\", date DATE, salary MY_DOUBLE(38, 4), updated TIMESTAMP, CONSTRAINT pk_MyTable PRIMARY KEY (id, name))",
+                    "CREATE TABLE MyTable (id INTEGER, name VARCHAR(255) DEFAULT \"ok\", date DATE, salary NUMERIC(38, 4), updated TIMESTAMP, CONSTRAINT pk_MyTable PRIMARY KEY (id, name))",
                     queries.get(0));
         } catch (Exception e) {
             e.printStackTrace();
@@ -82,7 +81,7 @@ public class DefaultSQLCreateTableActionTest {
             List<String> queries = action.getQueries();
             assertEquals(1, queries.size());
             assertEquals(
-                    "CREATE TABLE IF NOT EXISTS MyTable (id INTEGER, name VARCHAR(255) DEFAULT \"ok\", date DATE, salary MY_DOUBLE(38, 4), updated TIMESTAMP, CONSTRAINT pk_MyTable PRIMARY KEY (id, name))",
+                    "CREATE TABLE IF NOT EXISTS MyTable (id INTEGER, name VARCHAR(255) DEFAULT \"ok\", date DATE, salary NUMERIC(38, 4), updated TIMESTAMP, CONSTRAINT pk_MyTable PRIMARY KEY (id, name))",
                     queries.get(0));
         } catch (Exception e) {
             e.printStackTrace();
@@ -103,7 +102,7 @@ public class DefaultSQLCreateTableActionTest {
             assertEquals(2, queries.size());
             assertEquals("DROP TABLE MyTable CASCADE", queries.get(0));
             assertEquals(
-                    "CREATE TABLE MyTable (id INTEGER, name VARCHAR(255) DEFAULT \"ok\", date DATE, salary MY_DOUBLE(38, 4), updated TIMESTAMP, CONSTRAINT pk_MyTable PRIMARY KEY (id, name))",
+                    "CREATE TABLE MyTable (id INTEGER, name VARCHAR(255) DEFAULT \"ok\", date DATE, salary NUMERIC(38, 4), updated TIMESTAMP, CONSTRAINT pk_MyTable PRIMARY KEY (id, name))",
                     queries.get(1));
         } catch (Exception e) {
             e.printStackTrace();
@@ -124,7 +123,7 @@ public class DefaultSQLCreateTableActionTest {
             assertEquals(2, queries.size());
             assertEquals("DROP TABLE IF EXISTS MyTable CASCADE", queries.get(0));
             assertEquals(
-                    "CREATE TABLE MyTable (id INTEGER, name VARCHAR(255) DEFAULT \"ok\", date DATE, salary MY_DOUBLE(38, 4), updated TIMESTAMP, CONSTRAINT pk_MyTable PRIMARY KEY (id, name))",
+                    "CREATE TABLE MyTable (id INTEGER, name VARCHAR(255) DEFAULT \"ok\", date DATE, salary NUMERIC(38, 4), updated TIMESTAMP, CONSTRAINT pk_MyTable PRIMARY KEY (id, name))",
                     queries.get(1));
         } catch (Exception e) {
             e.printStackTrace();
@@ -146,7 +145,7 @@ public class DefaultSQLCreateTableActionTest {
             assertEquals(2, queries.size());
             assertEquals("DROP TABLE IF EXISTS MYTABLE CASCADE", queries.get(0));
             assertEquals(
-                    "CREATE TABLE MYTABLE (ID INTEGER, NAME VARCHAR(255) DEFAULT \"ok\", DATE DATE, SALARY MY_DOUBLE(38, 4), UPDATED TIMESTAMP, CONSTRAINT pk_MYTABLE PRIMARY KEY (ID, NAME))",
+                    "CREATE TABLE MYTABLE (ID INTEGER, NAME VARCHAR(255) DEFAULT \"ok\", DATE DATE, SALARY NUMERIC(38, 4), UPDATED TIMESTAMP, CONSTRAINT pk_MYTABLE PRIMARY KEY (ID, NAME))",
                     queries.get(1));
         } catch (Exception e) {
             e.printStackTrace();
@@ -188,7 +187,7 @@ public class DefaultSQLCreateTableActionTest {
             assertEquals("SQL_DROP_TABLE_PREFIX SQL_DROP_TABLE SQL_DROP_TABLE_IF_EXISITS MyTable SQL_DROP_TABLE_SUFFIX",
                     queries.get(0));
             assertEquals(
-                    "SQL_CREATE_TABLE_PREFIX SQL_CREATE_TABLE SQL_CREATE_TABLE_IF_NOT_EXISTS MyTable {id INTEGER| name VARCHAR<255> SQL_CREATE_TABLE_DEFAULT \"ok\"| date DATE| salary MY_DOUBLE<38#4>| updated TIMESTAMP| SQL_CREATE_TABLE_CONSTRAINT SQL_CREATE_TABLE_PRIMARY_KEY_PREFIXMyTable SQL_CREATE_TABLE_PRIMARY_KEY [id| name]}",
+                    "SQL_CREATE_TABLE_PREFIX SQL_CREATE_TABLE SQL_CREATE_TABLE_IF_NOT_EXISTS MyTable {id INTEGER| name VARCHAR<255> SQL_CREATE_TABLE_DEFAULT \"ok\"| date DATE| salary NUMERIC<38#4>| updated TIMESTAMP| SQL_CREATE_TABLE_CONSTRAINT SQL_CREATE_TABLE_PRIMARY_KEY_PREFIXMyTable SQL_CREATE_TABLE_PRIMARY_KEY [id| name]}",
                     queries.get(1));
         } catch (Exception e) {
             e.printStackTrace();
@@ -214,7 +213,6 @@ public class DefaultSQLCreateTableActionTest {
                 .type(Schema.createUnion(AvroUtils._logicalDate(), Schema.create(Schema.Type.NULL)))
                 .noDefault()
                 .name("salary")
-                .prop(SchemaConstants.TALEND_COLUMN_DB_TYPE, "MY_DOUBLE")
                 .prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "38")
                 .prop(SchemaConstants.TALEND_COLUMN_PRECISION, "4")
                 .type(Schema.createUnion(AvroUtils._double(), Schema.create(Schema.Type.NULL)))
@@ -249,7 +247,7 @@ public class DefaultSQLCreateTableActionTest {
             assertEquals(2, queries.size());
             assertEquals("DROP TABLE IF EXISTS MYTABLE CASCADE", queries.get(0));
             assertEquals(
-                    "CREATE TABLE MYTABLE (ID INTEGER, NAME VARCHAR(255) DEFAULT \"ok\", DATE DATETIME_TZ, SALARY MY_DOUBLE(38, 4), UPDATED TIMESTAMP, MYVARIANT VARIANT, CONSTRAINT pk_MYTABLE PRIMARY KEY (ID, NAME))",
+                    "CREATE TABLE MYTABLE (ID INTEGER, NAME VARCHAR(255) DEFAULT \"ok\", DATE DATETIME_TZ, SALARY NUMERIC(38, 4), UPDATED TIMESTAMP, MYVARIANT VARIANT, CONSTRAINT pk_MYTABLE PRIMARY KEY (ID, NAME))",
                     queries.get(1));
         } catch (Exception e) {
             e.printStackTrace();
@@ -295,7 +293,7 @@ public class DefaultSQLCreateTableActionTest {
             assertEquals(2, queries.size());
             assertEquals("DROP TABLE IF EXISTS MYTABLE CASCADE", queries.get(0));
             assertEquals(
-                    "CREATE TABLE MYTABLE (ID MY_ID_TYPE, NAME MY_NAME_TYPE(255) DEFAULT \"ok\", DATE MY_DATE_TYPE, SALARY MY_DOUBLE(38, 4), UPDATED TIMESTAMP, CONSTRAINT pk_MYTABLE PRIMARY KEY (ID, NAME))",
+                    "CREATE TABLE MYTABLE (ID MY_ID_TYPE, NAME MY_NAME_TYPE(255) DEFAULT \"ok\", DATE MY_DATE_TYPE, SALARY MY_SALARY_TYPE(38, 4), UPDATED TIMESTAMP, CONSTRAINT pk_MYTABLE PRIMARY KEY (ID, NAME))",
                     queries.get(1));
         } catch (Exception e) {
             e.printStackTrace();
@@ -321,7 +319,7 @@ public class DefaultSQLCreateTableActionTest {
                 .type(AvroUtils._logicalDate())
                 .noDefault()
                 .name("salary")
-                .prop(SchemaConstants.TALEND_COLUMN_DB_TYPE, "MY_DOUBLE")
+//                .prop(SchemaConstants.TALEND_COLUMN_DB_TYPE, "MY_DOUBLE")
                 .prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "38")
                 .prop(SchemaConstants.TALEND_COLUMN_PRECISION, "4")
                 .type(Schema.createUnion(AvroUtils._double(), Schema.create(Schema.Type.NULL)))
@@ -356,7 +354,7 @@ public class DefaultSQLCreateTableActionTest {
             assertEquals(2, queries.size());
             assertEquals("DROP TABLE IF EXISTS MYTABLE CASCADE", queries.get(0));
             assertEquals(
-                    "CREATE TABLE MYTABLE (ID INTEGER NOT NULL, NAME VARCHAR(255) DEFAULT \"ok\", DATE DATETIME_TZ NOT NULL, SALARY MY_DOUBLE(38, 4), UPDATED TIMESTAMP NOT NULL, MYVARIANT VARIANT, CONSTRAINT pk_MYTABLE PRIMARY KEY (ID, NAME))",
+                    "CREATE TABLE MYTABLE (ID INTEGER NOT NULL, NAME VARCHAR(255) DEFAULT \"ok\", DATE DATETIME_TZ NOT NULL, SALARY NUMERIC(38, 4), UPDATED TIMESTAMP NOT NULL, MYVARIANT VARIANT, CONSTRAINT pk_MYTABLE PRIMARY KEY (ID, NAME))",
                     queries.get(1));
         } catch (Exception e) {
             e.printStackTrace();

@@ -35,7 +35,6 @@ public class DefaultSQLTruncateTableActionTest {
                 .type(AvroUtils._logicalDate())
                 .noDefault()
                 .name("salary")
-                .prop(SchemaConstants.TALEND_COLUMN_DB_TYPE, "MY_DOUBLE")
                 .prop(SchemaConstants.TALEND_COLUMN_PRECISION, "38")
                 .prop(SchemaConstants.TALEND_COLUMN_SCALE, "4")
                 .type(AvroUtils._double())
