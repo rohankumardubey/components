@@ -36,7 +36,7 @@ public class DefaultSQLCreateTableAction extends TableAction {
     private boolean dropIfExists;
 
     public DefaultSQLCreateTableAction(final String[] fullTableName, final Schema schema, boolean createIfNotExists, boolean drop,
-        boolean dropIfExists) {
+                                       boolean dropIfExists) {
         if (fullTableName == null || fullTableName.length < 1) {
             throw new InvalidParameterException("Table name can't be null or empty");
         }
@@ -74,7 +74,7 @@ public class DefaultSQLCreateTableAction extends TableAction {
         sb.append(this.getConfig().SQL_DROP_TABLE_PREFIX);
         sb.append(this.getConfig().SQL_DROP_TABLE);
         sb.append(" ");
-        if(dropIfExists){
+        if (dropIfExists) {
             sb.append(this.getConfig().SQL_DROP_TABLE_IF_EXISITS);
             sb.append(" ");
         }
@@ -91,7 +91,7 @@ public class DefaultSQLCreateTableAction extends TableAction {
         sb.append(this.getConfig().SQL_CREATE_TABLE);
         sb.append(" ");
 
-        if(createIfNotExists){
+        if (createIfNotExists) {
             sb.append(this.getConfig().SQL_CREATE_TABLE_IF_NOT_EXISTS);
             sb.append(" ");
         }
@@ -121,7 +121,6 @@ public class DefaultSQLCreateTableAction extends TableAction {
 
             String sDBLength = f.getProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH);
             String sDBName = f.getProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME);
-            String sDBType = f.getProp(SchemaConstants.TALEND_COLUMN_DB_TYPE);
             String sDBDefault = f.getProp(SchemaConstants.TALEND_COLUMN_DEFAULT);
             String sDBPrecision = f.getProp(SchemaConstants.TALEND_COLUMN_PRECISION);
             boolean sDBIsKey = Boolean.valueOf(f.getProp(SchemaConstants.TALEND_COLUMN_IS_KEY)).booleanValue();
@@ -134,20 +133,24 @@ public class DefaultSQLCreateTableAction extends TableAction {
             sb.append(escape(updateCaseIdentifier(name)));
             sb.append(" ");
 
-            if(isNullOrEmpty(sDBType)){
-                // if SchemaConstants.TALEND_COLUMN_DB_TYPE not set, use given map
-                sDBType = this.getDbTypeMap().get(f.name());
-            }
 
+            String sDBType = this.getDbTypeMap().get(f.name());
             if (isNullOrEmpty(sDBType)) {
                 // If DB type not set, try to guess it
                 sDBType = convertAvroToSQL.convertToSQLTypeString(f.schema());
             }
+
+            if (isNullOrEmpty(sDBType)) {
+                // For compatibility
+                sDBType = f.getProp(SchemaConstants.TALEND_COLUMN_DB_TYPE);
+                LOG.warn("DBType retrieve from " + SchemaConstants.TALEND_COLUMN_DB_TYPE + " that should be empty or null : '" + sDBType + "'");
+            }
+
             sb.append(updateCaseIdentifier(sDBType));
 
             buildLengthPrecision(sb, f, sDBType);
 
-            if(!sDBNullable){
+            if (!sDBNullable) {
                 sb.append(this.getConfig().SQL_CREATE_TABLE_NOT_NULL);
             }
 
@@ -166,10 +169,10 @@ public class DefaultSQLCreateTableAction extends TableAction {
             sb.append(this.getConfig().SQL_CREATE_TABLE_CONSTRAINT);
             sb.append(" ");
             sb.append(escape(
-                                this.getConfig().SQL_CREATE_TABLE_PRIMARY_KEY_PREFIX +
-                                        buildFullTableName(fullTableName, this.getConfig().SQL_PRIMARY_KEY_FULL_NAME_SEGMENT_SEP, false)
-                            )
-                    );
+                    this.getConfig().SQL_CREATE_TABLE_PRIMARY_KEY_PREFIX +
+                            buildFullTableName(fullTableName, this.getConfig().SQL_PRIMARY_KEY_FULL_NAME_SEGMENT_SEP, false)
+                    )
+            );
             sb.append(" ");
             sb.append(this.getConfig().SQL_CREATE_TABLE_PRIMARY_KEY);
             sb.append(" ");
@@ -196,8 +199,8 @@ public class DefaultSQLCreateTableAction extends TableAction {
      * Component schema "precision" parameter is used as scale parameter for numeric types. Usually, "precision" is
      * ignored for String types
      *
-     * @param sb StringBuilder, which constructs query
-     * @param field Schema field
+     * @param sb     StringBuilder, which constructs query
+     * @param field  Schema field
      * @param dbType Snowflake database type to be used
      */
     private void buildLengthPrecision(StringBuilder sb, Schema.Field field, String dbType) {
@@ -233,7 +236,7 @@ public class DefaultSQLCreateTableAction extends TableAction {
         return s.trim().isEmpty();
     }
 
-    private boolean isNullable(Schema schema){
+    private boolean isNullable(Schema schema) {
         Schema.Type type = schema.getType();
         if (type == Schema.Type.UNION) {
             for (Schema s : schema.getTypes()) {
