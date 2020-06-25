@@ -319,7 +319,6 @@ public class DefaultSQLCreateTableActionTest {
                 .type(AvroUtils._logicalDate())
                 .noDefault()
                 .name("salary")
-//                .prop(SchemaConstants.TALEND_COLUMN_DB_TYPE, "MY_DOUBLE")
                 .prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "38")
                 .prop(SchemaConstants.TALEND_COLUMN_PRECISION, "4")
                 .type(Schema.createUnion(AvroUtils._double(), Schema.create(Schema.Type.NULL)))
