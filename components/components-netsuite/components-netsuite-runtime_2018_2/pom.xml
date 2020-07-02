@@ -10,6 +10,7 @@
     </parent>
 
     <artifactId>components-netsuite-runtime_2018_2</artifactId>
+    <version>0.27.6</version>
     <name>Components - NetSuite Runtime v2018.2</name>
     <packaging>jar</packaging>
 
@@ -22,12 +23,12 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-netsuite-definition</artifactId>
-            <version>${components.version}</version>
+            <version>0.27.6</version>
         </dependency>
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-netsuite-runtime</artifactId>
-            <version>${components.version}</version>
+            <version>0.27.6</version>
         </dependency>
         <dependency>
             <groupId>org.ops4j.pax.url</groupId>
@@ -93,7 +94,7 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-netsuite-runtime</artifactId>
-            <version>${components.version}</version>
+            <version>0.27.6</version>
             <classifier>tests</classifier>
             <scope>test</scope>
         </dependency>
