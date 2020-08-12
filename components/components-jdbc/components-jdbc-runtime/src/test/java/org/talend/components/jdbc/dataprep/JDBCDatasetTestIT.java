@@ -15,6 +15,7 @@ package org.talend.components.jdbc.dataprep;
 import java.io.IOException;
 import java.sql.Connection;
 import java.util.Iterator;
+import java.util.List;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
@@ -31,6 +32,7 @@ import org.talend.components.jdbc.runtime.JdbcRuntimeUtils;
 import org.talend.components.jdbc.runtime.dataprep.JDBCDatasetRuntime;
 import org.talend.components.jdbc.runtime.dataprep.JDBCDatastoreRuntime;
 import org.talend.components.jdbc.runtime.setting.AllSetting;
+import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.java8.Consumer;
 import org.talend.daikon.properties.ValidationResult;
 
@@ -132,6 +134,88 @@ public class JDBCDatasetTestIT {
     }
 
     @Test
+    public void testHive() {
+        JDBCDatastoreDefinition def = new JDBCDatastoreDefinition();
+        JDBCDatastoreProperties datastore = new JDBCDatastoreProperties("datastore") {
+
+            @Override
+            public AllSetting getRuntimeSetting() {
+                AllSetting setting = new AllSetting();
+
+                //setting.setDriverPaths(getCurrentDriverPaths());
+                setting.setDriverClass("org.apache.hive.jdbc.HiveDriver");
+                setting.setJdbcUrl(jdbcUrl.getValue());
+
+                setting.setUsername(userId.getValue());
+                setting.setPassword(password.getValue());
+
+                return setting;
+            }
+
+        };
+
+        datastore.init();
+
+        datastore.jdbcUrl.setValue("");//please get it from jira or supporter
+        datastore.userId.setValue("");//please get it from jira or supporter
+
+
+        JDBCDatasetProperties dataset = new JDBCDatasetProperties("dataset") {
+
+            @Override
+            public AllSetting getRuntimeSetting() {
+                AllSetting setting = new AllSetting();
+
+                JDBCDatastoreProperties datastoreProperties = this.getDatastoreProperties();
+                //setting.setDriverPaths(datastoreProperties.getCurrentDriverPaths());
+                setting.setDriverClass("org.apache.hive.jdbc.HiveDriver");
+                setting.setJdbcUrl(datastoreProperties.jdbcUrl.getValue());
+
+                setting.setUsername(datastoreProperties.userId.getValue());
+                setting.setPassword(datastoreProperties.password.getValue());
+
+                setting.setSchema(main.schema.getValue());
+
+                setting.setSql(getSql());
+                if (sourceType.getValue() == SourceType.TABLE_NAME) {
+                    setting.setTablename(tableName.getValue());
+                }
+
+                return setting;
+            }
+
+        };
+        dataset.init();
+        dataset.setDatastoreProperties(datastore);
+
+        dataset.sourceType.setValue(JDBCDatasetProperties.SourceType.QUERY);
+        dataset.sql.setValue("select * from tab1");
+
+        JDBCDatasetRuntime runtime = new JDBCDatasetRuntime();
+        runtime.initialize(null, dataset);
+        final IndexedRecord[] record = new IndexedRecord[1];
+        Consumer<IndexedRecord> storeTheRecords = new Consumer<IndexedRecord>() {
+
+            @Override
+            public void accept(IndexedRecord data) {
+                record[0] = data;
+
+            }
+        };
+
+        runtime.getSample(1, storeTheRecords);
+        Assert.assertEquals("valeur1", record[0].get(0));
+        Assert.assertEquals("valeur2", record[0].get(1));
+
+        List<Schema.Field> fields = record[0].getSchema().getFields();
+        Assert.assertEquals("tab1_name", fields.get(0).name());
+        Assert.assertEquals("tab1_surname", fields.get(1).name());
+
+        Assert.assertEquals("tab1.name", fields.get(0).getProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME));
+        Assert.assertEquals("tab1.surname", fields.get(1).getProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME));
+    }
+
+    @Test
     public void testDoHealthChecks() {
         JDBCDatasetProperties dataset = createDatasetProperties(true, tablename);
         JDBCDatastoreRuntime runtime = new JDBCDatastoreRuntime();
@@ -174,7 +258,7 @@ public class JDBCDatasetTestIT {
         datastore.password.setValue(allSetting.getPassword());
 
         JDBCDatasetProperties dataset = (JDBCDatasetProperties) def.createDatasetProperties(datastore);
-        dataset.sql.setValue(DBTestUtils.getSQL(tablename));
+        dataset.sql.setValue("select ID as \"JDBCDATASET.ID\", NAME as \"JDBCDATASET.NAME\" from JDBCDATASET");
 
         if (updateSchema) {
             updateSchema(dataset);
