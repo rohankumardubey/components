@@ -3,7 +3,7 @@
 
     <groupId>org.talend.components</groupId>
     <artifactId>components-elasticsearch-aggregator</artifactId>
-    <version>0.28.8-SNAPSHOT</version>
+    <version>0.28.8</version>
 
     <name>Components - Elasticsearch Aggregator</name>
     <packaging>pom</packaging>
