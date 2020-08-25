@@ -13,8 +13,10 @@
 package org.talend.components.snowflake;
 
 import static org.talend.daikon.properties.presentation.Widget.widget;
+import static org.talend.daikon.properties.property.PropertyFactory.newEnum;
 import static org.talend.daikon.properties.property.PropertyFactory.newString;
 
+import java.util.Arrays;
 import java.util.EnumSet;
 
 import org.talend.components.api.properties.ComponentPropertiesImpl;
@@ -23,11 +25,16 @@ import org.talend.daikon.i18n.I18nMessages;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
+import org.talend.daikon.serialize.PostDeserializeSetup;
+import org.talend.daikon.serialize.migration.SerializeSetVersion;
 
-public class SnowflakeOauthConnectionProperties extends ComponentPropertiesImpl {
+public class SnowflakeOauthConnectionProperties extends ComponentPropertiesImpl implements SerializeSetVersion {
 
     private static final I18nMessages I18N =
             GlobalI18N.getI18nMessageProvider().getI18nMessages(SnowflakeOauthConnectionProperties.class);
+
+    public Property<GrantType> grantType =
+            newEnum("grantType", GrantType.class).setValue(GrantType.CLIENT_CREDENTIALS);
 
     public Property<String> oauthTokenEndpoint = newString("oauthTokenEndpoint");
 
@@ -35,6 +42,11 @@ public class SnowflakeOauthConnectionProperties extends ComponentPropertiesImpl 
 
     public Property<String> clientSecret =
             newString("clientSecret").setFlags(EnumSet.of(Property.Flags.ENCRYPT, Property.Flags.SUPPRESS_LOGGING));
+
+    public Property<String> oauthUserName = newString("oauthUserName");
+
+    public Property<String> oauthPassword =
+            newString("oauthPassword").setFlags(EnumSet.of(Property.Flags.ENCRYPT, Property.Flags.SUPPRESS_LOGGING));
 
     public Property<String> scope = newString("scope");
 
@@ -49,9 +61,12 @@ public class SnowflakeOauthConnectionProperties extends ComponentPropertiesImpl 
     @Override
     public void setupProperties() {
         super.setupProperties();
+        grantType.setValue(GrantType.CLIENT_CREDENTIALS);
         oauthTokenEndpoint.setValue("");
         clientId.setValue("");
         clientSecret.setValue("");
+        oauthUserName.setValue("");
+        oauthPassword.setValue("");
         scope.setValue("");
     }
 
@@ -59,10 +74,40 @@ public class SnowflakeOauthConnectionProperties extends ComponentPropertiesImpl 
     public void setupLayout() {
         super.setupLayout();
         Form form = Form.create(this, Form.MAIN);
+        form.addRow(grantType);
         form.addRow(widget(oauthTokenEndpoint));
         form.addRow(widget(clientId));
         form.addRow(widget(clientSecret).setWidgetType(Widget.HIDDEN_TEXT_WIDGET_TYPE));
+        form.addRow(widget(oauthUserName).setHidden());
+        form.addRow(widget(oauthPassword).setWidgetType(Widget.HIDDEN_TEXT_WIDGET_TYPE).setHidden());
         form.addRow(widget(scope));
     }
 
+    public void afterGrantType() {
+        refreshLayout(getForm(Form.MAIN));
+    }
+
+    @Override
+    public void refreshLayout(Form form) {
+        super.refreshLayout(form);
+        form.getWidget(oauthUserName.getName()).setHidden(grantType.getValue() != GrantType.PASSWORD);
+        form.getWidget(oauthPassword.getName()).setHidden(grantType.getValue() != GrantType.PASSWORD);
+    }
+
+    @Override
+    public boolean postDeserialize(int version, PostDeserializeSetup setup, boolean persistent) {
+        boolean migrated = super.postDeserialize(version, setup, persistent);
+        grantType.setPossibleValues(Arrays.asList(GrantType.values()));
+        return migrated;
+    }
+
+    @Override
+    public int getVersionNumber() {
+        return 1;
+    }
+
+    public enum GrantType {
+        CLIENT_CREDENTIALS,
+        PASSWORD
+    }
 }
