@@ -9,22 +9,60 @@ def slackChannel = 'components-ci'
 def escaped_branch = branch.toLowerCase().replaceAll("/", "_")
 
 def nexusCredentials = usernamePassword(
-	credentialsId: 'nexus-artifact-zl-credentials',
-    usernameVariable: 'NEXUS_USER',
-    passwordVariable: 'NEXUS_PASSWORD')
+        credentialsId: 'nexus-artifact-zl-credentials',
+        usernameVariable: 'NEXUS_USER',
+        passwordVariable: 'NEXUS_PASSWORD')
 
 def gitCredentials = usernamePassword(
-	credentialsId: 'github-credentials',
-    usernameVariable: 'GITHUB_LOGIN',
-    passwordVariable: 'GITHUB_TOKEN')
+        credentialsId: 'github-credentials',
+        usernameVariable: 'GITHUB_LOGIN',
+        passwordVariable: 'GITHUB_TOKEN')
 
 def dockerCredentials = usernamePassword(
-	credentialsId: 'docker-registry-credentials',
-    passwordVariable: 'DOCKER_PASSWORD',
-    usernameVariable: 'DOCKER_LOGIN')
+        credentialsId: 'docker-registry-credentials',
+        passwordVariable: 'DOCKER_PASSWORD',
+        usernameVariable: 'DOCKER_LOGIN')
+
+def artifactoryCredentials = usernamePassword(
+        credentialsId: 'artifactory-datapwn-credentials',
+        passwordVariable: 'ARTIFACTORY_PASSWORD',
+        usernameVariable: 'ARTIFACTORY_LOGIN')
+
+def podLabel = "components-${UUID.randomUUID().toString()}".take(53)
 
 pipeline {
-  agent any
+  agent {
+    kubernetes {
+      label podLabel
+      yaml """
+apiVersion: v1
+kind: Pod
+spec:
+    containers:
+        -
+            name: main
+            image: '${env.TSBI_IMAGE}'
+            command: [cat]
+            tty: true
+            volumeMounts: [{name: docker, mountPath: /var/run/docker.sock}, {name: m2main, mountPath: /root/.m2/repository}]
+            resources: {requests: {memory: 3G, cpu: '2'}, limits: {memory: 8G, cpu: '2'}}
+    volumes:
+        -
+            name: docker
+            hostPath: {path: /var/run/docker.sock}
+        -
+            name: m2main
+            hostPath: { path: /tmp/jenkins/tdi/m2/ }
+    imagePullSecrets:
+        - name: talend-registry
+"""
+    }
+  }
+
+  environment {
+    MAVEN_OPTS = "-Dmaven.artifact.threads=128 -Dorg.slf4j.simpleLogger.showThreadName=true -Dorg.slf4j.simpleLogger.showDateTime=true -Dorg.slf4j.simpleLogger.dateTimeFormat=HH:mm:ss -Dtalend.maven.decrypter.m2.location=${WORKSPACE}/.jenkins/"
+    TALEND_REGISTRY_OLD = "registry.datapwn.com"
+  }
 
   options {
     timeout(time: 120, unit: 'MINUTES')
@@ -35,39 +73,40 @@ pipeline {
 
   stages {
 
-    stage('Compile') {
+    stage('Compile | Test') {
       steps {
-        sh 'mvn clean compile'
-      }
-    }
-
-    stage('Test') {
-      steps {
-        sh 'mvn test'
+        withCredentials([gitCredentials, nexusCredentials, dockerCredentials, artifactoryCredentials]) {
+          container('main') {
+            sh "echo $DOCKER_PASSWORD | docker login ${TALEND_REGISTRY_OLD} -u $DOCKER_LOGIN --password-stdin"
+            sh 'mvn clean install'
+          }
+        }
       }
     }
 
     stage('Deploy') {
       steps {
-        sh """
-            mvn -B -U -V 
-           """
-              // deploy
-              // -Dgit_branch="${escaped_branch}" \
-              // -Dbigquery.project="${bigquery_project}" \
-              // -Dbigquery.service.account.file="${service_account_file}" \
-              // -Dbigquery.gcp.temp.folder="${bigquery_gcp_temp_folder}" \
-              // -Dorg.talend.components.google.drive.service_account_file="${google_drive_service_account_file}" 
+        container('main') {
+          sh """
+              echo "deploy"
+             """
+          // mvn -B -U -V deploy
+          // -Dgit_branch="${escaped_branch}" \
+          // -Dbigquery.project="${bigquery_project}" \
+          // -Dbigquery.service.account.file="${service_account_file}" \
+          // -Dbigquery.gcp.temp.folder="${bigquery_gcp_temp_folder}" \
+          // -Dorg.talend.components.google.drive.service_account_file="${google_drive_service_account_file}"
+        }
       }
     }
   }
 
-  post {
-    success {
-        slackSend(color: '#00FF00', message: "SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})", channel: "${slackChannel}")
-    }
-    failure {
-        slackSend(color: '#FF0000', message: "FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})", channel: "${slackChannel}")
-    }
-  }
+//  post {
+//    success {
+//        slackSend(color: '#00FF00', message: "SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})", channel: "${slackChannel}")
+//    }
+//    failure {
+//        slackSend(color: '#FF0000', message: "FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})", channel: "${slackChannel}")
+//    }
+//  }
 }
