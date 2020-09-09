@@ -19,8 +19,8 @@
         <module>components-couchbase</module>
         <module>components-fileio</module>
         <module>components-jdbc</module>
-<!--        <module>components-splunk</module>-->
-<!--        <module>components-jira</module>-->
+        <module>components-splunk</module>
+        <module>components-jira</module>
         <module>components-marketo</module>
         <module>components-hadoopcluster</module>
         <module>components-marklogic</module>
