@@ -25,7 +25,6 @@ import org.apache.beam.sdk.transforms.Create;
 import org.apache.beam.sdk.values.PCollection;
 import org.apache.hadoop.fs.FileUtil;
 import org.apache.hadoop.fs.Path;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -99,7 +98,6 @@ public class SimpleFileIOOutputErrorTest {
      * Basic unit test using all default values (except for the path) on an in-memory DFS cluster.
      */
     @Test
-    @Ignore
     public void testUnauthorizedOverwrite() throws IOException, URISyntaxException {
         Path parent = new Path(mini.newFolder().toString());
         Path dst = new Path(parent, "output");
@@ -151,7 +149,6 @@ public class SimpleFileIOOutputErrorTest {
      * Basic unit test using all default values (except for the path) on an in-memory DFS cluster.
      */
     @Test
-    @Ignore
     public void testUnauthorizedAccess() throws IOException, URISyntaxException {
         Path parent = new Path(mini.newFolder().toString());
         String fileSpec = mini.getLocalFs().getUri().resolve(new Path(parent, "output.csv").toUri()).toString();
