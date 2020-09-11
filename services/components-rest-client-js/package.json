@@ -19,7 +19,7 @@
     "jasmine": "^2.5.2",
     "fetch-mock": "^5.5.0",
     "istanbul": "^0.4.5",
-    "node-fetch": "^1.6.3",
+    "node-fetch": "^2.6.1",
     "whatwg-fetch": "^1.0.0"
   }
 }
