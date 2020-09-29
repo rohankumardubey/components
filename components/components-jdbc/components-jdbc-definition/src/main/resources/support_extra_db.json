@@ -20,7 +20,7 @@
 			}
 		],
 		"configuration": [{
-				"component": "tDeltaLakeCommit",
+				"component": "tDeltaLakeConnection",
 				"parameters": [{
 						"name": "use_autocommit",
 						"value": "true"
