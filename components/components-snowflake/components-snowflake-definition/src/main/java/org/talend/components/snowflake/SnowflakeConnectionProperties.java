@@ -142,7 +142,7 @@ public class SnowflakeConnectionProperties extends ComponentPropertiesImpl
         wizardForm.addRow(authenticationType);
         wizardForm.addRow(userPassword.getForm(Form.MAIN));
         wizardForm.addRow(widget(keyAlias).setHidden(true));
-        wizardForm.addRow(widget(oauthProperties.getForm(Form.MAIN)));
+        wizardForm.addRow(oauthProperties.getForm(Form.MAIN));
         wizardForm.addRow(warehouse);
         wizardForm.addRow(schemaName);
         wizardForm.addRow(db);
@@ -155,7 +155,7 @@ public class SnowflakeConnectionProperties extends ComponentPropertiesImpl
         mainForm.addRow(authenticationType);
         mainForm.addRow(userPassword.getForm(Form.MAIN));
         mainForm.addRow(widget(keyAlias).setHidden(true));
-        mainForm.addRow(widget(oauthProperties.getForm(Form.MAIN)));
+        mainForm.addRow(oauthProperties.getForm(Form.MAIN));
         mainForm.addRow(warehouse);
         mainForm.addRow(schemaName);
         mainForm.addRow(db);
@@ -226,7 +226,12 @@ public class SnowflakeConnectionProperties extends ComponentPropertiesImpl
                 userPassword.getForm(Form.MAIN).getWidget(userPassword.userId.getName()).setHidden(authType == OAUTH);
                 userPassword.getForm(Form.MAIN).getWidget(userPassword.password.getName()).setHidden(authType != BASIC);
                 form.getWidget(keyAlias.getName()).setHidden(authType != KEY_PAIR);
-                oauthProperties.getForm(Form.MAIN).setHidden(authType != OAUTH);
+                if (authType == OAUTH) {
+                    oauthProperties.getForm(Form.MAIN).setHidden(false);
+                    oauthProperties.refreshLayout(oauthProperties.getForm(Form.MAIN));
+                } else {
+                    oauthProperties.getForm(Form.MAIN).setHidden(true);
+                }
                 form.getWidget(region.getName()).setHidden(useCustomRegion.getValue());
             }
         }
