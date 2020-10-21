@@ -71,9 +71,18 @@ spec:
     disableConcurrentBuilds()
   }
 
+  parameters {
+    choice(name: 'Action',
+            choices: ['STANDARD', 'RELEASE'],
+            description: 'Kind of running : \nSTANDARD (default), normal building \nRELEASE : build release')
+  }
+
   stages {
 
     stage('Compile | Test') {
+      when {
+         expression { params.Action == 'STANDARD' }
+      }
       steps {
         withCredentials([gitCredentials, nexusCredentials, dockerCredentials, artifactoryCredentials]) {
           container('main') {
@@ -84,13 +93,15 @@ spec:
       }
     }
 
-    stage('Deploy') {
+    stage('Compile | Test | Deploy') {
+      when {
+        expression { params.Action == 'RELEASE' }
+      }
       steps {
         container('main') {
           sh """
-              echo "deploy"
+              mvn clean -B -U -V -s ci/settings.xml deploy
              """
-          // mvn -B -U -V deploy
           // -Dgit_branch="${escaped_branch}" \
           // -Dbigquery.project="${bigquery_project}" \
           // -Dbigquery.service.account.file="${service_account_file}" \
@@ -101,12 +112,12 @@ spec:
     }
   }
 
-//  post {
-//    success {
-//        slackSend(color: '#00FF00', message: "SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})", channel: "${slackChannel}")
-//    }
-//    failure {
-//        slackSend(color: '#FF0000', message: "FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})", channel: "${slackChannel}")
-//    }
-//  }
+  post {
+    success {
+        slackSend(color: '#00FF00', message: "SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})", channel: "${slackChannel}")
+    }
+    failure {
+        slackSend(color: '#FF0000', message: "FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})", channel: "${slackChannel}")
+    }
+  }
 }
