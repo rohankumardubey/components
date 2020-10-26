@@ -617,13 +617,14 @@ public class SnowflakeWriter implements WriterWithFeedback<Result, IndexedRecord
     }
 
     protected void createConnections() throws IOException {
-        processingConnection = sink.createConnection(container);
+        processingConnection = sink.newConnection(container, sprops.connection.getConnectionProperties());
         uploadConnection = sink.createConnection(container);
     }
 
     protected void closeConnections() throws SQLException {
-        sink.closeConnection(container, processingConnection);
-        sink.closeConnection(container, uploadConnection);
+        try (Connection process = processingConnection) {
+            sink.closeConnection(container, uploadConnection);
+        }
     }
 
     private static class StringSchemaInfo {

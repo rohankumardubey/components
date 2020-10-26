@@ -19,6 +19,7 @@ import java.sql.SQLException;
 
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.snowflake.SnowflakeConnectionProperties;
+import org.talend.components.snowflake.SnowflakeProvideConnectionProperties;
 import org.talend.components.snowflake.runtime.utils.DriverManagerUtils;
 import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
@@ -77,21 +78,26 @@ public abstract class SnowflakeRuntime {
             }
         }
 
-        if (container != null) {
-            connectionProperties.talendProductVersion = (String) container.getGlobalData(KEY_TALEND_PRODUCT_VERSION);
-        }
-
-        conn = DriverManagerUtils.getConnection(connectionProperties);
-        try {
-            conn.setAutoCommit(connectionProperties.autoCommit.getValue());
-        } catch (SQLException e) {
-            throw new IOException(e);
-        }
+        conn = newConnection(container, connectionProperties);
         if (container != null) {
             container.setComponentData(container.getCurrentComponentId(), KEY_CONNECTION, conn);
             container.setComponentData(container.getCurrentComponentId(), KEY_CONNECTION_PROPERTIES, connectionProperties);
         }
 
+        return conn;
+    }
+
+    public Connection newConnection(RuntimeContainer container, SnowflakeConnectionProperties connectionProperties) throws IOException {
+        if (container != null) {
+            connectionProperties.talendProductVersion = (String) container.getGlobalData(KEY_TALEND_PRODUCT_VERSION);
+        }
+
+        Connection conn = DriverManagerUtils.getConnection(connectionProperties);
+        try {
+            conn.setAutoCommit(connectionProperties.autoCommit.getValue());
+        } catch (SQLException e) {
+            throw new IOException(e);
+        }
         return conn;
     }
 

@@ -40,8 +40,10 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.talend.components.api.component.runtime.Result;
+import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.common.tableaction.TableAction;
+import org.talend.components.snowflake.SnowflakeConnectionProperties;
 import org.talend.components.snowflake.runtime.utils.SchemaResolver;
 import org.talend.components.snowflake.tsnowflakeoutput.TSnowflakeOutputProperties;
 import org.talend.components.snowflake.tsnowflakeoutput.TSnowflakeOutputProperties.OutputAction;
@@ -86,6 +88,7 @@ public class SnowflakeWriterTest {
         schema.getField("column").addProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "column");
         schema.getField("field").addProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "field");
         Mockito.when(sink.createConnection(null)).thenReturn(Mockito.mock(Connection.class));
+        Mockito.when(sink.newConnection(Mockito.any(), Mockito.any(SnowflakeConnectionProperties.class))).thenReturn(Mockito.mock(Connection.class));
         Mockito.when(sink.getRuntimeSchema(Mockito.any(SchemaResolver.class), Mockito.eq(properties.tableAction.getValue())))
                 .thenReturn(schema);
         properties.table.main.schema.setValue(schema);
