@@ -146,12 +146,22 @@ public interface ComponentService extends PropertiesService<Properties> {
     /**
      * Return the png image related to the given component
      * 
-     * @param componentName, name of the comonent to get the image for
+     * @param componentName, name of the component to get the image for
      * @param imageType, the type of image requested
      * @return the png image stream or null if none was provided or an error occurred
      * @exception ComponentException thrown if the componentName is not registered in the service
      */
     InputStream getComponentPngImage(String componentName, ComponentImageType imageType);
+
+    /**
+     * Return the png image related to the given component and icon prefix
+     * 
+     * @param componentName, name of the component
+     * @param iconPrefix, the icon prefix
+     * @return the png image stream or null if none was provided or an error occurred
+     * @exception ComponentException thrown if the componentName is not registered in the service
+     */
+    public InputStream getComponentPngImage(String componentName, String iconPrefix);
 
     /**
      * Allows for a local implementation to setup a repository store used to store {@link ComponentProperties}.

@@ -208,6 +208,11 @@ public class ComponentServiceOsgi implements ComponentService {
     }
 
     @Override
+    public InputStream getComponentPngImage(String componentName, String iconPrefix) {
+        return componentServiceDelegate.getComponentPngImage(componentName, iconPrefix);
+    }
+
+    @Override
     public String storeProperties(Properties properties, String name, String repositoryLocation, String schemaPropertyName) {
         return componentServiceDelegate.storeProperties(properties, name, repositoryLocation, schemaPropertyName);
     }

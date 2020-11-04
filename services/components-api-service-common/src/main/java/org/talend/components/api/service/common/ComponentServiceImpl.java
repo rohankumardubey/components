@@ -12,13 +12,6 @@
 // ============================================================================
 package org.talend.components.api.service.common;
 
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.avro.Schema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +33,9 @@ import org.talend.daikon.exception.TalendRuntimeException;
 import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.service.PropertiesServiceImpl;
 import org.talend.daikon.runtime.RuntimeInfo;
+
+import java.io.InputStream;
+import java.util.*;
 
 /**
  * Main Component Service implementation that is not related to any framework (neither OSGI, nor Spring) it uses a
@@ -166,6 +162,15 @@ public class ComponentServiceImpl extends PropertiesServiceImpl implements Compo
     public InputStream getComponentPngImage(String componentName, ComponentImageType imageType) {
         ComponentDefinition componentDefinition = getComponentDefinition(componentName);
         return getImageStream(componentDefinition, componentDefinition.getPngImagePath(imageType));
+    }
+
+    @Override
+    public InputStream getComponentPngImage(String componentName, String iconPrefix) {
+        ComponentDefinition componentDefinition = getComponentDefinition(componentName);
+        if(iconPrefix == null || iconPrefix.isEmpty()) {
+            return getComponentPngImage(componentName, ComponentImageType.PALLETE_ICON_32X32);
+        }
+        return getImageStream(componentDefinition, iconPrefix + "_icon32.png");
     }
 
     /**
