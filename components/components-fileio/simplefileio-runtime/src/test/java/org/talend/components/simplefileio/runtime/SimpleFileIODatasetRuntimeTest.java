@@ -719,5 +719,31 @@ public class SimpleFileIODatasetRuntimeTest {
 
         assertThat(actual, hasSize(10));
     }
+    
+    @Test
+    public void testBug() throws Exception {
+        String fileSpec = sourceFilePrepare("10L3C.csv");
+
+        // Configure the component.
+        SimpleFileIODatasetProperties props = createDatasetProperties();
+        props.path.setValue(fileSpec);
+        props.format.setValue(SimpleFileIOFormat.CSV);
+        props.setHeaderLine.setValue(true);
+        props.headerLine.setValue(1);
+
+        final List<IndexedRecord> actual = getSample(props,100);
+
+        assertThat(actual, hasSize(10));
+        List<Field> fields = actual.get(0).getSchema().getFields();
+        assertThat(fields, hasSize(3));
+        
+        assertThat("0", equalTo(actual.get(0).get(0)));
+        assertThat("Adele", equalTo(actual.get(0).get(1)));
+        assertThat("15/01/2017", equalTo(actual.get(0).get(2)));
+        
+        assertThat("9", equalTo(actual.get(9).get(0)));
+        assertThat("Jenifer", equalTo(actual.get(9).get(1)));
+        assertThat("15/10/2017", equalTo(actual.get(9).get(2)));
+    }
 
 }

@@ -171,15 +171,6 @@ public class S3TestResource extends ExternalResource {
      */
     @Override
     protected void after() {
-        try {
-            S3DatasetProperties datasetProps = createS3DatasetProperties();
-            S3AFileSystem fs = S3Connection.createFileSystem(datasetProps);
-            Path path = new Path(S3Connection.getUriPath(datasetProps));
-            if (fs.exists(path)) {
-                fs.delete(path, true);
-            }
-        } catch (IOException ioe) {
-            throw new RuntimeException(ioe);
-        }
+        
     }
 }
