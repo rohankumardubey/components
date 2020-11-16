@@ -14,8 +14,6 @@
 package org.talend.components.simplefileio.runtime.s3;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -87,6 +85,11 @@ public class S3Connection {
         conf.set(Constants.ENDPOINT, endpoint);
         //need to it?
         //conf.set("fs.s3a.experimental.input.fadvise", "random");
+        conf.set(Constants.MULTIPART_SIZE, String.valueOf(Constants.DEFAULT_MULTIPART_SIZE));
+        conf.set(Constants.FS_S3A_BLOCK_SIZE, String.valueOf(S3AFileSystem.DEFAULT_BLOCKSIZE));
+        conf.set(Constants.MAX_THREADS, String.valueOf(Constants.DEFAULT_MAX_THREADS));
+        conf.set(Constants.CORE_THREADS, String.valueOf(Constants.DEFAULT_CORE_THREADS));
+        conf.set(Constants.MAX_TOTAL_TASKS, String.valueOf(Constants.DEFAULT_MAX_TOTAL_TASKS));
       
         if (properties.encryptDataAtRest.getValue()) {
             conf.set(Constants.SERVER_SIDE_ENCRYPTION_ALGORITHM, S3AEncryptionMethods.SSE_KMS.getMethod());
