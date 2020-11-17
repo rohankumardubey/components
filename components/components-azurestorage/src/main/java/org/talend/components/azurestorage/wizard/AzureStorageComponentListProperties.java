@@ -27,8 +27,6 @@ import org.talend.components.api.properties.ComponentPropertiesImpl;
 import org.talend.components.azurestorage.AzureStorageProvideConnectionProperties;
 import org.talend.components.azurestorage.blob.AzureStorageContainerProperties;
 import org.talend.components.azurestorage.queue.AzureStorageQueueProperties;
-import org.talend.components.azurestorage.table.AzureStorageTableProperties;
-import org.talend.components.azurestorage.table.runtime.AzureStorageTableSourceOrSink;
 import org.talend.components.azurestorage.tazurestorageconnection.TAzureStorageConnectionProperties;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.avro.AvroUtils;
@@ -151,22 +149,6 @@ public class AzureStorageComponentListProperties extends ComponentPropertiesImpl
                 queueProps.queueName.setValue(queueId);
                 queueProps.schema.schema.setValue(getQueueSchema());
                 repo.storeProperties(queueProps, formatSchemaName(queueId), repoLoc, "schema.schema");
-            }
-        }
-        if (selectedTableNames.getValue() != null) {
-            for (NamedThing nl : selectedTableNames.getValue()) {
-                String tableId = nl.getName();
-                AzureStorageTableProperties tableProps = new AzureStorageTableProperties(tableId);
-                tableProps.init();
-                tableProps.connection = connection;
-                tableProps.tableName.setValue(tableId);
-                try {
-                    Schema schema = AzureStorageTableSourceOrSink.getSchema(null, connection, tableId);
-                    tableProps.schema.schema.setValue(schema);
-                    repo.storeProperties(tableProps, formatSchemaName(tableId), repoLoc, "schema.schema");
-                } catch (IOException e) {
-                    LOGGER.error(e.getLocalizedMessage());
-                }
             }
         }
         return ValidationResult.OK;

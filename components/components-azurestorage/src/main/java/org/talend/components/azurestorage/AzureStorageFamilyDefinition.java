@@ -31,8 +31,6 @@ import org.talend.components.azurestorage.queue.tazurestoragequeueinputloop.TAzu
 import org.talend.components.azurestorage.queue.tazurestoragequeuelist.TAzureStorageQueueListDefinition;
 import org.talend.components.azurestorage.queue.tazurestoragequeueoutput.TAzureStorageQueueOutputDefinition;
 import org.talend.components.azurestorage.queue.tazurestoragequeuepurge.TAzureStorageQueuePurgeDefinition;
-import org.talend.components.azurestorage.table.tazurestorageinputtable.TAzureStorageInputTableDefinition;
-import org.talend.components.azurestorage.table.tazurestorageoutputtable.TAzureStorageOutputTableDefinition;
 import org.talend.components.azurestorage.tazurestorageconnection.TAzureStorageConnectionDefinition;
 import org.talend.components.azurestorage.wizard.AzureStorageConnectionEditWizardDefinition;
 import org.talend.components.azurestorage.wizard.AzureStorageConnectionWizardDefinition;
@@ -52,8 +50,6 @@ public class AzureStorageFamilyDefinition extends AbstractComponentFamilyDefinit
                 new TAzureStorageContainerDeleteDefinition(), new TAzureStorageContainerListDefinition(),
                 new TAzureStorageListDefinition(), new TAzureStorageDeleteDefinition(), new TAzureStorageGetDefinition(),
                 new TAzureStoragePutDefinition(),
-                // tables
-                new TAzureStorageInputTableDefinition(), new TAzureStorageOutputTableDefinition(),
                 // queues
                 new TAzureStorageQueueCreateDefinition(), new TAzureStorageQueueDeleteDefinition(),
                 new TAzureStorageQueueListDefinition(), new TAzureStorageQueueInputDefinition(),

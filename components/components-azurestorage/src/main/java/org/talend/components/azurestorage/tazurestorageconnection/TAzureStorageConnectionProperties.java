@@ -24,7 +24,6 @@ import org.talend.components.api.properties.ComponentReferenceProperties;
 import org.talend.components.azurestorage.AzureStorageProvideConnectionProperties;
 import org.talend.components.azurestorage.blob.runtime.AzureStorageSourceOrSink;
 import org.talend.components.azurestorage.queue.runtime.AzureStorageQueueSourceOrSink;
-import org.talend.components.azurestorage.table.runtime.AzureStorageTableSourceOrSink;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
@@ -210,13 +209,9 @@ public class TAzureStorageConnectionProperties extends ComponentPropertiesImpl
                 if (allowedQueue) {
                     QueueSchema = AzureStorageQueueSourceOrSink.getSchemaNames(null, this);
                 }
-                if (allowedtable) {
-                    TableSchema = AzureStorageTableSourceOrSink.getSchemaNames(null, this);
-                }
             } else {
                 BlobSchema = AzureStorageSourceOrSink.getSchemaNames(null, this);
                 QueueSchema = AzureStorageQueueSourceOrSink.getSchemaNames(null, this);
-                TableSchema = AzureStorageTableSourceOrSink.getSchemaNames(null, this);
             }
         } catch (Exception e) {
             String errorMessage = e.getLocalizedMessage() + '\n';
