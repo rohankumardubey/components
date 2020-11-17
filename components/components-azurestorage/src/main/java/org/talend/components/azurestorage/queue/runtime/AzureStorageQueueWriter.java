@@ -90,7 +90,7 @@ public class AzureStorageQueueWriter implements WriterWithFeedback<Result, Index
             }
         }
         try {
-            queue = sink.getCloudQueue(runtime, props.queueName.getValue());
+            queue = sink.getQueueItem(runtime, props.queueName.getValue());
         } catch (QueueStorageException e) {
             LOGGER.error(e.getLocalizedMessage());
             if (props.dieOnError.getValue()) {

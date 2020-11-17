@@ -20,8 +20,9 @@ import org.talend.components.azurestorage.AzureStorageProvideConnectionPropertie
 import org.talend.components.azurestorage.queue.runtime.AzureStorageQueueSource;
 import org.talend.components.azurestorage.queue.tazurestoragequeuecreate.TAzureStorageQueueCreateProperties;
 
-import com.microsoft.azure.storage.queue.CloudQueue;
-import com.microsoft.azure.storage.queue.CloudQueueClient;
+import com.azure.storage.queue.QueueClient;
+import com.azure.storage.queue.QueueServiceClient;
+import com.azure.storage.queue.models.QueueItem;
 
 public class AzureStorageBaseQueueTestIT extends AzureStorageBaseTestIT {
 
@@ -29,9 +30,9 @@ public class AzureStorageBaseQueueTestIT extends AzureStorageBaseTestIT {
 
     protected static final String TEST_QUEUE_NAME_CREATE = "test-queue-create";
 
-    protected static CloudQueue queue;
+    protected static QueueClient queue;
 
-    protected static CloudQueueClient queueClient;
+    protected static QueueServiceClient queueClient;
 
     protected String[] messages = { "A message to you rudy", "Message in a bottle", "Alert Message" };
 
@@ -49,8 +50,8 @@ public class AzureStorageBaseQueueTestIT extends AzureStorageBaseTestIT {
         AzureStorageQueueSource source = new AzureStorageQueueSource();
         source.initialize(null, properties);
         queueClient = source.getStorageQueueClient(null);
-        queue = source.getCloudQueue(null, TEST_QUEUE_NAME);
-        queue.createIfNotExists();
+        queue = source.getQueueItem(null, TEST_QUEUE_NAME);
+        queue.create();
     }
 
     @Override

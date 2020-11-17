@@ -53,8 +53,8 @@ public class AzureStorageQueuePurgeReaderTestIT extends AzureStorageBaseQueueTes
             writer.write(entity);
         }
         writer.close();
-        queue.downloadAttributes();
-        assertTrue(queue.getApproximateMessageCount() > 3);
+        // queue.downloadAttributes();
+        assertTrue(queue.getProperties().getApproximateMessagesCount() > 3);
     }
 
     @SuppressWarnings("rawtypes")
@@ -69,8 +69,8 @@ public class AzureStorageQueuePurgeReaderTestIT extends AzureStorageBaseQueueTes
         assertTrue(reader.start());
         assertFalse(reader.advance());
         reader.close();
-        queue.downloadAttributes();
-        assertEquals(0, queue.getApproximateMessageCount());
+        // queue.downloadAttributes();
+        assertEquals(0, queue.getProperties().getApproximateMessagesCount());
 
     }
 }

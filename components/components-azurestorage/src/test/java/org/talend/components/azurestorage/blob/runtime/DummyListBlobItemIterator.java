@@ -15,14 +15,13 @@ package org.talend.components.azurestorage.blob.runtime;
 import java.util.Iterator;
 import java.util.List;
 
-import com.microsoft.azure.storage.blob.CloudBlockBlob;
-import com.microsoft.azure.storage.blob.BlobItem;
+import com.azure.storage.blob.models.BlobItem;
 
 public class DummyListBlobItemIterator implements Iterator<BlobItem> {
 
-    private Iterator<CloudBlockBlob> it;
+    private Iterator<BlobItem> it;
 
-    public DummyListBlobItemIterator(List<CloudBlockBlob> list) {
+    public DummyListBlobItemIterator(List<BlobItem> list) {
         super();
         this.it = list.iterator();
     }
@@ -34,7 +33,7 @@ public class DummyListBlobItemIterator implements Iterator<BlobItem> {
     }
 
     @Override
-    public CloudBlockBlob next() {
+    public BlobItem next() {
         return it.next();
     }
 

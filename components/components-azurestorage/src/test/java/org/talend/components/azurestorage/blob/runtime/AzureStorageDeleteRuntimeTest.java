@@ -42,9 +42,8 @@ import org.talend.components.azurestorage.tazurestorageconnection.TAzureStorageC
 import org.talend.components.azurestorage.tazurestorageconnection.TAzureStorageConnectionProperties.Protocol;
 import org.talend.daikon.properties.ValidationResult;
 
-import com.microsoft.azure.storage.BlobStorageException;
-import com.microsoft.azure.storage.blob.CloudBlockBlob;
-import com.microsoft.azure.storage.blob.BlobItem;
+import com.azure.storage.blob.models.BlobItem;
+import com.azure.storage.blob.models.BlobStorageException;
 
 public class AzureStorageDeleteRuntimeTest {
 
@@ -101,8 +100,8 @@ public class AzureStorageDeleteRuntimeTest {
         deleteBlock.azureStorageBlobService = blobService;
 
         try {
-            final List<CloudBlockBlob> list = new ArrayList<>();
-            list.add(new CloudBlockBlob(new URI("https://storagesample.blob.core.windows.net/mycontainer/blob1.txt")));
+            final List<BlobItem> list = new ArrayList<>();
+            list.add(new BlobItem());
 
             when(blobService.listBlobs(anyString(), anyString(), anyBoolean())).thenReturn(new Iterable<BlobItem>() {
 
@@ -112,7 +111,7 @@ public class AzureStorageDeleteRuntimeTest {
                 }
             });
 
-            when(blobService.deleteBlobBlockIfExist(any(CloudBlockBlob.class))).thenReturn(false);
+            when(blobService.deleteBlobBlockIfExist(any(BlobItem.class))).thenReturn(false);
             deleteBlock.runAtDriver(runtimeContainer);
 
         } catch (BlobStorageException e) {
@@ -128,8 +127,8 @@ public class AzureStorageDeleteRuntimeTest {
         assertEquals(ValidationResult.OK.getStatus(), validationResult.getStatus());
         deleteBlock.azureStorageBlobService = blobService;
         try {
-            final List<CloudBlockBlob> list = new ArrayList<>();
-            list.add(new CloudBlockBlob(new URI("https://storagesample.blob.core.windows.net/mycontainer/blob1.txt")));
+            final List<BlobItem> list = new ArrayList<>();
+            list.add(new BlobItem());
 
             when(blobService.listBlobs(anyString(), anyString(), anyBoolean())).thenReturn(new Iterable<BlobItem>() {
 
@@ -139,7 +138,7 @@ public class AzureStorageDeleteRuntimeTest {
                 }
             });
 
-            when(blobService.deleteBlobBlockIfExist(any(CloudBlockBlob.class))).thenReturn(true);
+            when(blobService.deleteBlobBlockIfExist(any(BlobItem.class))).thenReturn(true);
 
             deleteBlock.runAtDriver(runtimeContainer);
         } catch (BlobStorageException e) {
@@ -158,10 +157,10 @@ public class AzureStorageDeleteRuntimeTest {
 
         try {
             when(blobService.listBlobs(anyString(), anyString(), anyBoolean()))
-                    .thenThrow(new BlobStorageException("some error code", "dummy message", new RuntimeException()));
+                    .thenThrow(new BlobStorageException("dummy message", null, new RuntimeException()));
             deleteBlock.runAtDriver(runtimeContainer);
 
-        } catch (InvalidKeyException | URISyntaxException | BlobStorageException e) {
+        } catch (BlobStorageException e) {
             fail("should not throw " + e.getMessage());
         }
     }
@@ -177,9 +176,9 @@ public class AzureStorageDeleteRuntimeTest {
         // prepare test data and mocks
         try {
             when(blobService.listBlobs(anyString(), anyString(), anyBoolean()))
-                    .thenThrow(new BlobStorageException("some error code", "dummy message", new RuntimeException()));
+                    .thenThrow(new BlobStorageException("dummy message", null, new RuntimeException()));
             deleteBlock.runAtDriver(runtimeContainer);
-        } catch (InvalidKeyException | URISyntaxException | BlobStorageException e) {
+        } catch (BlobStorageException e) {
             fail("should not throw " + e.getMessage());
         }
     }

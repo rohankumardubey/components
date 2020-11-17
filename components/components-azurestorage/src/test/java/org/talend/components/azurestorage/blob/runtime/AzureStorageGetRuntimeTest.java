@@ -32,6 +32,9 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+import com.azure.storage.blob.models.BlobItem;
+import com.azure.storage.blob.models.BlobStorageException;
+
 import org.assertj.core.util.Files;
 import org.junit.After;
 import org.junit.Before;
@@ -55,11 +58,6 @@ import org.talend.components.azurestorage.tazurestorageconnection.TAzureStorageC
 import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
 import org.talend.daikon.properties.ValidationResult;
-
-import com.microsoft.azure.storage.BlobStorageException;
-import com.microsoft.azure.storage.blob.BlobItem;
-import com.microsoft.azure.storage.blob.CloudBlockBlob;
-import com.microsoft.azure.storage.blob.BlobItem;
 
 public class AzureStorageGetRuntimeTest {
 
@@ -141,8 +139,8 @@ public class AzureStorageGetRuntimeTest {
             ValidationResult validationResult = storageGet.initialize(runtimeContainer, properties);
             assertEquals(ValidationResult.OK.getStatus(), validationResult.getStatus());
 
-            final List<CloudBlockBlob> list = new ArrayList<>();
-            list.add(new CloudBlockBlob(new URI("https://storagesample.blob.core.windows.net/mycontainer/blob1.txt")));
+            final List<BlobItem> list = new ArrayList<>();
+            list.add(new BlobItem());
             when(blobService.listBlobs(anyString(), anyString(), anyBoolean())).thenReturn(new Iterable<BlobItem>() {
 
                 @Override
@@ -188,8 +186,8 @@ public class AzureStorageGetRuntimeTest {
             ValidationResult validationResult = storageGet.initialize(runtimeContainer, properties);
             assertEquals(ValidationResult.OK.getStatus(), validationResult.getStatus());
 
-            final List<CloudBlockBlob> list = new ArrayList<>();
-            list.add(new CloudBlockBlob(new URI("https://storagesample.blob.core.windows.net/mycontainer/someDir/blob1.txt")));
+            final List<BlobItem> list = new ArrayList<>();
+            list.add(new BlobItem());
             when(blobService.listBlobs(anyString(), anyString(), anyBoolean())).thenReturn(new Iterable<BlobItem>() {
 
                 @Override

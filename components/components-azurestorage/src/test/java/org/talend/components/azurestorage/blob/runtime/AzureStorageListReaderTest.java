@@ -23,13 +23,14 @@ import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
-import java.security.InvalidKeyException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
+
+import com.azure.storage.blob.models.BlobItem;
+import com.azure.storage.blob.models.BlobStorageException;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -45,10 +46,6 @@ import org.talend.components.azurestorage.blob.helpers.RemoteBlobsTable;
 import org.talend.components.azurestorage.blob.tazurestoragelist.TAzureStorageListProperties;
 import org.talend.components.azurestorage.tazurestorageconnection.TAzureStorageConnectionProperties;
 import org.talend.components.azurestorage.tazurestorageconnection.TAzureStorageConnectionProperties.Protocol;
-
-import com.microsoft.azure.storage.BlobStorageException;
-import com.microsoft.azure.storage.blob.CloudBlockBlob;
-import com.microsoft.azure.storage.blob.BlobItem;
 
 public class AzureStorageListReaderTest {
 
@@ -92,7 +89,7 @@ public class AzureStorageListReaderTest {
 
                 @Override
                 public Iterator<BlobItem> iterator() {
-                    return new DummyListBlobItemIterator(new ArrayList<CloudBlockBlob>());
+                    return new DummyListBlobItemIterator(new ArrayList<BlobItem>());
                 }
             });
 
@@ -104,7 +101,7 @@ public class AzureStorageListReaderTest {
             assertFalse(startable);
             assertFalse(reader.advance());
 
-        } catch (InvalidKeyException | URISyntaxException | BlobStorageException | IOException e) {
+        } catch (BlobStorageException | IOException e) {
             fail("should not throw " + e.getMessage());
         }
     }
@@ -113,10 +110,10 @@ public class AzureStorageListReaderTest {
     public void testStartAsStartabke() {
 
         try {
-            final List<CloudBlockBlob> list = new ArrayList<>();
-            list.add(new CloudBlockBlob(new URI("https://storagesample.blob.core.windows.net/mycontainer/blob1.txt")));
-            list.add(new CloudBlockBlob(new URI("https://storagesample.blob.core.windows.net/mycontainer/blob2.txt")));
-            list.add(new CloudBlockBlob(new URI("https://storagesample.blob.core.windows.net/mycontainer/blob3.txt")));
+            final List<BlobItem> list = new ArrayList<>();
+            list.add(new BlobItem());
+            list.add(new BlobItem());
+            list.add(new BlobItem());
             when(blobService.listBlobs(anyString(), anyString(), anyBoolean())).thenReturn(new Iterable<BlobItem>() {
 
                 @Override
@@ -138,7 +135,7 @@ public class AzureStorageListReaderTest {
             assertNotNull(reader.getReturnValues());
             assertEquals(3, reader.getReturnValues().get(ComponentDefinition.RETURN_TOTAL_RECORD_COUNT));
 
-        } catch (InvalidKeyException | URISyntaxException | BlobStorageException | IOException e) {
+        } catch (BlobStorageException | IOException e) {
             fail("should not throw " + e.getMessage());
         }
     }
@@ -152,8 +149,8 @@ public class AzureStorageListReaderTest {
     @Test(expected = NoSuchElementException.class)
     public void getCurrentOnNonAdvancableReader() {
         try {
-            final List<CloudBlockBlob> list = new ArrayList<>();
-            list.add(new CloudBlockBlob(new URI("https://storagesample.blob.core.windows.net/mycontainer/blob1.txt")));
+            final List<BlobItem> list = new ArrayList<>();
+            list.add(new BlobItem());
 
             when(blobService.listBlobs(anyString(), anyString(), anyBoolean())).thenReturn(new Iterable<BlobItem>() {
 
@@ -175,7 +172,7 @@ public class AzureStorageListReaderTest {
             reader.getCurrent();
             fail("should throw NoSuchElementException");
 
-        } catch (InvalidKeyException | URISyntaxException | BlobStorageException | IOException e) {
+        } catch (BlobStorageException | IOException e) {
             fail("should not throw " + e.getMessage());
         }
     }

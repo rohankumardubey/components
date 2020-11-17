@@ -26,6 +26,8 @@ import java.net.URISyntaxException;
 import java.security.InvalidKeyException;
 import java.util.ArrayList;
 
+import com.azure.storage.blob.models.BlobStorageException;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -45,8 +47,6 @@ import org.talend.components.azurestorage.tazurestorageconnection.TAzureStorageC
 import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
 import org.talend.daikon.properties.ValidationResult;
-
-import com.microsoft.azure.storage.BlobStorageException;
 
 public class AzureStoragePutRuntimeTest {
 
@@ -141,12 +141,12 @@ public class AzureStoragePutRuntimeTest {
 
                 @Override
                 public Void answer(InvocationOnMock invocation) throws Throwable {
-                    throw new BlobStorageException("some error code", "some storage exception", new RuntimeException());
+                    throw new BlobStorageException("some storage exception", null, new RuntimeException());
                 }
             }).when(blobService).upload(anyString(), anyString(), any(InputStream.class), anyLong());
             this.storagePut.runAtDriver(runtimeContainer);
 
-        } catch (InvalidKeyException | BlobStorageException | IOException | URISyntaxException e) {
+        } catch (BlobStorageException e) {
             fail("should not throw " + e.getMessage());
         }
     }
@@ -172,12 +172,12 @@ public class AzureStoragePutRuntimeTest {
 
                 @Override
                 public Void answer(InvocationOnMock invocation) throws Throwable {
-                    throw new BlobStorageException("some error code", "some storage exception", new RuntimeException());
+                    throw new BlobStorageException("some storage exception", null, new RuntimeException());
                 }
             }).when(blobService).upload(anyString(), anyString(), any(InputStream.class), anyLong());
             this.storagePut.runAtDriver(runtimeContainer);
 
-        } catch (InvalidKeyException | BlobStorageException | IOException | URISyntaxException e) {
+        } catch (BlobStorageException  e) {
             fail("should not throw " + e.getMessage());
         }
 
@@ -208,7 +208,7 @@ public class AzureStoragePutRuntimeTest {
             }).when(blobService).upload(anyString(), anyString(), any(InputStream.class), anyLong());
             this.storagePut.runAtDriver(runtimeContainer);
 
-        } catch (InvalidKeyException | BlobStorageException | IOException | URISyntaxException e) {
+        } catch (BlobStorageException e) {
             fail("should not throw " + e.getMessage());
         }
 

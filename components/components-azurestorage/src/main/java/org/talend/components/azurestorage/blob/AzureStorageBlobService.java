@@ -103,8 +103,8 @@ public class AzureStorageBlobService {
      * This method delete the container if exist
      */
     public boolean deleteContainerIfExist(final String containerName) throws BlobStorageException {
-        final BlobContainerClient cloudBlobContainer = getContainerReference(containerName);
-        cloudBlobContainer.delete();
+        final BlobContainerClient BlobContainerItem = getContainerReference(containerName);
+        BlobContainerItem.delete();
         //FIXME
         return true;
     }

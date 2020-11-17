@@ -36,8 +36,6 @@ import org.talend.components.azurestorage.queue.tazurestoragequeueinputloop.TAzu
 import org.talend.components.azurestorage.queue.tazurestoragequeuelist.TAzureStorageQueueListDefinition;
 import org.talend.components.azurestorage.queue.tazurestoragequeueoutput.TAzureStorageQueueOutputDefinition;
 import org.talend.components.azurestorage.queue.tazurestoragequeuepurge.TAzureStorageQueuePurgeDefinition;
-import org.talend.components.azurestorage.table.tazurestorageinputtable.TAzureStorageInputTableDefinition;
-import org.talend.components.azurestorage.table.tazurestorageoutputtable.TAzureStorageOutputTableDefinition;
 import org.talend.components.azurestorage.tazurestorageconnection.TAzureStorageConnectionDefinition;
 import org.talend.daikon.definition.service.DefinitionRegistryService;
 
@@ -87,9 +85,6 @@ public abstract class AzureStorageGenericBase extends AbstractComponentTest2 {
         assertComponentIsRegistered(TAzureStorageGetDefinition.COMPONENT_NAME);
         assertComponentIsRegistered(TAzureStorageListDefinition.COMPONENT_NAME);
         assertComponentIsRegistered(TAzureStoragePutDefinition.COMPONENT_NAME);
-        // tables
-        assertComponentIsRegistered(TAzureStorageInputTableDefinition.COMPONENT_NAME);
-        assertComponentIsRegistered(TAzureStorageOutputTableDefinition.COMPONENT_NAME);
         // queues
         assertComponentIsRegistered(TAzureStorageQueueInputDefinition.COMPONENT_NAME);
         assertComponentIsRegistered(TAzureStorageQueueOutputDefinition.COMPONENT_NAME);

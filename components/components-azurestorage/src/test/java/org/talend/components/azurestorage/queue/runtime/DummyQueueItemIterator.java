@@ -15,13 +15,14 @@ package org.talend.components.azurestorage.queue.runtime;
 import java.util.Iterator;
 import java.util.List;
 
-import com.microsoft.azure.storage.queue.CloudQueueMessage;
+import com.azure.storage.queue.models.QueueItem;
+import com.azure.storage.queue.models.QueueItem;
 
-public class DummyCloudQueueMessageIterator implements Iterator<CloudQueueMessage> {
+public class DummyQueueItemIterator implements Iterator<QueueItem> {
 
-    private Iterator<CloudQueueMessage> it;
+    private Iterator<QueueItem> it;
 
-    public DummyCloudQueueMessageIterator(List<CloudQueueMessage> list) {
+    public DummyQueueItemIterator(List<QueueItem> list) {
         super();
         this.it = list.iterator();
     }
@@ -33,8 +34,7 @@ public class DummyCloudQueueMessageIterator implements Iterator<CloudQueueMessag
     }
 
     @Override
-    public CloudQueueMessage next() {
+    public QueueItem next() {
         return it.next();
     }
-
 }

@@ -42,8 +42,8 @@ import org.talend.components.azurestorage.blob.tazurestoragecontainerlist.TAzure
 import org.talend.components.azurestorage.tazurestorageconnection.TAzureStorageConnectionProperties;
 import org.talend.components.azurestorage.tazurestorageconnection.TAzureStorageConnectionProperties.Protocol;
 
-import com.microsoft.azure.storage.BlobStorageException;
-import com.microsoft.azure.storage.blob.CloudBlobContainer;
+import com.azure.storage.blob.models.BlobContainerItem;
+import com.azure.storage.blob.models.BlobStorageException;
 
 public class AzureStorageContainerListReaderTest {
 
@@ -81,11 +81,11 @@ public class AzureStorageContainerListReaderTest {
     public void testStartAsNonStartable() {
         // init mock
         try {
-            when(blobService.listContainers()).thenReturn(new Iterable<CloudBlobContainer>() {
+            when(blobService.listContainers()).thenReturn(new Iterable<BlobContainerItem>() {
 
                 @Override
-                public Iterator<CloudBlobContainer> iterator() {
-                    return new DummyCloudBlobContainerIterator(new ArrayList<CloudBlobContainer>());
+                public Iterator<BlobContainerItem> iterator() {
+                    return new DummyBlobContainerItemIterator(new ArrayList<BlobContainerItem>());
                 }
             });
 
@@ -93,7 +93,7 @@ public class AzureStorageContainerListReaderTest {
             assertFalse(startable);
             assertFalse(reader.advance());
 
-        } catch (InvalidKeyException | URISyntaxException | IOException e) {
+        } catch (Exception e) {
             fail("should not throw " + e.getMessage());
         }
     }
@@ -102,16 +102,16 @@ public class AzureStorageContainerListReaderTest {
     public void testStartAsStartabke() {
 
         try {
-            final List<CloudBlobContainer> list = new ArrayList<>();
-            list.add(new CloudBlobContainer(new URI("https://fakeAccountName.blob.core.windows.net/container-1")));
-            list.add(new CloudBlobContainer(new URI("https://fakeAccountName.blob.core.windows.net/container-2")));
-            list.add(new CloudBlobContainer(new URI("https://fakeAccountName.blob.core.windows.net/container-3")));
+            final List<BlobContainerItem> list = new ArrayList<>();
+            list.add(new BlobContainerItem());
+            list.add(new BlobContainerItem());
+            list.add(new BlobContainerItem());
 
-            when(blobService.listContainers()).thenReturn(new Iterable<CloudBlobContainer>() {
+            when(blobService.listContainers()).thenReturn(new Iterable<BlobContainerItem>() {
 
                 @Override
-                public Iterator<CloudBlobContainer> iterator() {
-                    return new DummyCloudBlobContainerIterator(list);
+                public Iterator<BlobContainerItem> iterator() {
+                    return new DummyBlobContainerItemIterator(list);
                 }
             });
 
@@ -124,7 +124,7 @@ public class AzureStorageContainerListReaderTest {
             assertNotNull(reader.getReturnValues());
             assertEquals(3, reader.getReturnValues().get(ComponentDefinition.RETURN_TOTAL_RECORD_COUNT));
 
-        } catch (InvalidKeyException | URISyntaxException | BlobStorageException | IOException e) {
+        } catch (BlobStorageException | IOException e) {
             fail("should not throw " + e.getMessage());
         }
     }
@@ -139,13 +139,13 @@ public class AzureStorageContainerListReaderTest {
     public void getCurrentOnNonAdvancableReader() {
 
         try {
-            final List<CloudBlobContainer> list = new ArrayList<>();
-            list.add(new CloudBlobContainer(new URI("https://fakeAccountName.blob.core.windows.net/container-1")));
-            when(blobService.listContainers()).thenReturn(new Iterable<CloudBlobContainer>() {
+            final List<BlobContainerItem> list = new ArrayList<>();
+            list.add(new BlobContainerItem());
+            when(blobService.listContainers()).thenReturn(new Iterable<BlobContainerItem>() {
 
                 @Override
-                public Iterator<CloudBlobContainer> iterator() {
-                    return new DummyCloudBlobContainerIterator(list);
+                public Iterator<BlobContainerItem> iterator() {
+                    return new DummyBlobContainerItemIterator(list);
                 }
             });
 

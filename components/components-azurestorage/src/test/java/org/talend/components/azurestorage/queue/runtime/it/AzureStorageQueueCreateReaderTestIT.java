@@ -26,7 +26,7 @@ import org.talend.components.azurestorage.AzureStorageDefinition;
 import org.talend.components.azurestorage.AzureStorageProvideConnectionProperties;
 import org.talend.components.azurestorage.queue.tazurestoragequeuecreate.TAzureStorageQueueCreateProperties;
 
-import com.microsoft.azure.storage.queue.CloudQueue;
+import com.azure.storage.queue.models.QueueItem;
 
 @Ignore
 public class AzureStorageQueueCreateReaderTestIT extends AzureStorageBaseQueueTestIT {
@@ -37,9 +37,7 @@ public class AzureStorageQueueCreateReaderTestIT extends AzureStorageBaseQueueTe
 
     @AfterClass
     public static void removeQueues() throws Throwable {
-        for (CloudQueue q : queueClient.listQueues(TEST_QUEUE_NAME_CREATE)) {
-            q.delete();
-        }
+        queueClient.getQueueClient(TEST_QUEUE_NAME_CREATE).delete();
     }
 
     @SuppressWarnings("rawtypes")
@@ -92,7 +90,7 @@ public class AzureStorageQueueCreateReaderTestIT extends AzureStorageBaseQueueTe
         assertTrue(reader.start());
         reader.close();
         //
-        queueClient.getQueueReference(fqueue).delete();
+        queueClient.getQueueClient(fqueue).delete();
         //
         assertTrue(reader.start());
         reader.close();

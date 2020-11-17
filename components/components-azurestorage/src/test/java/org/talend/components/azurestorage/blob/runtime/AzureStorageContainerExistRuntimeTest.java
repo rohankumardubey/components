@@ -35,7 +35,7 @@ import org.talend.components.azurestorage.tazurestorageconnection.TAzureStorageC
 import org.talend.components.azurestorage.tazurestorageconnection.TAzureStorageConnectionProperties.Protocol;
 import org.talend.daikon.properties.ValidationResult;
 
-import com.microsoft.azure.storage.BlobStorageException;
+import com.azure.storage.blob.models.BlobStorageException;
 
 public class AzureStorageContainerExistRuntimeTest {
 
@@ -94,10 +94,10 @@ public class AzureStorageContainerExistRuntimeTest {
         // Handle Storage exception
         try {
             when(blobService.containerExist(anyString()))
-                    .thenThrow(new BlobStorageException("errorCode", "storage exception message", new RuntimeException()));
+                    .thenThrow(new BlobStorageException("storage exception message", null, new RuntimeException()));
             existContainer.runAtDriver(runtimeContainer);
 
-        } catch (InvalidKeyException | BlobStorageException | URISyntaxException e) {
+        } catch (BlobStorageException e) {
             fail("should not throw exception " + e.getMessage());
         }
     }
@@ -117,7 +117,7 @@ public class AzureStorageContainerExistRuntimeTest {
 
             when(blobService.containerExist(anyString())).thenThrow(new InvalidKeyException());
             existContainer.runAtDriver(runtimeContainer);
-        } catch (InvalidKeyException | BlobStorageException | URISyntaxException e) {
+        } catch (BlobStorageException e) {
             fail("should not throw exception " + e.getMessage());
         }
     }
@@ -138,7 +138,7 @@ public class AzureStorageContainerExistRuntimeTest {
                     .thenThrow(new URISyntaxException("bad url", "some reason"));
             existContainer.runAtDriver(runtimeContainer);
 
-        } catch (InvalidKeyException | BlobStorageException | URISyntaxException e) {
+        } catch (BlobStorageException e) {
             fail("should not throw exception " + e.getMessage());
         }
     }
@@ -154,9 +154,9 @@ public class AzureStorageContainerExistRuntimeTest {
 
         try {
             when(blobService.containerExist(anyString()))
-                    .thenThrow(new BlobStorageException("errorCode", "storage exception message", new RuntimeException()));
+                    .thenThrow(new BlobStorageException("storage exception message", null, new RuntimeException()));
             existContainer.runAtDriver(runtimeContainer);
-        } catch (InvalidKeyException | BlobStorageException | URISyntaxException e) {
+        } catch (BlobStorageException e) {
             fail("should not throw exception " + e.getMessage());
         }
 
@@ -172,7 +172,7 @@ public class AzureStorageContainerExistRuntimeTest {
         try {
             when(blobService.containerExist(anyString())).thenReturn(false);
             existContainer.runAtDriver(runtimeContainer);
-        } catch (InvalidKeyException | BlobStorageException | URISyntaxException e) {
+        } catch (BlobStorageException e) {
             fail("should not throw exception " + e.getMessage());
         }
     }
@@ -186,7 +186,7 @@ public class AzureStorageContainerExistRuntimeTest {
         try {
             when(blobService.containerExist(anyString())).thenReturn(true);
             existContainer.runAtDriver(runtimeContainer);
-        } catch (InvalidKeyException | BlobStorageException | URISyntaxException e) {
+        } catch (BlobStorageException e) {
             fail("should not throw exception " + e.getMessage());
         }
 

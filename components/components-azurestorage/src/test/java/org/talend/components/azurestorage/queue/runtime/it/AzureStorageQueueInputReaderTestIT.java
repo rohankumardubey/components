@@ -15,13 +15,13 @@ package org.talend.components.azurestorage.queue.runtime.it;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import com.azure.storage.queue.models.QueueMessageItem;
+
 import org.junit.Ignore;
 import org.junit.Test;
 import org.talend.components.api.component.runtime.BoundedReader;
 import org.talend.components.azurestorage.AzureStorageProvideConnectionProperties;
 import org.talend.components.azurestorage.queue.tazurestoragequeueinput.TAzureStorageQueueInputProperties;
-
-import com.microsoft.azure.storage.queue.CloudQueueMessage;
 
 @Ignore
 public class AzureStorageQueueInputReaderTestIT extends AzureStorageBaseQueueTestIT {
@@ -32,9 +32,9 @@ public class AzureStorageQueueInputReaderTestIT extends AzureStorageBaseQueueTes
         super("queue-input");
         try {
             //
-            queue.clear();
+            queue.clearMessages();
             for (int idx = 0; idx < 50; idx++) {
-                queue.addMessage(new CloudQueueMessage("messageContent#" + idx));
+                queue.sendMessage("messageContent#" + idx);
             }
             //
             inputProps = new TAzureStorageQueueInputProperties("tests");

@@ -16,6 +16,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import com.azure.storage.queue.models.QueueMessageItem;
+
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.IndexedRecord;
 import org.junit.Ignore;
@@ -26,7 +28,6 @@ import org.talend.components.azurestorage.AzureStorageProvideConnectionPropertie
 import org.talend.components.azurestorage.queue.runtime.AzureStorageQueueSink;
 import org.talend.components.azurestorage.queue.tazurestoragequeueoutput.TAzureStorageQueueOutputProperties;
 
-import com.microsoft.azure.storage.queue.CloudQueueMessage;
 
 @Ignore
 public class AzureStorageQueueOutputWriterTestIT extends AzureStorageBaseQueueTestIT {
@@ -44,7 +45,7 @@ public class AzureStorageQueueOutputWriterTestIT extends AzureStorageBaseQueueTe
 
     @Test
     public void testWriteSimpleMessage() throws Throwable {
-        queue.clear();
+        queue.clearMessages();
         //
         TAzureStorageQueueOutputProperties properties = new TAzureStorageQueueOutputProperties("tests");
         properties = (TAzureStorageQueueOutputProperties) setupConnectionProperties(
@@ -59,17 +60,17 @@ public class AzureStorageQueueOutputWriterTestIT extends AzureStorageBaseQueueTe
             writer.write(entity);
         }
         writer.close();
-        queue.downloadAttributes();
-        assertEquals(3, queue.getApproximateMessageCount());
-        for (CloudQueueMessage msg : queue.retrieveMessages(3)) {
-            assertNotNull(msg.getMessageContentAsString());
-            assertTrue(msg.getMessageContentAsString().indexOf("SIMPLE") > 0);
+        //queue.getProperties().downloadAttributes();
+        assertEquals(3, queue.getProperties().getApproximateMessagesCount());
+        for (QueueMessageItem msg : queue.receiveMessages(3)) {
+            assertNotNull(msg.getMessageText());
+            assertTrue(msg.getMessageText().indexOf("SIMPLE") > 0);
         }
     }
 
     @Test
     public void testWriteDelayedMessage() throws Throwable {
-        queue.clear();
+        queue.clearMessages();
         //
         TAzureStorageQueueOutputProperties properties = new TAzureStorageQueueOutputProperties("tests");
         properties = (TAzureStorageQueueOutputProperties) setupConnectionProperties(
@@ -86,28 +87,28 @@ public class AzureStorageQueueOutputWriterTestIT extends AzureStorageBaseQueueTe
         }
         writer.close();
         int msgCount = 0;
-        for (CloudQueueMessage msg : queue.retrieveMessages(30)) {
+        for (QueueMessageItem msg : queue.receiveMessages(30)) {
             // we shoud not be here ...
             msgCount++;
-            assertNotNull(msg.getMessageContentAsString());
-            assertTrue(msg.getMessageContentAsString().indexOf("DLY") > 0);
+            assertNotNull(msg.getMessageText());
+            assertTrue(msg.getMessageText().indexOf("DLY") > 0);
         }
         assertEquals(0, msgCount);
         Thread.sleep(5000);
         msgCount = 0;
-        for (CloudQueueMessage msg : queue.retrieveMessages(30)) {
+        for (QueueMessageItem msg : queue.receiveMessages(30)) {
             msgCount++;
-            assertNotNull(msg.getMessageContentAsString());
-            assertTrue(msg.getMessageContentAsString().indexOf("DLY") > 0);
+            assertNotNull(msg.getMessageText());
+            assertTrue(msg.getMessageText().indexOf("DLY") > 0);
         }
         assertEquals(3, msgCount);
-        queue.downloadAttributes();
-        assertEquals(3, queue.getApproximateMessageCount());
+        // queue.downloadAttributes();
+        assertEquals(3, queue.getProperties().getApproximateMessagesCount());
     }
 
     @Test
     public void testWriteTTLMessage() throws Throwable {
-        queue.clear();
+        queue.clearMessages();
         //
         TAzureStorageQueueOutputProperties properties = new TAzureStorageQueueOutputProperties("tests");
         properties = (TAzureStorageQueueOutputProperties) setupConnectionProperties(
@@ -124,17 +125,17 @@ public class AzureStorageQueueOutputWriterTestIT extends AzureStorageBaseQueueTe
         }
         writer.close();
         int msgCount = 0;
-        for (CloudQueueMessage msg : queue.retrieveMessages(30)) {
+        for (QueueMessageItem msg : queue.receiveMessages(30)) {
             msgCount++;
-            assertNotNull(msg.getMessageContentAsString());
-            assertTrue(msg.getMessageContentAsString().indexOf("TTL") > 0);
+            assertNotNull(msg.getMessageText());
+            assertTrue(msg.getMessageText().indexOf("TTL") > 0);
         }
         assertEquals(3, msgCount);
         Thread.sleep(5000);
         msgCount = 0;
-        for (CloudQueueMessage msg : queue.retrieveMessages(30)) {
+        for (QueueMessageItem msg : queue.receiveMessages(30)) {
             msgCount++;
-            assertNotNull(msg.getMessageContentAsString());
+            assertNotNull(msg.getMessageText());
         }
         assertEquals(0, msgCount);
     }

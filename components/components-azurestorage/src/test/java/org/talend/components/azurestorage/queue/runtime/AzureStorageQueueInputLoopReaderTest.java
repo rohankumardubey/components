@@ -23,8 +23,6 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.security.InvalidKeyException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -48,8 +46,8 @@ import org.talend.components.azurestorage.queue.tazurestoragequeueinput.TAzureSt
 import org.talend.components.azurestorage.queue.tazurestoragequeueinputloop.TAzureStorageQueueInputLoopProperties;
 import org.talend.daikon.properties.ValidationResult;
 
-import com.microsoft.azure.storage.BlobStorageException;
-import com.microsoft.azure.storage.queue.CloudQueueMessage;
+import com.azure.storage.blob.models.BlobStorageException;
+import com.azure.storage.queue.models.QueueMessageItem;
 
 public class AzureStorageQueueInputLoopReaderTest extends AzureBaseTest {
 
@@ -83,13 +81,13 @@ public class AzureStorageQueueInputLoopReaderTest extends AzureBaseTest {
             reader = (AzureStorageQueueInputLoopReader) source.createReader(getDummyRuntimeContiner());
             reader.queueService = queueService; // inject mocked service
 
-            final List<CloudQueueMessage> messages = new ArrayList<>();
-            messages.add(new CloudQueueMessage("message-1"));
-            when(queueService.retrieveMessages(anyString(), anyInt())).thenReturn(new Iterable<CloudQueueMessage>() {
+            final List<QueueMessageItem> messages = new ArrayList<>();
+            messages.add(new QueueMessageItem());
+            when(queueService.retrieveMessages(anyString(), anyInt())).thenReturn(new Iterable<QueueMessageItem>() {
 
                 @Override
-                public Iterator<CloudQueueMessage> iterator() {
-                    return new DummyCloudQueueMessageIterator(messages);
+                public Iterator<QueueMessageItem> iterator() {
+                    return new DummyQueueMessageIterator(messages);
                 }
             });
             doAnswer(new Answer<Void>() {
@@ -98,11 +96,11 @@ public class AzureStorageQueueInputLoopReaderTest extends AzureBaseTest {
                 public Void answer(InvocationOnMock invocation) throws Throwable {
                     return null;
                 }
-            }).when(queueService).deleteMessage(anyString(), any(CloudQueueMessage.class));
+            }).when(queueService).deleteMessage(anyString(), any(QueueMessageItem.class));
 
             boolean startable = reader.start();
             assertTrue(startable);
-        } catch (IOException | InvalidKeyException | URISyntaxException | BlobStorageException e) {
+        } catch (IOException | BlobStorageException e) {
             fail("sould not throw " + e.getMessage());
         }
     }
@@ -119,15 +117,15 @@ public class AzureStorageQueueInputLoopReaderTest extends AzureBaseTest {
             reader = (AzureStorageQueueInputLoopReader) source.createReader(getDummyRuntimeContiner());
             reader.queueService = queueService; // inject mocked service
 
-            final List<CloudQueueMessage> messages = new ArrayList<>();
-            messages.add(new CloudQueueMessage("message-1"));
-            messages.add(new CloudQueueMessage("message-2"));
-            messages.add(new CloudQueueMessage("message-3"));
-            when(queueService.retrieveMessages(anyString(), anyInt())).thenReturn(new Iterable<CloudQueueMessage>() {
+            final List<QueueMessageItem> messages = new ArrayList<>();
+            messages.add(new QueueMessageItem());
+            messages.add(new QueueMessageItem());
+            messages.add(new QueueMessageItem());
+            when(queueService.retrieveMessages(anyString(), anyInt())).thenReturn(new Iterable<QueueMessageItem>() {
 
                 @Override
-                public Iterator<CloudQueueMessage> iterator() {
-                    return new DummyCloudQueueMessageIterator(messages);
+                public Iterator<QueueMessageItem> iterator() {
+                    return new DummyQueueMessageIterator(messages);
                 }
             });
             doAnswer(new Answer<Void>() {
@@ -136,14 +134,14 @@ public class AzureStorageQueueInputLoopReaderTest extends AzureBaseTest {
                 public Void answer(InvocationOnMock invocation) throws Throwable {
                     return null;
                 }
-            }).when(queueService).deleteMessage(anyString(), any(CloudQueueMessage.class));
+            }).when(queueService).deleteMessage(anyString(), any(QueueMessageItem.class));
 
             boolean startable = reader.start();
             assertTrue(startable);
             boolean advancable = reader.advance();
             assertTrue(advancable);
 
-        } catch (IOException | InvalidKeyException | URISyntaxException | BlobStorageException e) {
+        } catch (IOException | BlobStorageException e) {
             fail("sould not throw " + e.getMessage());
         }
     }
@@ -160,15 +158,15 @@ public class AzureStorageQueueInputLoopReaderTest extends AzureBaseTest {
             reader = (AzureStorageQueueInputLoopReader) source.createReader(getDummyRuntimeContiner());
             reader.queueService = queueService; // inject mocked service
 
-            final List<CloudQueueMessage> messages = new ArrayList<>();
-            messages.add(new CloudQueueMessage("message-1"));
-            messages.add(new CloudQueueMessage("message-2"));
-            messages.add(new CloudQueueMessage("message-3"));
-            when(queueService.retrieveMessages(anyString(), anyInt())).thenReturn(new Iterable<CloudQueueMessage>() {
+            final List<QueueMessageItem> messages = new ArrayList<>();
+            messages.add(new QueueMessageItem());
+            messages.add(new QueueMessageItem());
+            messages.add(new QueueMessageItem());
+            when(queueService.retrieveMessages(anyString(), anyInt())).thenReturn(new Iterable<QueueMessageItem>() {
 
                 @Override
-                public Iterator<CloudQueueMessage> iterator() {
-                    return new DummyCloudQueueMessageIterator(messages);
+                public Iterator<QueueMessageItem> iterator() {
+                    return new DummyQueueMessageIterator(messages);
                 }
             });
             boolean startable = reader.start();
@@ -186,7 +184,7 @@ public class AzureStorageQueueInputLoopReaderTest extends AzureBaseTest {
                 }
             } while (reader.advance());
 
-        } catch (IOException | InvalidKeyException | URISyntaxException | BlobStorageException e) {
+        } catch (IOException | BlobStorageException e) {
             fail("sould not throw " + e.getMessage());
         }
     }
@@ -203,15 +201,15 @@ public class AzureStorageQueueInputLoopReaderTest extends AzureBaseTest {
             reader = (AzureStorageQueueInputLoopReader) source.createReader(getDummyRuntimeContiner());
             reader.queueService = queueService; // inject mocked service
 
-            final List<CloudQueueMessage> messages = new ArrayList<>();
-            messages.add(new CloudQueueMessage("message-1"));
-            messages.add(new CloudQueueMessage("message-2"));
-            messages.add(new CloudQueueMessage("message-3"));
-            when(queueService.retrieveMessages(anyString(), anyInt())).thenReturn(new Iterable<CloudQueueMessage>() {
+            final List<QueueMessageItem> messages = new ArrayList<>();
+            messages.add(new QueueMessageItem());
+            messages.add(new QueueMessageItem());
+            messages.add(new QueueMessageItem());
+            when(queueService.retrieveMessages(anyString(), anyInt())).thenReturn(new Iterable<QueueMessageItem>() {
 
                 @Override
-                public Iterator<CloudQueueMessage> iterator() {
-                    return new DummyCloudQueueMessageIterator(messages);
+                public Iterator<QueueMessageItem> iterator() {
+                    return new DummyQueueMessageIterator(messages);
                 }
             });
             boolean startable = reader.start();
@@ -228,7 +226,7 @@ public class AzureStorageQueueInputLoopReaderTest extends AzureBaseTest {
             assertNotNull(returnedValues);
             assertEquals("some-queue-name", returnedValues.get(AzureStorageQueueDefinition.RETURN_QUEUE_NAME));
             assertEquals(3, returnedValues.get(ComponentDefinition.RETURN_TOTAL_RECORD_COUNT));
-        } catch (IOException | InvalidKeyException | URISyntaxException | BlobStorageException e) {
+        } catch (IOException | BlobStorageException e) {
             fail("sould not throw " + e.getMessage());
         }
     }

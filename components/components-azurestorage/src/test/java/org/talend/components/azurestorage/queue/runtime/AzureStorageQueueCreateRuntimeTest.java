@@ -22,6 +22,8 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.security.InvalidKeyException;
 
+import com.azure.storage.queue.models.QueueStorageException;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -39,8 +41,6 @@ import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.ValidationResult.Result;
-
-import com.microsoft.azure.storage.BlobStorageException;
 
 public class AzureStorageQueueCreateRuntimeTest {
 
@@ -136,7 +136,7 @@ public class AzureStorageQueueCreateRuntimeTest {
         try {
             when(queueService.createQueueIfNotExists(anyString())).thenReturn(true);
             azureStorageQueueCreate.runAtDriver(runtimeContainer);
-        } catch (InvalidKeyException | URISyntaxException | BlobStorageException e) {
+        } catch (QueueStorageException e) {
             fail("should not throw " + e.getMessage());
         }
     }
@@ -149,7 +149,7 @@ public class AzureStorageQueueCreateRuntimeTest {
         try {
             when(queueService.createQueueIfNotExists(anyString())).thenReturn(false);
             azureStorageQueueCreate.runAtDriver(runtimeContainer);
-        } catch (InvalidKeyException | URISyntaxException | BlobStorageException e) {
+        } catch (QueueStorageException e) {
             fail("should not throw " + e.getMessage());
         }
     }
@@ -162,9 +162,9 @@ public class AzureStorageQueueCreateRuntimeTest {
         azureStorageQueueCreate.queueService = queueService;
         try {
             when(queueService.createQueueIfNotExists(anyString()))
-                    .thenThrow(new BlobStorageException("errorCode", "some storage message", new RuntimeException()));
+                    .thenThrow(new QueueStorageException("errorCode", null, new RuntimeException()));
             azureStorageQueueCreate.runAtDriver(runtimeContainer);
-        } catch (InvalidKeyException | URISyntaxException | BlobStorageException e) {
+        } catch (QueueStorageException e) {
             fail("should not throw " + e.getMessage());
         }
     }
@@ -178,7 +178,7 @@ public class AzureStorageQueueCreateRuntimeTest {
         try {
             when(queueService.createQueueIfNotExists(anyString())).thenThrow(new InvalidKeyException());
             azureStorageQueueCreate.runAtDriver(runtimeContainer);
-        } catch (InvalidKeyException | URISyntaxException | BlobStorageException e) {
+        } catch (QueueStorageException e) {
             fail("should not throw " + e.getMessage());
         }
     }
@@ -190,9 +190,10 @@ public class AzureStorageQueueCreateRuntimeTest {
         azureStorageQueueCreate.initialize(runtimeContainer, properties);
         azureStorageQueueCreate.queueService = queueService;
         try {
-            when(queueService.createQueueIfNotExists(anyString())).thenThrow(new URISyntaxException("bad uri", "some reason"));
+            when(queueService.createQueueIfNotExists(anyString()))
+                    .thenThrow(new URISyntaxException("bad uri", "some reason"));
             azureStorageQueueCreate.runAtDriver(runtimeContainer);
-        } catch (InvalidKeyException | URISyntaxException | BlobStorageException e) {
+        } catch (QueueStorageException e) {
             fail("should not throw " + e.getMessage());
         }
     }
@@ -206,7 +207,7 @@ public class AzureStorageQueueCreateRuntimeTest {
         try {
             when(queueService.createQueueIfNotExists(anyString())).thenThrow(new InvalidKeyException());
             azureStorageQueueCreate.runAtDriver(runtimeContainer);
-        } catch (InvalidKeyException | URISyntaxException | BlobStorageException e) {
+        } catch (QueueStorageException e) {
             fail("should not throw " + e.getMessage());
         }
     }

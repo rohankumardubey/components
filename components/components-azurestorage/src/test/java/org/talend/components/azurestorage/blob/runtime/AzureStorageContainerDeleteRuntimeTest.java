@@ -20,6 +20,8 @@ import static org.mockito.Mockito.when;
 import java.net.URISyntaxException;
 import java.security.InvalidKeyException;
 
+import com.azure.storage.blob.models.BlobStorageException;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -34,8 +36,6 @@ import org.talend.components.azurestorage.blob.tazurestoragecontainerdelete.TAzu
 import org.talend.components.azurestorage.tazurestorageconnection.TAzureStorageConnectionProperties;
 import org.talend.components.azurestorage.tazurestorageconnection.TAzureStorageConnectionProperties.Protocol;
 import org.talend.daikon.properties.ValidationResult;
-
-import com.microsoft.azure.storage.BlobStorageException;
 
 public class AzureStorageContainerDeleteRuntimeTest {
 
@@ -94,9 +94,9 @@ public class AzureStorageContainerDeleteRuntimeTest {
 
         try {
             when(blobService.deleteContainerIfExist(anyString()))
-                    .thenThrow(new BlobStorageException("errorCode", "storage exception message", new RuntimeException()));
+                    .thenThrow(new BlobStorageException("storage exception message", null, new RuntimeException()));
             deleteContainer.runAtDriver(runtimeContainer);
-        } catch (InvalidKeyException | BlobStorageException | URISyntaxException e) {
+        } catch (BlobStorageException e) {
             fail("should not throw exception " + e.getMessage());
         }
     }
@@ -116,7 +116,7 @@ public class AzureStorageContainerDeleteRuntimeTest {
         try {
             when(blobService.deleteContainerIfExist(anyString())).thenThrow(new InvalidKeyException());
             deleteContainer.runAtDriver(runtimeContainer);
-        } catch (InvalidKeyException | BlobStorageException | URISyntaxException e) {
+        } catch (BlobStorageException e) {
             fail("should not throw exception " + e.getMessage());
         }
     }
@@ -137,7 +137,7 @@ public class AzureStorageContainerDeleteRuntimeTest {
             when(blobService.deleteContainerIfExist(anyString()))
                     .thenThrow(new URISyntaxException("bad url", "some reason"));
             deleteContainer.runAtDriver(runtimeContainer);
-        } catch (InvalidKeyException | BlobStorageException | URISyntaxException e) {
+        } catch (BlobStorageException e) {
             fail("should not throw exception " + e.getMessage());
         }
     }
@@ -153,10 +153,10 @@ public class AzureStorageContainerDeleteRuntimeTest {
 
         try {
             when(blobService.deleteContainerIfExist(anyString()))
-                    .thenThrow(new BlobStorageException("errorCode", "storage exception message", new RuntimeException()));
+                    .thenThrow(new BlobStorageException("storage exception message", null, new RuntimeException()));
             deleteContainer.runAtDriver(runtimeContainer);
 
-        } catch (InvalidKeyException | BlobStorageException | URISyntaxException e) {
+        } catch (BlobStorageException e) {
             fail("should not throw exception " + e.getMessage());
         }
     }
@@ -171,7 +171,7 @@ public class AzureStorageContainerDeleteRuntimeTest {
         try {
             when(blobService.deleteContainerIfExist(anyString())).thenReturn(false);
             deleteContainer.runAtDriver(runtimeContainer);
-        } catch (InvalidKeyException | BlobStorageException | URISyntaxException e) {
+        } catch (BlobStorageException e) {
             fail("should not throw exception " + e.getMessage());
         }
 
@@ -187,7 +187,7 @@ public class AzureStorageContainerDeleteRuntimeTest {
 
             when(blobService.deleteContainerIfExist(anyString())).thenReturn(true);
             deleteContainer.runAtDriver(runtimeContainer);
-        } catch (InvalidKeyException | BlobStorageException | URISyntaxException e) {
+        } catch (BlobStorageException e) {
             fail("should not throw exception " + e.getMessage());
         }
     }

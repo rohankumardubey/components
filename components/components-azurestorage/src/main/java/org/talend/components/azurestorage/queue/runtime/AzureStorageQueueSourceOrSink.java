@@ -111,7 +111,7 @@ public class AzureStorageQueueSourceOrSink extends AzureStorageSourceOrSink impl
         return getQueueServiceClient(runtime);
     }
 
-    public QueueClient getCloudQueue(RuntimeContainer runtime, String queue) throws QueueStorageException {
+    public QueueClient getQueueItem(RuntimeContainer runtime, String queue) throws QueueStorageException {
         return getStorageQueueClient(runtime).getQueueClient(queue);
     }
 

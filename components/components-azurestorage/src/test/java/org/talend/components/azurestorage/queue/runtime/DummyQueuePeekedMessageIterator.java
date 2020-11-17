@@ -1,0 +1,43 @@
+/*
+ * Copyright (C) 2006-2020 Talend Inc. - www.talend.com
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
+ *
+ */
+package org.talend.components.azurestorage.queue.runtime;
+
+import java.util.Iterator;
+import java.util.List;
+
+import com.azure.storage.queue.models.PeekedMessageItem;
+import com.azure.storage.queue.models.QueueMessageItem;
+
+public class DummyQueuePeekedMessageIterator implements Iterator<PeekedMessageItem> {
+
+    private Iterator<PeekedMessageItem> it;
+
+    public DummyQueuePeekedMessageIterator(List<PeekedMessageItem> list) {
+        super();
+        this.it = list.iterator();
+    }
+
+    @Override
+    public boolean hasNext() {
+
+        return it.hasNext();
+    }
+
+    @Override
+    public PeekedMessageItem next() {
+        return it.next();
+    }
+
+
+}

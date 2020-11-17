@@ -43,9 +43,9 @@ import org.talend.components.azurestorage.queue.tazurestoragequeuelist.TAzureSto
 import org.talend.components.azurestorage.queue.tazurestoragequeuelist.TAzureStorageQueueListProperties;
 import org.talend.daikon.properties.ValidationResult;
 
-import com.microsoft.azure.storage.StorageCredentialsSharedAccessSignature;
-import com.microsoft.azure.storage.BlobStorageException;
-import com.microsoft.azure.storage.queue.CloudQueue;
+import com.azure.storage.blob.models.BlobStorageException;
+import com.azure.storage.common.StorageSharedKeyCredential;
+import com.azure.storage.queue.models.QueueItem;
 
 public class AzureStorageQueueListReaderTest extends AzureBaseTest {
 
@@ -53,7 +53,7 @@ public class AzureStorageQueueListReaderTest extends AzureBaseTest {
 
     private TAzureStorageQueueListProperties properties;
 
-    private StorageCredentialsSharedAccessSignature dummyCredential;
+    private StorageSharedKeyCredential dummyCredential;
 
     @Mock
     private AzureStorageQueueService queueService;
@@ -63,7 +63,7 @@ public class AzureStorageQueueListReaderTest extends AzureBaseTest {
 
     @Before
     public void setUp() throws Exception {
-        dummyCredential = new StorageCredentialsSharedAccessSignature("fakesaas");
+        dummyCredential = new StorageSharedKeyCredential("fakesaas", "fakekey");
         properties = new TAzureStorageQueueListProperties(PROP_ + "QueueList");
         properties.setupProperties();
         properties.connection = getValidFakeConnection();
@@ -79,21 +79,20 @@ public class AzureStorageQueueListReaderTest extends AzureBaseTest {
         reader = (AzureStorageQueueListReader) source.createReader(getDummyRuntimeContiner());
         reader.queueService = queueService;
 
-        final List<CloudQueue> list = new ArrayList<>();
+        final List<QueueItem> list = new ArrayList<>();
         try {
-
-            list.add(new CloudQueue(new URI("https://storagesample.queue.core.windows.net/queue-1"), dummyCredential));
-            when(queueService.listQueues()).thenReturn(new Iterable<CloudQueue>() {
+            list.add(new QueueItem());
+            when(queueService.listQueues()).thenReturn(new Iterable<QueueItem>() {
 
                 @Override
-                public Iterator<CloudQueue> iterator() {
-                    return new DummyCloudQueueIterator(list);
+                public Iterator<QueueItem> iterator() {
+                    return new DummyQueueItemIterator(list);
                 }
             });
 
             assertTrue(reader.start());
 
-        } catch (InvalidKeyException | URISyntaxException | BlobStorageException | IOException e) {
+        } catch (BlobStorageException | IOException e) {
             fail("should not throw " + e.getMessage());
         }
     }
@@ -108,20 +107,20 @@ public class AzureStorageQueueListReaderTest extends AzureBaseTest {
         reader = (AzureStorageQueueListReader) source.createReader(getDummyRuntimeContiner());
         reader.queueService = queueService;
 
-        final List<CloudQueue> list = new ArrayList<>();
+        final List<QueueItem> list = new ArrayList<>();
         try {
 
-            when(queueService.listQueues()).thenReturn(new Iterable<CloudQueue>() {
+            when(queueService.listQueues()).thenReturn(new Iterable<QueueItem>() {
 
                 @Override
-                public Iterator<CloudQueue> iterator() {
-                    return new DummyCloudQueueIterator(list);
+                public Iterator<QueueItem> iterator() {
+                    return new DummyQueueItemIterator(list);
                 }
             });
 
             assertFalse(reader.start());
 
-        } catch (InvalidKeyException | URISyntaxException | IOException e) {
+        } catch (IOException e) {
             fail("should not throw " + e.getMessage());
         }
     }
@@ -143,7 +142,7 @@ public class AzureStorageQueueListReaderTest extends AzureBaseTest {
 
             assertFalse(reader.start());
 
-        } catch (InvalidKeyException | URISyntaxException | IOException e) {
+        } catch (IOException e) {
             fail("should not throw " + e.getMessage());
         }
     }
@@ -164,7 +163,7 @@ public class AzureStorageQueueListReaderTest extends AzureBaseTest {
             when(queueService.listQueues()).thenThrow(new InvalidKeyException());
             reader.start(); // should throw ComponentException
 
-        } catch (InvalidKeyException | URISyntaxException | IOException e) {
+        } catch (IOException e) {
             fail("should not throw " + e.getMessage());
         }
     }
@@ -179,23 +178,23 @@ public class AzureStorageQueueListReaderTest extends AzureBaseTest {
         reader = (AzureStorageQueueListReader) source.createReader(getDummyRuntimeContiner());
         reader.queueService = queueService;
 
-        final List<CloudQueue> list = new ArrayList<>();
+        final List<QueueItem> list = new ArrayList<>();
         try {
 
-            list.add(new CloudQueue(new URI("https://storagesample.queue.core.windows.net/queue-1"), dummyCredential));
-            list.add(new CloudQueue(new URI("https://storagesample.queue.core.windows.net/queue-2"), dummyCredential));
-            when(queueService.listQueues()).thenReturn(new Iterable<CloudQueue>() {
+            list.add(new QueueItem());
+            list.add(new QueueItem());
+            when(queueService.listQueues()).thenReturn(new Iterable<QueueItem>() {
 
                 @Override
-                public Iterator<CloudQueue> iterator() {
-                    return new DummyCloudQueueIterator(list);
+                public Iterator<QueueItem> iterator() {
+                    return new DummyQueueItemIterator(list);
                 }
             });
 
             assertTrue(reader.start());
             assertTrue(reader.advance());
 
-        } catch (InvalidKeyException | URISyntaxException | BlobStorageException | IOException e) {
+        } catch (BlobStorageException | IOException e) {
             fail("should not throw " + e.getMessage());
         }
     }
@@ -210,22 +209,22 @@ public class AzureStorageQueueListReaderTest extends AzureBaseTest {
         reader = (AzureStorageQueueListReader) source.createReader(getDummyRuntimeContiner());
         reader.queueService = queueService;
 
-        final List<CloudQueue> list = new ArrayList<>();
+        final List<QueueItem> list = new ArrayList<>();
         try {
 
-            list.add(new CloudQueue(new URI("https://storagesample.queue.core.windows.net/queue-1"), dummyCredential));
-            when(queueService.listQueues()).thenReturn(new Iterable<CloudQueue>() {
+            list.add(new QueueItem());
+            when(queueService.listQueues()).thenReturn(new Iterable<QueueItem>() {
 
                 @Override
-                public Iterator<CloudQueue> iterator() {
-                    return new DummyCloudQueueIterator(list);
+                public Iterator<QueueItem> iterator() {
+                    return new DummyQueueItemIterator(list);
                 }
             });
 
             assertTrue(reader.start());
             assertFalse(reader.advance());
 
-        } catch (InvalidKeyException | URISyntaxException | BlobStorageException | IOException e) {
+        } catch (BlobStorageException | IOException e) {
             fail("should not throw " + e.getMessage());
         }
     }
@@ -240,21 +239,21 @@ public class AzureStorageQueueListReaderTest extends AzureBaseTest {
         reader = (AzureStorageQueueListReader) source.createReader(getDummyRuntimeContiner());
         reader.queueService = queueService;
 
-        final List<CloudQueue> list = new ArrayList<>();
+        final List<QueueItem> list = new ArrayList<>();
         try {
 
-            when(queueService.listQueues()).thenReturn(new Iterable<CloudQueue>() {
+            when(queueService.listQueues()).thenReturn(new Iterable<QueueItem>() {
 
                 @Override
-                public Iterator<CloudQueue> iterator() {
-                    return new DummyCloudQueueIterator(list);
+                public Iterator<QueueItem> iterator() {
+                    return new DummyQueueItemIterator(list);
                 }
             });
 
             assertFalse(reader.start());
             assertFalse(reader.advance());
 
-        } catch (InvalidKeyException | URISyntaxException | IOException e) {
+        } catch (IOException e) {
             fail("should not throw " + e.getMessage());
         }
     }
@@ -268,15 +267,15 @@ public class AzureStorageQueueListReaderTest extends AzureBaseTest {
         reader = (AzureStorageQueueListReader) source.createReader(getDummyRuntimeContiner());
         reader.queueService = queueService;
 
-        final List<CloudQueue> list = new ArrayList<>();
+        final List<QueueItem> list = new ArrayList<>();
         try {
 
-            list.add(new CloudQueue(new URI("https://storagesample.queue.core.windows.net/queue-1"), dummyCredential));
-            when(queueService.listQueues()).thenReturn(new Iterable<CloudQueue>() {
+            list.add(new QueueItem());
+            when(queueService.listQueues()).thenReturn(new Iterable<QueueItem>() {
 
                 @Override
-                public Iterator<CloudQueue> iterator() {
-                    return new DummyCloudQueueIterator(list);
+                public Iterator<QueueItem> iterator() {
+                    return new DummyQueueItemIterator(list);
                 }
             });
 
@@ -285,7 +284,7 @@ public class AzureStorageQueueListReaderTest extends AzureBaseTest {
             assertNotNull(current);
             assertEquals("queue-1", current.get(0));
 
-        } catch (InvalidKeyException | URISyntaxException | BlobStorageException | IOException e) {
+        } catch (BlobStorageException | IOException e) {
             fail("should not throw " + e.getMessage());
         }
     }
@@ -299,21 +298,21 @@ public class AzureStorageQueueListReaderTest extends AzureBaseTest {
         reader = (AzureStorageQueueListReader) source.createReader(getDummyRuntimeContiner());
         reader.queueService = queueService;
 
-        final List<CloudQueue> list = new ArrayList<>();
+        final List<QueueItem> list = new ArrayList<>();
         try {
 
-            when(queueService.listQueues()).thenReturn(new Iterable<CloudQueue>() {
+            when(queueService.listQueues()).thenReturn(new Iterable<QueueItem>() {
 
                 @Override
-                public Iterator<CloudQueue> iterator() {
-                    return new DummyCloudQueueIterator(list);
+                public Iterator<QueueItem> iterator() {
+                    return new DummyQueueItemIterator(list);
                 }
             });
 
             assertFalse(reader.start());
             reader.getCurrent();
 
-        } catch (InvalidKeyException | URISyntaxException | IOException e) {
+        } catch (IOException e) {
             fail("should not throw " + e.getMessage());
         }
     }
@@ -327,15 +326,15 @@ public class AzureStorageQueueListReaderTest extends AzureBaseTest {
         reader = (AzureStorageQueueListReader) source.createReader(getDummyRuntimeContiner());
         reader.queueService = queueService;
 
-        final List<CloudQueue> list = new ArrayList<>();
+        final List<QueueItem> list = new ArrayList<>();
         try {
 
-            list.add(new CloudQueue(new URI("https://storagesample.queue.core.windows.net/queue-1"), dummyCredential));
-            when(queueService.listQueues()).thenReturn(new Iterable<CloudQueue>() {
+            list.add(new QueueItem());
+            when(queueService.listQueues()).thenReturn(new Iterable<QueueItem>() {
 
                 @Override
-                public Iterator<CloudQueue> iterator() {
-                    return new DummyCloudQueueIterator(list);
+                public Iterator<QueueItem> iterator() {
+                    return new DummyQueueItemIterator(list);
                 }
             });
 
@@ -343,7 +342,7 @@ public class AzureStorageQueueListReaderTest extends AzureBaseTest {
             assertFalse(reader.advance());
             reader.getCurrent();
 
-        } catch (InvalidKeyException | URISyntaxException | IOException | BlobStorageException e) {
+        } catch (IOException | BlobStorageException e) {
             fail("should not throw " + e.getMessage());
         }
     }
@@ -357,17 +356,17 @@ public class AzureStorageQueueListReaderTest extends AzureBaseTest {
         reader = (AzureStorageQueueListReader) source.createReader(getDummyRuntimeContiner());
         reader.queueService = queueService;
 
-        final List<CloudQueue> list = new ArrayList<>();
+        final List<QueueItem> list = new ArrayList<>();
         try {
 
-            list.add(new CloudQueue(new URI("https://storagesample.queue.core.windows.net/queue-1"), dummyCredential));
-            list.add(new CloudQueue(new URI("https://storagesample.queue.core.windows.net/queue-2"), dummyCredential));
-            list.add(new CloudQueue(new URI("https://storagesample.queue.core.windows.net/queue-3"), dummyCredential));
-            when(queueService.listQueues()).thenReturn(new Iterable<CloudQueue>() {
+            list.add(new QueueItem());
+            list.add(new QueueItem());
+            list.add(new QueueItem());
+            when(queueService.listQueues()).thenReturn(new Iterable<QueueItem>() {
 
                 @Override
-                public Iterator<CloudQueue> iterator() {
-                    return new DummyCloudQueueIterator(list);
+                public Iterator<QueueItem> iterator() {
+                    return new DummyQueueItemIterator(list);
                 }
             });
 
@@ -380,7 +379,7 @@ public class AzureStorageQueueListReaderTest extends AzureBaseTest {
             assertNotNull(returnedValues);
             assertEquals(3, returnedValues.get(TAzureStorageQueueListDefinition.RETURN_NB_QUEUE));
 
-        } catch (InvalidKeyException | URISyntaxException | BlobStorageException | IOException e) {
+        } catch (BlobStorageException | IOException e) {
             fail("should not throw " + e.getMessage());
         }
     }
