@@ -46,7 +46,7 @@ import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
 
-import com.microsoft.azure.storage.StorageException;
+import com.microsoft.azure.storage.BlobStorageException;
 import com.microsoft.azure.storage.table.DynamicTableEntity;
 import com.microsoft.azure.storage.table.EntityProperty;
 import com.microsoft.azure.storage.table.TableBatchOperation;
@@ -135,7 +135,7 @@ public class AzureStorageTableWriter implements WriterWithFeedback<Result, Index
             this.result = new Result(uId);
             tableservice.handleActionOnTable(tableName, actionOnTable);
 
-        } catch (InvalidKeyException | URISyntaxException | StorageException e) {
+        } catch (InvalidKeyException | URISyntaxException | BlobStorageException e) {
             LOGGER.error(e.getLocalizedMessage());
             throw new ComponentException(e);
         }
@@ -176,7 +176,7 @@ public class AzureStorageTableWriter implements WriterWithFeedback<Result, Index
                     DynamicTableEntity entity = createDynamicEntityFromInputRecord(record, writeSchema);
                     tableservice.executeOperation(tableName, getTableOperation(entity));
                     handleSuccess(record, 1);
-                } catch (StorageException e) {
+                } catch (BlobStorageException e) {
                     LOGGER.error(i18nMessages.getMessage("error.ProcessSingleOperation", actionData, e.getLocalizedMessage()), e);
                     if (dieOnError) {
                         throw new ComponentException(e);
@@ -369,7 +369,7 @@ public class AzureStorageTableWriter implements WriterWithFeedback<Result, Index
 
             handleSuccess(null, batchOperationsCount);
 
-        } catch (StorageException e) {
+        } catch (BlobStorageException e) {
             LOGGER.error(i18nMessages.getMessage("error.ProcessBatch", actionData, e.getLocalizedMessage()));
 
             handleReject(null, e, batchOperationsCount);
@@ -398,7 +398,7 @@ public class AzureStorageTableWriter implements WriterWithFeedback<Result, Index
         }
     }
 
-    private void handleReject(IndexedRecord record, StorageException e, int counted) {
+    private void handleReject(IndexedRecord record, BlobStorageException e, int counted) {
         result.rejectCount = result.rejectCount + counted;
 
         if (rejectSchema == null || rejectSchema.getFields().isEmpty()) {

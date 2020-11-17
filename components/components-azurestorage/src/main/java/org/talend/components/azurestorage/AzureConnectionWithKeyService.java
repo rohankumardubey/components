@@ -12,10 +12,12 @@
 // ============================================================================
 package org.talend.components.azurestorage;
 
-import java.net.URISyntaxException;
-import java.security.InvalidKeyException;
+import com.azure.storage.blob.BlobServiceClient;
+import com.azure.storage.blob.BlobServiceClientBuilder;
+import com.azure.storage.common.StorageSharedKeyCredential;
+import com.azure.storage.queue.QueueServiceClient;
+import com.azure.storage.queue.QueueServiceClientBuilder;
 
-import com.microsoft.azure.storage.CloudStorageAccount;
 
 /**
  * This class hold and provide azure storage connection using a key
@@ -35,14 +37,19 @@ public class AzureConnectionWithKeyService implements AzureConnection {
     }
 
     @Override
-    public CloudStorageAccount getCloudStorageAccount() throws InvalidKeyException, URISyntaxException {
+    public BlobServiceClient getBlobServiceClient()  {
+        return  new BlobServiceClientBuilder()
+                .endpoint(String.format("https://%s.blob.core.windows.net", accountName))
+                .credential(new StorageSharedKeyCredential(accountName, accountKey))
+                .buildClient();
+    }
 
-        StringBuilder connectionString = new StringBuilder();
-        connectionString.append("DefaultEndpointsProtocol=").append(protocol) //
-                .append(";AccountName=").append(accountName) //
-                .append(";AccountKey=").append(accountKey);
-
-        return CloudStorageAccount.parse(connectionString.toString());
+    @Override
+    public QueueServiceClient getQueueServiceClient() {
+        return new QueueServiceClientBuilder()
+                .endpoint(String.format("https://%s.queue.core.windows.net", accountName))
+                .credential(new StorageSharedKeyCredential(accountName, accountKey))
+                .buildClient();
     }
 
     public String getProtocol() {

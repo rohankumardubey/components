@@ -13,13 +13,14 @@
 package org.talend.components.azurestorage.blob.runtime;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.security.InvalidKeyException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+
+import com.azure.storage.blob.models.BlobItem;
+import com.azure.storage.blob.models.BlobStorageException;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericData;
@@ -37,17 +38,13 @@ import org.talend.components.azurestorage.blob.tazurestoragecontainerlist.TAzure
 import org.talend.components.azurestorage.blob.tazurestoragelist.TAzureStorageListProperties;
 import org.talend.components.common.avro.RootSchemaUtils;
 
-import com.microsoft.azure.storage.StorageException;
-import com.microsoft.azure.storage.blob.CloudBlob;
-import com.microsoft.azure.storage.blob.ListBlobItem;
-
 public class AzureStorageListReader extends AzureStorageReader<IndexedRecord> {
 
     private TAzureStorageListProperties properties;
 
-    private Iterator<CloudBlob> blobsIterator;
+    private Iterator<BlobItem> blobsIterator;
 
-    private CloudBlob currentBlob;
+    private BlobItem currentBlob;
 
     private IndexedRecord currentRecord;
 
@@ -70,22 +67,22 @@ public class AzureStorageListReader extends AzureStorageReader<IndexedRecord> {
     @Override
     public boolean start() throws IOException {
         String mycontainer = properties.container.getValue();
-        List<CloudBlob> blobs = new ArrayList<>();
+        List<BlobItem> blobs = new ArrayList<>();
         // build a list with remote blobs to fetch
         List<RemoteBlob> remoteBlobs = ((AzureStorageSource) getCurrentSource()).getRemoteBlobs();
         try {
 
             for (RemoteBlob rmtb : remoteBlobs) {
-                for (ListBlobItem blob : azureStorageBlobService.listBlobs(mycontainer, rmtb.prefix, rmtb.include)) {
-                    if (blob instanceof CloudBlob) {
-                        blobs.add((CloudBlob) blob);
+                for (BlobItem blob : azureStorageBlobService.listBlobs(mycontainer, rmtb.prefix, rmtb.include)) {
+                    if (blob instanceof BlobItem) {
+                        blobs.add(blob);
                     }
                 }
             }
 
             startable = !blobs.isEmpty();
             blobsIterator = blobs.iterator();
-        } catch (StorageException | URISyntaxException | InvalidKeyException e) {
+        } catch (BlobStorageException e) {
             LOGGER.error(e.getLocalizedMessage());
             if (properties.dieOnError.getValue()) {
                 throw new ComponentException(e);

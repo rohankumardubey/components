@@ -19,6 +19,9 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
+import com.azure.storage.queue.models.QueueItem;
+import com.azure.storage.queue.models.QueueStorageException;
+
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.IndexedRecord;
@@ -33,17 +36,15 @@ import org.talend.components.azurestorage.queue.AzureStorageQueueService;
 import org.talend.components.azurestorage.queue.tazurestoragequeuelist.TAzureStorageQueueListDefinition;
 import org.talend.components.azurestorage.queue.tazurestoragequeuelist.TAzureStorageQueueListProperties;
 
-import com.microsoft.azure.storage.queue.CloudQueue;
-
 public class AzureStorageQueueListReader extends AzureStorageReader<IndexedRecord> {
 
     private boolean dieOnError;
 
     private Schema schema;
 
-    private Iterator<CloudQueue> queues;
+    private Iterator<QueueItem> queues;
 
-    private CloudQueue current;
+    private QueueItem current;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AzureStorageQueueListReader.class);
 
@@ -72,7 +73,7 @@ public class AzureStorageQueueListReader extends AzureStorageReader<IndexedRecor
                 current = queues.next();
                 dataCount++;
             }
-        } catch (InvalidKeyException | URISyntaxException e) {
+        } catch (QueueStorageException e) {
             LOGGER.error(e.getLocalizedMessage());
             if (dieOnError) {
                 throw new ComponentException(e);

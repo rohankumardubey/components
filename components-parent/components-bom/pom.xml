@@ -30,6 +30,9 @@
         <aws-java-sdk-s3.version>${aws.version}</aws-java-sdk-s3.version>
         <aws-java-sdk-sts.version>${aws.version}</aws-java-sdk-sts.version>
         <aws.version>1.11.125</aws.version>
+        <azure-storage-blob.version>12.9.0</azure-storage-blob.version>
+        <azure-storage-queue.version>12.7.0</azure-storage-queue.version>
+        <azure-identity.version>1.2.0</azure-identity.version>
         <azure-keyvault-core.version>0.9.7</azure-keyvault-core.version>
         <azure-storage.version>8.6.0</azure-storage.version>
         <msla4j.version>1.4.0</msla4j.version>
@@ -440,6 +443,21 @@
                 <groupId>com.microsoft.azure</groupId>
                 <artifactId>msal4j</artifactId>
                 <version>${msla4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.azure</groupId>
+                <artifactId>azure-storage-blob</artifactId>
+                <version>${azure-storage-blob.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.azure</groupId>
+                <artifactId>azure-storage-queue</artifactId>
+                <version>${azure-storage-queue.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.azure</groupId>
+                <artifactId>azure-identity</artifactId>
+                <version>${azure-identity.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.squareup</groupId>

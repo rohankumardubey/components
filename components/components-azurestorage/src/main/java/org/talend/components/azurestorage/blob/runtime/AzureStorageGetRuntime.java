@@ -15,10 +15,11 @@ package org.talend.components.azurestorage.blob.runtime;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.net.URISyntaxException;
-import java.security.InvalidKeyException;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.azure.storage.blob.models.BlobItem;
+import com.azure.storage.blob.models.BlobStorageException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,10 +37,6 @@ import org.talend.components.azurestorage.utils.AzureStorageUtils;
 import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
 import org.talend.daikon.properties.ValidationResult;
-
-import com.microsoft.azure.storage.StorageException;
-import com.microsoft.azure.storage.blob.CloudBlob;
-import com.microsoft.azure.storage.blob.ListBlobItem;
 
 public class AzureStorageGetRuntime extends AzureStorageContainerRuntime
         implements ComponentDriverInitialization<ComponentProperties> {
@@ -100,16 +97,16 @@ public class AzureStorageGetRuntime extends AzureStorageContainerRuntime
         try {
             List<RemoteBlobGet> remoteBlobs = createRemoteBlobsGet();
             for (RemoteBlobGet rmtb : remoteBlobs) {
-                for (ListBlobItem blob : azureStorageBlobService.listBlobs(containerName, rmtb.prefix, rmtb.include)) {
-                    if (blob instanceof CloudBlob) {
+                for (BlobItem blob : azureStorageBlobService.listBlobs(containerName, rmtb.prefix, rmtb.include)) {
+                    if (blob instanceof BlobItem) {
                         // TODO - Action when create is false and include is true ???
                         if (keepRemoteDirStructure) {
                             if (rmtb.create) {
-                                new File(localFolder + "/" + ((CloudBlob) blob).getName()).getParentFile().mkdirs();
+                                new File(localFolder + "/" + blob.getName()).getParentFile().mkdirs();
                             }
-                            fos = new FileOutputStream(localFolder + "/" + ((CloudBlob) blob).getName());
+                            fos = new FileOutputStream(localFolder + "/" + blob.getName());
                         } else {
-                            String blobFullName = ((CloudBlob) blob).getName();
+                            String blobFullName = blob.getName();
                             String resultFileName = blobFullName;
                             String prefixDir = rmtb.prefix.contains("/") ? rmtb.prefix.substring(0, rmtb.prefix.lastIndexOf("/")) : rmtb.prefix;
                             if (blobFullName.startsWith(prefixDir + "/")) {
@@ -123,11 +120,11 @@ public class AzureStorageGetRuntime extends AzureStorageContainerRuntime
 
                             fos = new FileOutputStream(pathToWrite);
                         }
-                        azureStorageBlobService.download((CloudBlob) blob, fos);
+                        azureStorageBlobService.download((BlobItem) blob, fos);
                     }
                 }
             }
-        } catch (StorageException | URISyntaxException | FileNotFoundException | InvalidKeyException e) {
+        } catch (BlobStorageException | FileNotFoundException e) {
             LOGGER.error(e.getLocalizedMessage());
             if (dieOnError) {
                 throw new ComponentException(e);

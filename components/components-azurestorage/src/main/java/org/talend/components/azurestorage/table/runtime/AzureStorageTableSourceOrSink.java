@@ -39,7 +39,7 @@ import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
 import org.talend.daikon.properties.ValidationResult;
 
-import com.microsoft.azure.storage.StorageException;
+import com.microsoft.azure.storage.BlobStorageException;
 import com.microsoft.azure.storage.table.DynamicTableEntity;
 import com.microsoft.azure.storage.table.TableQuery;
 
@@ -130,7 +130,7 @@ public class AzureStorageTableSourceOrSink extends AzureStorageSourceOrSink impl
                 return null;
             }
 
-        } catch (InvalidKeyException | URISyntaxException | StorageException e) {
+        } catch (InvalidKeyException | URISyntaxException | BlobStorageException e) {
             LOGGER.error(e.getLocalizedMessage());
             throw new ComponentException(e);
         }

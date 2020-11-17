@@ -13,11 +13,14 @@
 package org.talend.components.azurestorage.queue.runtime;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.security.InvalidKeyException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
+
+import com.azure.storage.queue.QueueClient;
+import com.azure.storage.queue.QueueServiceClient;
+import com.azure.storage.queue.models.QueueItem;
+import com.azure.storage.queue.models.QueueStorageException;
 
 import org.talend.components.api.component.runtime.SourceOrSink;
 import org.talend.components.api.container.RuntimeContainer;
@@ -34,10 +37,6 @@ import org.talend.daikon.SimpleNamedThing;
 import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
 import org.talend.daikon.properties.ValidationResult;
-
-import com.microsoft.azure.storage.StorageException;
-import com.microsoft.azure.storage.queue.CloudQueue;
-import com.microsoft.azure.storage.queue.CloudQueueClient;
 
 public class AzureStorageQueueSourceOrSink extends AzureStorageSourceOrSink implements SourceOrSink {
 
@@ -65,8 +64,9 @@ public class AzureStorageQueueSourceOrSink extends AzureStorageSourceOrSink impl
     @Override
     public ValidationResult validate(RuntimeContainer container) {
         ValidationResult vr = super.validate(container);
-        if (vr != ValidationResult.OK)
+        if (vr != ValidationResult.OK) {
             return vr;
+        }
         if (properties instanceof TAzureStorageQueueListProperties) {
             // no validation needed...
             return ValidationResult.OK;
@@ -78,37 +78,41 @@ public class AzureStorageQueueSourceOrSink extends AzureStorageSourceOrSink impl
 
             }
             if (q.length() < 3 || q.length() > 63) {
-                return new ValidationResult(ValidationResult.Result.ERROR, i18nMessages.getMessage("error.LengthError"));
+                return new ValidationResult(ValidationResult.Result.ERROR, i18nMessages
+                        .getMessage("error.LengthError"));
             }
             if (q.indexOf("--") > -1) {
-                return new ValidationResult(ValidationResult.Result.ERROR, i18nMessages.getMessage("error.TwoDashError"));
+                return new ValidationResult(ValidationResult.Result.ERROR, i18nMessages
+                        .getMessage("error.TwoDashError"));
             }
 
             if (!queueCheckNamePattern.matcher(q.replaceAll("-", "")).matches()) {
-                return new ValidationResult(ValidationResult.Result.ERROR, i18nMessages.getMessage("error.QueueNameError"));
+                return new ValidationResult(ValidationResult.Result.ERROR, i18nMessages
+                        .getMessage("error.QueueNameError"));
             }
         }
         if (properties instanceof TAzureStorageQueueInputProperties) {
             int nom = ((TAzureStorageQueueInputProperties) properties).numberOfMessages.getValue();
             if (nom < 1 || nom > 32) {
-                return new ValidationResult(ValidationResult.Result.ERROR, i18nMessages.getMessage("error.ParameterLengthError"));
+                return new ValidationResult(ValidationResult.Result.ERROR, i18nMessages
+                        .getMessage("error.ParameterLengthError"));
             }
             int vtimeout = ((TAzureStorageQueueInputProperties) properties).visibilityTimeoutInSeconds.getValue();
             if (vtimeout < 0) {
-                return new ValidationResult(ValidationResult.Result.ERROR, i18nMessages.getMessage("error.ParameterValueError"));
+                return new ValidationResult(ValidationResult.Result.ERROR, i18nMessages
+                        .getMessage("error.ParameterValueError"));
             }
 
         }
         return ValidationResult.OK;
     }
 
-    public CloudQueueClient getStorageQueueClient(RuntimeContainer runtime) throws InvalidKeyException, URISyntaxException {
-        return getStorageAccount(runtime).createCloudQueueClient();
+    public QueueServiceClient getStorageQueueClient(RuntimeContainer runtime) {
+        return getQueueServiceClient(runtime);
     }
 
-    public CloudQueue getCloudQueue(RuntimeContainer runtime, String queue)
-            throws InvalidKeyException, URISyntaxException, StorageException {
-        return getStorageQueueClient(runtime).getQueueReference(queue);
+    public QueueClient getCloudQueue(RuntimeContainer runtime, String queue) throws QueueStorageException {
+        return getStorageQueueClient(runtime).getQueueClient(queue);
     }
 
     public static List<NamedThing> getSchemaNames(RuntimeContainer container, TAzureStorageConnectionProperties properties)
@@ -122,11 +126,11 @@ public class AzureStorageQueueSourceOrSink extends AzureStorageSourceOrSink impl
     public List<NamedThing> getSchemaNames(RuntimeContainer container) throws IOException {
         List<NamedThing> result = new ArrayList<>();
         try {
-            CloudQueueClient client = getStorageQueueClient(container);
-            for (CloudQueue q : client.listQueues()) {
+            final QueueServiceClient client = getStorageQueueClient(container);
+            for (QueueItem q : client.listQueues()) {
                 result.add(new SimpleNamedThing(q.getName(), q.getName()));
             }
-        } catch (InvalidKeyException | URISyntaxException e) {
+        } catch (QueueStorageException e) {
             throw new ComponentException(e);
         }
         return result;

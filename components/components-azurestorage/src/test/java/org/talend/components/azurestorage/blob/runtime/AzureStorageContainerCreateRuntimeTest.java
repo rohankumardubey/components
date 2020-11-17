@@ -43,7 +43,7 @@ import org.talend.components.azurestorage.tazurestorageconnection.TAzureStorageC
 import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
 import org.talend.daikon.properties.ValidationResult;
-import com.microsoft.azure.storage.StorageException;
+import com.microsoft.azure.storage.BlobStorageException;
 import com.microsoft.azure.storage.blob.BlobContainerPublicAccessType;
 
 public class AzureStorageContainerCreateRuntimeTest {
@@ -141,10 +141,10 @@ public class AzureStorageContainerCreateRuntimeTest {
         try {
 
             when(blobService.createContainerIfNotExist(anyString(), any(BlobContainerPublicAccessType.class))).thenThrow(
-                    new StorageException("errorCode", "storage exception message", new RuntimeException()));
+                    new BlobStorageException("errorCode", "storage exception message", new RuntimeException()));
             containerCreate.runAtDriver(runtimeContainer);
 
-        } catch (StorageException | URISyntaxException | InvalidKeyException e) {
+        } catch (BlobStorageException e) {
             fail("should handle this error correctly " + e.getMessage());
         }
 
@@ -168,7 +168,7 @@ public class AzureStorageContainerCreateRuntimeTest {
                     new URISyntaxException("bad url", "some reason"));
             containerCreate.runAtDriver(runtimeContainer);
 
-        } catch (StorageException | URISyntaxException | InvalidKeyException e) {
+        } catch (BlobStorageException e) {
             fail("should handle this error correctly " + e.getMessage());
         }
 
@@ -185,10 +185,10 @@ public class AzureStorageContainerCreateRuntimeTest {
 
         try {
             when(blobService.createContainerIfNotExist(anyString(), any(BlobContainerPublicAccessType.class))).thenThrow(
-                    new StorageException("errorCode", "storage exception message", new RuntimeException()));
+                    new BlobStorageException("errorCode", "storage exception message", new RuntimeException()));
             containerCreate.runAtDriver(runtimeContainer);
 
-        } catch (StorageException | URISyntaxException | InvalidKeyException e) {
+        } catch (BlobStorageException e) {
             fail("should not throw this exception" + e.getMessage());
         }
 
@@ -214,7 +214,7 @@ public class AzureStorageContainerCreateRuntimeTest {
 
             containerCreate.blobService = blobService;
             containerCreate.runAtDriver(runtimeContainer);
-        } catch (InvalidKeyException | StorageException | URISyntaxException e) {
+        } catch (InvalidKeyException | BlobStorageException | URISyntaxException e) {
             fail("should not throw this exception" + e.getMessage());
         }
 
@@ -240,7 +240,7 @@ public class AzureStorageContainerCreateRuntimeTest {
 
             containerCreate.blobService = blobService;
             containerCreate.runAtDriver(runtimeContainer);
-        } catch (InvalidKeyException | StorageException | URISyntaxException e) {
+        } catch (InvalidKeyException | BlobStorageException | URISyntaxException e) {
             fail("should not throw this exception" + e.getMessage());
         }
 

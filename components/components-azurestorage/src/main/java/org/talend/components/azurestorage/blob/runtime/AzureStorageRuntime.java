@@ -1,9 +1,10 @@
 package org.talend.components.azurestorage.blob.runtime;
 
-import java.net.URISyntaxException;
-import java.security.InvalidKeyException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import com.azure.storage.blob.BlobServiceClient;
+import com.azure.storage.queue.QueueServiceClient;
 
 import org.apache.commons.lang3.StringUtils;
 import org.talend.components.api.component.runtime.RuntimableRuntime;
@@ -20,8 +21,6 @@ import org.talend.components.azurestorage.utils.AzureStorageUtils;
 import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
 import org.talend.daikon.properties.ValidationResult;
-
-import com.microsoft.azure.storage.CloudStorageAccount;
 
 public class AzureStorageRuntime implements RuntimableRuntime<ComponentProperties> {
 
@@ -110,11 +109,13 @@ public class AzureStorageRuntime implements RuntimableRuntime<ComponentPropertie
         return connectionProperties;
     }
 
-    public CloudStorageAccount getStorageAccount(RuntimeContainer runtimeContainer)
-            throws URISyntaxException, InvalidKeyException {
-
-        return getAzureConnection(runtimeContainer).getCloudStorageAccount();
+    public BlobServiceClient getBlobServiceClient(RuntimeContainer runtimeContainer) {
+        return getAzureConnection(runtimeContainer).getBlobServiceClient();
     }
+    public QueueServiceClient getQueueServiceClient(RuntimeContainer runtimeContainer) {
+        return getAzureConnection(runtimeContainer).getQueueServiceClient();
+    }
+
 
     public AzureConnection getAzureConnection(RuntimeContainer runtimeContainer) {
 

@@ -46,9 +46,9 @@ import org.talend.components.azurestorage.blob.tazurestoragelist.TAzureStorageLi
 import org.talend.components.azurestorage.tazurestorageconnection.TAzureStorageConnectionProperties;
 import org.talend.components.azurestorage.tazurestorageconnection.TAzureStorageConnectionProperties.Protocol;
 
-import com.microsoft.azure.storage.StorageException;
+import com.microsoft.azure.storage.BlobStorageException;
 import com.microsoft.azure.storage.blob.CloudBlockBlob;
-import com.microsoft.azure.storage.blob.ListBlobItem;
+import com.microsoft.azure.storage.blob.BlobItem;
 
 public class AzureStorageListReaderTest {
 
@@ -88,10 +88,10 @@ public class AzureStorageListReaderTest {
     public void testStartAsNonStartable() {
         try {
 
-            when(blobService.listBlobs(anyString(), anyString(), anyBoolean())).thenReturn(new Iterable<ListBlobItem>() {
+            when(blobService.listBlobs(anyString(), anyString(), anyBoolean())).thenReturn(new Iterable<BlobItem>() {
 
                 @Override
-                public Iterator<ListBlobItem> iterator() {
+                public Iterator<BlobItem> iterator() {
                     return new DummyListBlobItemIterator(new ArrayList<CloudBlockBlob>());
                 }
             });
@@ -104,7 +104,7 @@ public class AzureStorageListReaderTest {
             assertFalse(startable);
             assertFalse(reader.advance());
 
-        } catch (InvalidKeyException | URISyntaxException | StorageException | IOException e) {
+        } catch (InvalidKeyException | URISyntaxException | BlobStorageException | IOException e) {
             fail("should not throw " + e.getMessage());
         }
     }
@@ -117,10 +117,10 @@ public class AzureStorageListReaderTest {
             list.add(new CloudBlockBlob(new URI("https://storagesample.blob.core.windows.net/mycontainer/blob1.txt")));
             list.add(new CloudBlockBlob(new URI("https://storagesample.blob.core.windows.net/mycontainer/blob2.txt")));
             list.add(new CloudBlockBlob(new URI("https://storagesample.blob.core.windows.net/mycontainer/blob3.txt")));
-            when(blobService.listBlobs(anyString(), anyString(), anyBoolean())).thenReturn(new Iterable<ListBlobItem>() {
+            when(blobService.listBlobs(anyString(), anyString(), anyBoolean())).thenReturn(new Iterable<BlobItem>() {
 
                 @Override
-                public Iterator<ListBlobItem> iterator() {
+                public Iterator<BlobItem> iterator() {
                     return new DummyListBlobItemIterator(list);
                 }
             });
@@ -138,7 +138,7 @@ public class AzureStorageListReaderTest {
             assertNotNull(reader.getReturnValues());
             assertEquals(3, reader.getReturnValues().get(ComponentDefinition.RETURN_TOTAL_RECORD_COUNT));
 
-        } catch (InvalidKeyException | URISyntaxException | StorageException | IOException e) {
+        } catch (InvalidKeyException | URISyntaxException | BlobStorageException | IOException e) {
             fail("should not throw " + e.getMessage());
         }
     }
@@ -155,10 +155,10 @@ public class AzureStorageListReaderTest {
             final List<CloudBlockBlob> list = new ArrayList<>();
             list.add(new CloudBlockBlob(new URI("https://storagesample.blob.core.windows.net/mycontainer/blob1.txt")));
 
-            when(blobService.listBlobs(anyString(), anyString(), anyBoolean())).thenReturn(new Iterable<ListBlobItem>() {
+            when(blobService.listBlobs(anyString(), anyString(), anyBoolean())).thenReturn(new Iterable<BlobItem>() {
 
                 @Override
-                public Iterator<ListBlobItem> iterator() {
+                public Iterator<BlobItem> iterator() {
                     return new DummyListBlobItemIterator(list);
                 }
             });
@@ -175,7 +175,7 @@ public class AzureStorageListReaderTest {
             reader.getCurrent();
             fail("should throw NoSuchElementException");
 
-        } catch (InvalidKeyException | URISyntaxException | StorageException | IOException e) {
+        } catch (InvalidKeyException | URISyntaxException | BlobStorageException | IOException e) {
             fail("should not throw " + e.getMessage());
         }
     }

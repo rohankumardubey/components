@@ -47,7 +47,7 @@ import org.talend.components.azurestorage.tazurestorageconnection.TAzureStorageC
 import org.talend.components.azurestorage.tazurestorageconnection.TAzureStorageConnectionProperties.Protocol;
 import org.talend.daikon.properties.ValidationResult;
 
-import com.microsoft.azure.storage.StorageException;
+import com.microsoft.azure.storage.BlobStorageException;
 import com.microsoft.azure.storage.table.TableOperation;
 import com.microsoft.azure.storage.table.TableResult;
 
@@ -118,7 +118,7 @@ public class AzureStorageTableWriterTest {
             // open should not fail
             writer.open(RandomStringUtils.random(12));
 
-        } catch (InvalidKeyException | URISyntaxException | StorageException | IOException e) {
+        } catch (InvalidKeyException | URISyntaxException | BlobStorageException | IOException e) {
             fail("should not throw " + e.getMessage());
         }
     }
@@ -139,14 +139,14 @@ public class AzureStorageTableWriterTest {
 
                 @Override
                 public Void answer(InvocationOnMock invocation) throws Throwable {
-                    throw new StorageException("500", "Unavailable sink", new RuntimeException());
+                    throw new BlobStorageException("500", "Unavailable sink", new RuntimeException());
                 }
             }).when(tableService).handleActionOnTable(anyString(), any(ActionOnTable.class));
 
             // open should not fail
             writer.open(RandomStringUtils.random(12));
 
-        } catch (InvalidKeyException | URISyntaxException | StorageException | IOException e) {
+        } catch (InvalidKeyException | URISyntaxException | BlobStorageException | IOException e) {
             fail("should not throw " + e.getMessage());
         }
     }
@@ -176,7 +176,7 @@ public class AzureStorageTableWriterTest {
             writer.write(null);
             writer.close();
 
-        } catch (InvalidKeyException | URISyntaxException | StorageException | IOException e) {
+        } catch (InvalidKeyException | URISyntaxException | BlobStorageException | IOException e) {
             fail("should not throw " + e.getMessage());
         }
     }
@@ -209,7 +209,7 @@ public class AzureStorageTableWriterTest {
             }
             writer.close();
 
-        } catch (InvalidKeyException | URISyntaxException | StorageException | IOException e) {
+        } catch (InvalidKeyException | URISyntaxException | BlobStorageException | IOException e) {
             fail("should not throw " + e.getMessage());
         }
     }
@@ -242,7 +242,7 @@ public class AzureStorageTableWriterTest {
             writer.write(TableHelper.getRecord(0));
             writer.close();
 
-        } catch (InvalidKeyException | URISyntaxException | StorageException | IOException e) {
+        } catch (InvalidKeyException | URISyntaxException | BlobStorageException | IOException e) {
             fail("should not throw " + e.getMessage());
         }
     }
@@ -267,7 +267,7 @@ public class AzureStorageTableWriterTest {
                 }
             }).when(tableService).handleActionOnTable(anyString(), any(ActionOnTable.class));
             when(tableService.executeOperation(anyString(), any(TableOperation.class)))
-                    .thenThrow(new StorageException("500", "insertion problem", new RuntimeException()));
+                    .thenThrow(new BlobStorageException("500", "insertion problem", new RuntimeException()));
 
             // assert
             writer.open(RandomStringUtils.random(12));
@@ -276,7 +276,7 @@ public class AzureStorageTableWriterTest {
             }
             writer.close();
 
-        } catch (InvalidKeyException | URISyntaxException | StorageException | IOException e) {
+        } catch (InvalidKeyException | URISyntaxException | BlobStorageException | IOException e) {
             fail("should not throw " + e.getMessage());
         }
 
@@ -304,7 +304,7 @@ public class AzureStorageTableWriterTest {
                 }
             }).when(tableService).handleActionOnTable(anyString(), any(ActionOnTable.class));
             when(tableService.executeOperation(anyString(), any(TableOperation.class)))
-                    .thenThrow(new StorageException("500", "insertion problem", new RuntimeException()));
+                    .thenThrow(new BlobStorageException("500", "insertion problem", new RuntimeException()));
 
             // assert
             writer.open(RandomStringUtils.random(12));
@@ -313,7 +313,7 @@ public class AzureStorageTableWriterTest {
             }
             writer.close();
 
-        } catch (InvalidKeyException | URISyntaxException | StorageException | IOException e) {
+        } catch (InvalidKeyException | URISyntaxException | BlobStorageException | IOException e) {
             fail("should not throw " + e.getMessage());
         }
 

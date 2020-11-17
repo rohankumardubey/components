@@ -44,7 +44,7 @@ import org.talend.components.azurestorage.queue.tazurestoragequeuelist.TAzureSto
 import org.talend.daikon.properties.ValidationResult;
 
 import com.microsoft.azure.storage.StorageCredentialsSharedAccessSignature;
-import com.microsoft.azure.storage.StorageException;
+import com.microsoft.azure.storage.BlobStorageException;
 import com.microsoft.azure.storage.queue.CloudQueue;
 
 public class AzureStorageQueueListReaderTest extends AzureBaseTest {
@@ -93,7 +93,7 @@ public class AzureStorageQueueListReaderTest extends AzureBaseTest {
 
             assertTrue(reader.start());
 
-        } catch (InvalidKeyException | URISyntaxException | StorageException | IOException e) {
+        } catch (InvalidKeyException | URISyntaxException | BlobStorageException | IOException e) {
             fail("should not throw " + e.getMessage());
         }
     }
@@ -195,7 +195,7 @@ public class AzureStorageQueueListReaderTest extends AzureBaseTest {
             assertTrue(reader.start());
             assertTrue(reader.advance());
 
-        } catch (InvalidKeyException | URISyntaxException | StorageException | IOException e) {
+        } catch (InvalidKeyException | URISyntaxException | BlobStorageException | IOException e) {
             fail("should not throw " + e.getMessage());
         }
     }
@@ -225,7 +225,7 @@ public class AzureStorageQueueListReaderTest extends AzureBaseTest {
             assertTrue(reader.start());
             assertFalse(reader.advance());
 
-        } catch (InvalidKeyException | URISyntaxException | StorageException | IOException e) {
+        } catch (InvalidKeyException | URISyntaxException | BlobStorageException | IOException e) {
             fail("should not throw " + e.getMessage());
         }
     }
@@ -285,7 +285,7 @@ public class AzureStorageQueueListReaderTest extends AzureBaseTest {
             assertNotNull(current);
             assertEquals("queue-1", current.get(0));
 
-        } catch (InvalidKeyException | URISyntaxException | StorageException | IOException e) {
+        } catch (InvalidKeyException | URISyntaxException | BlobStorageException | IOException e) {
             fail("should not throw " + e.getMessage());
         }
     }
@@ -343,7 +343,7 @@ public class AzureStorageQueueListReaderTest extends AzureBaseTest {
             assertFalse(reader.advance());
             reader.getCurrent();
 
-        } catch (InvalidKeyException | URISyntaxException | IOException | StorageException e) {
+        } catch (InvalidKeyException | URISyntaxException | IOException | BlobStorageException e) {
             fail("should not throw " + e.getMessage());
         }
     }
@@ -380,7 +380,7 @@ public class AzureStorageQueueListReaderTest extends AzureBaseTest {
             assertNotNull(returnedValues);
             assertEquals(3, returnedValues.get(TAzureStorageQueueListDefinition.RETURN_NB_QUEUE));
 
-        } catch (InvalidKeyException | URISyntaxException | StorageException | IOException e) {
+        } catch (InvalidKeyException | URISyntaxException | BlobStorageException | IOException e) {
             fail("should not throw " + e.getMessage());
         }
     }

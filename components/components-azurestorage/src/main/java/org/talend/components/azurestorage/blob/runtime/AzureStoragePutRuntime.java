@@ -15,12 +15,12 @@ package org.talend.components.azurestorage.blob.runtime;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.security.InvalidKeyException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import com.azure.storage.blob.models.BlobStorageException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,8 +37,6 @@ import org.talend.components.azurestorage.utils.AzureStorageUtils;
 import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
 import org.talend.daikon.properties.ValidationResult;
-
-import com.microsoft.azure.storage.StorageException;
 
 /**
  * Upload a set of files form a local folder to Azure blob storage
@@ -128,7 +126,7 @@ public class AzureStoragePutRuntime extends AzureStorageContainerRuntime
                 // TODO Any Action ??? if remoteFolder doesn't exist it will fail...
                 azureStorageBlobService.upload(containerName, entry.getValue(), stream, source.length());
 
-            } catch (StorageException | URISyntaxException | IOException | InvalidKeyException e) {
+            } catch (BlobStorageException | IOException e) {
                 LOGGER.error(e.getLocalizedMessage());
                 if (dieOnError) {
                     throw new ComponentException(e);

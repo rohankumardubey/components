@@ -48,7 +48,7 @@ import org.talend.components.azurestorage.queue.tazurestoragequeueinput.TAzureSt
 import org.talend.components.azurestorage.queue.tazurestoragequeueinputloop.TAzureStorageQueueInputLoopProperties;
 import org.talend.daikon.properties.ValidationResult;
 
-import com.microsoft.azure.storage.StorageException;
+import com.microsoft.azure.storage.BlobStorageException;
 import com.microsoft.azure.storage.queue.CloudQueueMessage;
 
 public class AzureStorageQueueInputLoopReaderTest extends AzureBaseTest {
@@ -102,7 +102,7 @@ public class AzureStorageQueueInputLoopReaderTest extends AzureBaseTest {
 
             boolean startable = reader.start();
             assertTrue(startable);
-        } catch (IOException | InvalidKeyException | URISyntaxException | StorageException e) {
+        } catch (IOException | InvalidKeyException | URISyntaxException | BlobStorageException e) {
             fail("sould not throw " + e.getMessage());
         }
     }
@@ -143,7 +143,7 @@ public class AzureStorageQueueInputLoopReaderTest extends AzureBaseTest {
             boolean advancable = reader.advance();
             assertTrue(advancable);
 
-        } catch (IOException | InvalidKeyException | URISyntaxException | StorageException e) {
+        } catch (IOException | InvalidKeyException | URISyntaxException | BlobStorageException e) {
             fail("sould not throw " + e.getMessage());
         }
     }
@@ -186,7 +186,7 @@ public class AzureStorageQueueInputLoopReaderTest extends AzureBaseTest {
                 }
             } while (reader.advance());
 
-        } catch (IOException | InvalidKeyException | URISyntaxException | StorageException e) {
+        } catch (IOException | InvalidKeyException | URISyntaxException | BlobStorageException e) {
             fail("sould not throw " + e.getMessage());
         }
     }
@@ -228,7 +228,7 @@ public class AzureStorageQueueInputLoopReaderTest extends AzureBaseTest {
             assertNotNull(returnedValues);
             assertEquals("some-queue-name", returnedValues.get(AzureStorageQueueDefinition.RETURN_QUEUE_NAME));
             assertEquals(3, returnedValues.get(ComponentDefinition.RETURN_TOTAL_RECORD_COUNT));
-        } catch (IOException | InvalidKeyException | URISyntaxException | StorageException e) {
+        } catch (IOException | InvalidKeyException | URISyntaxException | BlobStorageException e) {
             fail("sould not throw " + e.getMessage());
         }
     }

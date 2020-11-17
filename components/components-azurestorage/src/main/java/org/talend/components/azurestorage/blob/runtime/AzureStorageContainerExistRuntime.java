@@ -12,8 +12,7 @@
 // ============================================================================
 package org.talend.components.azurestorage.blob.runtime;
 
-import java.net.URISyntaxException;
-import java.security.InvalidKeyException;
+import com.azure.storage.blob.models.BlobStorageException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,8 +26,6 @@ import org.talend.components.azurestorage.blob.tazurestoragecontainerexist.TAzur
 import org.talend.components.azurestorage.blob.tazurestoragecontainerexist.TAzureStorageContainerExistProperties;
 import org.talend.components.azurestorage.utils.AzureStorageUtils;
 import org.talend.daikon.properties.ValidationResult;
-
-import com.microsoft.azure.storage.StorageException;
 
 public class AzureStorageContainerExistRuntime extends AzureStorageContainerRuntime
         implements ComponentDriverInitialization<ComponentProperties> {
@@ -64,7 +61,7 @@ public class AzureStorageContainerExistRuntime extends AzureStorageContainerRunt
 
             return azureStorageBlobService.containerExist(this.containerName);
 
-        } catch (StorageException | URISyntaxException | InvalidKeyException e) {
+        } catch (BlobStorageException e) {
             LOGGER.error(e.getLocalizedMessage());
             if (this.dieOnError) {
                 throw new ComponentException(e);

@@ -13,11 +13,12 @@
 package org.talend.components.azurestorage.blob.runtime;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.security.InvalidKeyException;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
+
+import com.azure.storage.blob.models.BlobContainerItem;
+import com.azure.storage.blob.models.BlobStorageException;
 
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.IndexedRecord;
@@ -30,15 +31,13 @@ import org.talend.components.azurestorage.blob.AzureStorageBlobService;
 import org.talend.components.azurestorage.blob.tazurestoragecontainerlist.TAzureStorageContainerListDefinition;
 import org.talend.components.azurestorage.blob.tazurestoragecontainerlist.TAzureStorageContainerListProperties;
 
-import com.microsoft.azure.storage.blob.CloudBlobContainer;
-
 public class AzureStorageContainerListReader extends AzureStorageReader<IndexedRecord> {
 
     private IndexedRecord currentRecord;
 
     private TAzureStorageContainerListProperties properties;
 
-    private transient Iterator<CloudBlobContainer> containers;
+    private transient Iterator<BlobContainerItem> containers;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AzureStorageContainerListReader.class);
 
@@ -46,11 +45,13 @@ public class AzureStorageContainerListReader extends AzureStorageReader<IndexedR
 
     Boolean advanceable = null; // this is initialized in the advance method
 
-    /** let this attribute public for test purpose */
+    /**
+     * let this attribute public for test purpose
+     */
     public AzureStorageBlobService blobService;
 
     public AzureStorageContainerListReader(RuntimeContainer container, BoundedSource source,
-            TAzureStorageContainerListProperties properties) {
+                                           TAzureStorageContainerListProperties properties) {
         super(container, source);
         this.properties = properties;
         AzureStorageSource currentSource = (AzureStorageSource) source;
@@ -63,12 +64,13 @@ public class AzureStorageContainerListReader extends AzureStorageReader<IndexedR
         try {
             containers = blobService.listContainers().iterator();
             startable = containers.hasNext();
-        } catch (InvalidKeyException | URISyntaxException e) {
+        } catch (BlobStorageException e) {
             LOGGER.error(e.getLocalizedMessage());
-            if (properties.dieOnError.getValue())
+            if (properties.dieOnError.getValue()) {
                 throw new ComponentException(e);
-            else
+            } else {
                 startable = false;
+            }
         }
         if (startable) {
             dataCount++;

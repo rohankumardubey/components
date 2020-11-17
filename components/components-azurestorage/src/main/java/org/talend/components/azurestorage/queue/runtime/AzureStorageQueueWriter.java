@@ -13,12 +13,16 @@
 package org.talend.components.azurestorage.queue.runtime;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.security.InvalidKeyException;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
+
+import com.azure.storage.queue.QueueClient;
+import com.azure.storage.queue.implementation.models.QueueMessage;
+import com.azure.storage.queue.models.QueueMessageItem;
+import com.azure.storage.queue.models.QueueStorageException;
 
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
@@ -38,10 +42,6 @@ import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
 
-import com.microsoft.azure.storage.StorageException;
-import com.microsoft.azure.storage.queue.CloudQueue;
-import com.microsoft.azure.storage.queue.CloudQueueMessage;
-
 public class AzureStorageQueueWriter implements WriterWithFeedback<Result, IndexedRecord, IndexedRecord> {
 
     private AzureStorageQueueWriteOperation wope;
@@ -52,13 +52,13 @@ public class AzureStorageQueueWriter implements WriterWithFeedback<Result, Index
 
     private RuntimeContainer runtime;
 
-    private CloudQueue queue;
+    private QueueClient queue;
 
     private Schema writeSchema;
 
     private Result result;
 
-    private List<QueueMessage> messagesBuffer;
+    private List<QueueMsg> messagesBuffer;
 
     private List<IndexedRecord> successfulWrites = new ArrayList<>();
 
@@ -91,18 +91,20 @@ public class AzureStorageQueueWriter implements WriterWithFeedback<Result, Index
         }
         try {
             queue = sink.getCloudQueue(runtime, props.queueName.getValue());
-        } catch (InvalidKeyException | URISyntaxException | StorageException e) {
+        } catch (QueueStorageException e) {
             LOGGER.error(e.getLocalizedMessage());
-            if (props.dieOnError.getValue())
+            if (props.dieOnError.getValue()) {
                 throw new ComponentException(e);
+            }
         }
     }
 
     @Override
     public void write(Object object) throws IOException {
         String content;
-        if (object == null)
+        if (object == null) {
             return;
+        }
         cleanWrites();
         result.totalCount++;
         if (writeSchema == null) {
@@ -122,7 +124,9 @@ public class AzureStorageQueueWriter implements WriterWithFeedback<Result, Index
             }
         } else {
             content = (String) inputRecord.get(msgContent.pos());
-            messagesBuffer.add(new QueueMessage(new CloudQueueMessage(content), ttl, visibility));
+            QueueMessageItem msg = new QueueMessageItem();
+            msg.setMessageText(content);
+            messagesBuffer.add(new QueueMsg(msg, ttl, visibility));
         }
 
         if (messagesBuffer.size() >= MAX_MSG_TO_ENQUEUE) {
@@ -138,20 +142,23 @@ public class AzureStorageQueueWriter implements WriterWithFeedback<Result, Index
     }
 
     private void sendParallelMessages() {
-        messagesBuffer.parallelStream().forEach(new Consumer<QueueMessage>() {
+        messagesBuffer.parallelStream().forEach(new Consumer<QueueMsg>() {
 
             @Override
-            public void accept(QueueMessage queueMessage) {
+            public void accept(QueueMsg msg) {
                 try {
-                    queue.addMessage(queueMessage.getMsg(), queueMessage.getTimeToLiveInSeconds(),
-                            queueMessage.getInitialVisibilityDelayInSeconds(), null, null);
+                    queue.sendMessageWithResponse(msg.getMsg().getMessageText(),
+                                                  Duration.ofSeconds(msg.getInitialVisibilityDelayInSeconds()),
+                                                  Duration.ofSeconds(msg.getTimeToLiveInSeconds()),
+                                                  Duration.ofSeconds(30),
+                                                  null);
                     synchronized (this) {
                         result.successCount++;
                         IndexedRecord record = new Record(writeSchema);
-                        record.put(0, queueMessage.getMsg().getMessageContentAsString());
+                        record.put(0, msg.getMsg().getMessageText());
                         successfulWrites.add(record);
                     }
-                } catch (StorageException e) {
+                } catch (QueueStorageException e) {
                     result.rejectCount++;
                     LOGGER.error(e.getLocalizedMessage());
                 }

@@ -36,7 +36,7 @@ import org.talend.components.azurestorage.tazurestorageconnection.TAzureStorageC
 import org.talend.components.azurestorage.tazurestorageconnection.TAzureStorageConnectionProperties.Protocol;
 import org.talend.daikon.properties.ValidationResult;
 
-import com.microsoft.azure.storage.StorageException;
+import com.microsoft.azure.storage.BlobStorageException;
 
 public class AzureStorageQueueDeleteRuntimeTest {
 
@@ -83,7 +83,7 @@ public class AzureStorageQueueDeleteRuntimeTest {
         try {
             when(queueService.deleteQueueIfExists(anyString())).thenReturn(true);
             queueDelete.runAtDriver(runtimeContainer);
-        } catch (InvalidKeyException | URISyntaxException | StorageException e) {
+        } catch (InvalidKeyException | URISyntaxException | BlobStorageException e) {
             fail("should not throw " + e.getMessage());
         }
     }
@@ -96,7 +96,7 @@ public class AzureStorageQueueDeleteRuntimeTest {
         try {
             when(queueService.deleteQueueIfExists(anyString())).thenReturn(false);
             queueDelete.runAtDriver(runtimeContainer);
-        } catch (InvalidKeyException | URISyntaxException | StorageException e) {
+        } catch (InvalidKeyException | URISyntaxException | BlobStorageException e) {
             fail("should not throw " + e.getMessage());
         }
     }
@@ -109,9 +109,9 @@ public class AzureStorageQueueDeleteRuntimeTest {
         queueDelete.queueService = queueService;
         try {
             when(queueService.deleteQueueIfExists(anyString()))
-                    .thenThrow(new StorageException("errorCode", "some storage message", new RuntimeException()));
+                    .thenThrow(new BlobStorageException("errorCode", "some storage message", new RuntimeException()));
             queueDelete.runAtDriver(runtimeContainer);
-        } catch (InvalidKeyException | URISyntaxException | StorageException e) {
+        } catch (InvalidKeyException | URISyntaxException | BlobStorageException e) {
             fail("should not throw " + e.getMessage());
         }
     }
@@ -125,7 +125,7 @@ public class AzureStorageQueueDeleteRuntimeTest {
         try {
             when(queueService.deleteQueueIfExists(anyString())).thenThrow(new InvalidKeyException());
             queueDelete.runAtDriver(runtimeContainer);
-        } catch (InvalidKeyException | URISyntaxException | StorageException e) {
+        } catch (InvalidKeyException | URISyntaxException | BlobStorageException e) {
             fail("should not throw " + e.getMessage());
         }
     }
@@ -139,7 +139,7 @@ public class AzureStorageQueueDeleteRuntimeTest {
         try {
             when(queueService.deleteQueueIfExists(anyString())).thenThrow(new URISyntaxException("bad uri", "some reason"));
             queueDelete.runAtDriver(runtimeContainer);
-        } catch (InvalidKeyException | URISyntaxException | StorageException e) {
+        } catch (InvalidKeyException | URISyntaxException | BlobStorageException e) {
             fail("should not throw " + e.getMessage());
         }
     }
@@ -153,7 +153,7 @@ public class AzureStorageQueueDeleteRuntimeTest {
         try {
             when(queueService.deleteQueueIfExists(anyString())).thenThrow(new InvalidKeyException());
             queueDelete.runAtDriver(runtimeContainer);
-        } catch (InvalidKeyException | URISyntaxException | StorageException e) {
+        } catch (InvalidKeyException | URISyntaxException | BlobStorageException e) {
             fail("should not throw " + e.getMessage());
         }
     }

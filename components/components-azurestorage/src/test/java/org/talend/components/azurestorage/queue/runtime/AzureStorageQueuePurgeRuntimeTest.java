@@ -37,7 +37,7 @@ import org.talend.components.azurestorage.queue.tazurestoragequeuepurge.TAzureSt
 import org.talend.components.azurestorage.tazurestorageconnection.TAzureStorageConnectionProperties;
 import org.talend.components.azurestorage.tazurestorageconnection.TAzureStorageConnectionProperties.Protocol;
 
-import com.microsoft.azure.storage.StorageException;
+import com.microsoft.azure.storage.BlobStorageException;
 
 public class AzureStorageQueuePurgeRuntimeTest {
 
@@ -84,7 +84,7 @@ public class AzureStorageQueuePurgeRuntimeTest {
                 }
             }).when(queueService).clear(anyString());
             azureStorageQueuePurge.runAtDriver(runtimeContainer);
-        } catch (InvalidKeyException | URISyntaxException | StorageException e) {
+        } catch (InvalidKeyException | URISyntaxException | BlobStorageException e) {
             fail("should not throw " + e.getMessage());
         }
     }
@@ -101,11 +101,11 @@ public class AzureStorageQueuePurgeRuntimeTest {
 
                 @Override
                 public Void answer(InvocationOnMock invocation) throws Throwable {
-                    throw new StorageException("errorCode", "some storage message", new RuntimeException());
+                    throw new BlobStorageException("errorCode", "some storage message", new RuntimeException());
                 }
             }).when(queueService).clear(anyString());
             azureStorageQueuePurge.runAtDriver(runtimeContainer);
-        } catch (InvalidKeyException | URISyntaxException | StorageException e) {
+        } catch (InvalidKeyException | URISyntaxException | BlobStorageException e) {
             fail("should not throw " + e.getMessage());
         }
     }
@@ -126,7 +126,7 @@ public class AzureStorageQueuePurgeRuntimeTest {
                 }
             }).when(queueService).clear(anyString());
             azureStorageQueuePurge.runAtDriver(runtimeContainer);
-        } catch (InvalidKeyException | URISyntaxException | StorageException e) {
+        } catch (InvalidKeyException | URISyntaxException | BlobStorageException e) {
             fail("should not throw " + e.getMessage());
         }
     }
@@ -147,7 +147,7 @@ public class AzureStorageQueuePurgeRuntimeTest {
                 }
             }).when(queueService).clear(anyString());
             azureStorageQueuePurge.runAtDriver(runtimeContainer);
-        } catch (InvalidKeyException | URISyntaxException | StorageException e) {
+        } catch (InvalidKeyException | URISyntaxException | BlobStorageException e) {
             fail("should not throw " + e.getMessage());
         }
     }
@@ -168,7 +168,7 @@ public class AzureStorageQueuePurgeRuntimeTest {
                 }
             }).when(queueService).clear(anyString());
             azureStorageQueuePurge.runAtDriver(runtimeContainer);
-        } catch (InvalidKeyException | URISyntaxException | StorageException e) {
+        } catch (InvalidKeyException | URISyntaxException | BlobStorageException e) {
             fail("should not throw " + e.getMessage());
         }
     }

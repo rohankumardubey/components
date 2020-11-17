@@ -42,7 +42,7 @@ import org.talend.components.azurestorage.blob.tazurestoragecontainerlist.TAzure
 import org.talend.components.azurestorage.tazurestorageconnection.TAzureStorageConnectionProperties;
 import org.talend.components.azurestorage.tazurestorageconnection.TAzureStorageConnectionProperties.Protocol;
 
-import com.microsoft.azure.storage.StorageException;
+import com.microsoft.azure.storage.BlobStorageException;
 import com.microsoft.azure.storage.blob.CloudBlobContainer;
 
 public class AzureStorageContainerListReaderTest {
@@ -124,7 +124,7 @@ public class AzureStorageContainerListReaderTest {
             assertNotNull(reader.getReturnValues());
             assertEquals(3, reader.getReturnValues().get(ComponentDefinition.RETURN_TOTAL_RECORD_COUNT));
 
-        } catch (InvalidKeyException | URISyntaxException | StorageException | IOException e) {
+        } catch (InvalidKeyException | URISyntaxException | BlobStorageException | IOException e) {
             fail("should not throw " + e.getMessage());
         }
     }
@@ -157,7 +157,7 @@ public class AzureStorageContainerListReaderTest {
             reader.getCurrent();
             fail("should throw NoSuchElementException");
 
-        } catch (StorageException | URISyntaxException | InvalidKeyException | IOException e) {
+        } catch (BlobStorageException | IOException e) {
             fail("should not throw " + e.getMessage());
         }
     }

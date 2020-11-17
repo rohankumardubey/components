@@ -50,7 +50,7 @@ import org.talend.components.azurestorage.queue.AzureStorageQueueService;
 import org.talend.components.azurestorage.queue.tazurestoragequeueinput.TAzureStorageQueueInputProperties;
 import org.talend.daikon.properties.ValidationResult;
 
-import com.microsoft.azure.storage.StorageException;
+import com.microsoft.azure.storage.BlobStorageException;
 import com.microsoft.azure.storage.queue.CloudQueueMessage;
 
 public class AzureStorageQueueInputReaderTest extends AzureBaseTest {
@@ -97,7 +97,7 @@ public class AzureStorageQueueInputReaderTest extends AzureBaseTest {
             });
             boolean startable = reader.start();
             assertTrue(startable);
-        } catch (IOException | InvalidKeyException | URISyntaxException | StorageException e) {
+        } catch (IOException | InvalidKeyException | URISyntaxException | BlobStorageException e) {
             fail("sould not throw " + e.getMessage());
         }
     }
@@ -126,7 +126,7 @@ public class AzureStorageQueueInputReaderTest extends AzureBaseTest {
             });
             boolean startable = reader.start();
             assertTrue(startable);
-        } catch (IOException | InvalidKeyException | URISyntaxException | StorageException e) {
+        } catch (IOException | InvalidKeyException | URISyntaxException | BlobStorageException e) {
             fail("sould not throw " + e.getMessage());
         }
     }
@@ -154,7 +154,7 @@ public class AzureStorageQueueInputReaderTest extends AzureBaseTest {
             });
             boolean startable = reader.start();
             assertFalse(startable);
-        } catch (IOException | InvalidKeyException | URISyntaxException | StorageException e) {
+        } catch (IOException | InvalidKeyException | URISyntaxException | BlobStorageException e) {
             fail("sould not throw " + e.getMessage());
         }
     }
@@ -193,7 +193,7 @@ public class AzureStorageQueueInputReaderTest extends AzureBaseTest {
 
             boolean startable = reader.start();
             assertTrue(startable);
-        } catch (IOException | InvalidKeyException | URISyntaxException | StorageException e) {
+        } catch (IOException | InvalidKeyException | URISyntaxException | BlobStorageException e) {
             fail("sould not throw " + e.getMessage());
         }
     }
@@ -226,13 +226,13 @@ public class AzureStorageQueueInputReaderTest extends AzureBaseTest {
 
                 @Override
                 public Void answer(InvocationOnMock invocation) throws Throwable {
-                    throw new StorageException("code", "message-1 can't be deleted", new RuntimeException());
+                    throw new BlobStorageException("code", "message-1 can't be deleted", new RuntimeException());
                 }
             }).when(queueService).deleteMessage(anyString(), any(CloudQueueMessage.class));
 
             boolean startable = reader.start();
             assertTrue(startable);
-        } catch (IOException | InvalidKeyException | URISyntaxException | StorageException e) {
+        } catch (IOException | InvalidKeyException | URISyntaxException | BlobStorageException e) {
             fail("sould not throw " + e.getMessage());
         }
     }
@@ -254,11 +254,11 @@ public class AzureStorageQueueInputReaderTest extends AzureBaseTest {
             final List<CloudQueueMessage> messages = new ArrayList<>();
             messages.add(new CloudQueueMessage("message-1"));
             when(queueService.peekMessages(anyString(), anyInt()))
-                    .thenThrow(new StorageException("code", "some storage exception", new RuntimeException()));
+                    .thenThrow(new BlobStorageException("code", "some storage exception", new RuntimeException()));
 
             boolean startable = reader.start();
             assertFalse(startable);
-        } catch (IOException | InvalidKeyException | URISyntaxException | StorageException e) {
+        } catch (IOException | InvalidKeyException | URISyntaxException | BlobStorageException e) {
             fail("sould not throw " + e.getMessage());
         }
     }
@@ -280,11 +280,11 @@ public class AzureStorageQueueInputReaderTest extends AzureBaseTest {
             final List<CloudQueueMessage> messages = new ArrayList<>();
             messages.add(new CloudQueueMessage("message-1"));
             when(queueService.peekMessages(anyString(), anyInt()))
-                    .thenThrow(new StorageException("code", "some storage exception", new RuntimeException()));
+                    .thenThrow(new BlobStorageException("code", "some storage exception", new RuntimeException()));
 
             boolean startable = reader.start();
             assertFalse(startable);
-        } catch (IOException | InvalidKeyException | URISyntaxException | StorageException e) {
+        } catch (IOException | InvalidKeyException | URISyntaxException | BlobStorageException e) {
             fail("sould not throw " + e.getMessage());
         }
     }
@@ -318,7 +318,7 @@ public class AzureStorageQueueInputReaderTest extends AzureBaseTest {
             boolean advancable = reader.advance();
             assertTrue(advancable);
 
-        } catch (IOException | InvalidKeyException | URISyntaxException | StorageException e) {
+        } catch (IOException | InvalidKeyException | URISyntaxException | BlobStorageException e) {
             fail("sould not throw " + e.getMessage());
         }
     }
@@ -351,7 +351,7 @@ public class AzureStorageQueueInputReaderTest extends AzureBaseTest {
 
                 @Override
                 public Void answer(InvocationOnMock invocation) throws Throwable {
-                    throw new StorageException("code", "message-1 can't be deleted", new RuntimeException());
+                    throw new BlobStorageException("code", "message-1 can't be deleted", new RuntimeException());
                 }
             }).when(queueService).deleteMessage(anyString(), any(CloudQueueMessage.class));
 
@@ -360,7 +360,7 @@ public class AzureStorageQueueInputReaderTest extends AzureBaseTest {
             boolean advancable = reader.advance();
             assertFalse(advancable);
 
-        } catch (IOException | InvalidKeyException | URISyntaxException | StorageException e) {
+        } catch (IOException | InvalidKeyException | URISyntaxException | BlobStorageException e) {
             fail("sould not throw " + e.getMessage());
         }
     }
@@ -392,7 +392,7 @@ public class AzureStorageQueueInputReaderTest extends AzureBaseTest {
 
                 @Override
                 public Void answer(InvocationOnMock invocation) throws Throwable {
-                    throw new StorageException("code", "message-1 can't be deleted", new RuntimeException());
+                    throw new BlobStorageException("code", "message-1 can't be deleted", new RuntimeException());
                 }
             }).when(queueService).deleteMessage(anyString(), any(CloudQueueMessage.class));
 
@@ -401,7 +401,7 @@ public class AzureStorageQueueInputReaderTest extends AzureBaseTest {
             boolean advancable = reader.advance();
             assertFalse(advancable);
 
-        } catch (IOException | InvalidKeyException | URISyntaxException | StorageException e) {
+        } catch (IOException | InvalidKeyException | URISyntaxException | BlobStorageException e) {
             fail("sould not throw " + e.getMessage());
         }
     }
@@ -445,7 +445,7 @@ public class AzureStorageQueueInputReaderTest extends AzureBaseTest {
             boolean advancable = reader.advance();
             assertTrue(advancable);
 
-        } catch (IOException | InvalidKeyException | URISyntaxException | StorageException e) {
+        } catch (IOException | InvalidKeyException | URISyntaxException | BlobStorageException e) {
             fail("sould not throw " + e.getMessage());
         }
     }
@@ -480,7 +480,7 @@ public class AzureStorageQueueInputReaderTest extends AzureBaseTest {
 
                 @Override
                 public Void answer(InvocationOnMock invocation) throws Throwable {
-                    throw new StorageException("code", "message-1 can't be deleted", new RuntimeException());
+                    throw new BlobStorageException("code", "message-1 can't be deleted", new RuntimeException());
                 }
             }).when(queueService).deleteMessage(anyString(), any(CloudQueueMessage.class));
 
@@ -489,7 +489,7 @@ public class AzureStorageQueueInputReaderTest extends AzureBaseTest {
             boolean advancable = reader.advance();
             assertTrue(advancable);
 
-        } catch (IOException | InvalidKeyException | URISyntaxException | StorageException e) {
+        } catch (IOException | InvalidKeyException | URISyntaxException | BlobStorageException e) {
             fail("sould not throw " + e.getMessage());
         }
     }
@@ -530,7 +530,7 @@ public class AzureStorageQueueInputReaderTest extends AzureBaseTest {
                 i++;
             } while (reader.advance());
 
-        } catch (IOException | InvalidKeyException | URISyntaxException | StorageException e) {
+        } catch (IOException | InvalidKeyException | URISyntaxException | BlobStorageException e) {
             fail("sould not throw " + e.getMessage());
         }
     }
@@ -560,7 +560,7 @@ public class AzureStorageQueueInputReaderTest extends AzureBaseTest {
             assertFalse(startable);
             reader.getCurrent(); // should throw NoSuchElementException
 
-        } catch (IOException | InvalidKeyException | URISyntaxException | StorageException e) {
+        } catch (IOException | InvalidKeyException | URISyntaxException | BlobStorageException e) {
             fail("sould not throw " + e.getMessage());
         }
     }
@@ -594,7 +594,7 @@ public class AzureStorageQueueInputReaderTest extends AzureBaseTest {
             assertFalse(advancable);
             reader.getCurrent(); // should throw NoSuchElementException
 
-        } catch (IOException | InvalidKeyException | URISyntaxException | StorageException e) {
+        } catch (IOException | InvalidKeyException | URISyntaxException | BlobStorageException e) {
             fail("sould not throw " + e.getMessage());
         }
     }
@@ -632,7 +632,7 @@ public class AzureStorageQueueInputReaderTest extends AzureBaseTest {
             assertNotNull(returnedValues);
             assertEquals("some-queue-name", returnedValues.get(AzureStorageQueueDefinition.RETURN_QUEUE_NAME));
             assertEquals(3, returnedValues.get(ComponentDefinition.RETURN_TOTAL_RECORD_COUNT));
-        } catch (IOException | InvalidKeyException | URISyntaxException | StorageException e) {
+        } catch (IOException | InvalidKeyException | URISyntaxException | BlobStorageException e) {
             fail("sould not throw " + e.getMessage());
         }
     }

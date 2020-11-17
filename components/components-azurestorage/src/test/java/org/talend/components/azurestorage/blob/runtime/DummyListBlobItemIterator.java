@@ -16,9 +16,9 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.microsoft.azure.storage.blob.CloudBlockBlob;
-import com.microsoft.azure.storage.blob.ListBlobItem;
+import com.microsoft.azure.storage.blob.BlobItem;
 
-public class DummyListBlobItemIterator implements Iterator<ListBlobItem> {
+public class DummyListBlobItemIterator implements Iterator<BlobItem> {
 
     private Iterator<CloudBlockBlob> it;
 

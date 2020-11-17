@@ -34,12 +34,12 @@ public class TAzureStorageListProperties extends AzureStorageBlobProperties {
 
     protected transient PropertyPathConnector MAIN_NAME = new PropertyPathConnector(Connector.MAIN_NAME, "schema");
 
-	public static final Schema outOfBandSchema;
-    
-	/**
+    public static final Schema outOfBandSchema;
+
+    /**
      * Sets Out of band schema. This schema is not supposed to be changed by user
      */
-    static {       
+    static {
         Field currentBlobField = new Field("CURRENT_BLOB", Schema.create(Schema.Type.STRING), null, (Object) null);
         outOfBandSchema = Schema.createRecord("OutOfBand", null, null, false);
         outOfBandSchema.setFields(Collections.singletonList(currentBlobField));
@@ -63,12 +63,13 @@ public class TAzureStorageListProperties extends AzureStorageBlobProperties {
     public void setupProperties() {
         super.setupProperties();
 
-        Schema s = SchemaBuilder.record("Main").fields().name("BlobName").prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "300")// $NON-NLS-3$
+        Schema s = SchemaBuilder.record("Main").fields().name("BlobName")
+                .prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "300")// $NON-NLS-3$
                 .prop(SchemaConstants.TALEND_IS_LOCKED, "true")//$NON-NLS-1$
                 .type(AvroUtils._string()).noDefault().endRecord();
         schema.schema.setValue(s);
     }
-    
+
     @Override
     public Set<PropertyPathConnector> getAllSchemaPropertiesConnectors(boolean isOutputConnection) {
         if (isOutputConnection) {
@@ -77,7 +78,6 @@ public class TAzureStorageListProperties extends AzureStorageBlobProperties {
             return Collections.emptySet();
         }
     }
-    
-    
+
 
 }

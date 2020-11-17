@@ -42,9 +42,9 @@ import org.talend.components.azurestorage.tazurestorageconnection.TAzureStorageC
 import org.talend.components.azurestorage.tazurestorageconnection.TAzureStorageConnectionProperties.Protocol;
 import org.talend.daikon.properties.ValidationResult;
 
-import com.microsoft.azure.storage.StorageException;
+import com.microsoft.azure.storage.BlobStorageException;
 import com.microsoft.azure.storage.blob.CloudBlockBlob;
-import com.microsoft.azure.storage.blob.ListBlobItem;
+import com.microsoft.azure.storage.blob.BlobItem;
 
 public class AzureStorageDeleteRuntimeTest {
 
@@ -104,10 +104,10 @@ public class AzureStorageDeleteRuntimeTest {
             final List<CloudBlockBlob> list = new ArrayList<>();
             list.add(new CloudBlockBlob(new URI("https://storagesample.blob.core.windows.net/mycontainer/blob1.txt")));
 
-            when(blobService.listBlobs(anyString(), anyString(), anyBoolean())).thenReturn(new Iterable<ListBlobItem>() {
+            when(blobService.listBlobs(anyString(), anyString(), anyBoolean())).thenReturn(new Iterable<BlobItem>() {
 
                 @Override
-                public Iterator<ListBlobItem> iterator() {
+                public Iterator<BlobItem> iterator() {
                     return new DummyListBlobItemIterator(list);
                 }
             });
@@ -115,7 +115,7 @@ public class AzureStorageDeleteRuntimeTest {
             when(blobService.deleteBlobBlockIfExist(any(CloudBlockBlob.class))).thenReturn(false);
             deleteBlock.runAtDriver(runtimeContainer);
 
-        } catch (StorageException | URISyntaxException | InvalidKeyException e) {
+        } catch (BlobStorageException e) {
             fail("should not throw " + e.getMessage());
         }
     }
@@ -131,10 +131,10 @@ public class AzureStorageDeleteRuntimeTest {
             final List<CloudBlockBlob> list = new ArrayList<>();
             list.add(new CloudBlockBlob(new URI("https://storagesample.blob.core.windows.net/mycontainer/blob1.txt")));
 
-            when(blobService.listBlobs(anyString(), anyString(), anyBoolean())).thenReturn(new Iterable<ListBlobItem>() {
+            when(blobService.listBlobs(anyString(), anyString(), anyBoolean())).thenReturn(new Iterable<BlobItem>() {
 
                 @Override
-                public Iterator<ListBlobItem> iterator() {
+                public Iterator<BlobItem> iterator() {
                     return new DummyListBlobItemIterator(list);
                 }
             });
@@ -142,7 +142,7 @@ public class AzureStorageDeleteRuntimeTest {
             when(blobService.deleteBlobBlockIfExist(any(CloudBlockBlob.class))).thenReturn(true);
 
             deleteBlock.runAtDriver(runtimeContainer);
-        } catch (StorageException | URISyntaxException | InvalidKeyException e) {
+        } catch (BlobStorageException e) {
             fail("should not throw " + e.getMessage());
         }
 
@@ -158,10 +158,10 @@ public class AzureStorageDeleteRuntimeTest {
 
         try {
             when(blobService.listBlobs(anyString(), anyString(), anyBoolean()))
-                    .thenThrow(new StorageException("some error code", "dummy message", new RuntimeException()));
+                    .thenThrow(new BlobStorageException("some error code", "dummy message", new RuntimeException()));
             deleteBlock.runAtDriver(runtimeContainer);
 
-        } catch (InvalidKeyException | URISyntaxException | StorageException e) {
+        } catch (InvalidKeyException | URISyntaxException | BlobStorageException e) {
             fail("should not throw " + e.getMessage());
         }
     }
@@ -177,9 +177,9 @@ public class AzureStorageDeleteRuntimeTest {
         // prepare test data and mocks
         try {
             when(blobService.listBlobs(anyString(), anyString(), anyBoolean()))
-                    .thenThrow(new StorageException("some error code", "dummy message", new RuntimeException()));
+                    .thenThrow(new BlobStorageException("some error code", "dummy message", new RuntimeException()));
             deleteBlock.runAtDriver(runtimeContainer);
-        } catch (InvalidKeyException | URISyntaxException | StorageException e) {
+        } catch (InvalidKeyException | URISyntaxException | BlobStorageException e) {
             fail("should not throw " + e.getMessage());
         }
     }

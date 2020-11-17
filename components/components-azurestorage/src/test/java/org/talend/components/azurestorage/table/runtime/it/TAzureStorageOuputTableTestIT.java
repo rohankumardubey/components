@@ -51,7 +51,7 @@ import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.properties.ValidationResult;
 
-import com.microsoft.azure.storage.StorageException;
+import com.microsoft.azure.storage.BlobStorageException;
 
 @Ignore
 public class TAzureStorageOuputTableTestIT extends AzureStorageTableBaseTestIT {
@@ -268,7 +268,7 @@ public class TAzureStorageOuputTableTestIT extends AzureStorageTableBaseTestIT {
     }
 
     @Test(expected = ComponentException.class)
-    public void testDropNonExistingTable() throws IOException, StorageException, URISyntaxException {
+    public void testDropNonExistingTable() throws IOException, BlobStorageException, URISyntaxException {
         String tblDrop = tbl_test + "NonExistingDrop";
         properties.schema.schema.setValue(getDynamicSchema());
         properties.actionOnTable.setValue(ActionOnTable.Drop_and_create_table);
@@ -280,7 +280,7 @@ public class TAzureStorageOuputTableTestIT extends AzureStorageTableBaseTestIT {
     }
 
     @Test
-    public void testDropAndCreateTable() throws IOException, StorageException, URISyntaxException {
+    public void testDropAndCreateTable() throws IOException, BlobStorageException, URISyntaxException {
 
         String tblDrop = tbl_test + "Drop";
         // create the table first

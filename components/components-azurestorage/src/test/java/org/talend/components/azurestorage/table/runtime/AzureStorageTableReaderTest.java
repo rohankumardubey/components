@@ -36,7 +36,7 @@ import org.talend.components.azurestorage.tazurestorageconnection.TAzureStorageC
 import org.talend.components.azurestorage.tazurestorageconnection.TAzureStorageConnectionProperties.Protocol;
 import org.talend.daikon.properties.ValidationResult;
 
-import com.microsoft.azure.storage.StorageException;
+import com.microsoft.azure.storage.BlobStorageException;
 import com.microsoft.azure.storage.table.DynamicTableEntity;
 import com.microsoft.azure.storage.table.TableQuery;
 
@@ -112,7 +112,7 @@ public class AzureStorageTableReaderTest {
                     return records.iterator();
                 }
             });
-        } catch (InvalidKeyException | URISyntaxException | StorageException e) {
+        } catch (InvalidKeyException | URISyntaxException | BlobStorageException e) {
             fail("should not throw " + e.getMessage());
         }
 
@@ -155,7 +155,7 @@ public class AzureStorageTableReaderTest {
                     return records.iterator();
                 }
             });
-        } catch (InvalidKeyException | URISyntaxException | StorageException e) {
+        } catch (InvalidKeyException | URISyntaxException | BlobStorageException e) {
             fail("should not throw " + e.getMessage());
         }
 
@@ -207,7 +207,7 @@ public class AzureStorageTableReaderTest {
                     return records.iterator();
                 }
             });
-        } catch (InvalidKeyException | URISyntaxException | StorageException e) {
+        } catch (InvalidKeyException | URISyntaxException | BlobStorageException e) {
             fail("should not throw " + e.getMessage());
         }
 
@@ -252,9 +252,9 @@ public class AzureStorageTableReaderTest {
         try {
             reader.tableService = tableService;
             when(tableService.executeQuery(anyString(), any(TableQuery.class)))
-                    .thenThrow(new StorageException("500", "Storage unavailable", new RuntimeException("")));
+                    .thenThrow(new BlobStorageException("500", "Storage unavailable", new RuntimeException("")));
 
-        } catch (InvalidKeyException | URISyntaxException | StorageException e) {
+        } catch (InvalidKeyException | URISyntaxException | BlobStorageException e) {
             fail("should not throw " + e.getMessage());
         }
 
@@ -286,9 +286,9 @@ public class AzureStorageTableReaderTest {
         try {
             reader.tableService = tableService;
             when(tableService.executeQuery(anyString(), any(TableQuery.class)))
-                    .thenThrow(new StorageException("500", "Storage unavailable", new RuntimeException("")));
+                    .thenThrow(new BlobStorageException("500", "Storage unavailable", new RuntimeException("")));
 
-        } catch (InvalidKeyException | URISyntaxException | StorageException e) {
+        } catch (InvalidKeyException | URISyntaxException | BlobStorageException e) {
             fail("should not throw " + e.getMessage());
         }
 

@@ -13,10 +13,10 @@
 package org.talend.components.azurestorage.queue.runtime;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.security.InvalidKeyException;
 import java.util.Map;
 import java.util.NoSuchElementException;
+
+import com.azure.storage.queue.models.QueueStorageException;
 
 import org.apache.avro.generic.IndexedRecord;
 import org.slf4j.Logger;
@@ -26,8 +26,6 @@ import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.azurestorage.queue.tazurestoragequeueinputloop.TAzureStorageQueueInputLoopProperties;
 import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
-
-import com.microsoft.azure.storage.StorageException;
 
 public class AzureStorageQueueInputLoopReader extends AzureStorageQueueInputReader {
 
@@ -39,7 +37,7 @@ public class AzureStorageQueueInputLoopReader extends AzureStorageQueueInputRead
             .getI18nMessages(AzureStorageQueueInputLoopReader.class);
 
     public AzureStorageQueueInputLoopReader(RuntimeContainer container, BoundedSource source,
-            TAzureStorageQueueInputLoopProperties properties) {
+                                            TAzureStorageQueueInputLoopProperties properties) {
 
         super(container, source, properties);
         loopWaitTime = properties.loopWaitTime.getValue();
@@ -59,13 +57,13 @@ public class AzureStorageQueueInputLoopReader extends AzureStorageQueueInputRead
 
     @Override
     public boolean advance() throws IOException {
-        advanceable = messages.hasNext();
-        if (messages.hasNext()) {
-            current = messages.next();
+        advanceable = receivedMessages.hasNext();
+        if (receivedMessages.hasNext()) {
+            current = getCurrentMessage();
             dataCount++;
             try {
-                queueService.deleteMessage(queueName, current);
-            } catch (InvalidKeyException | URISyntaxException | StorageException e) {
+                queueService.deleteMessage(queueName, current.getMsg());
+            } catch (QueueStorageException e) {
                 LOGGER.error(e.getLocalizedMessage());
             }
             return true;
@@ -96,15 +94,15 @@ public class AzureStorageQueueInputLoopReader extends AzureStorageQueueInputRead
                 Thread.sleep((long) loopWaitTime * 1000);
             }
 
-            messages = queueService.retrieveMessages(queueName, nbMsg).iterator();
-            if (messages.hasNext()) {
-                current = messages.next();
+            receivedMessages = queueService.retrieveMessages(queueName, nbMsg).iterator();
+            if (receivedMessages.hasNext()) {
+                current = getCurrentMessage();
                 dataCount++;
-                queueService.deleteMessage(queueName, current);
+                queueService.deleteMessage(queueName, current.getMsg());
                 return true;
             }
 
-        } catch (InterruptedException | StorageException | InvalidKeyException | URISyntaxException e) {
+        } catch (InterruptedException | QueueStorageException e) {
             LOGGER.error(e.getLocalizedMessage());
         }
 

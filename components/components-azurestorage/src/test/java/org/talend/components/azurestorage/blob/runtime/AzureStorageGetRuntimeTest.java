@@ -56,10 +56,10 @@ import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
 import org.talend.daikon.properties.ValidationResult;
 
-import com.microsoft.azure.storage.StorageException;
-import com.microsoft.azure.storage.blob.CloudBlob;
+import com.microsoft.azure.storage.BlobStorageException;
+import com.microsoft.azure.storage.blob.BlobItem;
 import com.microsoft.azure.storage.blob.CloudBlockBlob;
-import com.microsoft.azure.storage.blob.ListBlobItem;
+import com.microsoft.azure.storage.blob.BlobItem;
 
 public class AzureStorageGetRuntimeTest {
 
@@ -143,10 +143,10 @@ public class AzureStorageGetRuntimeTest {
 
             final List<CloudBlockBlob> list = new ArrayList<>();
             list.add(new CloudBlockBlob(new URI("https://storagesample.blob.core.windows.net/mycontainer/blob1.txt")));
-            when(blobService.listBlobs(anyString(), anyString(), anyBoolean())).thenReturn(new Iterable<ListBlobItem>() {
+            when(blobService.listBlobs(anyString(), anyString(), anyBoolean())).thenReturn(new Iterable<BlobItem>() {
 
                 @Override
-                public Iterator<ListBlobItem> iterator() {
+                public Iterator<BlobItem> iterator() {
                     return new DummyListBlobItemIterator(list);
                 }
             });
@@ -157,11 +157,11 @@ public class AzureStorageGetRuntimeTest {
                 public Void answer(InvocationOnMock invocation) throws Throwable {
                     return null;
                 }
-            }).when(blobService).download(any(CloudBlob.class), any(OutputStream.class));
+            }).when(blobService).download(any(BlobItem.class), any(OutputStream.class));
             storageGet.azureStorageBlobService = blobService;
             storageGet.runAtDriver(runtimeContainer);
 
-        } catch (StorageException | URISyntaxException | InvalidKeyException | IOException e) {
+        } catch (BlobStorageException | IOException e) {
             fail("should not throw " + e.getMessage());
         } finally {
             if (localFolderPath != null) {
@@ -190,10 +190,10 @@ public class AzureStorageGetRuntimeTest {
 
             final List<CloudBlockBlob> list = new ArrayList<>();
             list.add(new CloudBlockBlob(new URI("https://storagesample.blob.core.windows.net/mycontainer/someDir/blob1.txt")));
-            when(blobService.listBlobs(anyString(), anyString(), anyBoolean())).thenReturn(new Iterable<ListBlobItem>() {
+            when(blobService.listBlobs(anyString(), anyString(), anyBoolean())).thenReturn(new Iterable<BlobItem>() {
 
                 @Override
-                public Iterator<ListBlobItem> iterator() {
+                public Iterator<BlobItem> iterator() {
                     return new DummyListBlobItemIterator(list);
                 }
             });
@@ -204,13 +204,13 @@ public class AzureStorageGetRuntimeTest {
                 public Void answer(InvocationOnMock invocation) throws Throwable {
                     return null;
                 }
-            }).when(blobService).download(any(CloudBlob.class), any(OutputStream.class));
+            }).when(blobService).download(any(BlobItem.class), any(OutputStream.class));
             storageGet.azureStorageBlobService = blobService;
             storageGet.runAtDriver(runtimeContainer);
 
 
             Mockito.verify(blobService, Mockito.times(1)).download(any(), any());
-        } catch (StorageException | URISyntaxException | InvalidKeyException | IOException e) {
+        } catch (BlobStorageException | IOException e) {
             fail("should not throw " + e.getMessage());
         } finally {
             if (localFolderPath != null) {

@@ -13,7 +13,7 @@
 package org.talend.components.azurestorage.table;
 
 import com.microsoft.azure.storage.StorageErrorCodeStrings;
-import com.microsoft.azure.storage.StorageException;
+import com.microsoft.azure.storage.BlobStorageException;
 import com.microsoft.azure.storage.table.CloudTable;
 import com.microsoft.azure.storage.table.CloudTableClient;
 import com.microsoft.azure.storage.table.DynamicTableEntity;
@@ -52,14 +52,14 @@ public class AzureStorageTableService {
     }
 
     public Iterable<DynamicTableEntity> executeQuery(String tableName, TableQuery<DynamicTableEntity> partitionQuery)
-            throws InvalidKeyException, URISyntaxException, StorageException {
+            throws  BlobStorageException {
 
         CloudTable cloudTable = connection.getCloudStorageAccount().createCloudTableClient().getTableReference(tableName);
         return cloudTable.execute(partitionQuery, null, AzureStorageUtils.getTalendOperationContext());
     }
 
     public void handleActionOnTable(String tableName, ActionOnTable actionTable)
-            throws IOException, StorageException, InvalidKeyException, URISyntaxException {
+            throws IOException, BlobStorageException, InvalidKeyException, URISyntaxException {
 
         // FIXME How does this will behave in a distributed runtime ? See where to place correctly this
         // instruction...
@@ -87,14 +87,14 @@ public class AzureStorageTableService {
     }
 
     public TableResult executeOperation(String tableName, TableOperation ope)
-            throws InvalidKeyException, URISyntaxException, StorageException {
+            throws  BlobStorageException {
 
         CloudTable cloudTable = connection.getCloudStorageAccount().createCloudTableClient().getTableReference(tableName);
         return cloudTable.execute(ope, null, AzureStorageUtils.getTalendOperationContext());
     }
 
     public ArrayList<TableResult> executeOperation(String tableName, TableBatchOperation batchOpe)
-            throws InvalidKeyException, URISyntaxException, StorageException {
+            throws  BlobStorageException {
 
         CloudTable cloudTable = connection.getCloudStorageAccount().createCloudTableClient().getTableReference(tableName);
         return cloudTable.execute(batchOpe, null, AzureStorageUtils.getTalendOperationContext());
@@ -109,11 +109,11 @@ public class AzureStorageTableService {
      * 
      * @param cloudTable
      * 
-     * @throws StorageException
+     * @throws BlobStorageException
      * @throws IOException
      * 
      */
-    private void createTableAfterDeletion(CloudTable cloudTable) throws StorageException, IOException {
+    private void createTableAfterDeletion(CloudTable cloudTable) throws BlobStorageException, IOException {
         try {
             cloudTable.create(null, AzureStorageUtils.getTalendOperationContext());
         } catch (TableServiceException e) {

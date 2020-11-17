@@ -3,6 +3,9 @@ package org.talend.components.azurestorage.queue.runtime;
 import java.net.URISyntaxException;
 import java.security.InvalidKeyException;
 
+import com.azure.storage.blob.models.BlobStorageException;
+import com.azure.storage.queue.models.QueueStorageException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.ComponentDriverInitialization;
@@ -17,7 +20,6 @@ import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
 import org.talend.daikon.properties.ValidationResult;
 
-import com.microsoft.azure.storage.StorageException;
 
 public class AzureStorageQueueDeleteRuntime extends AzureStorageQueueRuntime
         implements ComponentDriverInitialization<ComponentProperties> {
@@ -54,22 +56,22 @@ public class AzureStorageQueueDeleteRuntime extends AzureStorageQueueRuntime
     private boolean deleteAzureQueue(RuntimeContainer container) {
         Boolean deleteResult = false;
         try {
-            deleteResult = queueService.deleteQueueIfExists(queueName);
+            queueService.deleteQueueIfExists(queueName);
+            deleteResult = true;
             LOGGER.debug(messages.getMessage("debug.QueueDeleted", queueName));
-            if (!deleteResult) {
-                LOGGER.warn(messages.getMessage("warn.CannotDelete", queueName));
-            }
-        } catch (InvalidKeyException | URISyntaxException | StorageException e) {
+        } catch (QueueStorageException e) {
             LOGGER.error(e.getLocalizedMessage());
-            if (dieOnError)
+            if (dieOnError) {
                 throw new ComponentException(e);
+            }
         }
         return deleteResult;
     }
 
     private void setReturnValues(RuntimeContainer container) {
         String componentId = container.getCurrentComponentId();
-        String returnQueueName = AzureStorageUtils.getStudioNameFromProperty(AzureStorageQueueDefinition.RETURN_QUEUE_NAME);
+        String returnQueueName = AzureStorageUtils
+                .getStudioNameFromProperty(AzureStorageQueueDefinition.RETURN_QUEUE_NAME);
         container.setComponentData(componentId, returnQueueName, queueName);
     }
 

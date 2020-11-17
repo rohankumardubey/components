@@ -36,7 +36,7 @@ import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
 
-import com.microsoft.azure.storage.StorageException;
+import com.microsoft.azure.storage.BlobStorageException;
 import com.microsoft.azure.storage.table.DynamicTableEntity;
 import com.microsoft.azure.storage.table.TableQuery;
 
@@ -123,7 +123,7 @@ public class AzureStorageTableReader extends AbstractBoundedReader<IndexedRecord
                 result.totalCount++;
                 current = recordsIterator.next();
             }
-        } catch (InvalidKeyException | URISyntaxException | StorageException e) {
+        } catch (InvalidKeyException | URISyntaxException | BlobStorageException e) {
             LOGGER.error(e.getLocalizedMessage());
             if (properties.dieOnError.getValue()) {
                 throw new ComponentException(e);

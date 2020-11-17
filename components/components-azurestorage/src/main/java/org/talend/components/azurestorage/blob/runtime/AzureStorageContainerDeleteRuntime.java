@@ -12,8 +12,9 @@
 // ============================================================================
 package org.talend.components.azurestorage.blob.runtime;
 
-import java.net.URISyntaxException;
-import java.security.InvalidKeyException;
+
+import com.azure.storage.blob.models.BlobErrorCode;
+import com.azure.storage.blob.models.BlobStorageException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,8 +30,6 @@ import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
 import org.talend.daikon.properties.ValidationResult;
 
-import com.microsoft.azure.storage.StorageException;
-
 public class AzureStorageContainerDeleteRuntime extends AzureStorageContainerRuntime
         implements ComponentDriverInitialization<ComponentProperties> {
 
@@ -41,7 +40,9 @@ public class AzureStorageContainerDeleteRuntime extends AzureStorageContainerRun
     private static final I18nMessages messages = GlobalI18N.getI18nMessageProvider()
             .getI18nMessages(AzureStorageContainerDeleteRuntime.class);
 
-    /** let this attribute public for test purpose */
+    /**
+     * let this attribute public for test purpose
+     */
     public AzureStorageBlobService blobService;
 
     @Override
@@ -66,14 +67,13 @@ public class AzureStorageContainerDeleteRuntime extends AzureStorageContainerRun
 
     private void deleteBlobContainerIfExists(RuntimeContainer runtimeContainer) {
         try {
-
-            boolean result = blobService.deleteContainerIfExist(this.containerName);
-            if (!result) {
+            blobService.deleteContainerIfExist(this.containerName);
+        } catch (BlobStorageException e) {
+            if (e.getErrorCode().equals(BlobErrorCode.CONTAINER_NOT_FOUND)) {
                 LOGGER.warn(messages.getMessage("error.ContainerNotExist", this.containerName));
+            } else {
+                LOGGER.error(e.getLocalizedMessage());
             }
-
-        } catch (StorageException | URISyntaxException | InvalidKeyException e) {
-            LOGGER.error(e.getLocalizedMessage());
             if (this.dieOnError) {
                 throw new ComponentException(e);
             }
@@ -82,7 +82,8 @@ public class AzureStorageContainerDeleteRuntime extends AzureStorageContainerRun
 
     private void setReturnValues(RuntimeContainer runtimeContainer) {
         String componentId = runtimeContainer.getCurrentComponentId();
-        String returnContainer = AzureStorageUtils.getStudioNameFromProperty(AzureStorageContainerDefinition.RETURN_CONTAINER);
+        String returnContainer = AzureStorageUtils
+                .getStudioNameFromProperty(AzureStorageContainerDefinition.RETURN_CONTAINER);
 
         runtimeContainer.setComponentData(componentId, returnContainer, containerName);
     }

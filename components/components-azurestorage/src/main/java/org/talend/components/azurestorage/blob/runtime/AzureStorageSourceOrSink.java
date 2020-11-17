@@ -18,6 +18,10 @@ import java.security.InvalidKeyException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.azure.storage.blob.BlobServiceClient;
+import com.azure.storage.blob.models.BlobContainerItem;
+import com.azure.storage.blob.models.BlobStorageException;
+
 import org.apache.avro.Schema;
 import org.talend.components.api.component.runtime.SourceOrSink;
 import org.talend.components.api.container.RuntimeContainer;
@@ -30,10 +34,6 @@ import org.talend.daikon.NamedThing;
 import org.talend.daikon.SimpleNamedThing;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.ValidationResult.Result;
-
-import com.microsoft.azure.storage.CloudStorageAccount;
-import com.microsoft.azure.storage.blob.CloudBlobClient;
-import com.microsoft.azure.storage.blob.CloudBlobContainer;
 
 public class AzureStorageSourceOrSink extends AzureStorageRuntime implements SourceOrSink {
 
@@ -74,8 +74,8 @@ public class AzureStorageSourceOrSink extends AzureStorageRuntime implements Sou
         }
 
         try {
-            sos.getStorageAccount(null);
-        } catch (InvalidKeyException | URISyntaxException e) {
+            sos.getBlobServiceClient(null);
+        } catch (Exception e) {
             return new ValidationResult(Result.ERROR, e.getLocalizedMessage());
         }
 
@@ -94,12 +94,11 @@ public class AzureStorageSourceOrSink extends AzureStorageRuntime implements Sou
     public List<NamedThing> getSchemaNames(RuntimeContainer container) throws IOException {
         List<NamedThing> result = new ArrayList<>();
         try {
-            CloudStorageAccount storageAccount = getAzureConnection(container).getCloudStorageAccount();
-            CloudBlobClient client = storageAccount.createCloudBlobClient();
-            for (CloudBlobContainer c : client.listContainers()) {
+            BlobServiceClient client = getAzureConnection(container).getBlobServiceClient();
+            for (BlobContainerItem c : client.listBlobContainers()) {
                 result.add(new SimpleNamedThing(c.getName(), c.getName()));
             }
-        } catch (InvalidKeyException | URISyntaxException e) {
+        } catch (BlobStorageException e) {
             throw new ComponentException(e);
         }
         return result;

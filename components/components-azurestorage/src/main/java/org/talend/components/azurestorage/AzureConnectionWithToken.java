@@ -13,21 +13,31 @@
 
 package org.talend.components.azurestorage;
 
-import org.talend.components.azure.runtime.token.AzureActiveDirectoryTokenGetter;
+import com.azure.identity.ClientSecretCredential;
+import com.azure.identity.ClientSecretCredentialBuilder;
+import com.azure.storage.blob.BlobServiceClient;
+import com.azure.storage.blob.BlobServiceClientBuilder;
+import com.azure.storage.queue.QueueServiceClient;
+import com.azure.storage.queue.QueueServiceClientBuilder;
 
-import com.microsoft.azure.storage.CloudStorageAccount;
-import com.microsoft.azure.storage.StorageCredentials;
-import com.microsoft.azure.storage.StorageCredentialsToken;
+import org.talend.components.azure.runtime.token.AzureActiveDirectoryTokenGetter;
 
 public class AzureConnectionWithToken implements AzureConnection {
 
     private final String accountName;
+
     private final AzureActiveDirectoryTokenGetter tokenGetter;
 
+    private ClientSecretCredential clientSecretCredential;
 
     public AzureConnectionWithToken(String accountName, String tenantId, String clientId, String clientSecret) {
         this.accountName = accountName;
         this.tokenGetter = new AzureActiveDirectoryTokenGetter(tenantId, clientId, clientSecret);
+        clientSecretCredential = new ClientSecretCredentialBuilder()
+                .clientId(clientId)
+                .clientSecret(clientSecret)
+                .tenantId(tenantId)
+                .build();
     }
 
     public AzureConnectionWithToken(String accountName, AzureActiveDirectoryTokenGetter tokenGetter) {
@@ -36,14 +46,22 @@ public class AzureConnectionWithToken implements AzureConnection {
     }
 
     @Override
-    public CloudStorageAccount getCloudStorageAccount() {
-        try {
-            String token = tokenGetter.retrieveAccessToken();
-
-            StorageCredentials credentials = new StorageCredentialsToken(accountName, token);
-            return new CloudStorageAccount(credentials, true);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+    public BlobServiceClient getBlobServiceClient() {
+        String endpoint = "https://" + accountName + ".dfs.core.windows.net";
+        return new BlobServiceClientBuilder()
+                .endpoint(endpoint)
+                .credential(clientSecretCredential)
+                .buildClient();
     }
+
+    @Override
+    public QueueServiceClient getQueueServiceClient() {
+        String endpoint = "https://" + accountName + ".dfs.core.windows.net";
+        return new QueueServiceClientBuilder()
+                .endpoint(endpoint)
+                .credential(clientSecretCredential)
+                .buildClient();
+    }
+
+
 }

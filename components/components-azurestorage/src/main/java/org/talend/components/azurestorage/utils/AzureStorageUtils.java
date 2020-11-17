@@ -14,23 +14,19 @@ package org.talend.components.azurestorage.utils;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Properties;
 import java.util.regex.Pattern;
+
+import com.azure.core.util.Context;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
-
-import com.microsoft.azure.storage.OperationContext;
 
 /**
  * This class comes from a decompilation of the {@code talend-azure-storage-utils-1.0.0.jar} provided by the
@@ -46,7 +42,7 @@ public class AzureStorageUtils {
     public static final String TALEND_PRODUCT_VERSION_GLOBAL_KEY = "TALEND_PRODUCT_VERSION";
     public static final String TALEND_COMPONENT_VERSION_GLOBAL_KEY = "TALEND_COMPONENTS_VERSION";
 
-    private static OperationContext talendOperationContext;
+    private static Context talendOperationContext;
 
     private static final String USER_AGENT_KEY = "User-Agent";
 
@@ -73,13 +69,10 @@ public class AzureStorageUtils {
      */
     private static final String USER_AGENT_FORMAT = "APN/1.0 Talend/%s TCOMP/%s";
 
-    public static OperationContext getTalendOperationContext() {
+    public static Context getTalendOperationContext() {
         if (talendOperationContext == null) {
             String userAgentString = getUserAgentString();
-            talendOperationContext = new OperationContext();
-            HashMap<String, String> talendUserHeaders = new HashMap<>();
-            talendUserHeaders.put(USER_AGENT_KEY, userAgentString);
-            talendOperationContext.setUserHeaders(talendUserHeaders);
+            talendOperationContext = new Context(USER_AGENT_KEY, userAgentString);
         }
 
         return talendOperationContext;

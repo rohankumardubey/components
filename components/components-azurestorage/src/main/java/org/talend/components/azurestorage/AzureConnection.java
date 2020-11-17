@@ -12,19 +12,13 @@
 // ============================================================================
 package org.talend.components.azurestorage;
 
-import java.net.URISyntaxException;
-import java.security.InvalidKeyException;
-
-import com.microsoft.azure.storage.CloudStorageAccount;
+import com.azure.storage.blob.BlobServiceClient;
+import com.azure.storage.queue.QueueServiceClient;
 
 public interface AzureConnection {
 
-    /**
-     * Return CloudStorageAccount for azure
-     * 
-     * @throws URISyntaxException
-     * @throws InvalidKeyException
-     */
-    CloudStorageAccount getCloudStorageAccount() throws InvalidKeyException, URISyntaxException;
+    BlobServiceClient getBlobServiceClient();
+
+    QueueServiceClient getQueueServiceClient();
 
 }

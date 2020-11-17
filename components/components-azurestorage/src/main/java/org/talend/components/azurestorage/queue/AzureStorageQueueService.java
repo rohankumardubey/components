@@ -12,21 +12,22 @@
 // ============================================================================
 package org.talend.components.azurestorage.queue;
 
-import com.microsoft.azure.storage.StorageErrorCodeStrings;
-import com.microsoft.azure.storage.StorageException;
-import com.microsoft.azure.storage.queue.CloudQueue;
-import com.microsoft.azure.storage.queue.CloudQueueClient;
-import com.microsoft.azure.storage.queue.CloudQueueMessage;
-import com.microsoft.azure.storage.queue.QueueListingDetails;
+import java.time.Duration;
+
+import com.azure.core.util.Context;
+import com.azure.storage.queue.QueueClient;
+import com.azure.storage.queue.models.PeekedMessageItem;
+import com.azure.storage.queue.models.QueueErrorCode;
+import com.azure.storage.queue.models.QueueItem;
+import com.azure.storage.queue.models.QueueMessageItem;
+import com.azure.storage.queue.models.QueueStorageException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.azurestorage.AzureConnection;
 import org.talend.components.azurestorage.utils.AzureStorageUtils;
 import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
-
-import java.net.URISyntaxException;
-import java.security.InvalidKeyException;
 
 /**
  * This class encapsulate and provide azure storage blob services
@@ -48,20 +49,24 @@ public class AzureStorageQueueService {
         this.connection = connection;
     }
 
+    private QueueClient getQueueClient(final String queue) {
+        return connection.getQueueServiceClient().getQueueClient(queue);
+    }
+
     /**
      * This method create a queue if it doesn't exist
      */
-    public boolean createQueueIfNotExists(String queueName) throws InvalidKeyException, URISyntaxException, StorageException {
-        CloudQueueClient client = connection.getCloudStorageAccount().createCloudQueueClient();
-        CloudQueue queueRef = client.getQueueReference(queueName);
+    public boolean createQueueIfNotExists(String queueName) throws QueueStorageException {
+        final QueueClient queueRef = getQueueClient(queueName);
         boolean creationResult;
         try {
-            creationResult = queueRef.createIfNotExists(null, AzureStorageUtils.getTalendOperationContext());
-        } catch (StorageException e) {
-            if (!e.getErrorCode().equals(StorageErrorCodeStrings.QUEUE_BEING_DELETED)) {
+            queueRef.create();
+            creationResult = true;
+        } catch (QueueStorageException e) {
+            if (!e.getErrorCode().equals(QueueErrorCode.QUEUE_BEING_DELETED)) {
                 throw e;
             }
-            LOGGER.warn(messages.getMessage("error.QueueDeleted", queueRef.getName()));
+            LOGGER.warn(messages.getMessage("error.QueueDeleted", queueName));
             // Documentation doesn't specify how many seconds at least to wait.
             // 40 seconds before retrying.
             // See https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/delete-queue3
@@ -70,65 +75,49 @@ public class AzureStorageQueueService {
             } catch (InterruptedException eint) {
                 throw new RuntimeException(messages.getMessage("error.InterruptedException"));
             }
-            creationResult = queueRef.createIfNotExists(null, AzureStorageUtils.getTalendOperationContext());
-            LOGGER.debug(messages.getMessage("debug.QueueCreated", queueRef.getName()));
+            queueRef.createWithResponse(null, Duration.ofSeconds(30), Context.NONE);
+            creationResult = true;
+            LOGGER.debug(messages.getMessage("debug.QueueCreated", queueName));
         }
 
         return creationResult;
     }
 
-    public boolean deleteQueueIfExists(String queueName) throws InvalidKeyException, URISyntaxException, StorageException {
-        CloudQueueClient client = connection.getCloudStorageAccount().createCloudQueueClient();
-        CloudQueue queueRef = client.getQueueReference(queueName);
-        return queueRef.deleteIfExists(null, AzureStorageUtils.getTalendOperationContext());
+    public void deleteQueueIfExists(String queueName) throws QueueStorageException {
+        connection.getQueueServiceClient().deleteQueue(queueName);
     }
 
-    public Iterable<CloudQueueMessage> peekMessages(String queueName, int numberOfMessages)
-            throws InvalidKeyException, URISyntaxException, StorageException {
-
-        CloudQueueClient client = connection.getCloudStorageAccount().createCloudQueueClient();
-        CloudQueue queueRef = client.getQueueReference(queueName);
-        return queueRef.peekMessages(numberOfMessages, null, AzureStorageUtils.getTalendOperationContext());
+    public Iterable<PeekedMessageItem> peekMessages(String queueName, int numberOfMessages) throws QueueStorageException {
+        return getQueueClient(queueName)
+                .peekMessages(numberOfMessages, null, AzureStorageUtils.getTalendOperationContext());
     }
 
-    public Iterable<CloudQueueMessage> retrieveMessages(String queueName, int numberOfMessages)
-            throws InvalidKeyException, URISyntaxException, StorageException {
-
+    public Iterable<QueueMessageItem> retrieveMessages(String queueName, int numberOfMessages) throws QueueStorageException {
         return retrieveMessages(queueName, numberOfMessages, 30);
     }
 
-    public Iterable<CloudQueueMessage> retrieveMessages(String queueName, int numberOfMessages, int visibilityTimeoutInSeconds)
-            throws InvalidKeyException, URISyntaxException, StorageException {
-
-        CloudQueueClient client = connection.getCloudStorageAccount().createCloudQueueClient();
-        CloudQueue queueRef = client.getQueueReference(queueName);
-        return queueRef.retrieveMessages(numberOfMessages, visibilityTimeoutInSeconds, null, AzureStorageUtils.getTalendOperationContext());
+    public Iterable<QueueMessageItem> retrieveMessages(String queueName, int numberOfMessages, int visibilityTimeoutInSeconds) throws QueueStorageException {
+        return getQueueClient(queueName)
+                .receiveMessages(numberOfMessages, Duration
+                        .ofSeconds(visibilityTimeoutInSeconds), null, AzureStorageUtils
+                                         .getTalendOperationContext());
     }
 
-    public void deleteMessage(String queueName, CloudQueueMessage message)
-            throws InvalidKeyException, URISyntaxException, StorageException {
-
-        CloudQueueClient client = connection.getCloudStorageAccount().createCloudQueueClient();
-        CloudQueue queueRef = client.getQueueReference(queueName);
-        queueRef.deleteMessage(message, null, AzureStorageUtils.getTalendOperationContext());
+    public void deleteMessage(String queueName, QueueMessageItem message) throws QueueStorageException {
+        getQueueClient(queueName).deleteMessage(message.getMessageId(), message.getPopReceipt());
     }
 
-    public Iterable<CloudQueue> listQueues() throws InvalidKeyException, URISyntaxException {
-
-        CloudQueueClient client = connection.getCloudStorageAccount().createCloudQueueClient();
-        return client.listQueues(null, QueueListingDetails.NONE, null, AzureStorageUtils.getTalendOperationContext());
+    public Iterable<QueueItem> listQueues() throws QueueStorageException {
+        return connection.getQueueServiceClient().listQueues();
     }
 
-    public long getApproximateMessageCount(String queueName) throws InvalidKeyException, URISyntaxException, StorageException {
-        CloudQueueClient client = connection.getCloudStorageAccount().createCloudQueueClient();
-        CloudQueue queueRef = client.getQueueReference(queueName);
-        return queueRef.getApproximateMessageCount();
+    public long getApproximateMessageCount(String queueName) throws QueueStorageException {
+        return getQueueClient(queueName).getProperties().getApproximateMessagesCount();
     }
 
-    public void clear(String queueName) throws InvalidKeyException, URISyntaxException, StorageException {
-        CloudQueueClient client = connection.getCloudStorageAccount().createCloudQueueClient();
-        CloudQueue queueRef = client.getQueueReference(queueName);
-        queueRef.clear(null, AzureStorageUtils.getTalendOperationContext());
+    public void clear(String queueName) throws QueueStorageException {
+        getQueueClient(queueName)
+                .clearMessagesWithResponse(Duration.ofSeconds(30), AzureStorageUtils.getTalendOperationContext());
     }
 
 }
