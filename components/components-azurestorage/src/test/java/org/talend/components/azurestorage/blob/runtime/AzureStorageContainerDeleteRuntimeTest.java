@@ -17,9 +17,16 @@ import static org.junit.Assert.fail;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
 import java.net.URISyntaxException;
+import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
 import java.security.InvalidKeyException;
 
+import com.azure.core.http.HttpHeaders;
+import com.azure.core.http.HttpResponse;
 import com.azure.storage.blob.models.BlobStorageException;
 
 import org.junit.Before;
@@ -153,7 +160,42 @@ public class AzureStorageContainerDeleteRuntimeTest {
 
         try {
             when(blobService.deleteContainerIfExist(anyString()))
-                    .thenThrow(new BlobStorageException("storage exception message", null, new RuntimeException()));
+                    .thenThrow(new BlobStorageException("storage exception message", new HttpResponse(null) {
+                        @Override
+                        public int getStatusCode() {
+                            return 500;
+                        }
+
+                        @Override
+                        public String getHeaderValue(final String s) {
+                            return s;
+                        }
+
+                        @Override
+                        public HttpHeaders getHeaders() {
+                            return null;
+                        }
+
+                        @Override
+                        public Flux<ByteBuffer> getBody() {
+                            return "#getBodyAsString()";
+                        }
+
+                        @Override
+                        public Mono<byte[]> getBodyAsByteArray() {
+                            throw new UnsupportedOperationException("#getBodyAsByteArray()");
+                        }
+
+                        @Override
+                        public Mono<String> getBodyAsString() {
+                            throw new UnsupportedOperationException("#getBodyAsString()");
+                        }
+
+                        @Override
+                        public Mono<String> getBodyAsString(final Charset charset) {
+                            throw new UnsupportedOperationException("#getBodyAsString()");
+                        }
+                    } , new RuntimeException()));
             deleteContainer.runAtDriver(runtimeContainer);
 
         } catch (BlobStorageException e) {

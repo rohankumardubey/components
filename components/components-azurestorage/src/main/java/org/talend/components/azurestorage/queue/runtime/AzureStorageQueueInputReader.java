@@ -100,7 +100,7 @@ public class AzureStorageQueueInputReader extends AzureStorageReader<IndexedReco
             } else {
                 receivedMessages = queueService.retrieveMessages(queueName, nbMsg, visibilityTimeout).iterator();
             }
-            startable = receivedMessages.hasNext();
+            startable = peek == true ? peekedMessages.hasNext() : receivedMessages.hasNext();
             if (startable) {
                 dataCount++;
                 current = getCurrentMessage();
@@ -124,7 +124,7 @@ public class AzureStorageQueueInputReader extends AzureStorageReader<IndexedReco
 
     @Override
     public boolean advance() throws IOException {
-        advanceable = receivedMessages.hasNext();
+        advanceable = peek == true ? peekedMessages.hasNext() : receivedMessages.hasNext();
         if (advanceable) {
             dataCount++;
             current = getCurrentMessage();

@@ -20,6 +20,7 @@ import static org.mockito.Mockito.when;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.security.InvalidKeyException;
+import java.util.Queue;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -38,6 +39,7 @@ import org.talend.components.azurestorage.tazurestorageconnection.TAzureStorageC
 import org.talend.components.azurestorage.tazurestorageconnection.TAzureStorageConnectionProperties.Protocol;
 
 import com.azure.storage.blob.models.BlobStorageException;
+import com.azure.storage.queue.models.QueueStorageException;
 
 public class AzureStorageQueuePurgeRuntimeTest {
 
@@ -101,56 +103,15 @@ public class AzureStorageQueuePurgeRuntimeTest {
 
                 @Override
                 public Void answer(InvocationOnMock invocation) throws Throwable {
-                    throw new BlobStorageException("errorCode", null, new RuntimeException());
+                    throw new QueueStorageException("errorCode", null, new RuntimeException());
                 }
             }).when(queueService).clear(anyString());
             azureStorageQueuePurge.runAtDriver(runtimeContainer);
-        } catch (BlobStorageException e) {
+        } catch (QueueStorageException e) {
             fail("should not throw " + e.getMessage());
         }
     }
 
-    @Test
-    public void testRunAtDriverHandleInvalidKeyException() {
-        properties.queueName.setValue("a-good-queue-name");
-        properties.dieOnError.setValue(false);
-        azureStorageQueuePurge.initialize(runtimeContainer, properties);
-        azureStorageQueuePurge.queueService = queueService;
-        try {
-            when(queueService.getApproximateMessageCount(anyString())).thenReturn(30l);
-            doAnswer(new Answer<Void>() {
-
-                @Override
-                public Void answer(InvocationOnMock invocation) throws Throwable {
-                    throw new InvalidKeyException();
-                }
-            }).when(queueService).clear(anyString());
-            azureStorageQueuePurge.runAtDriver(runtimeContainer);
-        } catch (BlobStorageException e) {
-            fail("should not throw " + e.getMessage());
-        }
-    }
-
-    @Test
-    public void testRunAtDriverHandleURISyntaxException() {
-        properties.queueName.setValue("a-good-queue-name");
-        properties.dieOnError.setValue(false);
-        azureStorageQueuePurge.initialize(runtimeContainer, properties);
-        azureStorageQueuePurge.queueService = queueService;
-        try {
-            when(queueService.getApproximateMessageCount(anyString())).thenReturn(30l);
-            doAnswer(new Answer<Void>() {
-
-                @Override
-                public Void answer(InvocationOnMock invocation) throws Throwable {
-                    throw new URISyntaxException("bad uri", "some reason");
-                }
-            }).when(queueService).clear(anyString());
-            azureStorageQueuePurge.runAtDriver(runtimeContainer);
-        } catch (BlobStorageException e) {
-            fail("should not throw " + e.getMessage());
-        }
-    }
 
     @Test(expected = ComponentException.class)
     public void testRunAtDriverDieOnError() {
@@ -164,11 +125,11 @@ public class AzureStorageQueuePurgeRuntimeTest {
 
                 @Override
                 public Void answer(InvocationOnMock invocation) throws Throwable {
-                    throw new URISyntaxException("bad uri", "some reason");
+                    throw new QueueStorageException("bad uri", null, new RuntimeException());
                 }
             }).when(queueService).clear(anyString());
             azureStorageQueuePurge.runAtDriver(runtimeContainer);
-        } catch (BlobStorageException e) {
+        } catch (QueueStorageException e) {
             fail("should not throw " + e.getMessage());
         }
     }

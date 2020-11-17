@@ -508,9 +508,11 @@ public class AzureStorageQueueInputReaderTest extends AzureBaseTest {
             reader.queueService = queueService; // inject mocked service
 
             final List<PeekedMessageItem> messages = new ArrayList<>();
-            messages.add(new PeekedMessageItem());
-            messages.add(new PeekedMessageItem());
-            messages.add(new PeekedMessageItem());
+            for (int idx=1; idx <4 ; idx++){
+                final PeekedMessageItem m = new PeekedMessageItem();
+                m.setMessageText("message-" +idx);
+                messages.add(m);
+            }
             when(queueService.peekMessages(anyString(), anyInt())).thenReturn(new Iterable<PeekedMessageItem>() {
 
                 @Override

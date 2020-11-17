@@ -37,6 +37,7 @@ import org.talend.components.azurestorage.tazurestorageconnection.TAzureStorageC
 import org.talend.daikon.properties.ValidationResult;
 
 import com.azure.storage.blob.models.BlobStorageException;
+import com.azure.storage.queue.models.QueueStorageException;
 
 public class AzureStorageQueueDeleteRuntimeTest {
 
@@ -150,7 +151,7 @@ public class AzureStorageQueueDeleteRuntimeTest {
         queueDelete.initialize(runtimeContainer, properties);
         queueDelete.queueService = queueService;
         try {
-            //when(queueService.deleteQueueIfExists(anyString())).thenThrow(new InvalidKeyException());
+            when(queueService.deleteQueueIfExists(anyString())).thenThrow(new QueueStorageException("die", null, new RuntimeException()));
             queueDelete.runAtDriver(runtimeContainer);
         } catch (BlobStorageException e) {
             fail("should not throw " + e.getMessage());

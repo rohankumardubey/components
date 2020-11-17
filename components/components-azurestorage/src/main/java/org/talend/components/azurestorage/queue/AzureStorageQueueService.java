@@ -24,6 +24,7 @@ import com.azure.storage.queue.models.QueueStorageException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.talend.components.api.exception.ComponentException;
 import org.talend.components.azurestorage.AzureConnection;
 import org.talend.components.azurestorage.utils.AzureStorageUtils;
 import org.talend.daikon.i18n.GlobalI18N;
@@ -83,8 +84,16 @@ public class AzureStorageQueueService {
         return creationResult;
     }
 
-    public void deleteQueueIfExists(String queueName) throws QueueStorageException {
-        connection.getQueueServiceClient().deleteQueue(queueName);
+    public boolean deleteQueueIfExists(String queueName) {
+        Boolean deleteResult =false ;
+        try {
+            connection.getQueueServiceClient().deleteQueue(queueName);
+            deleteResult = true;
+            LOGGER.debug(messages.getMessage("debug.QueueDeleted", queueName));
+        } catch (QueueStorageException e) {
+            LOGGER.error(e.getLocalizedMessage());
+        }
+        return deleteResult;
     }
 
     public Iterable<PeekedMessageItem> peekMessages(String queueName, int numberOfMessages) throws QueueStorageException {

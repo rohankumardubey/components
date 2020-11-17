@@ -269,8 +269,9 @@ public class AzureStorageQueueListReaderTest extends AzureBaseTest {
 
         final List<QueueItem> list = new ArrayList<>();
         try {
-
-            list.add(new QueueItem());
+            final QueueItem q = new QueueItem();
+            q.setName("queue-1");
+            list.add(q);
             when(queueService.listQueues()).thenReturn(new Iterable<QueueItem>() {
 
                 @Override
