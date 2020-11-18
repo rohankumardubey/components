@@ -85,8 +85,7 @@ public class SalesforceInputReaderTestIT extends SalesforceTestBase {
             .name("BillingCity").type().stringType().noDefault() //
             .name("BillingState").type().stringType().noDefault() //
             .name("NumberOfEmployees").type().intType().noDefault() //
-            .name("AnnualRevenue").type(AvroUtils._decimal()).noDefault() //
-            .name("BillingCountry").type().bytesType().noDefault().endRecord();
+            .name("AnnualRevenue").type(AvroUtils._decimal()).noDefault().endRecord();
 
     @Test
     public void testStartAdvanceGetCurrent() throws IOException {
@@ -221,8 +220,7 @@ public class SalesforceInputReaderTestIT extends SalesforceTestBase {
         try {
             List<IndexedRecord> rows = readRows(props);
             checkRows(random, rows, count);
-            // Some tests are duplicates, reuse some test for return all empty value as null test
-            testBulkQueryNullValue(props, random, !emptySchema);
+            testBulkQueryNullValue(props, random);
         } finally {
             deleteRows(outputRows, props);
         }
@@ -591,7 +589,7 @@ public class SalesforceInputReaderTestIT extends SalesforceTestBase {
         }
     }
 
-    protected void testBulkQueryNullValue(SalesforceConnectionModuleProperties props, String random,boolean returnNullForEmpty) throws Throwable {
+    protected void testBulkQueryNullValue(SalesforceConnectionModuleProperties props, String random) throws Throwable {
         ComponentDefinition sfInputDef = new TSalesforceInputDefinition();
         TSalesforceInputProperties sfInputProps = (TSalesforceInputProperties) sfInputDef.createRuntimeProperties();
         sfInputProps.copyValuesFrom(props);
@@ -599,22 +597,11 @@ public class SalesforceInputReaderTestIT extends SalesforceTestBase {
         sfInputProps.module.main.schema.setValue(SCHEMA_QUERY_ACCOUNT);
         sfInputProps.queryMode.setValue(TSalesforceInputProperties.QueryMode.Bulk);
         sfInputProps.condition.setValue("BillingPostalCode = '" + random + "'");
-        sfInputProps.returnNullValue.setValue(returnNullForEmpty);
 
         List<IndexedRecord> inpuRecords = readRows(sfInputProps);
         for (IndexedRecord record : inpuRecords) {
-            if (returnNullForEmpty) {
-                assertNull(record.get(3));
-            } else {
-                assertNotNull(record.get(3));
-            }
             assertNull(record.get(5));
             assertNull(record.get(6));
-            if (returnNullForEmpty) {
-                assertNull(record.get(7));
-            } else {
-                assertNotNull(record.get(7));
-            }
         }
     }
 
