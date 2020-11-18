@@ -24,9 +24,11 @@ This is a self-contained patch.
 
 This patch contains the following fixes:
 
-- TPS-2945  [7.0.1] Salesforce Oauth: support additional endpoint (aud, iss, ...) for JWT flow(TDI-40997)
-- TPS-4512  [7.0.1] tsalesforceoutput can sometimes output tSalesforceOutput_5 String index out of range: -4java.lang.StringIndexOutOfBoundsException: String index out of range: -4 (TDI-44856)
-
+- TDI-40431 Connection to salesforce is failing
+- TDI-40596 tSalesforceOutput upsert return wrong rejected records when using extend insert
+- TDI-40765 tsalesforceinput format anytype value in trace fields history module
+- TDI-40997 make the audience configurable for sf oauth2
+- TDI-44856 fix tsalesforceoutput stringoutbounds error
 
 ## Prerequisites
 
