@@ -11,7 +11,7 @@ product:
 | ---------------- | ---------------- |
 | Patch Name       | Patch\_20201118\_TPS\-4512\_v1\-7.0.1 |
 | Release Date     | 2020-11-18 |
-| Target Version   | Talend-Studio-20180411_1414-V7.0.1 |
+| Target Version   | 20180411_1414-V7.0.1 |
 | Product affected | Talend Studio |
 
 ## Introduction
