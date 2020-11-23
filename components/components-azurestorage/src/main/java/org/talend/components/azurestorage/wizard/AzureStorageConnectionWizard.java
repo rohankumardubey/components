@@ -17,7 +17,6 @@ import org.slf4j.LoggerFactory;
 import org.talend.components.api.wizard.ComponentWizard;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
 import org.talend.components.azurestorage.tazurestorageconnection.TAzureStorageConnectionProperties;
-import org.talend.daikon.NamedThing;
 
 public class AzureStorageConnectionWizard extends ComponentWizard {
 

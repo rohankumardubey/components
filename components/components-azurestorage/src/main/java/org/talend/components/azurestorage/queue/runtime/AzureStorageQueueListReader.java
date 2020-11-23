@@ -13,8 +13,6 @@
 package org.talend.components.azurestorage.queue.runtime;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.security.InvalidKeyException;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;

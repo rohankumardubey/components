@@ -18,8 +18,9 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.security.InvalidKeyException;
+
+import com.azure.storage.blob.models.BlobStorageException;
+import com.azure.storage.queue.models.QueueStorageException;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -35,9 +36,6 @@ import org.talend.components.azurestorage.queue.tazurestoragequeuedelete.TAzureS
 import org.talend.components.azurestorage.tazurestorageconnection.TAzureStorageConnectionProperties;
 import org.talend.components.azurestorage.tazurestorageconnection.TAzureStorageConnectionProperties.Protocol;
 import org.talend.daikon.properties.ValidationResult;
-
-import com.azure.storage.blob.models.BlobStorageException;
-import com.azure.storage.queue.models.QueueStorageException;
 
 public class AzureStorageQueueDeleteRuntimeTest {
 

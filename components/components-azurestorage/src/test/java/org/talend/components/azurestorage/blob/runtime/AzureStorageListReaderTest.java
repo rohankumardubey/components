@@ -22,13 +22,14 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import com.azure.core.http.rest.PagedFlux;
+import com.azure.core.http.rest.PagedIterable;
 import com.azure.storage.blob.models.BlobItem;
 import com.azure.storage.blob.models.BlobStorageException;
 
@@ -85,7 +86,7 @@ public class AzureStorageListReaderTest {
     public void testStartAsNonStartable() {
         try {
 
-            when(blobService.listBlobs(anyString(), anyString(), anyBoolean())).thenReturn(new Iterable<BlobItem>() {
+            when(blobService.listBlobs(anyString(), anyString(), anyBoolean())).thenReturn(new PagedIterable<BlobItem>(new PagedFlux<BlobItem>(() -> {return null;})) {
 
                 @Override
                 public Iterator<BlobItem> iterator() {
@@ -114,7 +115,7 @@ public class AzureStorageListReaderTest {
             list.add(new BlobItem());
             list.add(new BlobItem());
             list.add(new BlobItem());
-            when(blobService.listBlobs(anyString(), anyString(), anyBoolean())).thenReturn(new Iterable<BlobItem>() {
+            when(blobService.listBlobs(anyString(), anyString(), anyBoolean())).thenReturn(new PagedIterable<BlobItem>(new PagedFlux<BlobItem>(() -> {return null;})) {
 
                 @Override
                 public Iterator<BlobItem> iterator() {
@@ -152,7 +153,7 @@ public class AzureStorageListReaderTest {
             final List<BlobItem> list = new ArrayList<>();
             list.add(new BlobItem());
 
-            when(blobService.listBlobs(anyString(), anyString(), anyBoolean())).thenReturn(new Iterable<BlobItem>() {
+            when(blobService.listBlobs(anyString(), anyString(), anyBoolean())).thenReturn(new PagedIterable<BlobItem>(new PagedFlux<BlobItem>(() -> {return null;})) {
 
                 @Override
                 public Iterator<BlobItem> iterator() {

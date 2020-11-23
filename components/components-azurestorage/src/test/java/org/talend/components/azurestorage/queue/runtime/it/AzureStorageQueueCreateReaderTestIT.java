@@ -26,8 +26,6 @@ import org.talend.components.azurestorage.AzureStorageDefinition;
 import org.talend.components.azurestorage.AzureStorageProvideConnectionProperties;
 import org.talend.components.azurestorage.queue.tazurestoragequeuecreate.TAzureStorageQueueCreateProperties;
 
-import com.azure.storage.queue.models.QueueItem;
-
 @Ignore
 public class AzureStorageQueueCreateReaderTestIT extends AzureStorageBaseQueueTestIT {
 

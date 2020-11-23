@@ -12,6 +12,9 @@
 // ============================================================================
 package org.talend.components.azurestorage.queue.runtime.it;
 
+import com.azure.storage.queue.QueueClient;
+import com.azure.storage.queue.QueueServiceClient;
+
 import org.junit.BeforeClass;
 import org.talend.components.api.component.runtime.BoundedReader;
 import org.talend.components.api.properties.ComponentProperties;
@@ -19,10 +22,6 @@ import org.talend.components.azurestorage.AzureStorageBaseTestIT;
 import org.talend.components.azurestorage.AzureStorageProvideConnectionProperties;
 import org.talend.components.azurestorage.queue.runtime.AzureStorageQueueSource;
 import org.talend.components.azurestorage.queue.tazurestoragequeuecreate.TAzureStorageQueueCreateProperties;
-
-import com.azure.storage.queue.QueueClient;
-import com.azure.storage.queue.QueueServiceClient;
-import com.azure.storage.queue.models.QueueItem;
 
 public class AzureStorageBaseQueueTestIT extends AzureStorageBaseTestIT {
 

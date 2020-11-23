@@ -129,7 +129,7 @@ public class AzureStorageRuntime implements RuntimableRuntime<ComponentPropertie
                 return AzureConnectionWithSasService.builder()//
                         .accountName(m.group(2))//
                         .sasToken(m.group(5))//
-                        .endpointSuffix(m.group(4))
+                        .endpointSuffix(m.group(1)+"://"+m.group(2)+"."+m.group(3)+m.group(4))
                         .build();
 
             } else {

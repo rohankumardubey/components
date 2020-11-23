@@ -18,8 +18,6 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.talend.components.azurestorage.RuntimeContainerMock;
-import org.talend.components.azurestorage.blob.runtime.AzureStorageContainerCreateRuntime;
 import org.talend.components.azurestorage.tazurestorageconnection.TAzureStorageConnectionProperties.Protocol;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.ValidationResult.Result;
@@ -68,10 +66,10 @@ public class TAzureStorageConnectionPropertiesTest {
     
     @Test
     public final void testvalidateTestConnection() throws Exception {
+        props.accountName.setValue("talendrd");
         props.useSharedAccessSignature.setValue(true);
         props.sharedAccessSignature.setValue("https://talendrd.blob.core.windows.net/?sv=2016-05-31&ss=f&srt=sco&sp=rwdlacup&se=2017-06-07T23:50:05Z&st=2017-05-24T15:50:05Z&spr=https&sig=fakeSASfakeSASfakeSASfakeSASfakeSASfakeSASfakeSASfakeSAS");
         assertEquals(ValidationResult.Result.OK,props.validateTestConnection().getStatus());
-
     }
 
     @Test

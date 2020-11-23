@@ -1,9 +1,5 @@
 package org.talend.components.azurestorage.queue.runtime;
 
-import java.net.URISyntaxException;
-import java.security.InvalidKeyException;
-
-import com.azure.storage.blob.models.BlobStorageException;
 import com.azure.storage.queue.models.QueueStorageException;
 
 import org.slf4j.Logger;

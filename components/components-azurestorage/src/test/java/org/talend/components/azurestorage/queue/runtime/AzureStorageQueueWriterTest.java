@@ -42,23 +42,11 @@ public class AzureStorageQueueWriterTest {
 
     /**
      * Test method for
-     * {@link org.talend.components.azurestorage.queue.runtime.AzureStorageQueueWriter#open(java.lang.String)}.
-     *
-     * @throws IOException
-     */
-    @Test(expected = IllegalArgumentException.class)
-    public final void testOpen() throws IOException {
-        writer.open("test");
-        fail("Should have failed...");
-    }
-
-    /**
-     * Test method for
      * {@link org.talend.components.azurestorage.queue.runtime.AzureStorageQueueWriter#write(java.lang.Object)}.
      *
      * @throws IOException
      */
-    @Test(expected = NullPointerException.class)
+    @Test(expected = IllegalArgumentException.class)
     public final void testWrite() throws IOException {
         try {
             writer.open("testWrite");

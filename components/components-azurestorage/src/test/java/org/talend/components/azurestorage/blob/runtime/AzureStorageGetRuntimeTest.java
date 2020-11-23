@@ -24,14 +24,13 @@ import static org.mockito.Mockito.when;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.security.InvalidKeyException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+import com.azure.core.http.rest.PagedFlux;
+import com.azure.core.http.rest.PagedIterable;
 import com.azure.storage.blob.models.BlobItem;
 import com.azure.storage.blob.models.BlobStorageException;
 
@@ -46,7 +45,6 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.mockito.stubbing.Answer;
-import org.mockito.verification.VerificationMode;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.azurestorage.FileUtils;
 import org.talend.components.azurestorage.RuntimeContainerMock;
@@ -140,8 +138,10 @@ public class AzureStorageGetRuntimeTest {
             assertEquals(ValidationResult.OK.getStatus(), validationResult.getStatus());
 
             final List<BlobItem> list = new ArrayList<>();
-            list.add(new BlobItem());
-            when(blobService.listBlobs(anyString(), anyString(), anyBoolean())).thenReturn(new Iterable<BlobItem>() {
+            final BlobItem b = new BlobItem();
+            b.setName("blob-1");
+            list.add(b);
+            when(blobService.listBlobs(anyString(), anyString(), anyBoolean())).thenReturn(new PagedIterable<BlobItem>(new PagedFlux<BlobItem>(() -> {return null;})) {
 
                 @Override
                 public Iterator<BlobItem> iterator() {
@@ -187,8 +187,10 @@ public class AzureStorageGetRuntimeTest {
             assertEquals(ValidationResult.OK.getStatus(), validationResult.getStatus());
 
             final List<BlobItem> list = new ArrayList<>();
-            list.add(new BlobItem());
-            when(blobService.listBlobs(anyString(), anyString(), anyBoolean())).thenReturn(new Iterable<BlobItem>() {
+            final BlobItem b = new BlobItem();
+            b.setName("blob-1");
+            list.add(b);
+            when(blobService.listBlobs(anyString(), anyString(), anyBoolean())).thenReturn(new PagedIterable<BlobItem>(new PagedFlux<BlobItem>(() -> {return null;})) {
 
                 @Override
                 public Iterator<BlobItem> iterator() {

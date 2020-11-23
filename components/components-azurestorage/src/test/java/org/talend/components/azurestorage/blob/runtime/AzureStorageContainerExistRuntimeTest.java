@@ -17,8 +17,7 @@ import static org.junit.Assert.fail;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 
-import java.net.URISyntaxException;
-import java.security.InvalidKeyException;
+import com.azure.storage.blob.models.BlobStorageException;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -34,8 +33,6 @@ import org.talend.components.azurestorage.blob.tazurestoragecontainerexist.TAzur
 import org.talend.components.azurestorage.tazurestorageconnection.TAzureStorageConnectionProperties;
 import org.talend.components.azurestorage.tazurestorageconnection.TAzureStorageConnectionProperties.Protocol;
 import org.talend.daikon.properties.ValidationResult;
-
-import com.azure.storage.blob.models.BlobStorageException;
 
 public class AzureStorageContainerExistRuntimeTest {
 
@@ -95,47 +92,6 @@ public class AzureStorageContainerExistRuntimeTest {
         try {
             when(blobService.containerExist(anyString()))
                     .thenThrow(new BlobStorageException("storage exception message", null, new RuntimeException()));
-            existContainer.runAtDriver(runtimeContainer);
-
-        } catch (BlobStorageException e) {
-            fail("should not throw exception " + e.getMessage());
-        }
-    }
-
-    /**
-     * The method {@link AzureStorageContainerCreateRuntime#runAtDriver(RuntimeContainer)} should not throw any exception if the
-     * dieOnError is not set to true.
-     */
-    @Test
-    public void testRunAtDriverHandleInvalidKeyException() {
-
-        properties.container.setValue("container-name-ok");
-        ValidationResult validationResult = existContainer.initialize(runtimeContainer, properties);
-        assertEquals(ValidationResult.OK.getStatus(), validationResult.getStatus());
-        existContainer.azureStorageBlobService = blobService;
-        try {
-
-            when(blobService.containerExist(anyString())).thenThrow(new InvalidKeyException());
-            existContainer.runAtDriver(runtimeContainer);
-        } catch (BlobStorageException e) {
-            fail("should not throw exception " + e.getMessage());
-        }
-    }
-
-    /**
-     * The method {@link AzureStorageContainerCreateRuntime#runAtDriver(RuntimeContainer)} should not throw any exception if the
-     * dieOnError is not set to true.
-     */
-    @Test
-    public void testRunAtDriverHandleURISyntaxException() {
-
-        properties.container.setValue("container-name-ok");
-        ValidationResult validationResult = existContainer.initialize(runtimeContainer, properties);
-        assertEquals(ValidationResult.OK.getStatus(), validationResult.getStatus());
-        existContainer.azureStorageBlobService = blobService;
-        try {
-            when(blobService.containerExist(anyString()))
-                    .thenThrow(new URISyntaxException("bad url", "some reason"));
             existContainer.runAtDriver(runtimeContainer);
 
         } catch (BlobStorageException e) {

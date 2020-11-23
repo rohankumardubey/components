@@ -24,7 +24,6 @@ import com.azure.storage.queue.models.QueueStorageException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.talend.components.api.exception.ComponentException;
 import org.talend.components.azurestorage.AzureConnection;
 import org.talend.components.azurestorage.utils.AzureStorageUtils;
 import org.talend.daikon.i18n.GlobalI18N;

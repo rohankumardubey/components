@@ -19,15 +19,25 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.when;
 
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.security.InvalidKeyException;
+import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+
+import com.azure.core.http.HttpHeaders;
+import com.azure.core.http.HttpResponse;
+import com.azure.storage.blob.models.BlobStorageException;
+import com.azure.storage.common.StorageSharedKeyCredential;
+import com.azure.storage.queue.models.QueueItem;
+import com.azure.storage.queue.models.QueueStorageException;
 
 import org.apache.avro.generic.IndexedRecord;
 import org.junit.Before;
@@ -43,10 +53,6 @@ import org.talend.components.azurestorage.queue.tazurestoragequeuelist.TAzureSto
 import org.talend.components.azurestorage.queue.tazurestoragequeuelist.TAzureStorageQueueListProperties;
 import org.talend.daikon.properties.ValidationResult;
 
-import com.azure.storage.blob.models.BlobStorageException;
-import com.azure.storage.common.StorageSharedKeyCredential;
-import com.azure.storage.queue.models.QueueItem;
-
 public class AzureStorageQueueListReaderTest extends AzureBaseTest {
 
     private AzureStorageQueueListReader reader;
@@ -54,6 +60,8 @@ public class AzureStorageQueueListReaderTest extends AzureBaseTest {
     private TAzureStorageQueueListProperties properties;
 
     private StorageSharedKeyCredential dummyCredential;
+
+    private QueueStorageException storageException;
 
     @Mock
     private AzureStorageQueueService queueService;
@@ -67,6 +75,47 @@ public class AzureStorageQueueListReaderTest extends AzureBaseTest {
         properties = new TAzureStorageQueueListProperties(PROP_ + "QueueList");
         properties.setupProperties();
         properties.connection = getValidFakeConnection();
+
+        storageException = new QueueStorageException("storage exception message", new HttpResponse(null) {
+
+            @Override
+            public int getStatusCode() {
+                return 500;
+            }
+
+            @Override
+            public String getHeaderValue(String name) {
+                return "headers.getValue(name)";
+            }
+
+            @Override
+            public HttpHeaders getHeaders() {
+                Map<String, String> headers = new HashMap<>();
+                headers.put("x-ms-error-code", "500");
+                return new HttpHeaders(headers);
+            }
+
+            @Override
+            public Flux<ByteBuffer> getBody() {
+                return Flux.empty();
+            }
+
+            @Override
+            public Mono<byte[]> getBodyAsByteArray() {
+                return Mono.just(new byte[0]);
+            }
+
+            @Override
+            public Mono<String> getBodyAsString() {
+                return Mono.just("");
+            }
+
+            @Override
+            public Mono<String> getBodyAsString(Charset charset) {
+                return Mono.just("");
+            }
+
+        }, new RuntimeException());
     }
 
     @Test
@@ -138,7 +187,7 @@ public class AzureStorageQueueListReaderTest extends AzureBaseTest {
         reader.queueService = queueService;
         try {
 
-            when(queueService.listQueues()).thenThrow(new InvalidKeyException());
+            when(queueService.listQueues()).thenThrow(storageException);
 
             assertFalse(reader.start());
 
@@ -160,7 +209,7 @@ public class AzureStorageQueueListReaderTest extends AzureBaseTest {
         reader.queueService = queueService;
         try {
 
-            when(queueService.listQueues()).thenThrow(new InvalidKeyException());
+            when(queueService.listQueues()).thenThrow(storageException);
             reader.start(); // should throw ComponentException
 
         } catch (IOException e) {

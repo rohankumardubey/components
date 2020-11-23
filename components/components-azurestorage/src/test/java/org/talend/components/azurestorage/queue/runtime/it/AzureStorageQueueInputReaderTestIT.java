@@ -15,8 +15,6 @@ package org.talend.components.azurestorage.queue.runtime.it;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import com.azure.storage.queue.models.QueueMessageItem;
-
 import org.junit.Ignore;
 import org.junit.Test;
 import org.talend.components.api.component.runtime.BoundedReader;

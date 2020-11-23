@@ -18,8 +18,8 @@ import java.util.Collections;
 import java.util.Set;
 
 import org.apache.avro.Schema;
-import org.apache.avro.SchemaBuilder;
 import org.apache.avro.Schema.Field;
+import org.apache.avro.SchemaBuilder;
 import org.talend.components.api.component.Connector;
 import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.azurestorage.blob.AzureStorageBlobProperties;

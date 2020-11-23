@@ -19,8 +19,16 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.when;
 
-import java.net.URISyntaxException;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
+import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
+import java.util.HashMap;
+import java.util.Map;
+
+import com.azure.core.http.HttpHeaders;
+import com.azure.core.http.HttpResponse;
 import com.azure.storage.blob.models.BlobStorageException;
 import com.azure.storage.blob.models.PublicAccessType;
 
@@ -139,7 +147,46 @@ public class AzureStorageContainerCreateRuntimeTest {
         try {
 
             when(blobService.createContainerIfNotExist(anyString(), any(PublicAccessType.class))).thenThrow(
-                    new BlobStorageException("storage exception message", null, new RuntimeException()));
+                    new BlobStorageException("storage exception message", new HttpResponse(null) {
+
+                        @Override
+                        public int getStatusCode() {
+                            return 500;
+                        }
+
+                        @Override
+                        public String getHeaderValue(String name) {
+                            return "headers.getValue(name)";
+                        }
+
+                        @Override
+                        public HttpHeaders getHeaders() {
+                            Map<String, String > headers = new HashMap<>();
+                            headers.put("x-ms-error-code", "500");
+                            return new HttpHeaders(headers);
+                        }
+
+                        @Override
+                        public Flux<ByteBuffer> getBody() {
+                            return Flux.empty();
+                        }
+
+                        @Override
+                        public Mono<byte[]> getBodyAsByteArray() {
+                            return Mono.just(new byte[0]);
+                        }
+
+                        @Override
+                        public Mono<String> getBodyAsString() {
+                            return Mono.just("");
+                        }
+
+                        @Override
+                        public Mono<String> getBodyAsString(Charset charset) {
+                            return Mono.just("");
+                        }
+
+                    }, new RuntimeException()));
             containerCreate.runAtDriver(runtimeContainer);
 
         } catch (BlobStorageException e) {
@@ -148,30 +195,6 @@ public class AzureStorageContainerCreateRuntimeTest {
 
     }
 
-    /**
-     * The method {@link AzureStorageContainerCreateRuntime#runAtDriver(RuntimeContainer)} should not throw any
-     * exception if the
-     * dieOnError is not set to true.
-     */
-    @Test
-    public void testRunAtDriverHandleURISyntaxException() {
-
-        properties.container.setValue("container-name-ok");
-        ValidationResult validationResult = containerCreate.initialize(runtimeContainer, properties);
-        assertEquals(ValidationResult.OK.getStatus(), validationResult.getStatus());
-        containerCreate.blobService = blobService;
-
-        try {
-            when(blobService.createContainerIfNotExist(anyString(), any(PublicAccessType.class)))
-                    .thenThrow(
-                            new URISyntaxException("bad url", "some reason"));
-            containerCreate.runAtDriver(runtimeContainer);
-
-        } catch (BlobStorageException e) {
-            fail("should handle this error correctly " + e.getMessage());
-        }
-
-    }
 
     @Test(expected = ComponentException.class)
     public void testRunAtDriverDieOnError() {

@@ -18,10 +18,17 @@ import static org.junit.Assert.fail;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.security.InvalidKeyException;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
+import java.util.HashMap;
+import java.util.Map;
+
+import com.azure.core.http.HttpHeaders;
+import com.azure.core.http.HttpResponse;
 import com.azure.storage.queue.models.QueueStorageException;
 
 import org.junit.Before;
@@ -55,6 +62,8 @@ public class AzureStorageQueueCreateRuntimeTest {
 
     private AzureStorageQueueCreateRuntime azureStorageQueueCreate;
 
+    private QueueStorageException storageException;
+
     @Mock
     private AzureStorageQueueService queueService;
 
@@ -73,6 +82,47 @@ public class AzureStorageQueueCreateRuntimeTest {
 
         runtimeContainer = new RuntimeContainerMock();
         this.azureStorageQueueCreate = new AzureStorageQueueCreateRuntime();
+
+        storageException = new QueueStorageException("storage exception message", new HttpResponse(null) {
+
+            @Override
+            public int getStatusCode() {
+                return 500;
+            }
+
+            @Override
+            public String getHeaderValue(String name) {
+                return "headers.getValue(name)";
+            }
+
+            @Override
+            public HttpHeaders getHeaders() {
+                Map<String, String> headers = new HashMap<>();
+                headers.put("x-ms-error-code", "500");
+                return new HttpHeaders(headers);
+            }
+
+            @Override
+            public Flux<ByteBuffer> getBody() {
+                return Flux.empty();
+            }
+
+            @Override
+            public Mono<byte[]> getBodyAsByteArray() {
+                return Mono.just(new byte[0]);
+            }
+
+            @Override
+            public Mono<String> getBodyAsString() {
+                return Mono.just("");
+            }
+
+            @Override
+            public Mono<String> getBodyAsString(Charset charset) {
+                return Mono.just("");
+            }
+
+        }, new RuntimeException());
     }
 
     @Test
@@ -169,35 +219,6 @@ public class AzureStorageQueueCreateRuntimeTest {
         }
     }
 
-    @Test
-    public void testRunAtDriverHandleInvalidKeyException() {
-        properties.queueName.setValue("a-good-queue-name");
-        properties.dieOnError.setValue(false);
-        azureStorageQueueCreate.initialize(runtimeContainer, properties);
-        azureStorageQueueCreate.queueService = queueService;
-        try {
-            when(queueService.createQueueIfNotExists(anyString())).thenThrow(new InvalidKeyException());
-            azureStorageQueueCreate.runAtDriver(runtimeContainer);
-        } catch (QueueStorageException e) {
-            fail("should not throw " + e.getMessage());
-        }
-    }
-
-    @Test
-    public void testRunAtDriverHandleURISyntaxException() {
-        properties.queueName.setValue("a-good-queue-name");
-        properties.dieOnError.setValue(false);
-        azureStorageQueueCreate.initialize(runtimeContainer, properties);
-        azureStorageQueueCreate.queueService = queueService;
-        try {
-            when(queueService.createQueueIfNotExists(anyString()))
-                    .thenThrow(new URISyntaxException("bad uri", "some reason"));
-            azureStorageQueueCreate.runAtDriver(runtimeContainer);
-        } catch (QueueStorageException e) {
-            fail("should not throw " + e.getMessage());
-        }
-    }
-
     @Test(expected = ComponentException.class)
     public void testRunAtDriverDieOnError() {
         properties.queueName.setValue("a-good-queue-name");
@@ -205,7 +226,7 @@ public class AzureStorageQueueCreateRuntimeTest {
         azureStorageQueueCreate.initialize(runtimeContainer, properties);
         azureStorageQueueCreate.queueService = queueService;
         try {
-            when(queueService.createQueueIfNotExists(anyString())).thenThrow(new InvalidKeyException());
+            when(queueService.createQueueIfNotExists(anyString())).thenThrow(storageException);
             azureStorageQueueCreate.runAtDriver(runtimeContainer);
         } catch (QueueStorageException e) {
             fail("should not throw " + e.getMessage());

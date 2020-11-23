@@ -17,7 +17,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.azure.storage.queue.models.PeekedMessageItem;
-import com.azure.storage.queue.models.QueueMessageItem;
 
 public class DummyQueuePeekedMessageIterator implements Iterator<PeekedMessageItem> {
 

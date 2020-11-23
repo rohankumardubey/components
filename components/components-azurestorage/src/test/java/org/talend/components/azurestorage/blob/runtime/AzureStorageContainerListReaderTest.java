@@ -20,13 +20,15 @@ import static org.junit.Assert.fail;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.security.InvalidKeyException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
+
+import com.azure.core.http.rest.PagedFlux;
+import com.azure.core.http.rest.PagedIterable;
+import com.azure.storage.blob.models.BlobContainerItem;
+import com.azure.storage.blob.models.BlobStorageException;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -41,9 +43,6 @@ import org.talend.components.azurestorage.blob.AzureStorageBlobService;
 import org.talend.components.azurestorage.blob.tazurestoragecontainerlist.TAzureStorageContainerListProperties;
 import org.talend.components.azurestorage.tazurestorageconnection.TAzureStorageConnectionProperties;
 import org.talend.components.azurestorage.tazurestorageconnection.TAzureStorageConnectionProperties.Protocol;
-
-import com.azure.storage.blob.models.BlobContainerItem;
-import com.azure.storage.blob.models.BlobStorageException;
 
 public class AzureStorageContainerListReaderTest {
 
@@ -77,11 +76,19 @@ public class AzureStorageContainerListReaderTest {
         reader.blobService = blobService;
     }
 
-    @Test
+
+    @Test(expected = NoSuchElementException.class)
+    public void getCurrentOnNonStartableReader() {
+        reader.getCurrent();
+        fail("should throw NoSuchElementException");
+    }
+
+
+        @Test
     public void testStartAsNonStartable() {
         // init mock
         try {
-            when(blobService.listContainers()).thenReturn(new Iterable<BlobContainerItem>() {
+            when(blobService.listContainers()).thenReturn(new PagedIterable<BlobContainerItem>(new PagedFlux<BlobContainerItem>(() -> {return null;})) {
 
                 @Override
                 public Iterator<BlobContainerItem> iterator() {
@@ -107,7 +114,7 @@ public class AzureStorageContainerListReaderTest {
             list.add(new BlobContainerItem());
             list.add(new BlobContainerItem());
 
-            when(blobService.listContainers()).thenReturn(new Iterable<BlobContainerItem>() {
+            when(blobService.listContainers()).thenReturn(new PagedIterable<BlobContainerItem>(new PagedFlux<BlobContainerItem>(() -> {return null;})) {
 
                 @Override
                 public Iterator<BlobContainerItem> iterator() {
@@ -130,18 +137,12 @@ public class AzureStorageContainerListReaderTest {
     }
 
     @Test(expected = NoSuchElementException.class)
-    public void getCurrentOnNonStartableReader() {
-        reader.getCurrent();
-        fail("should throw NoSuchElementException");
-    }
-
-    @Test(expected = NoSuchElementException.class)
     public void getCurrentOnNonAdvancableReader() {
 
         try {
             final List<BlobContainerItem> list = new ArrayList<>();
             list.add(new BlobContainerItem());
-            when(blobService.listContainers()).thenReturn(new Iterable<BlobContainerItem>() {
+            when(blobService.listContainers()).thenReturn(new PagedIterable<BlobContainerItem>(new PagedFlux<BlobContainerItem>(() -> {return null;})) {
 
                 @Override
                 public Iterator<BlobContainerItem> iterator() {

@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import com.azure.storage.queue.QueueClient;
-import com.azure.storage.queue.implementation.models.QueueMessage;
 import com.azure.storage.queue.models.QueueMessageItem;
 import com.azure.storage.queue.models.QueueStorageException;
 
@@ -91,6 +90,7 @@ public class AzureStorageQueueWriter implements WriterWithFeedback<Result, Index
         }
         try {
             queue = sink.getQueueItem(runtime, props.queueName.getValue());
+            System.out.println("[open]");
         } catch (QueueStorageException e) {
             LOGGER.error(e.getLocalizedMessage());
             if (props.dieOnError.getValue()) {

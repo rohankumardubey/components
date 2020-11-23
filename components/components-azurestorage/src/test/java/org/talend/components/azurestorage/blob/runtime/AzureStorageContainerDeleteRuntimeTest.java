@@ -20,10 +20,10 @@ import static org.mockito.Mockito.when;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
-import java.security.InvalidKeyException;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.azure.core.http.HttpHeaders;
 import com.azure.core.http.HttpResponse;
@@ -54,6 +54,8 @@ public class AzureStorageContainerDeleteRuntimeTest {
 
     private AzureStorageContainerDeleteRuntime deleteContainer;
 
+    private BlobStorageException storageException;
+
     @Mock
     private AzureStorageBlobService blobService;
 
@@ -72,6 +74,46 @@ public class AzureStorageContainerDeleteRuntimeTest {
 
         runtimeContainer = new RuntimeContainerMock();
         this.deleteContainer = new AzureStorageContainerDeleteRuntime();
+        storageException = new BlobStorageException("storage exception message", new HttpResponse(null) {
+
+            @Override
+            public int getStatusCode() {
+                return 500;
+            }
+
+            @Override
+            public String getHeaderValue(String name) {
+                return "headers.getValue(name)";
+            }
+
+            @Override
+            public HttpHeaders getHeaders() {
+                Map<String, String > headers = new HashMap<>();
+                headers.put("x-ms-error-code", "500");
+                return new HttpHeaders(headers);
+            }
+
+            @Override
+            public Flux<ByteBuffer> getBody() {
+                return Flux.empty();
+            }
+
+            @Override
+            public Mono<byte[]> getBodyAsByteArray() {
+                return Mono.just(new byte[0]);
+            }
+
+            @Override
+            public Mono<String> getBodyAsString() {
+                return Mono.just("");
+            }
+
+            @Override
+            public Mono<String> getBodyAsString(Charset charset) {
+                return Mono.just("");
+            }
+
+        }, new RuntimeException());
     }
 
     @Test
@@ -100,49 +142,7 @@ public class AzureStorageContainerDeleteRuntimeTest {
         deleteContainer.blobService = blobService;
 
         try {
-            when(blobService.deleteContainerIfExist(anyString()))
-                    .thenThrow(new BlobStorageException("storage exception message", null, new RuntimeException()));
-            deleteContainer.runAtDriver(runtimeContainer);
-        } catch (BlobStorageException e) {
-            fail("should not throw exception " + e.getMessage());
-        }
-    }
-
-    /**
-     * The method {@link AzureStorageContainerCreateRuntime#runAtDriver(RuntimeContainer)} should not throw any exception if the
-     * dieOnError is not set to true.
-     */
-    @Test
-    public void testRunAtDriverHandleInvalidKeyException() {
-
-        properties.container.setValue("container-name-ok");
-        ValidationResult validationResult = deleteContainer.initialize(runtimeContainer, properties);
-        assertEquals(ValidationResult.OK.getStatus(), validationResult.getStatus());
-        deleteContainer.blobService = blobService;
-
-        try {
-            when(blobService.deleteContainerIfExist(anyString())).thenThrow(new InvalidKeyException());
-            deleteContainer.runAtDriver(runtimeContainer);
-        } catch (BlobStorageException e) {
-            fail("should not throw exception " + e.getMessage());
-        }
-    }
-
-    /**
-     * The method {@link AzureStorageContainerCreateRuntime#runAtDriver(RuntimeContainer)} should not throw any exception if the
-     * dieOnError is not set to true.
-     */
-    @Test
-    public void testRunAtDriverHandleURISyntaxException() {
-
-        properties.container.setValue("container-name-ok");
-        ValidationResult validationResult = deleteContainer.initialize(runtimeContainer, properties);
-        assertEquals(ValidationResult.OK.getStatus(), validationResult.getStatus());
-        deleteContainer.blobService = blobService;
-        try {
-
-            when(blobService.deleteContainerIfExist(anyString()))
-                    .thenThrow(new URISyntaxException("bad url", "some reason"));
+            when(blobService.deleteContainerIfExist(anyString()))               .thenThrow(storageException);
             deleteContainer.runAtDriver(runtimeContainer);
         } catch (BlobStorageException e) {
             fail("should not throw exception " + e.getMessage());
@@ -160,42 +160,7 @@ public class AzureStorageContainerDeleteRuntimeTest {
 
         try {
             when(blobService.deleteContainerIfExist(anyString()))
-                    .thenThrow(new BlobStorageException("storage exception message", new HttpResponse(null) {
-                        @Override
-                        public int getStatusCode() {
-                            return 500;
-                        }
-
-                        @Override
-                        public String getHeaderValue(final String s) {
-                            return s;
-                        }
-
-                        @Override
-                        public HttpHeaders getHeaders() {
-                            return null;
-                        }
-
-                        @Override
-                        public Flux<ByteBuffer> getBody() {
-                            return "#getBodyAsString()";
-                        }
-
-                        @Override
-                        public Mono<byte[]> getBodyAsByteArray() {
-                            throw new UnsupportedOperationException("#getBodyAsByteArray()");
-                        }
-
-                        @Override
-                        public Mono<String> getBodyAsString() {
-                            throw new UnsupportedOperationException("#getBodyAsString()");
-                        }
-
-                        @Override
-                        public Mono<String> getBodyAsString(final Charset charset) {
-                            throw new UnsupportedOperationException("#getBodyAsString()");
-                        }
-                    } , new RuntimeException()));
+                    .thenThrow(storageException);
             deleteContainer.runAtDriver(runtimeContainer);
 
         } catch (BlobStorageException e) {

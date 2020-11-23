@@ -15,7 +15,6 @@ package org.talend.components.azurestorage.wizard;
 import static org.talend.daikon.properties.presentation.Widget.widget;
 import static org.talend.daikon.properties.property.PropertyFactory.newProperty;
 
-import java.io.IOException;
 import java.util.List;
 
 import org.apache.avro.Schema;

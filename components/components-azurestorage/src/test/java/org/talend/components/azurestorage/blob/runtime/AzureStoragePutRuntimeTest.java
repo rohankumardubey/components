@@ -22,8 +22,6 @@ import static org.mockito.Mockito.doAnswer;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URISyntaxException;
-import java.security.InvalidKeyException;
 import java.util.ArrayList;
 
 import com.azure.storage.blob.models.BlobStorageException;

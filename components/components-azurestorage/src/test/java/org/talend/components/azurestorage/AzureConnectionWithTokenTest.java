@@ -13,12 +13,10 @@
 
 package org.talend.components.azurestorage;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.mockito.Mockito;
-import org.talend.components.azure.runtime.token.AzureActiveDirectoryTokenGetter;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
-import com.azure.storage.blob.models.StorageAccountInfo;
+import org.junit.Test;
 
 public class AzureConnectionWithTokenTest {
 
@@ -26,14 +24,14 @@ public class AzureConnectionWithTokenTest {
     @Test
     public void testCreateConnectionWithToken() throws Exception {
         String testAccountName = "someAccountName";
-        AzureActiveDirectoryTokenGetter mockedTokenGetter = Mockito.mock(AzureActiveDirectoryTokenGetter.class);
-        Mockito.when(mockedTokenGetter.retrieveAccessToken()).thenReturn("testToken");
-        AzureConnectionWithToken sutTokenConnection = new AzureConnectionWithToken(testAccountName, mockedTokenGetter);
-
-
-       // StorageAccountInfo account = sutTokenConnection.getCloudStorageAccount();
-
-        Mockito.verify(mockedTokenGetter).retrieveAccessToken();
-      //  Assert.assertEquals(testAccountName, account.getCredentials().getAccountName());
+        AzureConnectionWithToken instance = AzureConnectionWithToken.builder()
+                .withAccountName(testAccountName)
+                .withTenantId("tenantId")
+                .withClientId("clientId")
+                .withClientSecret("clientSecret")
+                .build();
+        assertNotNull(instance);
+        assertNotNull(instance.getClientSecretCredential());
+        assertEquals(testAccountName, instance.getAccountName());
     }
 }

@@ -18,9 +18,9 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.security.InvalidKeyException;
-import java.util.Queue;
+
+import com.azure.storage.blob.models.BlobStorageException;
+import com.azure.storage.queue.models.QueueStorageException;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -37,9 +37,6 @@ import org.talend.components.azurestorage.queue.AzureStorageQueueService;
 import org.talend.components.azurestorage.queue.tazurestoragequeuepurge.TAzureStorageQueuePurgeProperties;
 import org.talend.components.azurestorage.tazurestorageconnection.TAzureStorageConnectionProperties;
 import org.talend.components.azurestorage.tazurestorageconnection.TAzureStorageConnectionProperties.Protocol;
-
-import com.azure.storage.blob.models.BlobStorageException;
-import com.azure.storage.queue.models.QueueStorageException;
 
 public class AzureStorageQueuePurgeRuntimeTest {
 

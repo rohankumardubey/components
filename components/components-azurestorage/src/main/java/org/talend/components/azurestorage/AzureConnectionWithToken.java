@@ -45,6 +45,24 @@ public class AzureConnectionWithToken implements AzureConnection {
         this.tokenGetter = tokenGetter;
     }
 
+    private AzureConnectionWithToken(Builder builder) {
+        this.accountName = builder.accountName;
+        this.tokenGetter = new AzureActiveDirectoryTokenGetter(builder.tenantId, builder.clientId, builder.clientSecret);
+        clientSecretCredential = new ClientSecretCredentialBuilder()
+                .clientId(builder.clientId)
+                .clientSecret(builder.clientSecret)
+                .tenantId(builder.tenantId)
+                .build();
+    }
+
+    public String getAccountName() {
+        return this.accountName;
+    }
+
+    public ClientSecretCredential getClientSecretCredential() {
+        return this.clientSecretCredential;
+    }
+
     @Override
     public BlobServiceClient getBlobServiceClient() {
         String endpoint = "https://" + accountName + ".dfs.core.windows.net";
@@ -61,6 +79,46 @@ public class AzureConnectionWithToken implements AzureConnection {
                 .endpoint(endpoint)
                 .credential(clientSecretCredential)
                 .buildClient();
+    }
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static class Builder {
+
+        private String accountName;
+
+        private String tenantId;
+
+        private String clientId;
+
+        private String clientSecret;
+
+
+        public Builder withAccountName(String accountName) {
+            this.accountName = accountName;
+            return this;
+        }
+
+        public Builder withTenantId(String tenantId) {
+            this.tenantId = tenantId;
+            return this;
+        }
+
+        public Builder withClientId(String clientId) {
+            this.clientId = clientId;
+            return this;
+        }
+
+        public Builder withClientSecret(String clientSecret) {
+            this.clientSecret = clientSecret;
+            return this;
+        }
+
+        public AzureConnectionWithToken build() {
+            return new AzureConnectionWithToken(this);
+        }
     }
 
 

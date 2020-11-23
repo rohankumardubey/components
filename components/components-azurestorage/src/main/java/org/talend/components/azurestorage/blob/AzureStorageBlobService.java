@@ -16,7 +16,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.time.Duration;
 import java.util.Collections;
+import java.util.Date;
 
+import com.azure.core.http.rest.PagedIterable;
 import com.azure.storage.blob.BlobContainerClient;
 import com.azure.storage.blob.BlobServiceClient;
 import com.azure.storage.blob.models.BlobContainerItem;
@@ -104,7 +106,7 @@ public class AzureStorageBlobService {
      */
     public boolean deleteContainerIfExist(final String containerName) throws BlobStorageException {
         final BlobContainerClient BlobContainerItem = getContainerReference(containerName);
-        BlobContainerItem.delete();
+        BlobContainerItem.deleteWithResponse(null, null, AzureStorageUtils.getTalendOperationContext());
         //FIXME
         return true;
     }
@@ -118,19 +120,17 @@ public class AzureStorageBlobService {
                 .getValue();
     }
 
-    public Iterable<BlobContainerItem> listContainers() {
+    public PagedIterable<BlobContainerItem> listContainers() {
         final BlobServiceClient blobClient = connection.getBlobServiceClient();
-        return Iterable.class.cast(blobClient.listBlobContainers().stream().iterator());
+        return blobClient.listBlobContainers();
     }
 
-    public Iterable<BlobItem> listBlobs(final String containerName, final String prefix, final boolean useFlatBlobListing)
+    public PagedIterable<BlobItem> listBlobs(final String containerName, final String prefix, final boolean useFlatBlobListing)
             throws BlobStorageException {
         final BlobContainerClient container = getContainerReference(containerName);
         // FIXME
         // return container.listBlobs(prefix, useFlatBlobListing, EnumSet.noneOf(BlobListingDetails.class), null,                                      AzureStorageUtils.getTalendOperationContext());
         return container.listBlobs();
-
-
     }
 
     public boolean deleteBlobBlockIfExist(final BlobItem block) throws BlobStorageException {

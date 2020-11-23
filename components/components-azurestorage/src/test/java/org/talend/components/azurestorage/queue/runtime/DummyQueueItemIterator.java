@@ -16,7 +16,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.azure.storage.queue.models.QueueItem;
-import com.azure.storage.queue.models.QueueItem;
 
 public class DummyQueueItemIterator implements Iterator<QueueItem> {
 

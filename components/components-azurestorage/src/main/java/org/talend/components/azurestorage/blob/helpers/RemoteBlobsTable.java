@@ -18,7 +18,6 @@ import java.util.List;
 
 import org.apache.commons.lang3.reflect.TypeLiteral;
 import org.talend.components.api.properties.ComponentPropertiesImpl;
-import org.talend.components.azurestorage.blob.runtime.AzureStorageContainerCreateRuntime;
 import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
 import org.talend.daikon.properties.ValidationResult;

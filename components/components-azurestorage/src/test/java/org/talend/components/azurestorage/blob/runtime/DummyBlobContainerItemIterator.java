@@ -15,6 +15,7 @@ package org.talend.components.azurestorage.blob.runtime;
 import java.util.Iterator;
 import java.util.List;
 
+import com.azure.core.http.rest.PagedIterable;
 import com.azure.storage.blob.models.BlobContainerItem;
 
 public class DummyBlobContainerItemIterator implements Iterator<BlobContainerItem> {
@@ -23,7 +24,7 @@ public class DummyBlobContainerItemIterator implements Iterator<BlobContainerIte
 
     public DummyBlobContainerItemIterator(List<BlobContainerItem> list) {
         super();
-        this.it = list.iterator();
+        this.it = list.stream().iterator();
     }
 
     @Override

@@ -28,6 +28,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import com.azure.storage.blob.models.BlobStorageException;
+import com.azure.storage.queue.models.QueueMessageItem;
+
 import org.apache.avro.Schema.Field;
 import org.apache.avro.generic.IndexedRecord;
 import org.junit.Before;
@@ -45,9 +48,6 @@ import org.talend.components.azurestorage.queue.AzureStorageQueueService;
 import org.talend.components.azurestorage.queue.tazurestoragequeueinput.TAzureStorageQueueInputProperties;
 import org.talend.components.azurestorage.queue.tazurestoragequeueinputloop.TAzureStorageQueueInputLoopProperties;
 import org.talend.daikon.properties.ValidationResult;
-
-import com.azure.storage.blob.models.BlobStorageException;
-import com.azure.storage.queue.models.QueueMessageItem;
 
 public class AzureStorageQueueInputLoopReaderTest extends AzureBaseTest {
 
@@ -72,7 +72,7 @@ public class AzureStorageQueueInputLoopReaderTest extends AzureBaseTest {
     @Test
     public void testStartAsStartable() {
         try {
-
+            properties.peekMessages.setValue(false);
             AzureStorageQueueSource source = new AzureStorageQueueSource();
             ValidationResult vr = source.initialize(getDummyRuntimeContiner(), properties);
             assertNotNull(vr);
@@ -108,7 +108,7 @@ public class AzureStorageQueueInputLoopReaderTest extends AzureBaseTest {
     @Test
     public void testAdvanceAsAdvancable() {
         try {
-
+            properties.peekMessages.setValue(false);
             AzureStorageQueueSource source = new AzureStorageQueueSource();
             ValidationResult vr = source.initialize(getDummyRuntimeContiner(), properties);
             assertNotNull(vr);
@@ -149,7 +149,7 @@ public class AzureStorageQueueInputLoopReaderTest extends AzureBaseTest {
     @Test
     public void testGetCurrent() {
         try {
-
+            properties.peekMessages.setValue(false);
             AzureStorageQueueSource source = new AzureStorageQueueSource();
             ValidationResult vr = source.initialize(getDummyRuntimeContiner(), properties);
             assertNotNull(vr);
@@ -159,9 +159,11 @@ public class AzureStorageQueueInputLoopReaderTest extends AzureBaseTest {
             reader.queueService = queueService; // inject mocked service
 
             final List<QueueMessageItem> messages = new ArrayList<>();
-            messages.add(new QueueMessageItem());
-            messages.add(new QueueMessageItem());
-            messages.add(new QueueMessageItem());
+            for (int idx = 1; idx < 4; idx++) {
+                final QueueMessageItem m = new QueueMessageItem();
+                m.setMessageText("message-" + idx);
+                messages.add(m);
+            }
             when(queueService.retrieveMessages(anyString(), anyInt())).thenReturn(new Iterable<QueueMessageItem>() {
 
                 @Override
@@ -192,7 +194,7 @@ public class AzureStorageQueueInputLoopReaderTest extends AzureBaseTest {
     @Test
     public void testGetReturnValues() {
         try {
-
+            properties.peekMessages.setValue(false);
             AzureStorageQueueSource source = new AzureStorageQueueSource();
             ValidationResult vr = source.initialize(getDummyRuntimeContiner(), properties);
             assertNotNull(vr);

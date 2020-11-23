@@ -13,8 +13,6 @@
 package org.talend.components.azurestorage.blob.runtime;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.security.InvalidKeyException;
 import java.util.ArrayList;
 import java.util.List;
 
