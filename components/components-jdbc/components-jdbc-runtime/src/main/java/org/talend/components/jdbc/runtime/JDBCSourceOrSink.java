@@ -33,7 +33,6 @@ import org.apache.avro.generic.IndexedRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.container.RuntimeContainer;
-import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.common.avro.JDBCResultSetIndexedRecordConverter;
 import org.talend.components.common.avro.JDBCTableMetadata;
@@ -62,7 +61,7 @@ import org.talend.daikon.properties.ValidationResult;
  */
 public class JDBCSourceOrSink extends JdbcRuntimeSourceOrSinkDefault {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(JDBCSourceOrSink.class);
+    private static final Logger LOG = LoggerFactory.getLogger(JDBCSourceOrSink.class);
 
     private static final long serialVersionUID = 1L;
 
@@ -212,11 +211,13 @@ public class JDBCSourceOrSink extends JdbcRuntimeSourceOrSinkDefault {
 
     public Connection connect(RuntimeContainer runtime) throws ClassNotFoundException, SQLException {
         AllSetting setting = properties.getRuntimeSetting();
+        LOG.debug("Connection attempt to '{}' with the username '{}'",setting.getJdbcUrl(),setting.getUsername());
 
         // connection component
         Connection conn = JdbcRuntimeUtils.createConnectionOrGetFromSharedConnectionPoolOrDataSource(runtime, setting,
                 work4dataprep);
-
+        LOG.debug("Connection to '{}' has succeeded.",setting.getJdbcUrl());
+        LOG.debug("Connection is set auto commit to '{}'.",setting.getAutocommit());
         if (setting.getUseAutoCommit()) {
             conn.setAutoCommit(setting.getAutocommit());
         }

@@ -141,6 +141,8 @@ abstract public class JDBCOutputWriter implements WriterWithFeedback<Result, Ind
 
     @Override
     public void open(String uId) throws IOException {
+        LOG.debug("JDBCOutputWriter start.");
+        LOG.debug("Parameters: ",setting.toString());
         componentSchema = CommonUtils.getMainSchemaFromInputConnector((ComponentProperties) properties);
         rejectSchema = CommonUtils.getRejectSchema((ComponentProperties) properties);
         columnList = JDBCSQLBuilder.getInstance().createColumnList(setting, componentSchema);
@@ -153,6 +155,7 @@ abstract public class JDBCOutputWriter implements WriterWithFeedback<Result, Ind
         try {
             conn = sink.getConnection(runtime);
             try (Statement statement = conn.createStatement()) {
+                LOG.debug("Executing the query: '{}'",setting.getSql());
                 deleteCount += statement.executeUpdate(sql);
             }
         } catch (ClassNotFoundException | SQLException e) {
@@ -200,11 +203,13 @@ abstract public class JDBCOutputWriter implements WriterWithFeedback<Result, Ind
                 commitCount = 0;
 
                 if (conn != null) {
+                    LOG.debug("Committing the transaction.");
                     conn.commit();
                 }
             }
 
             if (conn != null) {
+                LOG.debug("Closing connection");
                 conn.close();
                 conn = null;
             }
@@ -294,7 +299,7 @@ abstract public class JDBCOutputWriter implements WriterWithFeedback<Result, Ind
                 result += executeBatchAndGetCount(statement);
                 batchCount = 0;
             }
-
+            LOG.debug("Committing the transaction.");
             conn.commit();
         }
 
@@ -318,6 +323,7 @@ abstract public class JDBCOutputWriter implements WriterWithFeedback<Result, Ind
                 count = executeBatchAndGetCount(statement);
             }
         } else {
+            LOG.debug("Executing statement");
             count = statement.executeUpdate();
             
             result.totalCount++;
@@ -332,6 +338,7 @@ abstract public class JDBCOutputWriter implements WriterWithFeedback<Result, Ind
         int result = 0;
 
         try {
+            LOG.debug("Executing batch");
             int[] batchResult = statement.executeBatch();
             result += sum(batchResult);
         } catch (BatchUpdateException e) {
@@ -344,7 +351,7 @@ abstract public class JDBCOutputWriter implements WriterWithFeedback<Result, Ind
                 LOG.warn(e.getMessage());
             }
         }
-
+        LOG.debug("Executing statement");
         int count = statement.getUpdateCount();
 
         result = Math.max(result, count);

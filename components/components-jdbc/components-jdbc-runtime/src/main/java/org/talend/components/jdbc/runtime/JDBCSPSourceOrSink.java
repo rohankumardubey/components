@@ -12,15 +12,11 @@
 // ============================================================================
 package org.talend.components.jdbc.runtime;
 
-import java.sql.CallableStatement;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.List;
-
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.talend.components.api.container.RuntimeContainer;
-import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.jdbc.CommonUtils;
 import org.talend.components.jdbc.RuntimeSettingProvider;
@@ -34,11 +30,18 @@ import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.ValidationResult.Result;
 import org.talend.daikon.properties.ValidationResultMutable;
 
+import java.sql.CallableStatement;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.List;
+
 /**
  * JDBC SP runtime execution object
  *
  */
 public class JDBCSPSourceOrSink extends JdbcRuntimeSourceOrSinkDefault {
+
+    private static final Logger LOG = LoggerFactory.getLogger(JDBCSPSourceOrSink.class);
 
     private static final long serialVersionUID = 1L;
 
@@ -176,6 +179,7 @@ public class JDBCSPSourceOrSink extends JdbcRuntimeSourceOrSinkDefault {
     public Connection connect(RuntimeContainer runtime) throws ClassNotFoundException, SQLException {
         // using another component's connection
         if (useExistedConnection) {
+            LOG.debug("Uses an existing connection");
             return JdbcRuntimeUtils.fetchConnectionFromContextOrCreateNew(setting, runtime);
         } else {
             return JdbcRuntimeUtils.createConnectionOrGetFromSharedConnectionPoolOrDataSource(runtime, setting, false);
