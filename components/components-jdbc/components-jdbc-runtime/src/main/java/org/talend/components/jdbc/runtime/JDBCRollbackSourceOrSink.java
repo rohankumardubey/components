@@ -14,8 +14,6 @@ package org.talend.components.jdbc.runtime;
 
 import java.sql.SQLException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.jdbc.CommonUtils;
@@ -32,7 +30,6 @@ import org.talend.daikon.properties.ValidationResultMutable;
  *
  */
 public class JDBCRollbackSourceOrSink extends JdbcRuntimeSourceOrSinkDefault {
-    private static final Logger LOG = LoggerFactory.getLogger(JDBCRollbackSourceOrSink.class);
 
     private static final long serialVersionUID = 1L;
 
@@ -62,11 +59,9 @@ public class JDBCRollbackSourceOrSink extends JdbcRuntimeSourceOrSinkDefault {
             java.sql.Connection conn = (java.sql.Connection) runtime.getComponentData(ComponentConstants.CONNECTION_KEY,
                     refComponentId);
             if (conn != null && !conn.isClosed()) {
-                LOG.debug("Eollback the transaction.");
                 conn.rollback();
 
                 if (setting.getCloseConnection()) {
-                    LOG.debug("Closing connection");
                     conn.close();
                 }
             }

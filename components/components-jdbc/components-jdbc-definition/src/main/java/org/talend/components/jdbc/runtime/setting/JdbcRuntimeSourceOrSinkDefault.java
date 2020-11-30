@@ -16,7 +16,6 @@ public abstract class JdbcRuntimeSourceOrSinkDefault implements JdbcRuntimeSourc
 
     private Connection conn;
 
-    @Override
     public void setDBTypeMapping(Dbms mapping) {
         
     }

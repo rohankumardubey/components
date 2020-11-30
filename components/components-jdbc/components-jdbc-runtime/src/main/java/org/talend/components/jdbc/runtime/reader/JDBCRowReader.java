@@ -25,8 +25,6 @@ import java.util.NoSuchElementException;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.IndexedRecord;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.AbstractBoundedReader;
 import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.container.RuntimeContainer;
@@ -44,7 +42,6 @@ import org.talend.components.jdbc.runtime.setting.AllSetting;
  *
  */
 public class JDBCRowReader extends AbstractBoundedReader<IndexedRecord> {
-    private static final Logger LOG = LoggerFactory.getLogger(JDBCRowReader.class);
 
     protected RuntimeSettingProvider properties;
 
@@ -92,8 +89,6 @@ public class JDBCRowReader extends AbstractBoundedReader<IndexedRecord> {
 
     @Override
     public boolean start() throws IOException {
-        LOG.debug("JDBCRowReader start.");
-        LOG.debug("Parameters: ",setting.toString());
         if (container != null) {
             container.setComponentData(container.getCurrentComponentId(),
                     CommonUtils.getStudioNameFromProperty(ComponentConstants.RETURN_QUERY), setting.getSql());
@@ -123,7 +118,6 @@ public class JDBCRowReader extends AbstractBoundedReader<IndexedRecord> {
             boolean propagateQueryResultSet = setting.getPropagateQueryResultSet();
 
             if (usePreparedStatement) {
-                LOG.debug("Prepared statement: "+setting.getSql());
                 prepared_statement = conn.prepareStatement(sql);
 
                 JdbcRuntimeUtils.setPreparedStatement(prepared_statement, setting.getIndexs(), setting.getTypes(),
@@ -137,7 +131,6 @@ public class JDBCRowReader extends AbstractBoundedReader<IndexedRecord> {
             } else {
                 statement = conn.createStatement();
 
-                LOG.debug("Executing the query: '{}'",setting.getSql());
                 if (propagateQueryResultSet) {
                     resultSet = statement.executeQuery(sql);
                 } else {
@@ -148,7 +141,6 @@ public class JDBCRowReader extends AbstractBoundedReader<IndexedRecord> {
             IndexedRecord output = handleSuccess(propagateQueryResultSet);
 
             if (useCommit) {
-                LOG.debug("Committing the transaction.");
                 conn.commit();
             }
 
@@ -220,10 +212,8 @@ public class JDBCRowReader extends AbstractBoundedReader<IndexedRecord> {
             if (!useExistedConnection && conn != null) {
                 // need to call the commit before close for some database when do some read action like reading the resultset
                 if (useCommit) {
-                    LOG.debug("Committing the transaction.");
                     conn.commit();
                 }
-                LOG.debug("Closing connection");
                 conn.close();
                 conn = null;
             }

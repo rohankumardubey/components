@@ -15,8 +15,6 @@ package org.talend.components.jdbc.runtime.reader;
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
 import org.apache.avro.generic.IndexedRecord;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.AbstractBoundedReader;
 import org.talend.components.api.component.runtime.Reader;
 import org.talend.components.api.component.runtime.Result;
@@ -50,8 +48,6 @@ import static org.talend.components.jdbc.ComponentConstants.ENABLE_SPECIAL_TABLE
  * common JDBC reader
  */
 public class JDBCInputReader extends AbstractBoundedReader<IndexedRecord> {
-
-    private static final Logger LOG = LoggerFactory.getLogger(JDBCInputReader.class);
 
     protected RuntimeSettingProvider properties;
 
@@ -162,7 +158,6 @@ public class JDBCInputReader extends AbstractBoundedReader<IndexedRecord> {
 
             setting.setTrimMap(trimMap);
         }
-        LOG.debug("QuerySchema: "+ querySchema.toString());
 
         return querySchema;
     }
@@ -189,9 +184,7 @@ public class JDBCInputReader extends AbstractBoundedReader<IndexedRecord> {
     }
 
     @Override
-    public boolean start() {
-        LOG.debug("JDBCInputReader start.");
-        LOG.debug("Parameters: ",setting.toString());
+    public boolean start() throws IOException {
         if (container != null) {
             container.setComponentData(container.getCurrentComponentId(),
                     CommonUtils.getStudioNameFromProperty(ComponentConstants.RETURN_QUERY), setting.getSql());
@@ -205,13 +198,11 @@ public class JDBCInputReader extends AbstractBoundedReader<IndexedRecord> {
             String driverClass = setting.getDriverClass();
             if (driverClass != null && driverClass.toLowerCase().contains("mysql")) {
                 if (usePreparedStatement) {
-                    LOG.debug("Prepared statement: "+setting.getSql());
                     PreparedStatement prepared_statement = conn.prepareStatement(setting.getSql(), ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
                     JdbcRuntimeUtils.setPreparedStatement(prepared_statement, setting.getIndexs(), setting.getTypes(),
                             setting.getValues());
                     statement = prepared_statement;
                 }else{
-                    LOG.debug("Create statement.");
                     statement = conn.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
                 }
                 Class clazz = statement.getClass();
@@ -226,7 +217,6 @@ public class JDBCInputReader extends AbstractBoundedReader<IndexedRecord> {
                 }
             } else {
                 if (usePreparedStatement) {
-                    LOG.debug("Prepared statement: "+setting.getSql());
                 	PreparedStatement prepared_statement = conn.prepareStatement(setting.getSql());
                     JdbcRuntimeUtils.setPreparedStatement(prepared_statement, setting.getIndexs(), setting.getTypes(),
                             setting.getValues());
@@ -239,13 +229,11 @@ public class JDBCInputReader extends AbstractBoundedReader<IndexedRecord> {
 
 
             if (setting.getUseCursor()) {
-                LOG.debug("Fetch size: " +setting.getCursor());
                 statement.setFetchSize(setting.getCursor());
             }
             if (usePreparedStatement) {
             	resultSet = ((PreparedStatement)statement).executeQuery();
             }else {
-                LOG.debug("Executing the query: '{}'",setting.getSql());
             	resultSet = statement.executeQuery(setting.getSql());
             }
             	
@@ -264,7 +252,6 @@ public class JDBCInputReader extends AbstractBoundedReader<IndexedRecord> {
 
         if (haveNext) {
             result.totalCount++;
-            LOG.debug("Retrieving the record: " + result.totalCount);
             currentRecord = getConverter(resultSet).convertToAvro(resultSet);
         }
 
@@ -303,7 +290,6 @@ public class JDBCInputReader extends AbstractBoundedReader<IndexedRecord> {
             }
 
             if (!useExistedConnection && conn != null) {
-                LOG.debug("Closing connection");
                 conn.close();
                 conn = null;
             }

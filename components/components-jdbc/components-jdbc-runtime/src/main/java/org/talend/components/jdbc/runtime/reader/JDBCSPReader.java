@@ -20,8 +20,6 @@ import java.util.Map;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.AbstractBoundedReader;
 import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.container.RuntimeContainer;
@@ -37,7 +35,6 @@ import org.talend.components.jdbc.runtime.setting.AllSetting;
  *
  */
 public class JDBCSPReader extends AbstractBoundedReader<IndexedRecord> {
-    private static final Logger LOG = LoggerFactory.getLogger(JDBCSPReader.class);
 
     protected RuntimeSettingProvider properties;
 
@@ -67,8 +64,6 @@ public class JDBCSPReader extends AbstractBoundedReader<IndexedRecord> {
 
     @Override
     public boolean start() throws IOException {
-        LOG.debug("JDBCSPReader start.");
-        LOG.debug("Parameters: ",setting.toString());
         result = new Result();
 
         try {
