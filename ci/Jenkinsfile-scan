@@ -73,7 +73,8 @@ spec:
                     withCredentials([veracodeCredentials]) {
                         sh "mvn -U -B clean install -pl core -Dmaven.test.skip=true"
                         sh "mvn -U -B clean install -f components/components-jdbc/pom.xml -pl components-jdbc-runtime-beam"
-                        sh "mvn -U -B clean package -f components/pom.xml"
+                        sh "mvn -U -B clean test-compile -f components/pom.xml"
+                        sh "mvn package -f components/pom.xml -Dmaven.test.skip=true"
                         veracode applicationName: "$VERACODE_APP_NAME",
                             canFailJob: true,
                             createProfile: false,
