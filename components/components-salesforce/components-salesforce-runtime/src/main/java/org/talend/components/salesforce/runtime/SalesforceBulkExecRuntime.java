@@ -37,7 +37,7 @@ public class SalesforceBulkExecRuntime extends SalesforceSourceOrSink
 
     private int rejectCount;
 
-    private transient static final Logger LOG = getLogger(SalesforceBulkExecRuntime.class);
+    private transient final Logger LOG = getLogger(SalesforceBulkExecRuntime.class);
 
     @Override
     public ValidationResult initialize(RuntimeContainer container, ComponentProperties properties) {

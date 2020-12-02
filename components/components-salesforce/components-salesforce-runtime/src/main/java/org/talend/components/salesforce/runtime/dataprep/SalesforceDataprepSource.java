@@ -58,7 +58,7 @@ public class SalesforceDataprepSource
 
     private static final long serialVersionUID = 1930140572051028338L;
 
-    private static final Logger LOG = LoggerFactory.getLogger(SalesforceDataprepSource.class);
+    private final Logger LOG = LoggerFactory.getLogger(SalesforceDataprepSource.class);
 
     private static final String CONFIG_FILE_lOCATION_KEY = "org.talend.component.salesforce.config.file";
 
