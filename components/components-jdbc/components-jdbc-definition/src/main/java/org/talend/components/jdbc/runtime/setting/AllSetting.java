@@ -12,16 +12,16 @@
 // ============================================================================
 package org.talend.components.jdbc.runtime.setting;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.avro.Schema;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.common.avro.JDBCAvroRegistryInfluencer;
 import org.talend.components.jdbc.module.DBTypes;
 import org.talend.components.jdbc.tjdbcoutput.TJDBCOutputProperties.DataAction;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * All the runtime setting for JDBC components
@@ -600,4 +600,61 @@ public class AllSetting implements Serializable, JDBCAvroRegistryInfluencer {
         this.enableFieldOptions = enableFieldOptions;
     }
 
+    @Override
+    public String toString() {
+        return "AllSetting{" +
+                "jdbcUrl='" + jdbcUrl + '\'' +
+                ", driverPaths=" + driverPaths +
+                ", driverClass='" + driverClass + '\'' +
+                ", username='" + username + '\'' +
+                ", tablename='" + tablename + '\'' +
+                ", sql='" + sql + '\'' +
+                ", useCursor=" + useCursor +
+                ", cursor=" + cursor +
+                ", trimStringOrCharColumns=" + trimStringOrCharColumns +
+                ", useAutoCommit=" + useAutoCommit +
+                ", autocommit=" + autocommit +
+                ", dataAction=" + dataAction +
+                ", clearDataInTable=" + clearDataInTable +
+                ", dieOnError=" + dieOnError +
+                ", commitEvery=" + commitEvery +
+                ", debug=" + debug +
+                ", useBatch=" + useBatch +
+                ", batchSize=" + batchSize +
+                ", closeConnection=" + closeConnection +
+                ", propagateQueryResultSet=" + propagateQueryResultSet +
+                ", useColumn='" + useColumn + '\'' +
+                ", usePreparedStatement=" + usePreparedStatement +
+                ", indexs=" + indexs +
+                ", types=" + types +
+                ", values=" + values +
+                ", referencedComponentId='" + referencedComponentId + '\'' +
+                ", readOnly=" + readOnly +
+                ", schema=" + schema +
+                ", spName='" + spName + '\'' +
+                ", isFunction=" + isFunction +
+                ", returnResultIn='" + returnResultIn + '\'' +
+                ", schemaColumns4SPParameters=" + schemaColumns4SPParameters +
+                ", parameterTypes=" + parameterTypes +
+                ", shareConnection=" + shareConnection +
+                ", sharedConnectionName='" + sharedConnectionName + '\'' +
+                ", useDataSource=" + useDataSource +
+                ", dataSource='" + dataSource + '\'' +
+                ", enableDBMapping=" + enableDBMapping +
+                ", dbMapping=" + dbMapping +
+                ", trimMap=" + trimMap +
+                ", trims=" + trims +
+                ", trimColumns=" + trimColumns +
+                ", newDBColumnNames4AdditionalParameters=" + newDBColumnNames4AdditionalParameters +
+                ", sqlExpressions4AdditionalParameters=" + sqlExpressions4AdditionalParameters +
+                ", positions4AdditionalParameters=" + positions4AdditionalParameters +
+                ", referenceColumns4AdditionalParameters=" + referenceColumns4AdditionalParameters +
+                ", enableFieldOptions=" + enableFieldOptions +
+                ", schemaColumns4FieldOption=" + schemaColumns4FieldOption +
+                ", updateKey4FieldOption=" + updateKey4FieldOption +
+                ", deletionKey4FieldOption=" + deletionKey4FieldOption +
+                ", updatable4FieldOption=" + updatable4FieldOption +
+                ", insertable4FieldOption=" + insertable4FieldOption +
+                '}';
+    }
 }

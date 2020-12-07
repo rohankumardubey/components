@@ -15,6 +15,8 @@ package org.talend.components.jdbc.runtime.reader;
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
 import org.apache.avro.generic.IndexedRecord;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.talend.components.api.component.runtime.AbstractBoundedReader;
 import org.talend.components.api.component.runtime.Reader;
 import org.talend.components.api.component.runtime.Result;
@@ -25,7 +27,6 @@ import org.talend.components.jdbc.ComponentConstants;
 import org.talend.components.jdbc.JdbcComponentErrorsCode;
 import org.talend.components.jdbc.RuntimeSettingProvider;
 import org.talend.components.jdbc.runtime.JDBCSource;
-import org.talend.components.jdbc.runtime.JdbcRuntimeUtils;
 import org.talend.components.jdbc.runtime.setting.AllSetting;
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.converter.IndexedRecordConverter;
@@ -45,6 +46,8 @@ import java.util.NoSuchElementException;
  * common JDBC reader
  */
 public class JDBCInputReader extends AbstractBoundedReader<IndexedRecord> {
+
+    private static final Logger LOG = LoggerFactory.getLogger(JDBCInputReader.class);
 
     protected RuntimeSettingProvider properties;
 
@@ -148,6 +151,7 @@ public class JDBCInputReader extends AbstractBoundedReader<IndexedRecord> {
 
             setting.setTrimMap(trimMap);
         }
+        LOG.debug("QuerySchema: "+ querySchema.toString());
 
         return querySchema;
     }
@@ -174,7 +178,8 @@ public class JDBCInputReader extends AbstractBoundedReader<IndexedRecord> {
     }
 
     @Override
-    public boolean start() throws IOException {
+    public boolean start() {
+        LOG.debug("JDBCInputReader start.");
         if (container != null) {
             container.setComponentData(container.getCurrentComponentId(),
                     CommonUtils.getStudioNameFromProperty(ComponentConstants.RETURN_QUERY), setting.getSql());
@@ -187,6 +192,7 @@ public class JDBCInputReader extends AbstractBoundedReader<IndexedRecord> {
             String driverClass = setting.getDriverClass();
             if (driverClass != null && driverClass.toLowerCase().contains("mysql")) {
                 statement = conn.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+                LOG.debug("Create statement.");
 
                 Class clazz = statement.getClass();
                 try {
@@ -203,8 +209,10 @@ public class JDBCInputReader extends AbstractBoundedReader<IndexedRecord> {
             }
 
             if (setting.getUseCursor()) {
+                LOG.debug("Fetch size: " +setting.getCursor());
                 statement.setFetchSize(setting.getCursor());
             }
+            LOG.debug("Executing the query: '{}'",setting.getSql());
 
             resultSet = statement.executeQuery(setting.getSql());
 
@@ -221,6 +229,7 @@ public class JDBCInputReader extends AbstractBoundedReader<IndexedRecord> {
 
         if (haveNext) {
             result.totalCount++;
+            LOG.debug("Retrieving the record: " + result.totalCount);
             currentRecord = getConverter(resultSet).convertToAvro(resultSet);
         }
 
@@ -259,6 +268,7 @@ public class JDBCInputReader extends AbstractBoundedReader<IndexedRecord> {
             }
 
             if (!useExistedConnection && conn != null) {
+                LOG.debug("Closing connection");
                 conn.close();
                 conn = null;
             }

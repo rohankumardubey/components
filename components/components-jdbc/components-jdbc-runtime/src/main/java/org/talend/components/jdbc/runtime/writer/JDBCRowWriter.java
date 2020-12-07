@@ -12,16 +12,6 @@
 // ============================================================================
 package org.talend.components.jdbc.runtime.writer;
 
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.IndexedRecord;
@@ -39,6 +29,16 @@ import org.talend.components.jdbc.runtime.JDBCRowSink;
 import org.talend.components.jdbc.runtime.JdbcRuntimeUtils;
 import org.talend.components.jdbc.runtime.setting.AllSetting;
 import org.talend.daikon.avro.converter.IndexedRecordConverter;
+
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * the JDBC writer for JDBC row
@@ -136,6 +136,7 @@ public class JDBCRowWriter implements WriterWithFeedback<Result, IndexedRecord, 
             sql = setting.getSql();
 
             if (usePreparedStatement) {
+                LOG.debug("Prepared statement: "+setting.getSql());
                 prepared_statement = conn.prepareStatement(sql);
             } else {
                 statement = conn.createStatement();
@@ -154,9 +155,10 @@ public class JDBCRowWriter implements WriterWithFeedback<Result, IndexedRecord, 
 
         //TODO low performance, but need to reset it by row level
         setting = sink.properties.getRuntimeSetting();
-        
+        LOG.debug("Adding the record {} to the INSERT batch.",result.totalCount);
         try {
             if (usePreparedStatement) {
+                LOG.debug("Prepared statement: "+setting.getSql());
                 JdbcRuntimeUtils.setPreparedStatement(prepared_statement, setting.getIndexs(), setting.getTypes(),
                         setting.getValues());
 
@@ -166,6 +168,7 @@ public class JDBCRowWriter implements WriterWithFeedback<Result, IndexedRecord, 
                     prepared_statement.execute();
                 }
             } else {
+                LOG.debug("Executing the query: '{}'",setting.getSql());
                 //Need to get updated sql query in case of dynamic(row) values usage
                 if (propagateQueryResultSet) {
                     resultSet = statement.executeQuery(setting.getSql());
@@ -224,6 +227,7 @@ public class JDBCRowWriter implements WriterWithFeedback<Result, IndexedRecord, 
                 commitCount = 0;
 
                 if (conn != null) {
+                    LOG.debug("Committing the transaction.");
                     conn.commit();
                 }
             }
@@ -231,9 +235,10 @@ public class JDBCRowWriter implements WriterWithFeedback<Result, IndexedRecord, 
             if (conn != null) {
                 // need to call the commit before close for some database when do some read action like reading the resultset
                 if (useCommit) {
+                    LOG.debug("Committing the transaction.");
                     conn.commit();
                 }
-
+                LOG.debug("Closing connection");
                 conn.close();
                 conn = null;
             }
@@ -328,6 +333,7 @@ public class JDBCRowWriter implements WriterWithFeedback<Result, IndexedRecord, 
                 commitCount++;
             } else {
                 commitCount = 0;
+                LOG.debug("Committing the transaction.");
                 conn.commit();
             }
         }

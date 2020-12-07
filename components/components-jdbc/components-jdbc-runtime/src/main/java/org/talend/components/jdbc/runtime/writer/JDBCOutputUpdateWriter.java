@@ -12,11 +12,6 @@
 // ============================================================================
 package org.talend.components.jdbc.runtime.writer;
 
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
 import org.slf4j.Logger;
@@ -27,6 +22,11 @@ import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.jdbc.CommonUtils;
 import org.talend.components.jdbc.runtime.setting.JDBCSQLBuilder;
 import org.talend.components.jdbc.runtime.type.RowWriter;
+
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class JDBCOutputUpdateWriter extends JDBCOutputWriter {
 
@@ -93,6 +93,9 @@ public class JDBCOutputUpdateWriter extends JDBCOutputWriter {
             String sql_fact = rowWriter.write(input);
             if (sql_fact != null) {
                 runtime.setComponentData(runtime.getCurrentComponentId(), QUERY_KEY, sql_fact);
+            }
+            if(setting.getDebug()) {
+                LOG.debug("'"+sql_fact.trim()+"'.");
             }
         } catch (SQLException e) {
             throw CommonUtils.newComponentException(e);
