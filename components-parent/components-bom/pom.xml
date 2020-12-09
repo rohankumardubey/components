@@ -5,11 +5,11 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.talend.components</groupId>
     <artifactId>components-bom</artifactId>
-    <version>0.27.5-SNAPSHOT</version>
+    <version>0.27.3</version>
     <packaging>pom</packaging>
     <name>Component BOM</name>
     <properties>
-        <components.version>0.27.5-SNAPSHOT</components.version>
+        <components.version>0.27.3</components.version>
         <daikon.version>0.31.7</daikon.version>
         <!-- repositories -->
         <talend_snapshots_deployment>https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceSnapshot/</talend_snapshots_deployment>
@@ -49,7 +49,7 @@
         <commons-cli.version>1.2</commons-cli.version>
         <commons-codec.version>1.10</commons-codec.version>
         <commons-collections.version>3.2.2</commons-collections.version>
-        <commons-compress.version>1.19</commons-compress.version>
+        <commons-compress.version>1.8.1</commons-compress.version>
         <commons-configuration.version>1.8</commons-configuration.version>
         <commons-csv.version>1.4</commons-csv.version>
         <commons-daemon.version>1.0.13</commons-daemon.version>
@@ -172,7 +172,7 @@
         <org.osgi.version>5.0.0</org.osgi.version>
         <oro.version>2.0.8</oro.version>
         <paranamer.version>2.7</paranamer.version>
-        <pax-url-aether.version>2.6.2</pax-url-aether.version>
+        <pax-url-aether.version>2.4.7</pax-url-aether.version>
         <powermock-api-mockito.version>2.0.0</powermock-api-mockito.version>
         <powermock-module-junit4.version>${powermock-api-mockito.version}</powermock-module-junit4.version>
         <protobuf-java.version>3.3.0</protobuf-java.version>
