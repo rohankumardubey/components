@@ -46,7 +46,9 @@ Consider the following requirements for your system:
 
 1) Create a folder named "patches" under your studio installer directory and copy the patch .zip file to this folder.
 
-2) Restart your studio: a window pops up, then click OK to install the patch, or restart the commandline and the patch will be installed automatically.
+2) Merge the folder "configuration" and its content to {studio}/configuration and overwrite the existing files.
+
+3) Restart your studio: a window pops up, then click OK to install the patch, or restart the commandline and the patch will be installed automatically.
 
 ### Installing the patch using Commandline
 
