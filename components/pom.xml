@@ -16,6 +16,7 @@
 
     <modules>
         <module>components-azurestorage</module>
+        <module>components-azure-dls-gen2-blob</module>
         <module>components-couchbase</module>
         <module>components-jdbc</module>
         <module>components-splunk</module>
