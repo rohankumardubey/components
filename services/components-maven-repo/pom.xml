@@ -78,6 +78,17 @@
             <groupId>org.talend.components</groupId>
             <artifactId>simplefileio-runtime</artifactId>
             <version>${components.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>io.netty</groupId>
+                    <artifactId>netty-all</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.talend.components</groupId>
+            <artifactId>components-azure-dls-gen2-blob</artifactId>
+            <version>${components.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.derby</groupId>
@@ -179,6 +190,7 @@
                                 <extraArtifact>org.talend.components:s3-runtime-di:${components.version}:jar</extraArtifact>
                                 <extraArtifact>org.talend.components:components-jdbc-runtime:${components.version}:jar</extraArtifact>
                                 <extraArtifact>org.talend.components:components-jdbc-runtime-beam:${components.version}:jar</extraArtifact>
+                                <extraArtifact>org.talend.components:components-azure-dls-gen2-blob:${components.version}:jar</extraArtifact>
                                 <!-- JDBC drivers -->
                                 <extraArtifact>org.apache.derby:derbyclient:${derby.driver.version}:jar</extraArtifact>
                                 <extraArtifact>org.mariadb.jdbc:mariadb-java-client:${mariadb.driver.version}:jar</extraArtifact>
@@ -276,6 +288,11 @@
                                 <artifact>
                                     <groupId>org.talend.components</groupId>
                                     <artifactId>components-salesforce-definition</artifactId>
+                                    <version>${components.version}</version>
+                                </artifact>
+                                <artifact>
+                                    <groupId>org.talend.components</groupId>
+                                    <artifactId>components-azure-dls-gen2-blob</artifactId>
                                     <version>${components.version}</version>
                                 </artifact>
                             </artifacts>

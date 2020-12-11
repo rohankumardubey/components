@@ -30,6 +30,8 @@
         <aws-java-sdk-s3.version>${aws.version}</aws-java-sdk-s3.version>
         <aws-java-sdk-sts.version>${aws.version}</aws-java-sdk-sts.version>
         <aws.version>1.11.848</aws.version>
+        <azure-storage-blob.version>12.9.0</azure-storage-blob.version>
+        <azure-identity.version>1.2.0</azure-identity.version>
         <azure-keyvault-core.version>0.9.7</azure-keyvault-core.version>
         <azure-storage.version>8.6.0</azure-storage.version>
         <msla4j.version>1.4.0</msla4j.version>
@@ -150,19 +152,19 @@
         <logback-classic.version>1.1.9</logback-classic.version>
         <marketo-soap-sdk.version>3.1</marketo-soap-sdk.version>
         <mockito-core.version>2.24.0</mockito-core.version>
-        <netty-all.version>4.1.17.Final</netty-all.version>
-        <netty-buffer.version>4.1.17.Final</netty-buffer.version>
-        <netty-codec-http.version>4.1.17.Final</netty-codec-http.version>
-        <netty-codec-http2.version>4.1.17.Final</netty-codec-http2.version>
-        <netty-codec-socks.version>4.1.17.Final</netty-codec-socks.version>
-        <netty-codec.version>4.1.17.Final</netty-codec.version>
-        <netty-common.version>4.1.17.Final</netty-common.version>
-        <netty-handler-proxy.version>4.1.17.Final</netty-handler-proxy.version>
-        <netty-handler.version>4.1.17.Final</netty-handler.version>
-        <netty-resolver.version>4.1.17.Final</netty-resolver.version>
+        <netty-all.version>4.1.54.Final</netty-all.version>
+        <netty-buffer.version>4.1.54.Final</netty-buffer.version>
+        <netty-codec-http.version>4.1.54.Final</netty-codec-http.version>
+        <netty-codec-http2.version>4.1.54.Final</netty-codec-http2.version>
+        <netty-codec-socks.version>4.1.54.Final</netty-codec-socks.version>
+        <netty-codec.version>4.1.54.Final</netty-codec.version>
+        <netty-common.version>4.1.54.Final</netty-common.version>
+        <netty-handler-proxy.version>4.1.54.Final</netty-handler-proxy.version>
+        <netty-handler.version>4.1.54.Final</netty-handler.version>
+        <netty-resolver.version>4.1.54.Final</netty-resolver.version>
         <netty-tcnative-boringssl-static.version>1.1.33.Fork26</netty-tcnative-boringssl-static.version>
-        <netty-transport-native-epoll.version>4.0.27.Final</netty-transport-native-epoll.version>
-        <netty-transport.version>4.1.17.Final</netty-transport.version>
+        <netty-transport-native-epoll.version>4.0.54.Final</netty-transport-native-epoll.version>
+        <netty-transport.version>4.1.54.Final</netty-transport.version>
         <netty.version>3.10.6.Final</netty.version>
         <okio.version>1.14.0</okio.version>
         <org.codehaus.janino.commons-compiler.version>${org.codehaus.janino.version}</org.codehaus.janino.commons-compiler.version>
@@ -428,6 +430,16 @@
                 <groupId>com.microsoft.azure</groupId>
                 <artifactId>msal4j</artifactId>
                 <version>${msla4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.azure</groupId>
+                <artifactId>azure-storage-blob</artifactId>
+                <version>${azure-storage-blob.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.azure</groupId>
+                <artifactId>azure-identity</artifactId>
+                <version>${azure-identity.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.squareup</groupId>
