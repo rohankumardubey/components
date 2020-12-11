@@ -320,7 +320,7 @@
               </instructions>
             </configuration>
           </execution>
-          <!--<execution>
+          <execution>
             <id>osgi-bundle</id>
             <phase>package</phase>
             <goals>
@@ -335,42 +335,12 @@
                 <Bundle-SymbolicName>org.talend.components.azure-dls-gen2-blob</Bundle-SymbolicName>
                 <Service-Component>*</Service-Component>
                 <Embed-Dependency>*;artifactId=!components*|commons-lang3*|jackson-core*|slf4j-*;scope=compile|runtime;inline=false;</Embed-Dependency>
-                <Include-Resource>
-                  {maven-resources},META-INF/services/=target/classes/META-INF/services/,META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt=target/classes/META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt
-                </Include-Resource>
+                <Include-Resource>{maven-resources},META-INF/services/=target/classes/META-INF/services/,META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt=target/classes/META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt</Include-Resource>
                 <Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
-                <Import-Package>
-                  !*internal,
-                  !com.google.crypto.tink*,
-                  !com.google.protobuf*,
-                  !com.ibm.uvm.tools.*,
-                  !com.ning.*,
-                  !com.oracle.*,
-                  !com.sun.*,
-                  !javax.*,
-                  !kotlin.*,
-                  !lombok.*,
-                  !lzma.*,
-                  !net.jpountz.*,
-                  !net.shibboleth.utilities.java.support.xml*,
-                  !org.apache.logging.*,
-                  !org.bouncycastle.*,
-                  !org.conscrypt.*,
-                  !org.cryptomator.siv.*,
-                  !org.eclipse.jetty.*,!io.*,
-                  !org.jboss.*,
-                  !org.jetbrain.*,
-                  !org.linguafranca.*,
-                  !org.opensaml.*,
-                  !org.w3c.*,
-                  !reactor.*,
-                  !sun.*,
-                  *
-                </Import-Package>
-                <Embed-Transitive>true</Embed-Transitive>
+                <Embed-Transitive>false</Embed-Transitive>
               </instructions>
             </configuration>
-          </execution>-->
+          </execution>
         </executions>
       </plugin>
     </plugins>
