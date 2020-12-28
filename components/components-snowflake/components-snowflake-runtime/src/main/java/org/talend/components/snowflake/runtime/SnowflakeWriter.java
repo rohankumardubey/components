@@ -15,6 +15,7 @@ package org.talend.components.snowflake.runtime;
 import static org.talend.components.snowflake.tsnowflakeoutput.TSnowflakeOutputProperties.OutputAction.UPSERT;
 
 import java.io.IOException;
+import java.net.URL;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -287,7 +288,7 @@ public class SnowflakeWriter implements WriterWithFeedback<Result, IndexedRecord
      * @return TableActionConfig
      */
     private TableActionConfig createTableActionConfig() {
-        TableActionConfig conf = new SnowflakeTableActionConfig(sprops.convertColumnsAndTableToUppercase.getValue());
+        TableActionConfig conf = new SnowflakeTableActionConfig(getMappingFilesDir(), sprops.convertColumnsAndTableToUppercase.getValue());
         if (sprops.useDateMapping.getValue() && sprops.isDesignSchemaDynamic()) {
             // will map java.util.Date to fake DI_DATE SQL type
             conf.CONVERT_JAVATYPE_TO_SQLTYPE.put("java.util.Date", SnowflakeTableActionConfig.DI_DATE);
@@ -296,6 +297,10 @@ public class SnowflakeWriter implements WriterWithFeedback<Result, IndexedRecord
             conf.CUSTOMIZE_SQLTYPE_TYPENAME.put(SnowflakeTableActionConfig.DI_DATE, outputDateType);
         } // else use mapping to SQL type - to Date type as before
         return conf;
+    }
+    
+    private URL getMappingFilesDir() {
+        return (URL) container.getComponentData(container.getCurrentComponentId(), "MAPPINGS_URL");
     }
 
     private Schema getSchemaForTableAction(Object datum) {

@@ -14,6 +14,7 @@ package org.talend.components.common.tableaction;
 
 import org.apache.avro.LogicalType;
 import org.apache.avro.Schema;
+import org.talend.components.common.config.jdbc.Dbms;
 import org.talend.components.common.config.jdbc.DbmsType;
 
 import java.util.HashMap;
@@ -74,5 +75,18 @@ public class TableActionConfig {
     public Map<Integer, String> CUSTOMIZE_SQLTYPE_TYPENAME = new HashMap<>();
 
     public Map<String, DbmsType> DB_TYPES = new HashMap<>();
+
+    /**
+     * Returns type mapping between Talend types and specific DBMS types
+     * This default implementation returns null.
+     * Method is designed for override in subclasses.
+     * Subclasses may require URL/path to external mapping file location.
+     * In this case it should be provided as an argument to subclass constructor
+     *
+     * @return type mapping
+     */
+    protected Dbms getMapping() {
+        return null;
+    }
 
 }

@@ -14,10 +14,15 @@ package org.talend.components.snowflake.runtime.tableaction;
 
 import org.apache.avro.LogicalTypes;
 import org.apache.avro.Schema;
+import org.talend.components.common.config.jdbc.Dbms;
+import org.talend.components.common.config.jdbc.MappingFileLoader;
 import org.talend.components.common.tableaction.TableActionConfig;
 import org.talend.components.snowflake.SnowflakeTypes;
 
+import java.io.File;
+import java.net.URL;
 import java.sql.Types;
+import java.util.List;
 
 public class SnowflakeTableActionConfig extends TableActionConfig {
 
@@ -30,7 +35,14 @@ public class SnowflakeTableActionConfig extends TableActionConfig {
      */
     public static final int DI_DATE = 91404;
 
-    public SnowflakeTableActionConfig(boolean isUpperCase){
+    private final static String MAPPING_FILE = "mapping_snowflake.xml";
+
+    /**
+     * URL of mapping directory, which contains type mapping files (e.g. mapping_Snowflake.xml)
+     */
+    private final URL mappingFilesDir;
+
+    public SnowflakeTableActionConfig(URL mappingFilesDir, boolean isUpperCase){
         this.SQL_UPPERCASE_IDENTIFIER = isUpperCase;
         this.SQL_ESCAPE_ENABLED = true;
         this.SQL_DROP_TABLE_SUFFIX = " CASCADE";
@@ -45,6 +57,27 @@ public class SnowflakeTableActionConfig extends TableActionConfig {
         this.CONVERT_SQLTYPE_TO_ANOTHER_SQLTYPE.put(Types.BLOB, Types.BINARY);
 
         this.DB_TYPES = SnowflakeTypes.all();
+        this.mappingFilesDir = mappingFilesDir;
+    }
+
+    /**
+     * Loads and parses external mapping file.
+     * Returns {@link Dbms} instance if mapping file was found and parsed successfully. Otherwise, null
+     *
+     * @return mapping file representation
+     */
+    protected Dbms getMapping() {
+        File mappingFileFullPath = new File(mappingFilesDir.getFile(), MAPPING_FILE);
+        if (!mappingFileFullPath.exists()) {
+            System.out.println("mapping file wasn't found"); // TODO replace with logging
+            return null;
+        }
+        MappingFileLoader fileLoader = new MappingFileLoader();
+        List<Dbms> dbmsList = fileLoader.load(mappingFileFullPath);
+        if (dbmsList == null) {
+            return null;
+        }
+        return dbmsList.get(0);
     }
 
 }
