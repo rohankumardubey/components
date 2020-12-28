@@ -5,7 +5,7 @@ product:
 - https://talend.poolparty.biz/coretaxonomy/23
 ---
 
-# TPS-4380
+# TPS-4586
 
 | Info             | Value |
 | ---------------- | ---------------- |
@@ -39,7 +39,7 @@ Consider the following requirements for your system:
 
 ## Installation
 
-**NOTE**: Merge the folder "configuration/.m2/" and its content to "{studio}/configuration/.m2/" and overwrite the existing files.
+**NOTE**: If the patch is deployed in the apporach **Installing the patch using Talend Studio**, the folder **configuration** under this patch must be replaced manually.
 
 ### Installing the patch using Software update
 
