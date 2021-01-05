@@ -200,6 +200,9 @@
                                             </http>
                                             <time>60000</time>
                                         </wait>
+                                        <log>
+                                            <enabled>true</enabled>
+                                        </log>
                                     </run>
                                 </image>
                             </images>
