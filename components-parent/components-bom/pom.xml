@@ -10,6 +10,8 @@
     <name>Component BOM</name>
     <properties>
         <components.version>0.29.0</components.version>
+        <!-- as we already remove all rest api and service in master, here use old one and TODO remove all rest integration test-->
+        <components-api-service-rest.version>0.28.14</components-api-service-rest.version>
         <daikon.version>0.31.11</daikon.version>
         <!-- repositories -->
         <talend_snapshots_deployment>https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceSnapshot/</talend_snapshots_deployment>
@@ -1454,18 +1456,18 @@
             <dependency>
                 <groupId>org.talend.components</groupId>
                 <artifactId>components-api-service-rest</artifactId>
-                <version>${components.version}</version>
+                <version>${components-api-service-rest.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.talend.components</groupId>
                 <artifactId>components-api-service-rest</artifactId>
-                <version>${components.version}</version>
+                <version>${components-api-service-rest.version}</version>
                 <classifier>lib</classifier>
             </dependency>
             <dependency>
                 <groupId>org.talend.components</groupId>
                 <artifactId>components-api-service-rest</artifactId>
-                <version>${components.version}</version>
+                <version>${components-api-service-rest.version}</version>
                 <type>test-jar</type>
             </dependency>
             <dependency>
