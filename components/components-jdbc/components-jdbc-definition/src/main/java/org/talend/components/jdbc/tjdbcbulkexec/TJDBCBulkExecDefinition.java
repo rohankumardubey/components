@@ -28,12 +28,6 @@ public class TJDBCBulkExecDefinition extends AbstractComponentDefinition {
 
     public static final String COMPONENT_NAME = "tJDBCBulkExec";
 
-    public static final String BULK_EXEC_RUNTIME_CLASS = "org.talend.components.snowflake.ee.runtime.tsnowflakebulkexec.SnowflakeBulkExecRuntime";
-
-    public static final String RUNTIME_MVN_URL = "mvn:org.talend.components/components-snowflake-ee-runtime";
-
-    public static final String RUNTIME_MVN_ARTIFACT_ID = "components-snowflake-ee-runtime";
-
     public TJDBCBulkExecDefinition() {
     	super(COMPONENT_NAME, ExecutionEngine.DI);
     }
