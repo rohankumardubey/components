@@ -31,6 +31,11 @@ public class TJDBCBulkExecDefinition extends AbstractComponentDefinition {
     public TJDBCBulkExecDefinition() {
     	super(COMPONENT_NAME, ExecutionEngine.DI);
     }
+    
+    @Override
+    public String[] getFamilies() {
+        return new String[] { "Databases/DB Specifics/JDBC" };
+    }
 
     @Override
     public String getPartitioning() {

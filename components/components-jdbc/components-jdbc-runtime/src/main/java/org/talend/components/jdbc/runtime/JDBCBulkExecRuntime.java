@@ -15,7 +15,10 @@ package org.talend.components.jdbc.runtime;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.List;
 
+import org.apache.avro.Schema;
+import org.apache.avro.Schema.Field;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.container.RuntimeContainer;
@@ -24,6 +27,7 @@ import org.talend.components.jdbc.CommonUtils;
 import org.talend.components.jdbc.RuntimeSettingProvider;
 import org.talend.components.jdbc.runtime.setting.AllSetting;
 import org.talend.components.jdbc.runtime.setting.JdbcRuntimeSourceOrSinkDefault;
+import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.ValidationResult.Result;
 import org.talend.daikon.properties.ValidationResultMutable;
@@ -53,10 +57,34 @@ public class JDBCBulkExecRuntime extends JdbcRuntimeSourceOrSinkDefault {
 	}
 
 	private String createBulkSQL() {
-		//TODO use stringbuilder
-		return "LOAD DATA LOCAL INFILE '" + setting.getBulkFile() + "' INTO TABLE "
-				+ setting.getTablename()
-				+ " FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '\"' LINES TERMINATED BY '\\n'";
+		StringBuilder sb = new StringBuilder();
+		
+		sb.append("LOAD DATA LOCAL INFILE '").append(setting.getBulkFile()).append("' INTO TABLE ")
+				.append(setting.getTablename())
+				.append(" FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '\"' LINES TERMINATED BY '\\n' ");
+		
+		if(setting.getSchema()==null) {
+			return sb.toString();
+		}
+		
+		List<Field> fields = setting.getSchema().getFields();
+		
+		if(fields==null || fields.isEmpty()) {
+			return sb.toString();
+		}
+		
+		sb.append('(');
+		for (int i=0;i<fields.size();i++) {
+			Schema.Field field = fields.get(i);
+			String originName = field.getProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME);
+			String headerName = originName!=null ? originName : field.name();
+			sb.append('`').append(headerName).append('`');
+			if(i!=fields.size()-1) {
+				sb.append(',');
+			}
+		}
+		sb.append(')');
+		return sb.toString();
 	}
 
 	@Override

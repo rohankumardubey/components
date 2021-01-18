@@ -15,7 +15,6 @@ package org.talend.components.jdbc.runtime;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
 import org.apache.avro.generic.IndexedRecord;
 import org.talend.components.api.component.runtime.Result;
@@ -36,13 +35,8 @@ final class JDBCBulkFileWriter extends BulkFileWriter {
     }
 
     @Override
-    public String[] getHeaders(Schema schema) {
-        List<String> headers = new ArrayList<String>();
-        for (Schema.Field f : schema.getFields()) {
-            String header = f.name();
-            headers.add(header);
-        }
-        return headers.toArray(new String[headers.size()]);
+    public boolean needHeader() {
+        return false;
     }
 
     @Override

@@ -97,6 +97,6 @@ public class TJDBCOutputBulkExecProperties extends TJDBCBulkExecProperties imple
 
     @Override
     protected Set<PropertyPathConnector> getAllSchemaPropertiesConnectors(boolean isOutputConnection) {
-        return Collections.emptySet();
+        return Collections.singleton(MAIN_CONNECTOR);
     }
 }

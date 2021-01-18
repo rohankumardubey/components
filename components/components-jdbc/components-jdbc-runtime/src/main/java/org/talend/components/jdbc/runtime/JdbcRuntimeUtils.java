@@ -73,9 +73,12 @@ public class JdbcRuntimeUtils {
             if(isMysql(driverClass)) {
             	setProperty("allowLoadLocalInfile", "false"); // MySQL
             }
+            //TODO do more, now, need to set it to true for studio run, so here only comment the code that ask user to decide in jdbc url
+            /*
             if(isMariadb(driverClass)) {
             	setProperty("allowLocalInfile", "false"); // MariaDB
             }
+            */
         }};
         return java.sql.DriverManager.getConnection(setting.getJdbcUrl(), properties);
     }

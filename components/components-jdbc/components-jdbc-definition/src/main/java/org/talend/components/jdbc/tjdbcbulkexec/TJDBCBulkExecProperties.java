@@ -84,8 +84,18 @@ public class TJDBCBulkExecProperties extends FixedConnectorsComponentProperties 
     @Override
     public void refreshLayout(Form form) {
         super.refreshLayout(form);
-        //TODO
-     }
+
+        boolean useOtherConnection = CommonUtils.useExistedConnection(referencedComponent);
+
+        if (form.getName().equals(Form.MAIN)) {
+            form.getChildForm(connection.getName()).setHidden(useOtherConnection);
+        }
+    }
+    
+    public void afterReferencedComponent() {
+        refreshLayout(getForm(Form.MAIN));
+        refreshLayout(getForm(Form.ADVANCED));
+    }
 
     @Override
     public void setupProperties() {

@@ -34,6 +34,11 @@ public class TJDBCOutputBulkExecDefinition extends AbstractComponentDefinition i
     public TJDBCOutputBulkExecDefinition() {
         super(COMPONENT_NAME, ExecutionEngine.DI);
     }
+    
+    @Override
+    public String[] getFamilies() {
+        return new String[] { "Databases/DB Specifics/JDBC" };
+    }
 
     @Override
     public boolean isStartable() {
@@ -79,7 +84,7 @@ public class TJDBCOutputBulkExecDefinition extends AbstractComponentDefinition i
 
     @Override
     public Set<ConnectorTopology> getSupportedConnectorTopologies() {
-        return EnumSet.of(ConnectorTopology.INCOMING, ConnectorTopology.INCOMING_AND_OUTGOING);
+        return EnumSet.of(ConnectorTopology.INCOMING);
     }
 
 }
