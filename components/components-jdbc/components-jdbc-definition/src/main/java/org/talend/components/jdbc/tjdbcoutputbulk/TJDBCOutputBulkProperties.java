@@ -13,18 +13,26 @@
 package org.talend.components.jdbc.tjdbcoutputbulk;
 
 import org.talend.components.common.BulkFileProperties;
+import org.talend.components.common.EncodingTypeProperties;
 import org.talend.components.jdbc.CommonUtils;
 import org.talend.components.jdbc.RuntimeSettingProvider;
+import org.talend.components.jdbc.module.BulkModule;
 import org.talend.components.jdbc.runtime.setting.AllSetting;
 import org.talend.daikon.properties.presentation.Form;
+import org.talend.daikon.properties.property.Property;
+import org.talend.daikon.properties.property.PropertyFactory;
 
 public class TJDBCOutputBulkProperties extends BulkFileProperties implements RuntimeSettingProvider {
 
+    public BulkModule bulkModule = new BulkModule("bulkModule");
+
+    public Property<Boolean> includeHeader = PropertyFactory.newBoolean("includeHeader");
+    
+    public EncodingTypeProperties encoding = new EncodingTypeProperties("encoding");
+    
     public TJDBCOutputBulkProperties(String name) {
         super(name);
     }
-
-    //TODO add more ui parameters
 
     @Override
     public void setupProperties() {
@@ -35,13 +43,13 @@ public class TJDBCOutputBulkProperties extends BulkFileProperties implements Run
     public void setupLayout() {
         super.setupLayout();
 
-        //TODO use them later
-        Form mainForm = CommonUtils.addForm(this, Form.MAIN);
-        
         Form refForm = CommonUtils.addForm(this, Form.REFERENCE);
         refForm.addRow(append);
         
         Form advancedForm = CommonUtils.addForm(this, Form.ADVANCED);
+        advancedForm.addRow(bulkModule);
+        advancedForm.addRow(includeHeader);
+        advancedForm.addRow(encoding);
     }
 
     @Override

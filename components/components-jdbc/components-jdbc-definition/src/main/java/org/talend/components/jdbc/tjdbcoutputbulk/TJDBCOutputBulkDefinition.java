@@ -57,11 +57,16 @@ public class TJDBCOutputBulkDefinition extends AbstractComponentDefinition {
     }
     
     @Override
-	public String getPartitioning() {
-		return "NONE";
-	}
+    public String getPartitioning() {
+        return "NONE";
+    }
+    
+    @Override
+    public boolean isSchemaAutoPropagate() {
+        return true;
+    }
 
-	@Override
+    @Override
     public RuntimeInfo getRuntimeInfo(ExecutionEngine engine, ComponentProperties properties,
             ConnectorTopology connectorTopology) {
         assertEngineCompatibility(engine);
