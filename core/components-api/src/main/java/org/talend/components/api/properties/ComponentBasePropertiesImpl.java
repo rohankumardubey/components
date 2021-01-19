@@ -12,6 +12,7 @@
 // ============================================================================
 package org.talend.components.api.properties;
 
+import org.talend.daikon.NamedThing;
 import org.talend.daikon.properties.PropertiesImpl;
 import org.talend.daikon.properties.property.Property;
 
@@ -48,5 +49,19 @@ public class ComponentBasePropertiesImpl extends PropertiesImpl {
                 super.encryptData(property, encrypt);
             }
         }
+    }
+
+    @Override
+    public void setValue(String property, Object value) {
+        Object newVal = value;
+        NamedThing p = getProperty(property);
+        if (p instanceof Property) {
+            if (((Property) p).isFlag(Property.Flags.ENCRYPT)) {
+                if (ComponentEncryption.isEncrypted(String.valueOf(value))) {
+                    newVal = ComponentEncryption.decrypt(String.valueOf(value));
+                }
+            }
+        }
+        super.setValue(property, newVal);
     }
 }
