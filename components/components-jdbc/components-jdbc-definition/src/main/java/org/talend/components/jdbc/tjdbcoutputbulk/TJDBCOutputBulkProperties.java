@@ -1,6 +1,6 @@
 // ============================================================================
 //
-// Copyright (C) 2006-2017 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2020 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
 // %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
@@ -13,7 +13,6 @@
 package org.talend.components.jdbc.tjdbcoutputbulk;
 
 import org.talend.components.common.BulkFileProperties;
-import org.talend.components.common.EncodingTypeProperties;
 import org.talend.components.jdbc.CommonUtils;
 import org.talend.components.jdbc.RuntimeSettingProvider;
 import org.talend.components.jdbc.module.BulkModule;
@@ -27,8 +26,6 @@ public class TJDBCOutputBulkProperties extends BulkFileProperties implements Run
     public BulkModule bulkModule = new BulkModule("bulkModule");
 
     public Property<Boolean> includeHeader = PropertyFactory.newBoolean("includeHeader");
-    
-    public EncodingTypeProperties encoding = new EncodingTypeProperties("encoding");
     
     public TJDBCOutputBulkProperties(String name) {
         super(name);
@@ -47,14 +44,22 @@ public class TJDBCOutputBulkProperties extends BulkFileProperties implements Run
         refForm.addRow(append);
         
         Form advancedForm = CommonUtils.addForm(this, Form.ADVANCED);
-        advancedForm.addRow(bulkModule);
+        advancedForm.addRow(bulkModule.getForm(Form.MAIN));
         advancedForm.addRow(includeHeader);
-        advancedForm.addRow(encoding);
     }
 
     @Override
     public void refreshLayout(Form form) {
         super.refreshLayout(form);
+        
+        if(form.getName().equals(Form.ADVANCED)) {
+            Form bulkModuleForm = form.getChildForm(bulkModule.getName());
+            if (bulkModuleForm != null) {
+                bulkModuleForm.getWidget(bulkModule.escapeChar.getName()).setHidden(!bulkModule.setEscapeChar.getValue());
+                bulkModuleForm.getWidget(bulkModule.textEnclosure.getName()).setHidden(!bulkModule.setTextEnclosure.getValue());
+                bulkModuleForm.getWidget(bulkModule.nullValue.getName()).setHidden(!bulkModule.setNullValue.getValue());
+            }
+        }
     }
 
     @Override
