@@ -85,18 +85,13 @@ public class BulkFileWriter implements Writer<Result> {
 
     private boolean fileIsEmpty = false;
     
-    //some bulk file don't need header, and that is defined in load statement
-    protected boolean needHeader() {
-        return true;
-    }
-
     @Override
     public void write(Object datum) throws IOException {
         if (null == datum) {
             return;
         }
 
-        if (needHeader() && !headerIsReady && (!isAppend || fileIsEmpty)) {
+        if (!headerIsReady && (!isAppend || fileIsEmpty)) {
             Schema schema = new Schema.Parser().parse(bulkProperties.schema.schema.getStringValue());
 
             if (AvroUtils.isIncludeAllFields(schema) && (datum instanceof org.apache.avro.generic.IndexedRecord)) {

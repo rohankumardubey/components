@@ -13,18 +13,21 @@
 package org.talend.components.jdbc.runtime;
 
 import org.talend.components.api.component.runtime.Result;
+import org.talend.components.api.component.runtime.Sink;
 import org.talend.components.api.component.runtime.Writer;
 import org.talend.components.api.container.RuntimeContainer;
-import org.talend.components.common.runtime.BulkFileSink;
-import org.talend.components.common.runtime.BulkFileWriteOperation;
 
-public class JDBCBulkFileWriteOperation extends BulkFileWriteOperation {
-    public JDBCBulkFileWriteOperation(BulkFileSink fileSink) {
-        super(fileSink);
+public class JDBCBulkFileWriteOperation extends DefaultWriteOperation {
+
+    private static final long serialVersionUID = 1L;
+
+    public JDBCBulkFileWriteOperation(Sink sink) {
+        super(sink);
     }
 
     @Override
     public Writer<Result> createWriter(RuntimeContainer adaptor) {
-        return new JDBCBulkFileWriter(this, ((BulkFileSink)getSink()).getBulkFileProperties(), adaptor);
+        return new JDBCBulkFileWriter(this, ((JDBCBulkFileRuntime)getSink()).properties, adaptor);
     }
+
 }

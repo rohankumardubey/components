@@ -12,30 +12,54 @@
 // ============================================================================
 package org.talend.components.jdbc.module;
 
-import org.talend.components.jdbc.CommonUtils;
-import org.talend.daikon.properties.PropertiesImpl;
+import static org.talend.daikon.properties.property.PropertyFactory.newProperty;
+
+import java.util.Collections;
+import java.util.Set;
+
+import org.talend.components.api.component.ISchemaListener;
+import org.talend.components.api.component.PropertyPathConnector;
+import org.talend.components.common.FixedConnectorsComponentProperties;
+import org.talend.components.common.SchemaProperties;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.property.PropertyFactory;
 
 /**
- * common advanced JDBC bulk information properties
+ * common JDBC bulk properties for outputbulk, bulkexec and outputbulkexec all
  *
  */
-public class BulkModule extends PropertiesImpl {
+public class BulkModule extends FixedConnectorsComponentProperties {
 
-    //parameters which both have meaning for outputbulk and bulk exec components
+    public Property<String> bulkFilePath = newProperty("bulkFilePath").setRequired();
+    
     public Property<String> rowSeparator = PropertyFactory.newProperty("rowSeparator").setRequired();
     public Property<String> fieldSeparator = PropertyFactory.newProperty("fieldSeparator").setRequired();
     
-    public Property<Boolean> setEscapeChar = PropertyFactory.newBoolean("setEscapeChar");
-    public Property<String> escapeChar = PropertyFactory.newString("escapeChar");
+    //not sure need to support this, always use "\" as escape is ok, and not easy to control the relationship between bulkexec and outputbulk
+    //public Property<Boolean> setEscapeChar = PropertyFactory.newBoolean("setEscapeChar");
+    //public Property<String> escapeChar = PropertyFactory.newString("escapeChar");
     
     public Property<Boolean> setTextEnclosure = PropertyFactory.newBoolean("setTextEnclosure");
     public Property<String> textEnclosure = PropertyFactory.newString("textEnclosure");
     
     public Property<Boolean> setNullValue = PropertyFactory.newBoolean("setNullValue");
     public Property<String> nullValue = PropertyFactory.newString("nullValue");
+    
+    public ISchemaListener schemaListener;
+    
+    public SchemaProperties main = new SchemaProperties("main") {
+
+        @SuppressWarnings("unused")
+        public void afterSchema() {
+        
+        }
+
+    };
+    
+    public void setSchemaListener(ISchemaListener schemaListener) {
+        this.schemaListener = schemaListener;
+    }
     
     public BulkModule(String name) {
         super(name);
@@ -45,51 +69,40 @@ public class BulkModule extends PropertiesImpl {
     public void setupProperties() {
         super.setupProperties();
         
-        //this is also the value which show in ui, but we use javajet to pass the value back to tcompv0, the value need to respect the java string rule
         rowSeparator.setValue("\\n");
         fieldSeparator.setValue(";");
         
-        escapeChar.setValue("\"");
         textEnclosure.setValue("\"");
-    }
-
-    @Override
-    public void setupLayout() {
-        super.setupLayout();
-
-        Form form = CommonUtils.addForm(this, Form.MAIN);
-        form.addRow(rowSeparator);
-        form.addColumn(fieldSeparator);
-        
-        form.addRow(setEscapeChar);
-        form.addColumn(escapeChar);
-        
-        form.addRow(setTextEnclosure);
-        form.addColumn(textEnclosure);
-        
-        form.addRow(setNullValue);
-        form.addColumn(nullValue);
     }
     
     @Override
     public void refreshLayout(Form form) {
-        if (form.getName().equals(Form.MAIN)) {
-            form.getWidget(escapeChar.getName()).setHidden(!setEscapeChar.getValue());
+        super.refreshLayout(form);
+        
+        if (form.getName().equals(Form.ADVANCED)) {
+            //form.getWidget(escapeChar.getName()).setHidden(!setEscapeChar.getValue());
             form.getWidget(textEnclosure.getName()).setHidden(!setTextEnclosure.getValue());
             form.getWidget(nullValue.getName()).setHidden(!setNullValue.getValue());
         }
     }
-
-    public void afterSetEscapeChar() {
-        refreshLayout(getForm(Form.MAIN));
-    }
     
     public void afterSetTextEnclosure() {
-        refreshLayout(getForm(Form.MAIN));
+        refreshLayout(getForm(Form.ADVANCED));
     }
-
+    
     public void afterSetNullValue() {
-        refreshLayout(getForm(Form.MAIN));
+        refreshLayout(getForm(Form.ADVANCED));
+    }
+    
+    /*
+    public void afterSetEscapeChar() {
+        refreshLayout(getForm(Form.ADVANCED));
+    }
+    */
+
+    @Override
+    protected Set<PropertyPathConnector> getAllSchemaPropertiesConnectors(boolean isOutputConnection) {
+        return Collections.emptySet();
     }
 
 }

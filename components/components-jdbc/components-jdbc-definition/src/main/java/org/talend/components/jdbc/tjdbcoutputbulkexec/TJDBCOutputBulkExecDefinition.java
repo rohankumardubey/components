@@ -49,8 +49,13 @@ public class TJDBCOutputBulkExecDefinition extends AbstractComponentDefinition i
     public String getPartitioning() {
         return NONE;
     }
-
+    
     @Override
+    public boolean isSchemaAutoPropagate() {
+        return true;
+    }
+
+	@Override
     public Class<? extends ComponentProperties> getPropertyClass() {
         return TJDBCOutputBulkExecProperties.class;
     }

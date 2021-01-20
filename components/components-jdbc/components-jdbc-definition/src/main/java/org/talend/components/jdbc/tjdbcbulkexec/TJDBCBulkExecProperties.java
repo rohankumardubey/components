@@ -13,18 +13,15 @@
 package org.talend.components.jdbc.tjdbcbulkexec;
 
 import static org.talend.daikon.properties.presentation.Widget.widget;
-import static org.talend.daikon.properties.property.PropertyFactory.newProperty;
 
 import java.util.Collections;
 import java.util.Set;
 
-import org.talend.components.api.component.Connector;
 import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.api.properties.ComponentReferenceProperties;
-import org.talend.components.common.FixedConnectorsComponentProperties;
-import org.talend.components.common.SchemaProperties;
 import org.talend.components.jdbc.CommonUtils;
 import org.talend.components.jdbc.RuntimeSettingProvider;
+import org.talend.components.jdbc.module.BulkModule;
 import org.talend.components.jdbc.module.JDBCConnectionModule;
 import org.talend.components.jdbc.module.JDBCTableSelectionModule;
 import org.talend.components.jdbc.runtime.setting.AllSetting;
@@ -32,32 +29,17 @@ import org.talend.components.jdbc.tjdbcconnection.TJDBCConnectionDefinition;
 import org.talend.components.jdbc.tjdbcconnection.TJDBCConnectionProperties;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
-import org.talend.daikon.properties.property.Property;
 
-public class TJDBCBulkExecProperties extends FixedConnectorsComponentProperties implements RuntimeSettingProvider {
-	
-	// main
+public class TJDBCBulkExecProperties extends BulkModule implements RuntimeSettingProvider {
+
+    // main
     public ComponentReferenceProperties<TJDBCConnectionProperties> referencedComponent = new ComponentReferenceProperties<>(
             "referencedComponent", TJDBCConnectionDefinition.COMPONENT_NAME);
 
     public JDBCConnectionModule connection = new JDBCConnectionModule("connection");
     
     public JDBCTableSelectionModule tableSelection = new JDBCTableSelectionModule("tableSelection");
-
-    public Property<String> bulkFilePath = newProperty("bulkFilePath");
     
-    public transient PropertyPathConnector MAIN_CONNECTOR = new PropertyPathConnector(Connector.MAIN_NAME, "main");
-    
-    public SchemaProperties main = new SchemaProperties("main") {
-
-        @SuppressWarnings("unused")
-        public void afterSchema() {
-        	//TODO remove it
-            //updateOutputSchemas();
-        }
-
-    };
-
     public TJDBCBulkExecProperties(String name) {
         super(name);
     }
@@ -65,6 +47,7 @@ public class TJDBCBulkExecProperties extends FixedConnectorsComponentProperties 
     @Override
     public void setupLayout() {
         super.setupLayout();
+        
         Form mainForm = CommonUtils.addForm(this, Form.MAIN);
         
         Widget compListWidget = widget(referencedComponent).setWidgetType(Widget.COMPONENT_REFERENCE_WIDGET_TYPE);
@@ -77,8 +60,18 @@ public class TJDBCBulkExecProperties extends FixedConnectorsComponentProperties 
         
         mainForm.addRow(widget(bulkFilePath).setWidgetType(Widget.FILE_WIDGET_TYPE));
 
-        //TODO
         Form advancedForm = CommonUtils.addForm(this, Form.ADVANCED);
+        advancedForm.addRow(rowSeparator);
+        advancedForm.addColumn(fieldSeparator);
+        
+        advancedForm.addRow(setTextEnclosure);
+        advancedForm.addColumn(textEnclosure);
+        
+        //advancedForm.addRow(setEscapeChar);
+        //advancedForm.addColumn(escapeChar);
+        
+        advancedForm.addRow(setNullValue);
+        advancedForm.addColumn(nullValue);
     }
 
     @Override
@@ -94,24 +87,22 @@ public class TJDBCBulkExecProperties extends FixedConnectorsComponentProperties 
     
     public void afterReferencedComponent() {
         refreshLayout(getForm(Form.MAIN));
-        refreshLayout(getForm(Form.ADVANCED));
     }
 
     @Override
     public void setupProperties() {
         super.setupProperties();
-
+        
         tableSelection.setConnection(this);
 
         connection.setNotRequired();
     }
-
+    
     @Override
     protected Set<PropertyPathConnector> getAllSchemaPropertiesConnectors(boolean isOutputConnection) {
-    	return Collections.emptySet();
+        return Collections.emptySet();
     }
 
-    //TODO
     @Override
     public AllSetting getRuntimeSetting() {
         AllSetting setting = new AllSetting();
@@ -122,7 +113,17 @@ public class TJDBCBulkExecProperties extends FixedConnectorsComponentProperties 
         
         setting.setSchema(main.schema.getValue());
         
-        setting.setBulkFile(this.bulkFilePath.getValue());
+        setting.bulkFile = this.bulkFilePath.getValue();
+        setting.rowSeparator = this.rowSeparator.getValue();
+        setting.fieldSeparator = this.fieldSeparator.getValue();
+        
+        setting.setTextEnclosure = this.setTextEnclosure.getValue();
+        setting.textEnclosure = this.textEnclosure.getValue();
+        //setting.setEscapeChar = this.setEscapeChar.getValue();
+        //setting.escapeChar = this.escapeChar.getValue();
+        
+        setting.setNullValue = this.setNullValue.getValue();
+        setting.nullValue = this.nullValue.getValue();
 
         return setting;
     }

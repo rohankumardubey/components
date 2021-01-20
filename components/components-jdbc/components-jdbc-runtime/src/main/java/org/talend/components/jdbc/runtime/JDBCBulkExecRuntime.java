@@ -19,6 +19,7 @@ import java.util.List;
 
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.container.RuntimeContainer;
@@ -58,28 +59,35 @@ public class JDBCBulkExecRuntime extends JdbcRuntimeSourceOrSinkDefault {
 
 	private String createBulkSQL() {
 		StringBuilder sb = new StringBuilder();
-		
-		sb.append("LOAD DATA LOCAL INFILE '").append(setting.getBulkFile()).append("' INTO TABLE ")
-				.append(setting.getTablename())
-				.append(" FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '\"' LINES TERMINATED BY '\\n' ");
-		
-		if(setting.getSchema()==null) {
+
+		sb.append("LOAD DATA LOCAL INFILE '").append(setting.bulkFile).append("' INTO TABLE ")
+				.append(setting.getTablename()).append(" FIELDS TERMINATED BY '").append(setting.fieldSeparator).append("' ");
+		if(setting.setTextEnclosure) {
+			sb.append("OPTIONALLY ENCLOSED BY '").append(setting.textEnclosure).append("' ");
+		}
+		sb.append("LINES TERMINATED BY '").append(setting.rowSeparator).append("' ");
+		if(setting.setNullValue) {
+			sb.append("NULL DEFINED BY '").append(setting.nullValue).append("' ");
+		}
+
+		if (setting.getSchema() == null) {
 			return sb.toString();
 		}
-		
+
 		List<Field> fields = setting.getSchema().getFields();
-		
-		if(fields==null || fields.isEmpty()) {
+
+		if (fields == null || fields.isEmpty()) {
 			return sb.toString();
 		}
-		
+
+		//TODO support dynamic
 		sb.append('(');
-		for (int i=0;i<fields.size();i++) {
+		for (int i = 0; i < fields.size(); i++) {
 			Schema.Field field = fields.get(i);
 			String originName = field.getProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME);
-			String headerName = originName!=null ? originName : field.name();
+			String headerName = StringUtils.isEmpty(originName) ? field.name() : originName;
 			sb.append('`').append(headerName).append('`');
-			if(i!=fields.size()-1) {
+			if (i != fields.size() - 1) {
 				sb.append(',');
 			}
 		}
