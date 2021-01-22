@@ -51,7 +51,10 @@ public class JdbcRuntimeUtils {
      * @throws SQLException
      */
     public static Connection createConnection(final AllSetting setting) throws ClassNotFoundException, SQLException {
+        return createConnection(setting, false);
+    }
 
+    private static Connection createConnection(final AllSetting setting, final boolean readonly) throws ClassNotFoundException, SQLException {
         if (!valid(setting.getJdbcUrl())) {
             throw new RuntimeException("JDBC URL should not be empty, please set it");
         }
@@ -71,14 +74,11 @@ public class JdbcRuntimeUtils {
             }
             // Security Issues with LOAD DATA LOCAL https://jira.talendforge.org/browse/TDI-42006
             if(isMysql(driverClass)) {
-            	setProperty("allowLoadLocalInfile", "false"); // MySQL
+                setProperty("allowLoadLocalInfile", "false"); // MySQL
             }
-            //TODO do more, now, need to set it to true for studio run, so here only comment the code that ask user to decide in jdbc url
-            /*
-            if(isMariadb(driverClass)) {
-            	setProperty("allowLocalInfile", "false"); // MariaDB
+            if(readonly && isMariadb(driverClass)) {
+                setProperty("allowLocalInfile", "false"); // MariaDB
             }
-            */
         }};
         return java.sql.DriverManager.getConnection(setting.getJdbcUrl(), properties);
     }
@@ -220,7 +220,7 @@ public class JdbcRuntimeUtils {
                 conn = createConnection(setting);
             }
         } else {
-            conn = createConnection(setting);
+            conn = createConnection(setting, readonly);
             // somebody add it for performance for dataprep
             if (readonly) {
                 try {
