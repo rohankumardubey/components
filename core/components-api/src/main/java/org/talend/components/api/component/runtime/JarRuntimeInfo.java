@@ -189,7 +189,7 @@ public class JarRuntimeInfo implements RuntimeInfo, SandboxControl {
         this(createJarUrl(jarUrlString), depTxtPath, runtimeClassName, SandboxControl.CLASSLOADER_REUSABLE);
     }
 
-    public JarRuntimeInfo(String jarUrlString, String depTxtPath, String runtimeClassName, URLStreamHandler handler) {
+    private JarRuntimeInfo(String jarUrlString, String depTxtPath, String runtimeClassName, URLStreamHandler handler) {
         this(createJarUrl(jarUrlString, handler), depTxtPath, runtimeClassName, SandboxControl.CLASSLOADER_REUSABLE);
     }
 
