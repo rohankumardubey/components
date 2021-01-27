@@ -12,8 +12,6 @@
 // ============================================================================
 package org.talend.components.api.component.runtime;
 
-import sun.misc.Unsafe;
-
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,9 +29,10 @@ import org.ops4j.pax.url.mvn.MavenResolvers;
 import org.ops4j.pax.url.mvn.ServiceConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.talend.daikon.exception.TalendRuntimeException;
 import org.talend.daikon.runtime.RuntimeInfo;
 import org.talend.daikon.sandbox.SandboxControl;
+
+import sun.misc.Unsafe;
 
 /**
  * create a {@link RuntimeInfo} that will look for a given jar and will look for a dependency.txt file inside this jar
@@ -190,6 +189,10 @@ public class JarRuntimeInfo implements RuntimeInfo, SandboxControl {
         this(createJarUrl(jarUrlString), depTxtPath, runtimeClassName, SandboxControl.CLASSLOADER_REUSABLE);
     }
 
+    private JarRuntimeInfo(String jarUrlString, String depTxtPath, String runtimeClassName, URLStreamHandler handler) {
+        this(createJarUrl(jarUrlString, handler), depTxtPath, runtimeClassName, SandboxControl.CLASSLOADER_REUSABLE);
+    }
+
     /**
      * Constructor
      * 
@@ -212,8 +215,21 @@ public class JarRuntimeInfo implements RuntimeInfo, SandboxControl {
         return null;
     }
 
+    private static URL createJarUrl(String jarUrlString, URLStreamHandler handler) {
+        try {
+            return new URL(null, jarUrlString, handler);
+        } catch (MalformedURLException e) {
+            LOG.debug(e.getMessage());
+        }
+        return null;
+    }
+
     public JarRuntimeInfo cloneWithNewJarUrlString(String newJarUrlString) {
         return new JarRuntimeInfo(newJarUrlString, this.getDepTxtPath(), this.getRuntimeClassName());
+    }
+
+    public JarRuntimeInfo cloneWithNewJarUrlString(String newJarUrlString, URLStreamHandler handler) {
+        return new JarRuntimeInfo(newJarUrlString, this.getDepTxtPath(), this.getRuntimeClassName(), handler);
     }
 
     public URL getJarUrl() {
