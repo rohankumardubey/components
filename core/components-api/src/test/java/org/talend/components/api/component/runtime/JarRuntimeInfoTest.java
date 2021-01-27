@@ -13,7 +13,12 @@
 package org.talend.components.api.component.runtime;
 
 import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -242,26 +247,6 @@ public class JarRuntimeInfoTest {
                 return null;// added cause the compiler does not understand the fail() as a RuntimeException.
             }
         };
-    }
-
-    /*
-     * add testcase for https://jira.talendforge.org/browse/TUP-29701
-     */
-    @Test
-    public void testHandler() throws Exception {
-        JarRuntimeInfo jarRuntimeInfo = createJarRuntimeInfo("mvn:org.talend.components/components-googledrive-runtime",
-                "META-INF/maven/org.talend.components/components-googledrive-runtime/dependencies.txt",
-                "org.talend.components.google.drive.runtime.GoogleDriveSource", "mvn:foo");
-        jarRuntimeInfo = jarRuntimeInfo.cloneWithNewJarUrlString(
-                jarRuntimeInfo.getJarUrl().toString(),
-                new org.ops4j.pax.url.mvn.Handler());
-        
-        List<URL> mavenUrlDependencies = jarRuntimeInfo.getMavenUrlDependencies();
-        // when upgrade eclipse, One more maven handler was registered by org.eclipse.m2e.core,which will conflict with
-        // the service registered from org.ops4j.pax.url.mvn.
-        // so here if the handler is from m2e, will throw Exception "required format is groupId:artifactId:version or
-        // groupId:artifactId:version:type");
-        assertNotNull(mavenUrlDependencies);
     }
 
 }
