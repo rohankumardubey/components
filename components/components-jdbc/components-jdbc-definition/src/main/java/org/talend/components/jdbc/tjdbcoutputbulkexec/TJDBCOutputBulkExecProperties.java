@@ -36,7 +36,6 @@ import org.talend.components.jdbc.tjdbcoutputbulk.TJDBCOutputBulkProperties;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
-import org.talend.daikon.properties.property.PropertyFactory;
 
 public class TJDBCOutputBulkExecProperties extends BulkModule implements VirtualComponentProperties, RuntimeSettingProvider {
 
@@ -48,7 +47,7 @@ public class TJDBCOutputBulkExecProperties extends BulkModule implements Virtual
     
     public JDBCTableSelectionModule tableSelection = new JDBCTableSelectionModule("tableSelection");
 
-    public Property<Boolean> includeHeader = PropertyFactory.newBoolean("includeHeader");
+    //public Property<Boolean> includeHeader = newBoolean("includeHeader");
     public Property<Boolean> append = newBoolean("append");
     
     public TJDBCOutputBulkExecProperties(String name) {
@@ -95,7 +94,7 @@ public class TJDBCOutputBulkExecProperties extends BulkModule implements Virtual
         advancedForm.addRow(setNullValue);
         advancedForm.addColumn(nullValue);
         
-        advancedForm.addRow(includeHeader);
+        //advancedForm.addRow(includeHeader);
     }
 
     @Override

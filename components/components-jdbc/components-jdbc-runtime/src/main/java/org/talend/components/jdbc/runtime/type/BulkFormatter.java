@@ -1,6 +1,8 @@
 package org.talend.components.jdbc.runtime.type;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -37,6 +39,8 @@ public class BulkFormatter {
 
             if (AvroUtils.isSameType(basicSchema, AvroUtils._date())) {
                 writer = new DateTypeWriter(inputValueLocation, pattern);
+            } else if (AvroUtils.isSameType(basicSchema, AvroUtils._bytes())) {
+                writer = new BytesTypeWriter(inputValueLocation);
             } else {
                 writer = new StringTypeWriter(inputValueLocation);
             }
@@ -65,6 +69,18 @@ public class BulkFormatter {
         }
 
     }
+    
+    private void fillNull(String nullValue, CsvWriter writer) throws IOException {
+        writer.setUseTextQualifier(false);
+        writer.setForceQualifier(false);
+        if(nullValue!=null) {
+            writer.write(nullValue);
+        } else {
+            writer.write("");
+        }
+        writer.setUseTextQualifier(useTextEnclosure);
+        writer.setForceQualifier(useTextEnclosure);
+    }
 
     public class StringTypeWriter extends Formatter {
 
@@ -75,15 +91,7 @@ public class BulkFormatter {
         public void format(IndexedRecord input, String nullValue, CsvWriter writer) throws IOException {
             Object inputValue = input.get(inputValueLocation);
             if(inputValue==null) {
-                writer.setUseTextQualifier(false);
-                writer.setForceQualifier(false);
-                if(nullValue!=null) {
-                    writer.write(nullValue);
-                } else {
-                    writer.write("");
-                }
-                writer.setUseTextQualifier(useTextEnclosure);
-                writer.setForceQualifier(useTextEnclosure);
+                fillNull(nullValue, writer);
             } else {
                 writer.write(String.valueOf(inputValue), true);
             }
@@ -102,19 +110,32 @@ public class BulkFormatter {
         public void format(IndexedRecord input, String nullValue, CsvWriter writer) throws IOException {
             Object inputValue = input.get(inputValueLocation);
             if(inputValue==null) {
-                writer.setUseTextQualifier(false);
-                writer.setForceQualifier(false);
-                if(nullValue!=null) {
-                    writer.write(nullValue);
-                } else {
-                    writer.write("");
-                }
-                writer.setUseTextQualifier(useTextEnclosure);
-                writer.setForceQualifier(useTextEnclosure);
+                fillNull(nullValue, writer);
             } else {
                 writer.write(FormatterUtils.formatDate((Date)inputValue, pattern), true);
             }
         }
+
+    }
+    
+    class BytesTypeWriter extends Formatter {
+        //always use utf8? bytes array can't mean a lob object?
+        //now use utf8, not use platform default as easy migration if fix it in future
+        private Charset charset = Charset.forName("UTF-8");
+
+        BytesTypeWriter(int inputValueLocation) {
+            super(inputValueLocation);
+        }
+
+        public void format(IndexedRecord input, String nullValue, CsvWriter writer) throws IOException {
+            Object inputValue = input.get(inputValueLocation);
+            if(inputValue==null) {
+                fillNull(nullValue, writer);
+            } else {
+                writer.write(charset.decode(ByteBuffer.wrap((byte[])inputValue)).toString(), true);
+            }
+        }
+
     }
 
 }

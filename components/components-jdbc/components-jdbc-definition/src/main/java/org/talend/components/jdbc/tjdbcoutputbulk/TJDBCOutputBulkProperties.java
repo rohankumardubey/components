@@ -27,11 +27,10 @@ import org.talend.components.jdbc.runtime.setting.AllSetting;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
-import org.talend.daikon.properties.property.PropertyFactory;
 
 public class TJDBCOutputBulkProperties extends BulkModule implements RuntimeSettingProvider {
 
-    public Property<Boolean> includeHeader = PropertyFactory.newBoolean("includeHeader");
+    //public Property<Boolean> includeHeader = newBoolean("includeHeader");
     public Property<Boolean> append = newBoolean("append");
     
     public TJDBCOutputBulkProperties(String name) {
@@ -65,7 +64,7 @@ public class TJDBCOutputBulkProperties extends BulkModule implements RuntimeSett
         advancedForm.addRow(setNullValue);
         advancedForm.addColumn(nullValue);
         
-        advancedForm.addRow(includeHeader);
+        //advancedForm.addRow(includeHeader);
     }
 
     @Override
@@ -84,7 +83,7 @@ public class TJDBCOutputBulkProperties extends BulkModule implements RuntimeSett
         
         setting.setNullValue = this.setNullValue.getValue();
         setting.nullValue = this.nullValue.getValue();
-        setting.includeHeader = this.includeHeader.getValue();
+        //setting.includeHeader = this.includeHeader.getValue();
         return setting;
     }
     
