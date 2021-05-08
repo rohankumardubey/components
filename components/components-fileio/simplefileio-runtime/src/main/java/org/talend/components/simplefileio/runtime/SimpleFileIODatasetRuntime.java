@@ -16,7 +16,6 @@ import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
 import org.apache.beam.runners.direct.DirectOptions;
 import org.apache.beam.sdk.Pipeline;
-import org.apache.beam.sdk.transforms.Sample;
 import org.talend.components.adapter.beam.BeamLocalRunnerOption;
 import org.talend.components.adapter.beam.transform.DirectConsumerCollector;
 import org.talend.components.api.container.RuntimeContainer;

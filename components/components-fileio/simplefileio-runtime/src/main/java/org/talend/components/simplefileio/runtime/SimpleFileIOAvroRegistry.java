@@ -76,7 +76,6 @@ public class SimpleFileIOAvroRegistry extends AvroRegistry {
      * @return the schema for data given from the object.
      */
     private Schema inferStringArray(String[] in) {
-        List<Schema.Field> fields = new ArrayList<>();
 
         SchemaBuilder.FieldAssembler<Schema> fa = SchemaBuilder.record(RECORD_NAME).fields();
         for (int i = 0; i < in.length; i++) {
@@ -93,7 +92,6 @@ public class SimpleFileIOAvroRegistry extends AvroRegistry {
      * @return the schema for data given from the object.
      */
     private Schema inferCsvRecord(CSVRecord in) {
-        List<Schema.Field> fields = new ArrayList<>();
 
         SchemaBuilder.FieldAssembler<Schema> fa = SchemaBuilder.record(RECORD_NAME).fields();
         for (int i = 0; i < in.size(); i++) {
@@ -203,10 +201,13 @@ public class SimpleFileIOAvroRegistry extends AvroRegistry {
 
         private final CSVRecord value;
 
+        private Character sep;
+
         public CsvIndexedRecord(Schema schema, CSVRecord value) {
             this.schema = schema;
             this.value = value;
         }
+
 
         @Override
         public Schema getSchema() {
@@ -215,7 +216,11 @@ public class SimpleFileIOAvroRegistry extends AvroRegistry {
 
         @Override
         public Object get(int i) {
-            return value.get(i);
+            if (value.size() > i) {
+                return value.get(i);
+            } else {
+                return "";
+            }
         }
 
         @Override
