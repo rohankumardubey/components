@@ -99,8 +99,8 @@ public abstract class GeneratorFunction<T> implements SerializableFunction<Gener
         private static long scramble(long inSeed) {
             try {
                 long out = inSeed;
-                // Turn the seed into a byte array to pass through MD5.
-                MessageDigest d = MessageDigest.getInstance("MD5");
+                // Turn the seed into a byte array to pass through SHA-256.
+                MessageDigest d = MessageDigest.getInstance("SHA-256");
                 byte[] bytes = new byte[Long.SIZE / Byte.SIZE];
                 for (int i = 0; i < bytes.length; i++) {
                     bytes[i] = (byte) (out & 0xFF);
