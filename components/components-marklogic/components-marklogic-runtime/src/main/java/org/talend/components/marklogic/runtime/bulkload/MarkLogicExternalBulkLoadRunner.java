@@ -39,9 +39,9 @@ import org.talend.daikon.i18n.I18nMessages;
 public class MarkLogicExternalBulkLoadRunner extends AbstractMarkLogicBulkLoadRunner {
 
     private static final I18nMessages MESSAGES = GlobalI18N.getI18nMessageProvider()
-            .getI18nMessages(MarkLogicExternalBulkLoadRunner.class);
+            .getI18nMessages(MarkLogicBulkLoad.class);
 
-    private transient static final Logger LOGGER = LoggerFactory.getLogger(MarkLogicBulkLoad.class);
+    private transient static final Logger LOGGER = LoggerFactory.getLogger(MarkLogicExternalBulkLoadRunner.class);
 
     private static final String CMD_CALL = "mlcp.bat";
 
