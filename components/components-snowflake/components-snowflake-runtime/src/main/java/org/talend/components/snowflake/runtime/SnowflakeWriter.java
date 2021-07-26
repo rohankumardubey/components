@@ -622,7 +622,7 @@ public class SnowflakeWriter implements WriterWithFeedback<Result, IndexedRecord
 
     protected void createConnections() throws IOException {
         processingConnection = sink.createConnection(container);
-        uploadConnection = sink.createConnection(container);
+        uploadConnection = sink.createNewConnection(container);
     }
 
     protected void closeConnections() throws SQLException {
