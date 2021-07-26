@@ -39,6 +39,8 @@ public abstract class SnowflakeRuntime {
 
     public abstract SnowflakeConnectionProperties getConnectionProperties();
 
+    private transient Connection connection;
+
     /**
      * Creates or gets connection.
      * If component use existing connection then get it by reference component id from container(and check if it's not closed),
@@ -51,7 +53,13 @@ public abstract class SnowflakeRuntime {
      */
     public Connection createConnection(RuntimeContainer container)
             throws IOException {
+        if (connection == null) {
+            connection = createNewConnection(container);
+        }
+        return connection;
+    }
 
+    public Connection createNewConnection(RuntimeContainer container) throws IOException {
         Connection conn = null;
         SnowflakeConnectionProperties connectionProperties = getConnectionProperties();
         String refComponentId = connectionProperties.getReferencedComponentId();
@@ -74,10 +82,6 @@ public abstract class SnowflakeRuntime {
         }
 
         if (container != null) {
-            conn = getConnection(container, container.getCurrentComponentId());
-            if (isConnectionValid(conn)) {
-                return conn;
-            }
             connectionProperties.talendProductVersion = (String) container.getGlobalData(KEY_TALEND_PRODUCT_VERSION);
         }
 
@@ -91,7 +95,6 @@ public abstract class SnowflakeRuntime {
             container.setComponentData(container.getCurrentComponentId(), KEY_CONNECTION, conn);
             container.setComponentData(container.getCurrentComponentId(), KEY_CONNECTION_PROPERTIES, connectionProperties);
         }
-
         return conn;
     }
 

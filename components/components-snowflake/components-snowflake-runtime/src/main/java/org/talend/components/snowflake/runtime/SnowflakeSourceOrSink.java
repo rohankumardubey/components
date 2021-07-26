@@ -37,9 +37,9 @@ import org.talend.components.common.tableaction.TableAction;
 import org.talend.components.snowflake.SnowflakeConnectionProperties;
 import org.talend.components.snowflake.SnowflakeConnectionTableProperties;
 import org.talend.components.snowflake.SnowflakeGuessSchemaProperties;
+import org.talend.components.snowflake.SnowflakeOauthConnectionProperties.GrantType;
 import org.talend.components.snowflake.SnowflakeProvideConnectionProperties;
 import org.talend.components.snowflake.SnowflakeRuntimeSourceOrSink;
-import org.talend.components.snowflake.SnowflakeOauthConnectionProperties.GrantType;
 import org.talend.components.snowflake.runtime.utils.SchemaResolver;
 import org.talend.components.snowflake.tsnowflakeconnection.AuthenticationType;
 import org.talend.daikon.NamedThing;
@@ -101,9 +101,9 @@ public class SnowflakeSourceOrSink extends SnowflakeRuntime implements SourceOrS
         ValidationResultMutable vr = validateConnectionProperties(properties);
         if (vr.getStatus() == Result.OK) {
             try {
-                createConnection(null);
-                // Make sure we can get the schema names, as that tests that all of the connection parameters are really OK
-                getSchemaNames((RuntimeContainer) null);
+                // Make sure we can get the schema names, as that tests that all of the connection parameters are really
+                // OK
+                getSchemaNames(null);
             } catch (Exception ex) {
                 return exceptionToValidationResult(ex);
             }
@@ -187,7 +187,11 @@ public class SnowflakeSourceOrSink extends SnowflakeRuntime implements SourceOrS
 
     @Override
     public List<NamedThing> getSchemaNames(RuntimeContainer container) throws IOException {
-        return getSchemaNames(container, createConnection(container));
+        try (Connection conn = createNewConnection(container)) {
+            return getSchemaNames(container, conn);
+        } catch (SQLException sqle) {
+            throw new IOException(sqle);
+        }
     }
 
     protected String getCatalog(SnowflakeConnectionProperties connProps) {
@@ -223,7 +227,11 @@ public class SnowflakeSourceOrSink extends SnowflakeRuntime implements SourceOrS
 
     @Override
     public Schema getEndpointSchema(RuntimeContainer container, String schemaName) throws IOException {
-        return getSchema(container, createConnection(container), schemaName);
+        try (Connection conn = createNewConnection(container)) {
+            return getSchema(container, conn, schemaName);
+        } catch (SQLException sqle) {
+            throw new IOException(sqle);
+        }
     }
 
     protected Schema getRuntimeSchema(SchemaResolver resolver) throws IOException {
@@ -241,7 +249,8 @@ public class SnowflakeSourceOrSink extends SnowflakeRuntime implements SourceOrS
         return schema;
     }
 
-    public static Schema getSchemaFromQuery(RuntimeContainer container, SnowflakeProvideConnectionProperties properties) throws IOException {
+    public static Schema getSchemaFromQuery(RuntimeContainer container, SnowflakeProvideConnectionProperties properties)
+            throws IOException {
         SnowflakeSourceOrSink ss = new SnowflakeSourceOrSink();
         ss.initialize(container, (ComponentProperties) properties);
         return ss.getSchemaFromQuery(container);
@@ -250,7 +259,7 @@ public class SnowflakeSourceOrSink extends SnowflakeRuntime implements SourceOrS
     @Override
     public Schema getSchemaFromQuery(RuntimeContainer container) throws IOException {
         ResultSetMetaData metadata = null;
-        try (Connection connection = createConnection(container);
+        try (Connection connection = createNewConnection(container);
                 Statement statement = connection.createStatement();
                 ResultSet rs = statement.executeQuery(((SnowflakeGuessSchemaProperties)properties).getQuery())) {
             metadata = rs.getMetaData();

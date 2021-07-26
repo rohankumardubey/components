@@ -86,6 +86,7 @@ public class SnowflakeWriterTest {
         schema.getField("column").addProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "column");
         schema.getField("field").addProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, "field");
         Mockito.when(sink.createConnection(null)).thenReturn(Mockito.mock(Connection.class));
+        Mockito.when(sink.createNewConnection(null)).thenReturn(Mockito.mock(Connection.class));
         Mockito.when(sink.getRuntimeSchema(Mockito.any(SchemaResolver.class), Mockito.eq(properties.tableAction.getValue())))
                 .thenReturn(schema);
         properties.table.main.schema.setValue(schema);
