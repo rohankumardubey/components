@@ -14,6 +14,7 @@ package org.talend.components.azurestorage.utils;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -70,20 +71,27 @@ public class AzureStorageUtilsTest {
         }
     }
 
-    /**
-     *
-     * @see org.talend.components.azurestorage.utils.AzureStorageUtils#genFileFilterList(List<Map<String,String>>,String,String)
-     */
     @Test
-    public void genFileFilterList() {
-        List<Map<String, String>> list = new ArrayList<Map<String, String>>();
-        Map myMap = new HashMap<String, String>();
-        myMap.put("*.txt", "b");
-        myMap.put("*", "d");
-        myMap.put("c", "d");
+    public void genFileFilterListEscapedPlusCan() {
+        List<Map<String, String>> list = new ArrayList<>();
+        Map<String, String> myMap = new HashMap<>();
+        myMap.put("blob\\+.txt", "b");
         list.add(myMap);
-        Map<String, String> result = azureStorageUtils.genFileFilterList(list, folder, remotedir);
+        Map<String, String> result = azureStorageUtils.genFileFilterList(list, folder, remotedir, true);
         assertNotNull("result cannot be null", result);
+        assertEquals(1, result.size());
+        assertTrue(result.keySet().stream().anyMatch(e -> e.endsWith("blob+.txt")));
+    }
+
+    @Test
+    public void genFileFilterListEscapedPlusCanNot() {
+        List<Map<String, String>> list = new ArrayList<>();
+        Map<String, String> myMap = new HashMap<>();
+        myMap.put("blob\\+.txt", "b");
+        list.add(myMap);
+        Map<String, String> result = azureStorageUtils.genFileFilterList(list, folder, remotedir, false);
+        assertNotNull("result cannot be null", result);
+        assertEquals(0, result.size());
     }
 
 }
