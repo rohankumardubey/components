@@ -33,6 +33,8 @@ public class TAzureStoragePutProperties extends AzureStorageBlobProperties {
 
     public FileMaskTable files = new FileMaskTable("files"); //$NON-NLS-1$
 
+    public Property<Boolean> allowEscapePlusSymbol = PropertyFactory.newBoolean("allowEscapePlusSymbol"); //$NON-NLS-1$
+
     public TAzureStoragePutProperties(String name) {
         super(name);
     }
@@ -44,6 +46,8 @@ public class TAzureStoragePutProperties extends AzureStorageBlobProperties {
         localFolder.setValue("");
         remoteFolder.setValue("");
         useFileList.setValue(false);
+
+        allowEscapePlusSymbol.setValue(false);
     }
 
     @Override
@@ -56,6 +60,9 @@ public class TAzureStoragePutProperties extends AzureStorageBlobProperties {
         mainForm.addRow(useFileList);
         mainForm.addRow(widget(files).setWidgetType(Widget.TABLE_WIDGET_TYPE));
         mainForm.addRow(dieOnError);
+
+        Form advancedForm = new Form(this, Form.ADVANCED);
+        advancedForm.addRow(allowEscapePlusSymbol);
     }
 
     @Override

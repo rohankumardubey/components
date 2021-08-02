@@ -14,23 +14,20 @@ package org.talend.components.azurestorage.utils;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Properties;
+import java.util.Map.Entry;
 import java.util.regex.Pattern;
+
+import com.microsoft.azure.storage.OperationContext;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
-
-import com.microsoft.azure.storage.OperationContext;
 
 /**
  * This class comes from a decompilation of the {@code talend-azure-storage-utils-1.0.0.jar} provided by the
@@ -136,29 +133,33 @@ public class AzureStorageUtils {
     }
 
     /**
-     *
+     * @param allowEscapePlusSymbol to add ability to protect '+' symbol in the filemask
      */
-    public Map<String, String> genFileFilterList(List<Map<String, String>> list, String localdir, String remotedir) {
+    public Map<String, String> genFileFilterList(List<Map<String, String>> list, String localdir, String remotedir, boolean allowEscapePlusSymbol) {
         if (remotedir != null) {
             if (!("".equals(remotedir) || remotedir.trim().lastIndexOf("/") == remotedir.trim().length() - 1)) {
                 remotedir = new StringBuilder(String.valueOf(remotedir)).append("/").toString();
             }
         }
-        Map<String, String> fileMap = new HashMap<String, String>();
+        Map<String, String> fileMap = new HashMap<>();
         for (Map<String, String> map : list) {
-            for (String key : map.keySet()) {
+            for (Entry<String, String> entry : map.entrySet()) {
+                String key = entry.getKey();
+                String value = entry.getValue();
+
                 String tempdir = localdir;
                 String dir = null;
-                String mask = key.replaceAll("\\\\", "/");
+                //corner case, and workaround param.
+                String mask = allowEscapePlusSymbol //
+                        ? key.replaceAll("\\\\([^+]|$)", "/$1") // TDI-46283
+                        : key.replaceAll("\\\\", "/"); //
                 int i = mask.lastIndexOf(47);
                 if (i != -1) {
                     dir = mask.substring(0, i);
                     mask = mask.substring(i + 1);
                 }
-                if (dir != null) {
-                    if (!"".equals(dir)) {
-                        tempdir = new StringBuilder(String.valueOf(tempdir)).append("/").append(dir).toString();
-                    }
+                if (dir != null && !"".equals(dir)) {
+                    tempdir = new StringBuilder(String.valueOf(tempdir)).append("/").append(dir).toString();
                 }
                 mask = mask.replaceAll("\\.", "\\\\.").replaceAll("\\*", ".*");
                 String finalMask = mask;
@@ -170,23 +171,17 @@ public class AzureStorageUtils {
                 if (listings != null && listings.length > 0) {
                     String localFilePath = "";
                     String newObjectKey = "";
-                    int m = 0;
-                    while (true) {
-                        int length = listings.length;
-                        if (m >= length) {
-                            break;
-                        }
-                        if (listings[m].getName().matches(mask)) {
-                            localFilePath = listings[m].getAbsolutePath();
-                            if (map.get(key) == null || map.get(key).length() <= 0) {
-                                newObjectKey = new StringBuilder(String.valueOf(remotedir)).append(listings[m].getName())
+                    for (File listing : listings) {
+                        if (listing.getName().matches(mask)) {
+                            localFilePath = listing.getAbsolutePath();
+                            if (value == null || value.length() <= 0) {
+                                newObjectKey = new StringBuilder(String.valueOf(remotedir)).append(listing.getName())
                                         .toString();
                             } else {
-                                newObjectKey = new StringBuilder(String.valueOf(remotedir)).append(map.get(key)).toString();
+                                newObjectKey = new StringBuilder(String.valueOf(remotedir)).append(value).toString();
                             }
                             fileMap.put(localFilePath, newObjectKey);
                         }
-                        m++;
                     }
                 } else {
                     LOG.error(i18nMessages.getMessage("error.FileNotExist", key));

@@ -61,6 +61,8 @@ public class AzureStoragePutRuntime extends AzureStorageContainerRuntime
 
     private FileMaskTable files;
 
+    private Boolean allowEscapePlusSymbol;
+
     public AzureStorageBlobService azureStorageBlobService;
 
     @Override
@@ -74,6 +76,7 @@ public class AzureStoragePutRuntime extends AzureStorageContainerRuntime
         localFolder = componentProperties.localFolder.getValue();
         remoteFolder = componentProperties.remoteFolder.getValue();
         useFileList = componentProperties.useFileList.getValue();
+        allowEscapePlusSymbol = componentProperties.allowEscapePlusSymbol.getValue();
         files = componentProperties.files;
         this.dieOnError = componentProperties.dieOnError.getValue();
         this.azureStorageBlobService = new AzureStorageBlobService(getAzureConnection(runtimeContainer));
@@ -117,7 +120,7 @@ public class AzureStoragePutRuntime extends AzureStorageContainerRuntime
         }
         Map<String, String> fileMap;
         if (useFileList) {
-            fileMap = utils.genFileFilterList(list, localFolder, remoteFolder);
+            fileMap = utils.genFileFilterList(list, localFolder, remoteFolder, allowEscapePlusSymbol);
         } else {
             fileMap = utils.genAzureObjectList(new File(localFolder), remoteFolder);
         }
