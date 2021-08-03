@@ -2,6 +2,7 @@ package org.talend.components.jdbc;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.avro.Schema;
@@ -9,6 +10,8 @@ import org.apache.avro.Schema.Field;
 import org.apache.avro.SchemaBuilder;
 import org.junit.Assert;
 import org.junit.Test;
+import org.talend.components.common.config.jdbc.Dbms;
+import org.talend.components.jdbc.module.DBTypes;
 import org.talend.components.jdbc.module.JDBCConnectionModule;
 import org.talend.components.jdbc.runtime.setting.AllSetting;
 import org.talend.components.jdbc.tjdbcconnection.TJDBCConnectionProperties;
@@ -175,6 +178,18 @@ public class CommonUtilsTest {
         CommonUtils.updatePossibleValues(property, newPossibleValues);
         Assert.assertEquals("a1", property.getValue());
         Assert.assertEquals(newPossibleValues, property.getPossibleValues());
+    }
+
+    @Test
+    public void testLoadMapping() {
+        AllSetting settings = new AllSetting();
+        settings.setDbMapping(DBTypes.MYSQL);
+        settings.setDriverClass("com.mysql.jdbc.Driver");
+        settings.setDriverPaths(Collections.emptyList());
+        Dbms dbms = CommonUtils.getMapping(getClass().getResource("/xmlMappings"), settings, null, settings.getDbMapping());
+        Assert.assertEquals("mysql_id", dbms.getId());
+        Assert.assertEquals("MYSQL", dbms.getProduct());
+        Assert.assertEquals(43, dbms.getDbmsTypes().size());
     }
 
 }

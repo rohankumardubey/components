@@ -17,6 +17,9 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.List;
 
 import org.junit.Assert;
@@ -56,6 +59,46 @@ public class MappingFileLoaderTest {
         Assert.assertEquals(TalendType.STRING, stringMapping.getSourceType());
         Assert.assertEquals("VARCHAR", stringMapping.getDefaultType().getName());
 
+    }
+
+    @Test
+    public void testLoadFromStream() throws IOException {
+        URL url = getClass().getResource("mapping_mysql.xml");
+        InputStream stream = null;
+        try {
+            stream = url.openStream();
+
+            MappingFileLoader fileLoader = new MappingFileLoader();
+            List<Dbms> dbmsList = fileLoader.load(stream);
+
+            assertThat(dbmsList, hasSize(1));
+            Dbms dbms = dbmsList.get(0);
+            assertThat(dbms.getDbmsTypes(), hasSize(43));
+            assertThat(dbms.getDbmsTypes(),
+                    containsInAnyOrder("BIGINT", "BIGINT UNSIGNED", "BINARY", "BIT", "BLOB", "CHAR", "DATE", "DATETIME",
+                            "DECIMAL", "DOUBLE", "DOUBLE UNSIGNED", "ENUM", "FLOAT", "FLOAT UNSIGNED", "GEOMETRY",
+                            "GEOMETRYCOLLECTION", "INT", "INT UNSIGNED", "LINESTRING", "LONGTEXT", "LONGBLOB",
+                            "MEDIUMBLOB", "MEDIUMINT", "MEDIUMINT UNSIGNED", "MEDIUMTEXT", "MULTILINESTRING",
+                            "MULTIPOINT", "MULTIPOLYGON", "POINT", "POLYGON", "SMALLINT", "SMALLINT UNSIGNED", "SET",
+                            "TEXT", "TIME", "TIMESTAMP", "TINYBLOB", "TINYINT", "TINYINT UNSIGNED", "TINYTEXT",
+                            "VARBINARY", "VARCHAR", "YEAR"));
+
+            DbmsType blobType = dbms.getDbmsType("BLOB");
+            Assert.assertTrue(blobType.isIgnoreLength());
+            Assert.assertTrue(blobType.isIgnorePrecision());
+
+            DbmsType decimalType = dbms.getDbmsType("DECIMAL");
+            Assert.assertEquals(20, decimalType.getDefaultLength());
+            Assert.assertEquals(10, decimalType.getDefaultPrecision());
+
+            MappingType<TalendType, DbmsType> stringMapping = dbms.getTalendMapping("id_String");
+            Assert.assertEquals(TalendType.STRING, stringMapping.getSourceType());
+            Assert.assertEquals("VARCHAR", stringMapping.getDefaultType().getName());
+        } finally {
+            if(stream != null) {
+                stream.close();
+            }
+        }
     }
 
 }

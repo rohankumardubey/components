@@ -13,7 +13,10 @@
 package org.talend.components.common.config.jdbc;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -23,6 +26,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -33,6 +38,8 @@ import org.xml.sax.SAXException;
  * JDBC configuration parser (mapping_*.xml)
  */
 public class MappingFileLoader {
+
+    private static Logger LOG = LoggerFactory.getLogger(MappingFileLoader.class);
 
     /**
      * Parses configuration mapping files and returns a list of {@link Dbms}
@@ -51,19 +58,36 @@ public class MappingFileLoader {
      * @return list of {@link Dbms}
      */
     public List<Dbms> load(File file) {
+        FileInputStream inputStream = null;
+        try {
+            inputStream = new FileInputStream(file);
+            return load(inputStream);
+        } catch (FileNotFoundException e) {
+            LOG.error("File " + file.getPath() + " not found.", e);
+        } finally {
+            if(inputStream != null) {
+                try {
+                    inputStream.close();
+                } catch(IOException e) {
+                    LOG.error("Could not close the stream.", e);
+                }
+            }
+        }
+        return null;
+    }
+
+    public List<Dbms> load(InputStream inputStream) {
         DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
 
         try {
             DocumentBuilder analyser = documentBuilderFactory.newDocumentBuilder();
-            Document document = analyser.parse(file);
+            Document document = analyser.parse(inputStream);
             NodeList dbmsNodes = document.getElementsByTagName("dbms");
             return constructAllDbms(dbmsNodes);
         } catch (ParserConfigurationException e) {
-            e.printStackTrace();
-        } catch (SAXException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+            LOG.error("Could not init parser", e);
+        } catch (SAXException | IOException e) {
+            LOG.error("Could not parse mapping file", e);
         }
         return null;
     }
