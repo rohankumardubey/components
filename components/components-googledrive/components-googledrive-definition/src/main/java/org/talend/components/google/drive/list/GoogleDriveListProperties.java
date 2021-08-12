@@ -12,6 +12,8 @@
 // ============================================================================
 package org.talend.components.google.drive.list;
 
+import static org.talend.components.google.drive.connection.GoogleDriveConnectionProperties.OAuthMethod.InstalledApplicationWithIdAndSecret;
+import static org.talend.components.google.drive.connection.GoogleDriveConnectionProperties.OAuthMethod.InstalledApplicationWithJSON;
 import static org.talend.daikon.properties.presentation.Form.MAIN;
 import static org.talend.daikon.properties.property.PropertyFactory.newBoolean;
 import static org.talend.daikon.properties.property.PropertyFactory.newEnum;
@@ -24,6 +26,7 @@ import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
 import org.talend.components.api.component.Connector;
 import org.talend.components.google.drive.GoogleDriveComponentProperties;
+import org.talend.components.google.drive.connection.GoogleDriveConnectionDefinition;
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.i18n.GlobalI18N;
@@ -49,6 +52,14 @@ public class GoogleDriveListProperties extends GoogleDriveComponentProperties {
     public Property<ListMode> listMode = newEnum("listMode", ListMode.class);
 
     public Property<Boolean> includeTrashedFiles = newBoolean("includeTrashedFiles");
+
+    public Property<Boolean> includeSharedWithMe = newBoolean("includeSharedWithMe");
+
+    public Property<Boolean> includeSharedDrives = newBoolean("includeSharedDrives");
+
+    public Property<Boolean> useCustomQuery = newBoolean("useCustomQuery");
+
+    public Property<String> query = newString("query");
 
     public Property<Integer> pageSize = newInteger("pageSize", 1000);
 
@@ -129,15 +140,38 @@ public class GoogleDriveListProperties extends GoogleDriveComponentProperties {
         super.setupLayout();
 
         Form mainForm = getForm(MAIN);
+        mainForm.addRow(useCustomQuery);
+        mainForm.addRow(query);
         mainForm.addRow(folder);
         mainForm.addColumn(folderAccessMethod);
         mainForm.addRow(Widget.widget(listMode).setWidgetType(Widget.ENUMERATION_WIDGET_TYPE));
         mainForm.addRow(includeSubDirectories);
+        mainForm.addRow(includeSharedWithMe);
+        mainForm.addRow(includeSharedDrives);
         mainForm.addRow(schemaMain.getForm(Form.REFERENCE));
 
         Form advancedForm = getForm(Form.ADVANCED);
         advancedForm.addRow(includeTrashedFiles);
         advancedForm.addRow(pageSize);
+    }
+
+    @Override
+    public void refreshLayout(Form form) {
+        super.refreshLayout(form);
+
+        if (form.getName().equals(Form.MAIN)) {
+            form.getWidget(folder.getName()).setHidden(!useCustomQuery.getValue());
+            form.getWidget(folderAccessMethod.getName()).setHidden(!useCustomQuery.getValue());
+            form.getWidget(includeSubDirectories.getName()).setHidden(!useCustomQuery.getValue());
+            form.getWidget(includeSharedWithMe.getName()).setHidden(!useCustomQuery.getValue());
+            form.getWidget(query.getName()).setHidden(useCustomQuery.getValue());
+        }
+    }
+
+    public void afterUseCustomQuery() {
+        refreshLayout(getForm(Form.MAIN));
+        refreshLayout(getForm(Form.ADVANCED));
+        refreshLayout(getForm(Form.REFERENCE));
     }
 
 }

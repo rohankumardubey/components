@@ -14,6 +14,10 @@ package org.talend.components.google.drive.runtime;
 
 public class GoogleDriveConstants {
 
+    public static final String Q_SHARED = "sharedWithMe=true";
+
+    public static final String Q_OR = " or ";
+
     public static final String DRIVE_ROOT_FOLDER = "root";
 
     public static final String ROOT_FOLDER_SEPARATOR = "/";

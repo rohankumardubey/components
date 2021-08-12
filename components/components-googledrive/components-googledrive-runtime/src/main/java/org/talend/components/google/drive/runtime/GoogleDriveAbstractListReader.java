@@ -60,6 +60,14 @@ public abstract class GoogleDriveAbstractListReader extends AbstractBoundedReade
 
     protected boolean includeTrashedFiles;
 
+    protected boolean includeSharedWithMe;
+
+    protected boolean includeSharedDrives;
+
+    protected boolean useCustomQuery;
+
+    protected String customQuery;
+
     protected String listModeStr;
 
     protected String folderName;
@@ -88,16 +96,32 @@ public abstract class GoogleDriveAbstractListReader extends AbstractBoundedReade
         folderAccessMethod = AccessMethod.Id;
     }
 
+    protected String getQuery() {
+        String query;
+        if(useCustomQuery) {
+            query = customQuery;
+        } else {
+            String qTrash = includeTrashedFiles ? "" : Q_AND + Q_NOT_TRASHED;
+            query = Q_IN_PARENTS +
+                    ("DIRECTORIES".equals(listModeStr) ? QUERY_MIME_FOLDER : "") + qTrash;
+        }
+        return query;
+    }
+
     @Override
     public boolean start() throws IOException {
         /* build query string */
-        String qTrash = includeTrashedFiles ? "" : Q_AND + Q_NOT_TRASHED;
-        query = Q_IN_PARENTS + ("DIRECTORIES".equals(listModeStr) ? QUERY_MIME_FOLDER : "") + qTrash;
-        request = drive.files().list();
+        query = getQuery();
+        request = drive.files().list()
+                .setSupportsAllDrives(includeSharedDrives)
+                .setIncludeItemsFromAllDrives(includeSharedDrives);
         request.setFields(FIELDS_SELECTION);
         request.setPageSize(maxPageSize);
         LOG.debug("[start] request: {}.", request);
         //
+        if(useCustomQuery) {
+            return processCustomQuery(query);
+        }
         if (folderAccessMethod.equals(AccessMethod.Id)) {
             subFolders.add(folderName);
         } else {
@@ -109,9 +133,27 @@ public abstract class GoogleDriveAbstractListReader extends AbstractBoundedReade
             return false;
         }
         if (subFolders.size() > 1) {
+            // TODO: Remove this log as we might have folders with same name in sharedWithMe?
             LOG.warn(messages.getMessage("error.folder.more.than.one", folderName));
         }
         return processFolder();
+    }
+
+    private boolean processCustomQuery(final String query) throws IOException {
+        searchResults.clear();
+        request.setQ(query);
+        LOG.debug("query = {} {}.", query, folderId);
+        FileList files = request.execute();
+        for (File file : files.getFiles()) {
+            if (canAddFile(file.getMimeType())) {
+                searchResults.add(file);
+                result.totalCount++;
+            }
+        }
+        request.setPageToken(files.getNextPageToken());
+        searchCount = searchResults.size();
+
+        return searchCount > 0;
     }
 
     @Override
@@ -136,13 +178,15 @@ public abstract class GoogleDriveAbstractListReader extends AbstractBoundedReade
         boolean next = (searchIdx + 1) < searchCount;
         if (next) {
             searchIdx++;
-        } else {
+        } else if(!useCustomQuery) {
             while (!next && (!subFolders.isEmpty() || (folderId != null))) {
                 next = processFolder();
             }
             if (next) {
                 searchIdx = 0;
             }
+        } else if(request.getPageToken() != null) {
+            next = processCustomQuery(query);
         }
 
         return next;
@@ -195,7 +239,9 @@ public abstract class GoogleDriveAbstractListReader extends AbstractBoundedReade
         main.put(4, file.getSize());
         main.put(5, file.getKind());
         main.put(6, file.getTrashed());
-        main.put(7, file.getParents().toString()); // TODO This should be a List<String>
+        if(file.getParents() != null) { //"Shared with me" files might not keep info about parent.
+            main.put(7, file.getParents().toString()); // TODO This should be a List<String>
+        }
         main.put(8, file.getWebViewLink());
 
         return main;

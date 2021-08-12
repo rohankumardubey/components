@@ -38,6 +38,10 @@ public class GoogleDriveListReader extends GoogleDriveAbstractListReader {
         listModeStr = properties.listMode.getValue().name().toUpperCase();
         includeSubDirectories = properties.includeSubDirectories.getValue();
         includeTrashedFiles = properties.includeTrashedFiles.getValue();
+        includeSharedWithMe = properties.includeSharedWithMe.getValue();
+        includeSharedDrives = properties.includeSharedDrives.getValue();
+        useCustomQuery = properties.useCustomQuery.getValue();
+        customQuery = properties.query.getValue();
         maxPageSize = properties.pageSize.getValue();
     }
 

@@ -110,7 +110,10 @@ public class GoogleDriveUtils {
                 Q_MIME_FOLDER + //
                 (searchInTrash ? "" : Q_AND + Q_NOT_TRASHED);
         LOG.debug("[checkPath] Query({}).", query);
-        FileList files = drive.files().list().setQ(query).execute();
+        FileList files = drive.files().list().setQ(query)
+                .setSupportsAllDrives(true) // required for shared drives
+                .setIncludeItemsFromAllDrives(true)
+                .execute();
         if (files.getFiles().isEmpty()) {
             return Collections.emptyList();
         }
@@ -136,6 +139,20 @@ public class GoogleDriveUtils {
         }
         LOG.debug("[checkPath] `{}` => [{}].", String.join("/", path), result);
 
+        return result;
+    }
+
+    public List<String> getFolderIdsWithQuery(String query, boolean searchInTrash, boolean includeSharedDrives)
+            throws IOException {
+        LOG.debug("[getFolderIds] (query = [{}], searchInTrash = [{}], includeSharedDrives = [{}]).", query, searchInTrash, includeSharedDrives);
+        List<String> result = new ArrayList<>();
+        FileList files = drive.files().list().setQ(query)
+                .setSupportsAllDrives(includeSharedDrives) // required for shared drives
+                .setIncludeItemsFromAllDrives(includeSharedDrives) // required for shared drives
+                .execute();
+        for(File file : files.getFiles()) {
+            result.add(file.getId());
+        }
         return result;
     }
 
