@@ -12,16 +12,17 @@
 // ============================================================================
 package org.talend.components.jira.datum;
 
-import java.io.IOException;
+import java.io.ByteArrayInputStream;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonObject;
+import javax.json.stream.JsonParser;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
 
 /**
  * Utility class for retrieving certain values from Entity JSON representation
@@ -47,24 +48,13 @@ abstract class EntityParser {
      * @return total property value, if it is exist or -1 otherwise
      */
     static int getTotal(String json) {
-        JsonFactory factory = new JsonFactory();
-        try {
-            JsonParser parser = factory.createParser(json);
-
-            boolean totalFound = rewindToField(parser, "total");
-
-            if (!totalFound) {
+            JsonParser parser = Json.createParser(new ByteArrayInputStream(json.getBytes()));
+            JsonObject object = parser.getObject();
+            if(object.get("total")==null){
                 return UNDEFINED;
+            }else {
+                return object.getInt("total");
             }
-
-            // get total value
-            String value = parser.getText();
-
-            return Integer.parseInt(value);
-        } catch (IOException e) {
-            LOG.debug("Exception during JSON parsing. {}", e.getMessage());
-        }
-        return UNDEFINED;
     }
 
     /**
@@ -75,122 +65,22 @@ abstract class EntityParser {
      * @return a {@link List} of {@link Entity}
      */
     static List<Entity> getEntities(String json, final String fieldName) {
-
-        if (fieldName != null) {
-            // cuts input JSON to parse only entities
-            json = json.substring(json.indexOf(fieldName));
-            // cuts input JSON to array of entities
-            json = json.substring(json.indexOf('['));
-            json = json.substring(0, json.lastIndexOf(']') + 1);
-        }
-
+        JsonParser parser = Json.createParser(new ByteArrayInputStream(json.getBytes()));
         List<Entity> entities = new LinkedList<Entity>();
-        StringBuilder entityBuilder = null;
-        State currentState = State.INITIAL;
-        /*
-         * This counter counts braces '{' and '}'. It is used to define
-         * start and end of JSON objects
-         */
-        int openedBraces = 0;
-        char prev = ' ';
-
-        for (char cur : json.toCharArray()) {
-
-            switch (currentState) {
-            case INITIAL: {
-                if (cur == '[') {
-                    currentState = State.READ_JSON_ARRAY;
-                }
-                break;
-            }
-            case READ_JSON_ARRAY: {
-                if (cur == '{') {
-                    currentState = State.READ_JSON_OBJECT;
-                    entityBuilder = new StringBuilder();
-                    entityBuilder.append(cur);
-                    openedBraces++;
-                }
-                if (cur == ']') {
-                    currentState = State.INITIAL;
-                }
-                break;
-            }
-            case READ_JSON_OBJECT: {
-                entityBuilder.append(cur);
-                if (cur == '{') {
-                    openedBraces++;
-                }
-                if (cur == '}') {
-                    openedBraces--;
-                    if (openedBraces == 0) {
-                        currentState = State.READ_JSON_ARRAY;
-                        Entity entity = new Entity(entityBuilder.toString());
-                        entities.add(entity);
-                    }
-                }
-                if (cur == '"') {
-                    currentState = State.READ_JSON_STRING;
-                }
-                break;
-            }
-            case READ_JSON_STRING: {
-                entityBuilder.append(cur);
-                if (cur == '"' && prev == '\\') {
-                    int countBackslash = 0;
-                    for (int k = entityBuilder.length() - 2; k > 0; k--) {
-                        if (entityBuilder.charAt(k) != '\\' && countBackslash % 2 == 0) {
-                            currentState = State.READ_JSON_OBJECT;
-                            break;
-                        }
-                        countBackslash++;
-                    }
-
-                } else if (cur == '"' && prev != '\\') {
-                    currentState = State.READ_JSON_OBJECT;
-                }
-                break;
-            }
-            }
-            prev = cur;
+        JsonArray records;
+        if (fieldName != null) {
+             records = parser.getObject().getJsonArray(fieldName);
+        }else {
+            records = parser.getArray();
         }
+        records.forEach(
+                e->{
+                    entities.add(new Entity(e.asJsonObject().toString()));
+                }
+        );
         return entities;
     }
 
-    /**
-     * Rewinds {@link JsonParser} to the value of specified field
-     * 
-     * @param parser JSON parser
-     * @param fieldName name of field rewind to
-     * @return true if field was found, false otherwise
-     * @throws IOException in case of exception during JSON parsing
-     */
-    private static boolean rewindToField(JsonParser parser, final String fieldName) throws IOException {
-
-        JsonToken currentToken = parser.nextToken();
-        /*
-         * There is no special token, which denotes end of file, in Jackson.
-         * This counter is used to define the end of file.
-         * The counter counts '{' and '}'. It is increased, when meets '{' and
-         * decreased, when meets '}'. When braceCounter == 0 it means the end
-         * of file was met
-         */
-        int braceCounter = 0;
-        String currentField = null;
-        do {
-            if (JsonToken.START_OBJECT == currentToken) {
-                braceCounter++;
-            }
-            if (JsonToken.END_OBJECT == currentToken) {
-                braceCounter--;
-            }
-            if (JsonToken.FIELD_NAME == currentToken) {
-                currentField = parser.getCurrentName();
-            }
-            currentToken = parser.nextToken();
-        } while (!fieldName.equals(currentField) && braceCounter != END_JSON);
-
-        return braceCounter != END_JSON;
-    }
 
     /**
      * Entity Parser state

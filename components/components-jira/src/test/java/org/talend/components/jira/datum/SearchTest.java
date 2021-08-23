@@ -30,11 +30,11 @@ public class SearchTest {
     public void testGetTotal() {
     	String paginationJson = "{\"expand\":\"schema,names\",\"startAt\":0,\"maxResults\":50,\"total\":37,\"issues\":["
 				+ "{\"expand\":\"operations,versionedRepresentations,editmeta,changelog,transitions,renderedFields\",\"id\":\"10413\","
-				+ "\"self\":\"http://localhost:8080/rest/api/2/issue/10413\",\"key\":\"TP-41\",\"fields\":{\"description\":\"task upd\",\"summary\":\"Updated 37\",}},"
+				+ "\"self\":\"http://localhost:8080/rest/api/2/issue/10413\",\"key\":\"TP-41\",\"fields\":{\"description\":\"task upd\",\"summary\":\"Updated 37\"}},"
 				+ "{\"expand\":\"operations,versionedRepresentations,editmeta,changelog,transitions,renderedFields\",\"id\":\"10412\","
-				+ "\"self\":\"http://localhost:8080/rest/api/2/issue/10412\",\"key\":\"TP-40\",\"fields\":{\"description\":\"Task updated\",\"summary\":\"TP 38 updated\",}},"
+				+ "\"self\":\"http://localhost:8080/rest/api/2/issue/10412\",\"key\":\"TP-40\",\"fields\":{\"description\":\"Task updated\",\"summary\":\"TP 38 updated\"}},"
 				+ "{\"expand\":\"operations,versionedRepresentations,editmeta,changelog,transitions,renderedFields\",\"id\":\"10411\","
-				+ "\"self\":\"http://localhost:8080/rest/api/2/issue/10411\",\"key\":\"TP-39\",\"fields\":{\"description\":null,\"summary\":\"115\",}}]}";
+				+ "\"self\":\"http://localhost:8080/rest/api/2/issue/10411\",\"key\":\"TP-39\",\"fields\":{\"description\":null,\"summary\":\"115\"}}]}";
         Search search = new Search(paginationJson);
 
         int actual = search.getTotal();
@@ -65,11 +65,11 @@ public class SearchTest {
     public void testGetEntities() {
     	String paginationJson = "{\"expand\":\"schema,names\",\"startAt\":0,\"maxResults\":50,\"total\":37,\"issues\":["
 				+ "{\"expand\":\"operations,versionedRepresentations,editmeta,changelog,transitions,renderedFields\",\"id\":\"10413\","
-				+ "\"self\":\"http://localhost:8080/rest/api/2/issue/10413\",\"key\":\"TP-41\",\"fields\":{\"description\":\"task upd\",\"summary\":\"Updated 37\",}},"
+				+ "\"self\":\"http://localhost:8080/rest/api/2/issue/10413\",\"key\":\"TP-41\",\"fields\":{\"description\":\"task upd\",\"summary\":\"Updated 37\"}},"
 				+ "{\"expand\":\"operations,versionedRepresentations,editmeta,changelog,transitions,renderedFields\",\"id\":\"10412\","
-				+ "\"self\":\"http://localhost:8080/rest/api/2/issue/10412\",\"key\":\"TP-40\",\"fields\":{\"description\":\"Task updated\",\"summary\":\"TP 38 updated\",}},"
+				+ "\"self\":\"http://localhost:8080/rest/api/2/issue/10412\",\"key\":\"TP-40\",\"fields\":{\"description\":\"Task updated\",\"summary\":\"TP 38 updated\"}},"
 				+ "{\"expand\":\"operations,versionedRepresentations,editmeta,changelog,transitions,renderedFields\",\"id\":\"10411\","
-				+ "\"self\":\"http://localhost:8080/rest/api/2/issue/10411\",\"key\":\"TP-39\",\"fields\":{\"description\":null,\"summary\":\"115\",}}]}";
+				+ "\"self\":\"http://localhost:8080/rest/api/2/issue/10411\",\"key\":\"TP-39\",\"fields\":{\"description\":null,\"summary\":\"115\"}}]}";
         Search search = new Search(paginationJson);
 
         List<Entity> entities = search.getEntities();
@@ -83,11 +83,11 @@ public class SearchTest {
     public void testBlackSlash() {
         String paginationJson = "{\"expand\":\"schema,names\",\"startAt\":0,\"maxResults\":50,\"total\":37,\"issues\":["
                 + "{\"expand\":\"operations,versionedRepresentations,editmeta,changelog,transitions,renderedFields\",\"id\":\"10413\","
-                + "\"self\":\"http://localhost:8080/rest/api/2/issue/10413\",\"key\":\"TP-41\",\"fields\":{\"description\":\"task upd\",\"summary\":\"Updated 37\",}},"
+                + "\"self\":\"http://localhost:8080/rest/api/2/issue/10413\",\"key\":\"TP-41\",\"fields\":{\"description\":\"task upd\",\"summary\":\"Updated 37\"}},"
                 + "{\"expand\":\"operations,versionedRepresentations,editmeta,changelog,transitions,renderedFields\",\"id\":\"10412\","
-                + "\"self\":\"http://localhost:8080/rest/api/2/issue/10412\",\"key\":\"TP-40\",\"fields\":{\"description\":\"Task updated\",\"summary\":\"TP 38 updated\\\\\",}},"
+                + "\"self\":\"http://localhost:8080/rest/api/2/issue/10412\",\"key\":\"TP-40\",\"fields\":{\"description\":\"Task updated\",\"summary\":\"TP 38 updated\\\\\"}},"
                 + "{\"expand\":\"operations,versionedRepresentations,editmeta,changelog,transitions,renderedFields\",\"id\":\"10411\","
-                + "\"self\":\"http://localhost:8080/rest/api/2/issue/10411\",\"key\":\"TP-39\",\"fields\":{\"description\":null,\"summary\":\"115\",}}]}";
+                + "\"self\":\"http://localhost:8080/rest/api/2/issue/10411\",\"key\":\"TP-39\",\"fields\":{\"description\":null,\"summary\":\"115\"}}]}";
         Search search = new Search(paginationJson);
 
         List<Entity> entities = search.getEntities();
@@ -113,7 +113,7 @@ public class SearchTest {
      */
     @Test
     public void testGetEntitiesBracesInString() {
-    	String hasBraceJson = "{\"issues\":[{\"expand\":\"operations,versionedRepresentations,editmeta,changelog,transitions,renderedFields\",\"id\":\"10413\",\"self\":\"http://localhost:8080/rest/api/2/issue/10413\",\"key\":\"TP-41\",\"fields\":{\"description\":\"task upd\",\"summary\":\"Has brace \\\"}} in string \\\\\"{\"}}]}";
+    	String hasBraceJson = "{\"issues\":[{\"expand\":\"operations,versionedRepresentations,editmeta,changelog,transitions,renderedFields\",\"id\":\"10413\",\"self\":\"http://localhost:8080/rest/api/2/issue/10413\",\"key\":\"TP-41\",\"fields\":{\"description\":\"task upd\",\"summary\":\"Has brace \\\"}} in string \\\"{\"}}]}";
         Search search = new Search(hasBraceJson);
 
         List<Entity> entities = search.getEntities();
