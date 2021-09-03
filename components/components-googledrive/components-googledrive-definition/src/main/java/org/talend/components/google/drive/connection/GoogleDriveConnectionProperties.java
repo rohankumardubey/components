@@ -260,8 +260,8 @@ public class GoogleDriveConnectionProperties extends ComponentPropertiesImpl imp
             }
         }
         if (Form.ADVANCED.equals(form.getName()) || FORM_WIZARD.equals(form.getName())) {
-            boolean showDS = InstalledApplicationWithIdAndSecret.equals(oAuthMethod.getValue())
-                    || InstalledApplicationWithJSON.equals(oAuthMethod.getValue()) && !useOtherConnection;
+            boolean showDS = (InstalledApplicationWithIdAndSecret.equals(oAuthMethod.getValue())
+                    || InstalledApplicationWithJSON.equals(oAuthMethod.getValue())) && !useOtherConnection;
             form.getWidget(datastorePath.getName()).setVisible(showDS);
             form.getWidget(readTimeout.getName()).setHidden(useOtherConnection);
         }

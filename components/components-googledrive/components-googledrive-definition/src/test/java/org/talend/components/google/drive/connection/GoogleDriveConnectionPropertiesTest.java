@@ -63,7 +63,7 @@ public class GoogleDriveConnectionPropertiesTest extends GoogleDriveTestBase {
         properties.afterReferencedComponent();
         assertTrue(properties.getForm(Form.MAIN).getWidget(properties.oAuthMethod.getName()).isHidden());
         assertTrue(properties.getForm(Form.MAIN).getWidget(properties.applicationName.getName()).isHidden());
-        assertFalse(properties.getForm(Form.ADVANCED).getWidget(properties.datastorePath.getName()).isHidden());
+        assertTrue(properties.getForm(Form.ADVANCED).getWidget(properties.datastorePath.getName()).isHidden());
         assertTrue(properties.getForm(Form.ADVANCED).getWidget(properties.readTimeout.getName()).isHidden());
     }
 
