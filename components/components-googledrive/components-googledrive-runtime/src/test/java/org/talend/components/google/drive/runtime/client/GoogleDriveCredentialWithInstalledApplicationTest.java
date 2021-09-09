@@ -17,6 +17,7 @@ import static org.junit.Assert.assertNull;
 import java.io.File;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.google.api.client.auth.oauth2.Credential;
@@ -26,6 +27,7 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.testing.http.MockHttpTransport;
 import com.google.common.collect.ImmutableList;
 
+@Ignore
 public class GoogleDriveCredentialWithInstalledApplicationTest {
 
     private File dataStoreDir;

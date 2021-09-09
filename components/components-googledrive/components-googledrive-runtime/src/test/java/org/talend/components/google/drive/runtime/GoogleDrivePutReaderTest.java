@@ -11,6 +11,7 @@ import java.util.Map;
 
 import org.apache.avro.generic.IndexedRecord;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.talend.components.api.component.runtime.BoundedReader;
 import org.talend.components.google.drive.put.GoogleDrivePutDefinition;
@@ -20,6 +21,7 @@ import org.talend.components.google.drive.put.GoogleDrivePutProperties.UploadMod
 import com.google.api.client.http.AbstractInputStreamContent;
 import com.google.api.services.drive.model.File;
 
+@Ignore
 public class GoogleDrivePutReaderTest extends GoogleDriveTestBaseRuntime {
 
     public static final String PUT_FILE_ID = "put-fileName-id";
