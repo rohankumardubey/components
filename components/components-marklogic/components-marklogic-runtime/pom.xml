@@ -26,11 +26,6 @@
     </properties>
 
     <repositories>
-        <!-- Spring repository is used for some dependencies. e.g. okhttp-digest dependency-->
-        <repository>
-            <id>mulesoft-releases</id>
-            <url>${mulesoft.repo}</url>
-        </repository>
         <repository>
             <id>MarkLogic-releases</id>
             <name>MarkLogic Releases</name>
