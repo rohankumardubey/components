@@ -26,4 +26,6 @@ public abstract class SalesforceSchemaConstants {
     public final static String VALUE_DELIMITER = "salesforce.value.delimiter";
 
     public final static String RETURN_NULL_FOR_EMPTY = "RETURN_NULL_FOR_EMPTY";
+
+    public final static String DATETIME_LOCAL = "salesforce.datetime.local";
 }

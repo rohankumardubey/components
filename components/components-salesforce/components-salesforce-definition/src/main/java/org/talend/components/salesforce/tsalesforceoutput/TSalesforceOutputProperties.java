@@ -28,8 +28,10 @@ import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
+import org.talend.daikon.serialize.PostDeserializeSetup;
+import org.talend.daikon.serialize.migration.SerializeSetVersion;
 
-public class TSalesforceOutputProperties extends SalesforceOutputProperties {
+public class TSalesforceOutputProperties extends SalesforceOutputProperties implements SerializeSetVersion {
 
     public static final String FIELD_SALESFORCE_ID = "salesforce_id";
 
@@ -53,6 +55,8 @@ public class TSalesforceOutputProperties extends SalesforceOutputProperties {
     public Property<Boolean> retrieveInsertId = newBoolean("retrieveInsertId"); //$NON-NLS-1$
 
     public Property<Integer> commitLevel = newInteger("commitLevel", 200); //$NON-NLS-1$
+
+    public Property<Boolean> dataTimeUTC = newBoolean("dataTimeUTC",true); //$NON-NLS-1$
 
     // FIXME - should be file
     public Property<String> logFileName = newString("logFileName"); //$NON-NLS-1$
@@ -164,6 +168,7 @@ public class TSalesforceOutputProperties extends SalesforceOutputProperties {
         advancedForm.addRow(retrieveInsertId);
         advancedForm.addRow(commitLevel);
         advancedForm.addRow(widget(logFileName).setWidgetType(Widget.FILE_WIDGET_TYPE));
+        advancedForm.addRow(dataTimeUTC);
     }
 
     public void afterExtendInsert() {
@@ -196,6 +201,23 @@ public class TSalesforceOutputProperties extends SalesforceOutputProperties {
             form.getWidget("ignoreNull").setHidden(!(OutputAction.UPDATE.equals(outputAction.getValue())
                     || OutputAction.UPSERT.equals(outputAction.getValue())));
         }
+    }
+
+    @Override
+    public int getVersionNumber() {
+        return 2;
+    }
+
+    @Override
+    public boolean postDeserialize(int version, PostDeserializeSetup setup, boolean persistent) {
+        boolean deserialized = super.postDeserialize(version, setup, persistent);
+
+        if (version < 2) {
+            dataTimeUTC.setValue(false);
+            deserialized = true;
+        }
+
+        return deserialized;
     }
 
 }

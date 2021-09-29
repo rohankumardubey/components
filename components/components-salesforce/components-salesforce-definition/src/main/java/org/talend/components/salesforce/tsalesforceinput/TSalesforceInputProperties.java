@@ -104,6 +104,9 @@ public class TSalesforceInputProperties extends SalesforceConnectionModuleProper
 
     public Property<Integer> maxRecords = newInteger("maxRecords", 50000);
 
+    public Property<Boolean> dataTimeUTC = newBoolean("dataTimeUTC", true);
+
+
     public TSalesforceInputProperties(@JsonProperty("name") String name) {
         super(name);
     }
@@ -123,7 +126,7 @@ public class TSalesforceInputProperties extends SalesforceConnectionModuleProper
 
     @Override
     public int getVersionNumber() {
-        return 2;
+        return 3;
     }
 
     @Override
@@ -143,6 +146,11 @@ public class TSalesforceInputProperties extends SalesforceConnectionModuleProper
                 deserialized = true;
                 queryMode.setPossibleValues(Arrays.asList(QueryMode.Query, QueryMode.Bulk, QueryMode.BulkV2));
             }
+        }
+
+        if (version < 3) {
+            dataTimeUTC.setValue(false);
+            deserialized = true;
         }
 
         return deserialized;
@@ -176,6 +184,7 @@ public class TSalesforceInputProperties extends SalesforceConnectionModuleProper
         advancedForm.addRow(columnNameDelimiter);
         advancedForm.addRow(useResultLocator);
         advancedForm.addRow(maxRecords);
+        advancedForm.addRow(dataTimeUTC);
     }
 
     public ValidationResult validateGuessSchema() {

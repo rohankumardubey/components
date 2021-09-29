@@ -24,6 +24,7 @@ import org.talend.components.api.exception.ComponentException;
 import org.talend.components.salesforce.soql.SoqlQuery;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
 import org.talend.daikon.avro.AvroUtils;
+import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.exception.TalendRuntimeException;
 
 import com.sforce.async.AsyncApiException;
@@ -160,10 +161,11 @@ public class SalesforceBulkQueryInputReader extends SalesforceReader<IndexedReco
                 TSalesforceInputProperties inProperties = (TSalesforceInputProperties) properties;
                 if (inProperties.manualQuery.getValue()) {
                     querySchema = ((SalesforceSource) getCurrentSource()).guessSchema(inProperties.query.getValue());
+                    addDateTimeUTCField(querySchema);
                     return querySchema;
                 }
             }
         }
-        return super.getSchema();
+        return addDateTimeUTCField(super.getSchema());
     }
 }

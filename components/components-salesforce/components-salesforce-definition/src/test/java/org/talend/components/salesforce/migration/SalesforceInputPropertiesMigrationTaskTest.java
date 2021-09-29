@@ -1,6 +1,7 @@
 package org.talend.components.salesforce.migration;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
@@ -8,6 +9,7 @@ import java.io.IOException;
 import org.junit.Test;
 import org.talend.components.salesforce.TestUtils;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
+import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties;
 import org.talend.daikon.properties.Properties;
 import org.talend.daikon.serialize.SerializerDeserializer.Deserialized;
 
@@ -43,5 +45,25 @@ public class SalesforceInputPropertiesMigrationTaskTest {
         TSalesforceInputProperties properties = deser.object;
         assertEquals(3,properties.queryMode.getPossibleValues().size());
         assertTrue(properties.queryMode.getPossibleValues().contains(TSalesforceInputProperties.QueryMode.BulkV2));
+    }
+
+    @Test
+    public void testDataTimeValues() throws IOException {
+        Deserialized<TSalesforceInputProperties> deser = Properties.Helper.fromSerializedPersistent(
+                TestUtils.getResourceAsString(getClass(), "tSalesforceInputProperties_721.json"),
+                TSalesforceInputProperties.class);
+
+        TSalesforceInputProperties properties = deser.object;
+        assertFalse(properties.dataTimeUTC.getValue());
+    }
+
+    @Test
+    public void testDataTimeUTCValues() throws IOException {
+        Deserialized<TSalesforceOutputProperties> deser = Properties.Helper.fromSerializedPersistent(
+                TestUtils.getResourceAsString(getClass(), "tSalesforceOutputProperties_731.json"),
+                TSalesforceOutputProperties.class);
+
+        TSalesforceOutputProperties properties = deser.object;
+        assertFalse(properties.dataTimeUTC.getValue());
     }
 }

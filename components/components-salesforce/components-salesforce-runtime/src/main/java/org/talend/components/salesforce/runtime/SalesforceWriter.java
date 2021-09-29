@@ -298,13 +298,17 @@ final class SalesforceWriter implements WriterWithFeedback<Result, IndexedRecord
             valueToAdd = value;
             break;
         }
+        Schema.Field se = moduleSchema.getField(fieldName);
+        String datePattern = se != null? se.getProp(SchemaConstants.TALEND_COLUMN_PATTERN):"";
         if (valueToAdd instanceof Date) {
-            xmlObject.setField(fieldName, SalesforceRuntime.convertDateToCalendar((Date) valueToAdd, true));
+            boolean useLocalTZ = (!sprops.dataTimeUTC.getValue()) || (sprops.dataTimeUTC.getValue() && datePattern != null
+                    && !datePattern.isEmpty() && "yyyy-MM-dd".equals(datePattern));
+            xmlObject.setField(fieldName, SalesforceRuntime.convertDateToCalendar((Date) valueToAdd, useLocalTZ));
         } else {
-            Schema.Field se = moduleSchema.getField(fieldName);
+
             if (se != null && valueToAdd instanceof String) {
-                String datePattern = se.getProp(SchemaConstants.TALEND_COLUMN_PATTERN);
-                if (datePattern != null && !datePattern.toString().isEmpty()) {
+
+                if (datePattern != null && !datePattern.isEmpty()) {
                     if ("yyyy-MM-dd'T'HH:mm:ss'.000Z'".equals(datePattern)) {
                         xmlObject.setField(fieldName, calendarCodec.deserialize((String) valueToAdd));
                     } else if ("yyyy-MM-dd".equals(datePattern)) {
