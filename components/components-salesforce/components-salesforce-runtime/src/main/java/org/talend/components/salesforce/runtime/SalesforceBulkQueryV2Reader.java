@@ -23,6 +23,7 @@ import org.talend.components.salesforce.runtime.bulk.v2.SalesforceBulkQueryV2Run
 import org.talend.components.salesforce.runtime.bulk.v2.error.BulkV2ClientException;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
 import org.talend.daikon.avro.AvroUtils;
+import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
 
@@ -116,10 +117,11 @@ final class SalesforceBulkQueryV2Reader extends SalesforceReader {
                 TSalesforceInputProperties inProperties = (TSalesforceInputProperties) properties;
                 if (inProperties.manualQuery.getValue()) {
                     querySchema = ((SalesforceSource) getCurrentSource()).guessSchema(inProperties.query.getValue());
+                    addDateTimeUTCField(querySchema);
                     return querySchema;
                 }
             }
         }
-        return super.getSchema();
+        return addDateTimeUTCField(super.getSchema());
     }
 }

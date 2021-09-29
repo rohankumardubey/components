@@ -27,6 +27,7 @@ import org.talend.components.salesforce.runtime.common.ConnectionHolder;
 import org.talend.components.salesforce.tsalesforcebulkexec.TSalesforceBulkExecProperties;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
 import org.talend.daikon.avro.AvroUtils;
+import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.avro.converter.IndexedRecordConverter;
 import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
@@ -107,6 +108,17 @@ public abstract class SalesforceReader<T> extends AbstractBoundedReader<T> {
             }
         }
         return querySchema;
+    }
+
+    protected Schema addDateTimeUTCField(Schema schema) {
+        if(schema != null && properties instanceof  TSalesforceInputProperties){
+            schema.getFields()
+                    .stream()
+                    .filter(e -> "yyyy-MM-dd'T'HH:mm:ss'.000Z'".equals(e.getProp(SchemaConstants.TALEND_COLUMN_PATTERN)))
+                    .forEach(e -> e.addProp(SalesforceSchemaConstants.DATETIME_LOCAL,
+                            ((TSalesforceInputProperties) properties).dataTimeUTC.getStringValue()));
+        }
+        return schema;
     }
 
     protected String getQueryString(SalesforceConnectionModuleProperties properties) throws IOException {

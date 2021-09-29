@@ -19,6 +19,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 import org.apache.avro.Schema;
 import org.apache.commons.lang3.StringUtils;
@@ -339,6 +340,11 @@ public class SalesforceAvroRegistry extends AvroRegistry {
             String pattern = field.getProp(SchemaConstants.TALEND_COLUMN_PATTERN);
             // TODO: null handling
             format = new SimpleDateFormat(pattern);
+            String datePattern = field.getProp(SchemaConstants.TALEND_COLUMN_PATTERN);
+            boolean datetimeUTC = "true".equals(field.getProp(SalesforceSchemaConstants.DATETIME_LOCAL));
+            if(datetimeUTC && "yyyy-MM-dd'T'HH:mm:ss'.000Z'".equals(datePattern)){
+                format.setTimeZone(TimeZone.getTimeZone("UTC"));
+            }
         }
 
         @Override
