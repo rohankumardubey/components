@@ -62,7 +62,7 @@ COMPONENT_VERSION_PROPERTY="components\.version"
 ARTIFACT_VERSION_REGEXP="[0-9]+\.[0-9]+\.[0-9]+(-SNAPSHOT)?"
 
 # Jenkins build server URL
-CI_SERVER="https://ci-common.datapwn.com/view/Components/"
+CI_SERVER="https://jenkins-connectors.datapwn.com/job/components/"
 
 # Component repository URL
 REPOSITORY=https://github.com/Talend/components/
