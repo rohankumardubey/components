@@ -50,7 +50,12 @@ public class GoogleDriveCreateRuntimeTest extends GoogleDriveTestBaseRuntime {
         doReturn(drive).when(testRuntime).getDriveService();
         File fc = new File();
         fc.setId(FOLDER_CREATE_ID);
-        when(drive.files().create(any(File.class)).setFields(eq("id")).execute()).thenReturn(fc);
+        when(drive
+                .files()
+                .create(any(File.class))
+                .setFields(eq("id"))
+                .setSupportsAllDrives(false)
+                .execute()).thenReturn(fc);
         //
 
         FileList flA = new FileList();
@@ -59,21 +64,38 @@ public class GoogleDriveCreateRuntimeTest extends GoogleDriveTestBaseRuntime {
         fA.setId("A");
         fs.add(fA);
         flA.setFiles(fs);
-        when(drive.files().list().setQ(qA).execute()).thenReturn(flA);
+        when(drive
+                .files()
+                .list()
+                .setQ(qA)
+                .setSupportsAllDrives(false)
+                .setIncludeItemsFromAllDrives(false).execute()).thenReturn(flA);
         FileList flB = new FileList();
         List<File> fsA = new ArrayList<>();
         File fB = new File();
         fB.setId("B");
         fsA.add(fB);
         flB.setFiles(fsA);
-        when(drive.files().list().setQ(qB).execute()).thenReturn(flB);
+        when(drive
+                .files()
+                .list()
+                .setQ(qB)
+                .setSupportsAllDrives(false)
+                .setIncludeItemsFromAllDrives(false)
+                .execute()).thenReturn(flB);
         FileList flC = new FileList();
         List<File> fsC = new ArrayList<>();
         File fC = new File();
         fC.setId("C");
         fsC.add(fC);
         flC.setFiles(fsC);
-        when(drive.files().list().setQ(qC).execute()).thenReturn(flC);
+        when(drive
+                .files()
+                .list()
+                .setQ(qC)
+                .setSupportsAllDrives(false)
+                .setIncludeItemsFromAllDrives(false)
+                .execute()).thenReturn(flC);
     }
 
     @Test
@@ -108,7 +130,12 @@ public class GoogleDriveCreateRuntimeTest extends GoogleDriveTestBaseRuntime {
 
     @Test
     public void testExceptionThrownInRuntime() throws Exception {
-        when(drive.files().create(any()).setFields("id").execute().getId()).thenThrow(new IOException("error"));
+        when(drive
+                .files()
+                .create(any())
+                .setFields("id")
+                .setSupportsAllDrives(false)
+                .execute().getId()).thenThrow(new IOException("error"));
         testRuntime.initialize(container, properties);
         try {
             testRuntime.runAtDriver(container);
@@ -128,7 +155,13 @@ public class GoogleDriveCreateRuntimeTest extends GoogleDriveTestBaseRuntime {
         fAp.setId("A");
         fs.add(fAp);
         flA.setFiles(fs);
-        when(drive.files().list().setQ(eq(qA)).execute()).thenReturn(flA);
+        when(drive
+                .files()
+                .list()
+                .setQ(eq(qA))
+                .setSupportsAllDrives(false)
+                .setIncludeItemsFromAllDrives(false)
+                .execute()).thenReturn(flA);
 
         properties.parentFolder.setValue("/A");
         testRuntime.initialize(container, properties);
@@ -138,7 +171,13 @@ public class GoogleDriveCreateRuntimeTest extends GoogleDriveTestBaseRuntime {
 
     @Test(expected = ComponentException.class)
     public void testNoResourcesMatching() throws Exception {
-        when(drive.files().list().setQ(eq(qA)).execute()).thenReturn(emptyFileList);
+        when(drive
+                .files()
+                .list()
+                .setQ(eq(qA))
+                .setSupportsAllDrives(false)
+                .setIncludeItemsFromAllDrives(false)
+                .execute()).thenReturn(emptyFileList);
 
         properties.parentFolder.setValue("/A");
         testRuntime.initialize(container, properties);

@@ -53,10 +53,17 @@ public class GoogleDriveDeleteRuntime extends GoogleDriveRuntime implements Comp
 
     public void delete(RuntimeContainer container) {
         try {
+            GoogleDriveUtils utils = getDriveUtils();
+            utils.setIncludeSharedDrives(properties.includeSharedDrives.getValue());
+            if (properties.includeSharedDrives.getValue()) {
+                utils.setCorpora(properties.corpora.getValue());
+                utils.setDriveId(properties.driveId.getValue());
+            }
             if (properties.deleteMode.getValue().equals(AccessMethod.Name)) {
-                fileId = getDriveUtils().deleteResourceByName(properties.file.getValue(), properties.useTrash.getValue());
+                fileId = utils.deleteResourceByName(properties.file.getValue(), properties.useTrash.getValue(),
+                        properties.includeSharedItems.getValue());
             } else {
-                fileId = getDriveUtils().deleteResourceById(properties.file.getValue(), properties.useTrash.getValue());
+                fileId = utils.deleteResourceById(properties.file.getValue(), properties.useTrash.getValue());
             }
         } catch (IOException | GeneralSecurityException e) {
             LOG.error(e.getLocalizedMessage());

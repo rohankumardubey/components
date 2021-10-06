@@ -57,19 +57,41 @@ public class GoogleDriveCopyReaderTest extends GoogleDriveTestBaseRuntime {
         final String q1 = "name='A' and 'root' in parents and mimeType='application/vnd.google-apps.folder'";
         final String q2 = "name='" + FILE_COPY_NAME + "' and mimeType!='application/vnd.google-apps.folder'";
 
-        when(drive.files().list().setQ(eq(q1)).execute()).thenReturn(list);
-        when(drive.files().list().setQ(eq(q2)).execute()).thenReturn(list);
+        when(drive
+                .files()
+                .list()
+                .setQ(eq(q1))
+                .setSupportsAllDrives(false)
+                .setIncludeItemsFromAllDrives(false)
+                .execute()).thenReturn(list);
+        when(drive
+                .files()
+                .list()
+                .setQ(eq(q2))
+                .setSupportsAllDrives(false)
+                .setIncludeItemsFromAllDrives(false)
+                .execute()).thenReturn(list);
 
         // destination/copied
         File copiedFile = new File();
         copiedFile.setId(DESTINATION_ID);
         copiedFile.setParents(Collections.singletonList(SOURCE_ID));
-        when(drive.files().copy(anyString(), any(File.class)).setFields(anyString()).execute()).thenReturn(copiedFile);
+        when(drive
+                .files()
+                .copy(anyString(), any(File.class))
+                .setFields(anyString())
+                .setSupportsAllDrives(false)
+                .execute()).thenReturn(copiedFile);
 
         File destFolder = new File();
         destFolder.setId(DESTINATION_ID);
         destFolder.setParents(Collections.singletonList(SOURCE_ID));
-        when(drive.files().create(any(File.class)).setFields(anyString()).execute()).thenReturn(destFolder);
+        when(drive
+                .files()
+                .create(any(File.class))
+                .setFields(anyString())
+                .setSupportsAllDrives(false)
+                .execute()).thenReturn(destFolder);
     }
 
     @Test
@@ -182,7 +204,13 @@ public class GoogleDriveCopyReaderTest extends GoogleDriveTestBaseRuntime {
         fsfolder.setId(SOURCE_ID);
         fsfiles.add(fsfolder);
         fsource.setFiles(fsfiles);
-        when(drive.files().list().setQ(eq(q1)).execute()).thenReturn(fsource);
+        when(drive
+                .files()
+                .list()
+                .setQ(eq(q1))
+                .setSupportsAllDrives(false)
+                .setIncludeItemsFromAllDrives(false)
+                .execute()).thenReturn(fsource);
 
         FileList flist = new FileList();
         List<File> ffiles = new ArrayList<>();
@@ -197,8 +225,20 @@ public class GoogleDriveCopyReaderTest extends GoogleDriveTestBaseRuntime {
         ffolder.setId("folder-id2");
         ffiles.add(ffolder);
         flist.setFiles(ffiles);
-        when(drive.files().list().setQ(eq(q2)).execute()).thenReturn(flist);
-        when(drive.files().list().setQ(eq(q3)).execute()).thenReturn(emptyFileList);
+        when(drive
+                .files()
+                .list()
+                .setQ(eq(q2))
+                .setSupportsAllDrives(false)
+                .setIncludeItemsFromAllDrives(false)
+                .execute()).thenReturn(flist);
+        when(drive
+                .files()
+                .list()
+                .setQ(eq(q3))
+                .setSupportsAllDrives(false)
+                .setIncludeItemsFromAllDrives(false)
+                .execute()).thenReturn(emptyFileList);
 
         properties.copyMode.setValue(CopyMode.Folder);
         properties.source.setValue("/folder");

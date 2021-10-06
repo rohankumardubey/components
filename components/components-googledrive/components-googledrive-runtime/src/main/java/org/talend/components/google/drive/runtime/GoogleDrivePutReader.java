@@ -49,10 +49,15 @@ public class GoogleDrivePutReader extends GoogleDriveReader {
     public boolean start() throws IOException {
         super.start();
 
+        utils.setIncludeSharedDrives(properties.includeSharedDrives.getValue());
+        if (properties.includeSharedDrives.getValue()) {
+            utils.setCorpora(properties.corpora.getValue());
+            utils.setDriveId(properties.driveId.getValue());
+        }
         String localFilePath = properties.localFilePath.getValue();
         String destinationFolderId = properties.destinationFolderAccessMethod.getValue().equals(AccessMethod.Id)
                 ? properties.destinationFolder.getValue()
-                : utils.getFolderId(properties.destinationFolder.getValue(), false);
+                : utils.getFolderId(properties.destinationFolder.getValue(), false, properties.includeSharedItems.getValue());
 
         GoogleDrivePutParameters p = new GoogleDrivePutParameters(destinationFolderId, properties.fileName.getValue(),
                 properties.overwrite.getValue(), localFilePath);

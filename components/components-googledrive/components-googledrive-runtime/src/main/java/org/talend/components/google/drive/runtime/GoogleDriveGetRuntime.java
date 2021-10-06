@@ -63,8 +63,15 @@ public class GoogleDriveGetRuntime extends GoogleDriveRuntime implements Compone
 
     public void getFile(RuntimeContainer container) {
         try {
-            String resourceId = properties.fileAccessMethod.getValue().equals(AccessMethod.Id) ? properties.file.getValue()
-                    : getDriveUtils().getFileId(properties.file.getValue());
+            GoogleDriveUtils utils = getDriveUtils();
+            utils.setIncludeSharedDrives(properties.includeSharedDrives.getValue());
+            if (properties.includeSharedDrives.getValue()) {
+                utils.setCorpora(properties.corpora.getValue());
+                utils.setDriveId(properties.driveId.getValue());
+            }
+            String resourceId = properties.fileAccessMethod.getValue().equals(AccessMethod.Id)
+                    ? properties.file.getValue()
+                    : utils.getFileId(properties.file.getValue(), properties.includeSharedItems.getValue());
             Map<String, MimeType> mimes = GoogleDriveMimeTypes.newDefaultMimeTypesSupported();
             mimes.put(MIME_TYPE_GOOGLE_DOCUMENT, properties.exportDocument.getValue());
             mimes.put(MIME_TYPE_GOOGLE_DRAWING, properties.exportDrawing.getValue());
@@ -73,7 +80,7 @@ public class GoogleDriveGetRuntime extends GoogleDriveRuntime implements Compone
             GoogleDriveGetParameters p = new GoogleDriveGetParameters(resourceId, mimes, properties.storeToLocal.getValue(),
                     properties.outputFileName.getValue(), properties.setOutputExt.getValue());
             //
-            GoogleDriveGetResult r = getDriveUtils().getResource(p);
+            GoogleDriveGetResult r = utils.getResource(p);
             fileId = r.getId();
         } catch (IOException | GeneralSecurityException e) {
             LOG.error(e.getMessage());

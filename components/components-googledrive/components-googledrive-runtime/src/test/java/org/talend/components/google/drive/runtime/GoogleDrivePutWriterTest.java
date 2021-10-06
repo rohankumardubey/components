@@ -54,13 +54,23 @@ public class GoogleDrivePutWriterTest extends GoogleDriveTestBaseRuntime {
         wop = (GoogleDriveWriteOperation) sink.createWriteOperation();
         writer = new GoogleDrivePutWriter(wop, properties, container);
 
-        when(drive.files().list().setQ(anyString()).execute()).thenReturn(emptyFileList);
+        when(drive
+                .files()
+                .list()
+                .setQ(anyString())
+                .setSupportsAllDrives(false)
+                .setIncludeItemsFromAllDrives(false).execute()).thenReturn(emptyFileList);
         //
         File putFile = new File();
         putFile.setId(PUT_FILE_ID);
         putFile.setParents(Collections.singletonList(PUT_FILE_PARENT_ID));
-        when(drive.files().create(any(File.class), any(AbstractInputStreamContent.class)).setFields(anyString()).execute())
-                .thenReturn(putFile);
+        when(drive
+                .files()
+                .create(any(File.class), any(AbstractInputStreamContent.class))
+                .setFields(anyString())
+                .setSupportsAllDrives(false)
+                .execute())
+                        .thenReturn(putFile);
     }
 
     @Test

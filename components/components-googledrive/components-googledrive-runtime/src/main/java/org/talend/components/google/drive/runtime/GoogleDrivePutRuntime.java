@@ -56,12 +56,18 @@ public class GoogleDrivePutRuntime extends GoogleDriveRuntime implements Compone
 
     private void putFile(RuntimeContainer container) {
         try {
+            final GoogleDriveUtils utils = getDriveUtils();
+            utils.setIncludeSharedDrives(properties.includeSharedDrives.getValue());
+            if (properties.includeSharedDrives.getValue()) {
+                utils.setCorpora(properties.corpora.getValue());
+                utils.setDriveId(properties.driveId.getValue());
+            }
             String destinationFolderId = properties.destinationFolderAccessMethod.getValue().equals(AccessMethod.Id)
                     ? properties.destinationFolder.getValue()
-                    : getDriveUtils().getFolderId(properties.destinationFolder.getValue(), false);
+                    : utils.getFolderId(properties.destinationFolder.getValue(), false, properties.includeSharedItems.getValue());
             GoogleDrivePutParameters p = new GoogleDrivePutParameters(destinationFolderId, properties.fileName.getValue(),
                     properties.overwrite.getValue(), properties.localFilePath.getValue());
-            sentFile = getDriveUtils().putResource(p);
+            sentFile = utils.putResource(p);
         } catch (IOException | GeneralSecurityException e) {
             LOG.error(e.getLocalizedMessage());
             throw new ComponentException(e);

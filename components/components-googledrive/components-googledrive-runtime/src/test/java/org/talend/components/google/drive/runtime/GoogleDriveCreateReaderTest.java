@@ -35,7 +35,12 @@ public class GoogleDriveCreateReaderTest extends GoogleDriveTestBaseRuntime {
 
         File fc = new File();
         fc.setId(FOLDER_CREATE_ID);
-        when(drive.files().create(any(File.class)).setFields(eq("id")).execute()).thenReturn(fc);
+        when(drive
+                .files()
+                .create(any(File.class))
+                .setFields(eq("id"))
+                .setSupportsAllDrives(false)
+                .execute()).thenReturn(fc);
     }
 
     @Test

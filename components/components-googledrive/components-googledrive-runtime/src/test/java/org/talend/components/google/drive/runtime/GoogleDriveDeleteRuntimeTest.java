@@ -45,8 +45,15 @@ public class GoogleDriveDeleteRuntimeTest extends GoogleDriveTestBaseRuntime {
         testRuntime = spy(GoogleDriveDeleteRuntime.class);
         doReturn(drive).when(testRuntime).getDriveService();
 
-        when(drive.files().update(anyString(), any(File.class)).execute()).thenReturn(null);
-        when(drive.files().delete(anyString()).execute()).thenReturn(null);
+        when(drive
+                .files()
+                .update(anyString(), any(File.class))
+                .setSupportsAllDrives(false)
+                .execute()).thenReturn(null);
+        when(drive
+                .files()
+                .delete(anyString())
+                .setSupportsAllDrives(false).execute()).thenReturn(null);
 
         deleteFileList = new FileList();
         List<File> files = new ArrayList<>();
@@ -58,7 +65,12 @@ public class GoogleDriveDeleteRuntimeTest extends GoogleDriveTestBaseRuntime {
 
     @Test
     public void testDeleteByName() throws Exception {
-        when(drive.files().list().setQ(anyString()).execute()).thenReturn(deleteFileList);
+        when(drive
+                .files()
+                .list()
+                .setQ(anyString())
+                .setSupportsAllDrives(false)
+                .setIncludeItemsFromAllDrives(false).execute()).thenReturn(deleteFileList);
         testRuntime.initialize(container, properties);
         testRuntime.runAtDriver(container);
         assertEquals(FOLDER_DELETE_ID,
@@ -72,18 +84,52 @@ public class GoogleDriveDeleteRuntimeTest extends GoogleDriveTestBaseRuntime {
         String qC = "name='C' and 'B' in parents and mimeType='application/vnd.google-apps.folder'";
         String qD = "name='delete-id' and 'C' in parents and mimeType='application/vnd.google-apps.folder'";
         String qDn = "name='delete-id' and 'C' in parents and mimeType!='application/vnd.google-apps.folder'";
-        when(drive.files().list().setQ(eq(qA)).execute()).thenReturn(createFolderFileList("A", false));
-        when(drive.files().list().setQ(eq(qB)).execute()).thenReturn(createFolderFileList("B", false));
-        when(drive.files().list().setQ(eq(qC)).execute()).thenReturn(deleteFileList);
+        when(drive
+                .files()
+                .list()
+                .setQ(eq(qA))
+                .setSupportsAllDrives(false)
+                .setIncludeItemsFromAllDrives(false)
+                .execute()).thenReturn(createFolderFileList("A", false));
+        when(drive
+                .files()
+                .list()
+                .setQ(eq(qB))
+                .setSupportsAllDrives(false)
+                .setIncludeItemsFromAllDrives(false)
+                .execute()).thenReturn(createFolderFileList("B", false));
+        when(drive
+                .files()
+                .list()
+                .setQ(eq(qC))
+                .setSupportsAllDrives(false)
+                .setIncludeItemsFromAllDrives(false).execute()).thenReturn(deleteFileList);
         properties.file.setValue("/A/B/C");
         testRuntime.initialize(container, properties);
         testRuntime.runAtDriver(container);
         assertEquals(FOLDER_DELETE_ID,
                 container.getComponentData(TEST_CONTAINER, getStudioName(GoogleDriveDeleteDefinition.RETURN_FILE_ID)));
         //
-        when(drive.files().list().setQ(eq(qC)).execute()).thenReturn(createFolderFileList("C", false));
-        when(drive.files().list().setQ(eq(qD)).execute()).thenReturn(emptyFileList);
-        when(drive.files().list().setQ(eq(qDn)).execute()).thenReturn(deleteFileList);
+        when(drive
+                .files()
+                .list()
+                .setQ(eq(qC))
+                .setSupportsAllDrives(false)
+                .setIncludeItemsFromAllDrives(false)
+                .execute()).thenReturn(createFolderFileList("C", false));
+        when(drive
+                .files()
+                .list()
+                .setQ(eq(qD))
+                .setSupportsAllDrives(false)
+                .setIncludeItemsFromAllDrives(false)
+                .execute()).thenReturn(emptyFileList);
+        when(drive
+                .files()
+                .list()
+                .setQ(eq(qDn))
+                .setSupportsAllDrives(false)
+                .setIncludeItemsFromAllDrives(false).execute()).thenReturn(deleteFileList);
         properties.file.setValue("/A/B/C/delete-id");
         testRuntime.initialize(container, properties);
         testRuntime.runAtDriver(container);
@@ -113,7 +159,10 @@ public class GoogleDriveDeleteRuntimeTest extends GoogleDriveTestBaseRuntime {
 
     @Test
     public void testExceptionThrown() throws Exception {
-        when(drive.files().update(anyString(), any(File.class)).execute()).thenThrow(new IOException("error"));
+        when(drive
+                .files()
+                .update(anyString(), any(File.class))
+                .setSupportsAllDrives(false).execute()).thenThrow(new IOException("error"));
         testRuntime.initialize(container, properties);
         try {
             testRuntime.runAtDriver(container);

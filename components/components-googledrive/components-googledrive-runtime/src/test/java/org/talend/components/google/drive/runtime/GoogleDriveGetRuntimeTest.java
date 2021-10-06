@@ -55,13 +55,22 @@ public class GoogleDriveGetRuntimeTest extends GoogleDriveTestBaseRuntime {
         files.add(f);
         fileList.setFiles(files);
 
-        when(drive.files().list().setQ(anyString()).execute()).thenReturn(fileList);
+        when(drive
+                .files()
+                .list()
+                .setQ(anyString())
+                .setSupportsAllDrives(false)
+                .setIncludeItemsFromAllDrives(false).execute()).thenReturn(fileList);
 
         File file = new File();
         file.setId("fileName-id");
         file.setMimeType(GoogleDriveMimeTypes.MIME_TYPE_JSON);
         file.setFileExtension("json");
-        when(drive.files().get(any()).setFields(anyString()).execute()).thenReturn(file);
+        when(drive
+                .files()
+                .get(any())
+                .setFields(anyString())
+                .setSupportsAllDrives(false).execute()).thenReturn(file);
     }
 
     @Test
@@ -84,10 +93,32 @@ public class GoogleDriveGetRuntimeTest extends GoogleDriveTestBaseRuntime {
         file.setId("fileName-id");
         file.setMimeType(GoogleDriveMimeTypes.MIME_TYPE_GOOGLE_DOCUMENT);
 
-        when(drive.files().list().setQ(qA).execute()).thenReturn(createFolderFileList("A", false));
-        when(drive.files().list().setQ(qB).execute()).thenReturn(createFolderFileList("B", false));
-        when(drive.files().list().setQ(qC).execute()).thenReturn(createFolderFileList("C", false));
-        when(drive.files().get(anyString()).setFields(anyString()).execute()).thenReturn(file);
+        when(drive
+                .files()
+                .list()
+                .setQ(qA)
+                .setSupportsAllDrives(false)
+                .setIncludeItemsFromAllDrives(false)
+                .execute()).thenReturn(createFolderFileList("A", false));
+        when(drive
+                .files()
+                .list()
+                .setQ(qB)
+                .setSupportsAllDrives(false)
+                .setIncludeItemsFromAllDrives(false)
+                .execute()).thenReturn(createFolderFileList("B", false));
+        when(drive
+                .files()
+                .list()
+                .setQ(qC)
+                .setSupportsAllDrives(false)
+                .setIncludeItemsFromAllDrives(false)
+                .execute()).thenReturn(createFolderFileList("C", false));
+        when(drive
+                .files()
+                .get(anyString())
+                .setFields(anyString())
+                .setSupportsAllDrives(false).execute()).thenReturn(file);
         //
         properties.file.setValue("/A/B/C");
         testRuntime.initialize(container, properties);
@@ -101,7 +132,11 @@ public class GoogleDriveGetRuntimeTest extends GoogleDriveTestBaseRuntime {
         File file = new File();
         file.setId("fileName-id");
         file.setMimeType(GoogleDriveMimeTypes.MIME_TYPE_GOOGLE_DOCUMENT);
-        when(drive.files().get(any()).setFields(anyString()).execute()).thenReturn(file);
+        when(drive
+                .files()
+                .get(any())
+                .setFields(anyString())
+                .setSupportsAllDrives(false).execute()).thenReturn(file);
         //
         testRuntime.initialize(container, properties);
         testRuntime.runAtDriver(container);
@@ -133,7 +168,13 @@ public class GoogleDriveGetRuntimeTest extends GoogleDriveTestBaseRuntime {
 
     @Test
     public void testExceptionThrown() throws Exception {
-        when(drive.files().list().setQ(anyString()).execute()).thenThrow(new IOException("error"));
+        when(drive
+                .files()
+                .list()
+                .setQ(anyString())
+                .setSupportsAllDrives(false)
+                .setIncludeItemsFromAllDrives(false)
+                .execute()).thenThrow(new IOException("error"));
         testRuntime.initialize(container, properties);
         try {
             testRuntime.runAtDriver(container);
@@ -145,8 +186,19 @@ public class GoogleDriveGetRuntimeTest extends GoogleDriveTestBaseRuntime {
     @Test(expected = ComponentException.class)
     public void testNonExistentFile() throws Exception {
         String q1 = "name='A' and 'root' in parents and mimeType='application/vnd.google-apps.folder'";
-        when(drive.files().list().setQ(q1).execute()).thenReturn(emptyFileList);
-        when(drive.files().list().setQ(anyString()).execute()).thenReturn(emptyFileList);
+        when(drive
+                .files()
+                .list()
+                .setQ(q1)
+                .setSupportsAllDrives(false)
+                .setIncludeItemsFromAllDrives(false)
+                .execute()).thenReturn(emptyFileList);
+        when(drive
+                .files()
+                .list()
+                .setQ(anyString())
+                .setSupportsAllDrives(false)
+                .setIncludeItemsFromAllDrives(false).execute()).thenReturn(emptyFileList);
         //
         properties.file.setValue("/A");
         testRuntime.initialize(container, properties);
@@ -164,8 +216,19 @@ public class GoogleDriveGetRuntimeTest extends GoogleDriveTestBaseRuntime {
         fl.add(f2);
         files.setFiles(fl);
         String q1 = "name='A' and 'root' in parents and mimeType='application/vnd.google-apps.folder'";
-        when(drive.files().list().setQ(q1).execute()).thenReturn(files);
-        when(drive.files().list().setQ(any()).execute()).thenReturn(files);
+        when(drive
+                .files()
+                .list()
+                .setQ(q1)
+                .setSupportsAllDrives(false)
+                .setIncludeItemsFromAllDrives(false)
+                .execute()).thenReturn(files);
+        when(drive
+                .files()
+                .list()
+                .setQ(any())
+                .setSupportsAllDrives(false)
+                .setIncludeItemsFromAllDrives(false).execute()).thenReturn(files);
         //
         properties.file.setValue("/A");
         testRuntime.initialize(container, properties);

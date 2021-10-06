@@ -65,7 +65,7 @@ public class GoogleDriveListTestIT extends GoogleDriveBaseTestIT {
 
     private void deleteFolder(GoogleDriveListReader reader, String folderName) throws Exception {
         if (folderName.startsWith("TalendTest_")) {
-            reader.utils.deleteResourceByName(folderName, false);
+            reader.utils.deleteResourceByName(folderName, false, false);
         }
     }
 
@@ -85,7 +85,7 @@ public class GoogleDriveListTestIT extends GoogleDriveBaseTestIT {
         while (reader.advance()) {
             assertNotNull(reader.getCurrent());
         }
-        reader.utils.deleteResourceByName(folder, false);
+        reader.utils.deleteResourceByName(folder, false, false);
     }
 
     @Test
@@ -119,7 +119,7 @@ public class GoogleDriveListTestIT extends GoogleDriveBaseTestIT {
         }
         assertEquals(MAX_FOLDERS, counter);
         // finally remove test folder
-        reader.utils.deleteResourceByName(folder, false);
+        reader.utils.deleteResourceByName(folder, false, false);
     }
 
     @Test
@@ -169,7 +169,7 @@ public class GoogleDriveListTestIT extends GoogleDriveBaseTestIT {
         }
         assertEquals(MAX_FILES, counter);
         // finally remove test folder
-        reader.utils.deleteResourceByName(folder, false);
+        reader.utils.deleteResourceByName(folder, false, false);
     }
 
 }

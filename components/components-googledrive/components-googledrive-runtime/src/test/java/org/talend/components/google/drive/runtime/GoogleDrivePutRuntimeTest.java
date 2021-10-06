@@ -58,13 +58,24 @@ public class GoogleDrivePutRuntimeTest extends GoogleDriveTestBaseRuntime {
         testRuntime = spy(GoogleDrivePutRuntime.class);
         doReturn(drive).when(testRuntime).getDriveService();
 
-        when(drive.files().list().setQ(anyString()).execute()).thenReturn(emptyFileList);
+        when(drive
+                .files()
+                .list()
+                .setQ(anyString())
+                .setSupportsAllDrives(false)
+                .setIncludeItemsFromAllDrives(false)
+                .execute()).thenReturn(emptyFileList);
         //
         File putFile = new File();
         putFile.setId(PUT_FILE_ID);
         putFile.setParents(Collections.singletonList(PUT_FILE_PARENT_ID));
-        when(drive.files().create(any(File.class), any(AbstractInputStreamContent.class)).setFields(anyString()).execute())
-                .thenReturn(putFile);
+        when(drive
+                .files()
+                .create(any(File.class), any(AbstractInputStreamContent.class))
+                .setFields(anyString())
+                .setSupportsAllDrives(false)
+                .execute())
+                        .thenReturn(putFile);
 
     }
 
@@ -109,7 +120,13 @@ public class GoogleDrivePutRuntimeTest extends GoogleDriveTestBaseRuntime {
 
     @Test
     public void testExceptionThrown() throws Exception {
-        when(drive.files().list().setQ(anyString()).execute()).thenThrow(new IOException("error"));
+        when(drive
+                .files()
+                .list()
+                .setQ(anyString())
+                .setSupportsAllDrives(false)
+                .setIncludeItemsFromAllDrives(false)
+                .execute()).thenThrow(new IOException("error"));
         testRuntime.initialize(container, properties);
         try {
             testRuntime.runAtDriver(container);
@@ -138,7 +155,13 @@ public class GoogleDrivePutRuntimeTest extends GoogleDriveTestBaseRuntime {
         hfiles.add(hfile);
         hfiles.add(new File());
         hasfilelist.setFiles(hfiles);
-        when(drive.files().list().setQ(anyString()).execute()).thenReturn(hasfilelist);
+        when(drive
+                .files()
+                .list()
+                .setQ(anyString())
+                .setSupportsAllDrives(false)
+                .setIncludeItemsFromAllDrives(false)
+                .execute()).thenReturn(hasfilelist);
         properties.overwrite.setValue(true);
         testRuntime.initialize(container, properties);
         try {
@@ -156,7 +179,13 @@ public class GoogleDrivePutRuntimeTest extends GoogleDriveTestBaseRuntime {
         hfile.setId(FILE_PUT_NAME);
         hfiles.add(hfile);
         hasfilelist.setFiles(hfiles);
-        when(drive.files().list().setQ(anyString()).execute()).thenReturn(hasfilelist);
+        when(drive
+                .files()
+                .list()
+                .setQ(anyString())
+                .setSupportsAllDrives(false)
+                .setIncludeItemsFromAllDrives(false)
+                .execute()).thenReturn(hasfilelist);
         properties.overwrite.setValue(true);
         testRuntime.initialize(container, properties);
         testRuntime.runAtDriver(container);
@@ -175,7 +204,13 @@ public class GoogleDrivePutRuntimeTest extends GoogleDriveTestBaseRuntime {
         hfile.setId(FILE_PUT_NAME);
         hfiles.add(hfile);
         hasfilelist.setFiles(hfiles);
-        when(drive.files().list().setQ(anyString()).execute()).thenReturn(hasfilelist);
+        when(drive
+                .files()
+                .list()
+                .setQ(anyString())
+                .setSupportsAllDrives(false)
+                .setIncludeItemsFromAllDrives(false)
+                .execute()).thenReturn(hasfilelist);
         properties.overwrite.setValue(false);
         testRuntime.initialize(container, properties);
         try {

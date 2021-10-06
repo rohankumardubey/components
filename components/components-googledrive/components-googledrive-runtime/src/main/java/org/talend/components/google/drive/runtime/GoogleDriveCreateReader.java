@@ -46,10 +46,15 @@ public class GoogleDriveCreateReader extends GoogleDriveReader {
     @Override
     public boolean start() throws IOException {
         super.start();
-
+        utils.setIncludeSharedDrives(properties.includeSharedDrives.getValue());
+        if (properties.includeSharedDrives.getValue()) {
+            utils.setCorpora(properties.corpora.getValue());
+            utils.setDriveId(properties.driveId.getValue());
+        }
         String parentFolder = properties.parentFolder.getValue();
-        parentFolderId = properties.parentFolderAccessMethod.getValue().equals(AccessMethod.Id) ? parentFolder
-                : utils.getFolderId(parentFolder, false);
+        parentFolderId = properties.parentFolderAccessMethod.getValue().equals(AccessMethod.Id)
+                ? parentFolder
+                : utils.getFolderId(parentFolder, false, properties.includeSharedItems.getValue());
         newFolderId = utils.createFolder(parentFolderId, properties.newFolder.getValue());
         /* feeding record */
         record = new GenericData.Record(properties.schemaMain.schema.getValue());

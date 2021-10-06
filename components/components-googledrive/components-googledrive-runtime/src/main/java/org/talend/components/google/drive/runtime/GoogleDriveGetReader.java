@@ -53,9 +53,14 @@ public class GoogleDriveGetReader extends GoogleDriveReader {
     @Override
     public boolean start() throws IOException {
         super.start();
+        utils.setIncludeSharedDrives(properties.includeSharedDrives.getValue());
+        if (properties.includeSharedDrives.getValue()) {
+            utils.setCorpora(properties.corpora.getValue());
+            utils.setDriveId(properties.driveId.getValue());
+        }
         //
         String resourceId = properties.fileAccessMethod.getValue().equals(AccessMethod.Id) ? properties.file.getValue()
-                : utils.getFileId(properties.file.getValue());
+                : utils.getFileId(properties.file.getValue(), properties.includeSharedItems.getValue());
         Map<String, MimeType> mimes = GoogleDriveMimeTypes.newDefaultMimeTypesSupported();
         mimes.put(MIME_TYPE_GOOGLE_DOCUMENT, properties.exportDocument.getValue());
         mimes.put(MIME_TYPE_GOOGLE_DRAWING, properties.exportDrawing.getValue());

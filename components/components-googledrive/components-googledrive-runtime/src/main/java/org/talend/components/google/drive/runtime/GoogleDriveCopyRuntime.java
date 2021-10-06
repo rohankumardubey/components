@@ -29,8 +29,6 @@ import org.talend.components.google.drive.copy.GoogleDriveCopyProperties.CopyMod
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.ValidationResult.Result;
 
-import com.google.api.services.drive.Drive;
-
 public class GoogleDriveCopyRuntime extends GoogleDriveRuntime implements ComponentDriverInitialization<ComponentProperties> {
 
     private GoogleDriveCopyProperties properties;
@@ -65,22 +63,26 @@ public class GoogleDriveCopyRuntime extends GoogleDriveRuntime implements Compon
         String newName = properties.rename.getValue() ? properties.newName.getValue() : "";
         boolean deleteSourceFile = properties.deleteSourceFile.getValue();
         try {
-            Drive drive = getDriveService();
             final GoogleDriveUtils utils = getDriveUtils();
-
+            utils.setIncludeSharedDrives(properties.includeSharedDrives.getValue());
+            if (properties.includeSharedDrives.getValue()) {
+                utils.setCorpora(properties.corpora.getValue());
+                utils.setDriveId(properties.driveId.getValue());
+            }
             /* check for destination folder */
             String destinationFolderId = properties.destinationFolderAccessMethod.getValue().equals(AccessMethod.Id)
                     ? destinationFolder
-                    : utils.getFolderId(destinationFolder, false);
+                    : utils.getFolderId(destinationFolder, false, properties.includeSharedItems.getValue());
             /* work on a fileName */
             if (CopyMode.File.equals(copyMode)) {
                 /* check for managed resource */
-                sourceId = properties.sourceAccessMethod.getValue().equals(AccessMethod.Id) ? source : utils.getFileId(source);
+                sourceId = properties.sourceAccessMethod.getValue().equals(AccessMethod.Id) ? source
+                        : utils.getFileId(source, properties.includeSharedItems.getValue());
                 destinationId = utils.copyFile(sourceId, destinationFolderId, newName, deleteSourceFile);
             } else {/* work on a folder */
                 /* check for managed resource */
                 sourceId = properties.sourceAccessMethod.getValue().equals(AccessMethod.Id) ? source
-                        : utils.getFolderId(source, false);
+                        : utils.getFolderId(source, false, properties.includeSharedItems.getValue());
                 if (newName.isEmpty()) {
                     List<String> paths = utils.getExplodedPath(source);
                     newName = paths.get(paths.size() - 1);

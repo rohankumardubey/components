@@ -16,6 +16,8 @@ public class GoogleDriveConstants {
 
     public static final String DRIVE_ROOT_FOLDER = "root";
 
+    public static final String ROOT_OR_SHARED_WITH_ME_PARENT = "(sharedWithMe or 'root' in parents)";
+
     public static final String ROOT_FOLDER_SEPARATOR = "/";
 
     public static final String Q_AND = " and ";

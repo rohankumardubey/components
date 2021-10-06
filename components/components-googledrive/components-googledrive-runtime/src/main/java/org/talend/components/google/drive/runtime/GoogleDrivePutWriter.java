@@ -71,6 +71,11 @@ public class GoogleDrivePutWriter implements WriterWithFeedback {
         result = new Result(uId);
         try {
             utils = ((GoogleDriveSink) getWriteOperation().getSink()).getDriveUtils();
+            utils.setIncludeSharedDrives(properties.includeSharedDrives.getValue());
+            if (properties.includeSharedDrives.getValue()) {
+                utils.setCorpora(properties.corpora.getValue());
+                utils.setDriveId(properties.driveId.getValue());
+            }
         } catch (GeneralSecurityException e) {
             LOG.error(e.getMessage());
             result.toMap().put(GoogleDriveCreateDefinition.RETURN_ERROR_MESSAGE, e.getMessage());
@@ -95,7 +100,7 @@ public class GoogleDrivePutWriter implements WriterWithFeedback {
         //
         String destinationFolderId = properties.destinationFolderAccessMethod.getValue().equals(AccessMethod.Id)
                 ? properties.destinationFolder.getValue()
-                : utils.getFolderId(properties.destinationFolder.getValue(), false);
+                : utils.getFolderId(properties.destinationFolder.getValue(), false, properties.includeSharedItems.getValue());
         GoogleDrivePutParameters p = new GoogleDrivePutParameters(destinationFolderId, properties.fileName.getValue(),
                 properties.overwrite.getValue(), bytes);
         sentFile = utils.putResource(p);

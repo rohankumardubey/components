@@ -23,6 +23,7 @@ import static org.talend.components.google.drive.runtime.GoogleDriveConstants.Q_
 import static org.talend.components.google.drive.runtime.GoogleDriveConstants.Q_MIME_NOT_FOLDER;
 import static org.talend.components.google.drive.runtime.GoogleDriveConstants.Q_NAME;
 import static org.talend.components.google.drive.runtime.GoogleDriveConstants.Q_NOT_TRASHED;
+import static org.talend.components.google.drive.runtime.GoogleDriveConstants.ROOT_OR_SHARED_WITH_ME_PARENT;
 import static org.talend.components.google.drive.runtime.GoogleDriveConstants.ROOT_FOLDER_SEPARATOR;
 
 import java.io.ByteArrayOutputStream;
@@ -36,6 +37,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.google.drive.GoogleDriveMimeTypes;
+import org.talend.components.google.drive.GoogleDriveComponentProperties.Corpora;
 import org.talend.components.google.drive.runtime.utils.GoogleDriveGetParameters;
 import org.talend.components.google.drive.runtime.utils.GoogleDriveGetResult;
 import org.talend.components.google.drive.runtime.utils.GoogleDrivePutParameters;
@@ -54,7 +56,8 @@ public class GoogleDriveUtils {
 
     private static final Logger LOG = LoggerFactory.getLogger(GoogleDriveUtils.class);
 
-    private static final I18nMessages messages = GlobalI18N.getI18nMessageProvider().getI18nMessages(GoogleDriveUtils.class);
+    private static final I18nMessages messages =
+            GlobalI18N.getI18nMessageProvider().getI18nMessages(GoogleDriveUtils.class);
 
     private Drive drive;
 
@@ -66,8 +69,44 @@ public class GoogleDriveUtils {
 
     private static final String PATH_SEPARATOR = "/";
 
+    private boolean includeSharedItems;
+
+    private boolean includeSharedDrives;
+
+    private Corpora corpora;
+
+    private String driveId;
+
     public GoogleDriveUtils(Drive drive) {
         this.drive = drive;
+    }
+
+    public void setIncludeSharedDrives(boolean includeSharedDrives) {
+        this.includeSharedDrives = includeSharedDrives;
+    }
+
+    public void setCorpora(Corpora corpora) {
+        this.corpora = corpora;
+    }
+
+    public void setDriveId(String driveId) {
+        this.driveId = driveId;
+    }
+
+    private Files.List createListRequest(String query) throws IOException {
+        Files.List request = drive
+                .files()
+                .list()
+                .setQ(query)
+                .setSupportsAllDrives(includeSharedDrives)
+                .setIncludeItemsFromAllDrives(includeSharedDrives);
+        if (corpora != null) {
+            request.setCorpora(corpora.getCorporaName());
+            if (corpora == Corpora.DRIVE) {
+                request.setDriveId(driveId);
+            }
+        }
+        return request;
     }
 
     public List<String> getExplodedPath(String resourcePath) {
@@ -80,12 +119,12 @@ public class GoogleDriveUtils {
 
     public File getMetadata(String id, String metadata) throws IOException {
         LOG.debug("[getMetadata] id={}, metadata={}.", id, metadata);
-        return drive.files().get(id).setFields(metadata).execute();
+        return drive.files().get(id).setFields(metadata).setSupportsAllDrives(includeSharedDrives).execute();
     }
 
     public String getResourceId(String query, String resourceName, String type) throws IOException {
         LOG.debug("[getResourceId] Searching for {} named {} with `{}`.", type, resourceName, query);
-        FileList files = drive.files().list().setQ(query).execute();
+        FileList files = createListRequest(query).execute();
         if (files.getFiles().size() > 1) {
             String errorMsg = messages.getMessage(format("error.%s.more.than.one", type), resourceName);
             LOG.error(errorMsg);
@@ -100,17 +139,35 @@ public class GoogleDriveUtils {
         return files.getFiles().get(0).getId();
     }
 
-    public List<String> checkPath(int pathLevel, List<String> path, String folderName, String parentId, boolean searchInTrash)
-            throws IOException {
+    private List<String> checkPath(int pathLevel, List<String> path, String folderName, String parentId,
+            boolean searchInTrash) throws IOException {
         List<String> result = new ArrayList<>();
         LOG.debug("[checkPath] (pathLevel = [{}], path = [{}], folderName = [{}], parentId = [{}], searchInTrash = [{}]).",
-                pathLevel, path, folderName, parentId, searchInTrash);
-        String query = format(Q_NAME, folderName) + Q_AND + //
-                format(Q_IN_PARENTS, parentId) + Q_AND + //
-                Q_MIME_FOLDER + //
-                (searchInTrash ? "" : Q_AND + Q_NOT_TRASHED);
+                        pathLevel, path, folderName, parentId, searchInTrash);
+        String query = null;
+        if (includeSharedDrives && DRIVE_ROOT_FOLDER.equals(parentId)) {
+            query = new StringBuilder()
+                    .append(format(Q_NAME, folderName))
+                    .append(Q_AND)
+                    .append(Q_MIME_FOLDER)
+                    .append(searchInTrash ? "" : Q_AND + Q_NOT_TRASHED)
+                    .toString();
+        } else {
+            String parentIdFormatted =
+                    includeSharedItems && DRIVE_ROOT_FOLDER.equals(parentId)
+                            ? ROOT_OR_SHARED_WITH_ME_PARENT
+                            : format(Q_IN_PARENTS, parentId);
+            query = new StringBuilder()
+                    .append(format(Q_NAME, folderName))
+                    .append(Q_AND)
+                    .append(parentIdFormatted)
+                    .append(Q_AND)
+                    .append(Q_MIME_FOLDER)
+                    .append(searchInTrash ? "" : Q_AND + Q_NOT_TRASHED)
+                    .toString();
+        }
         LOG.debug("[checkPath] Query({}).", query);
-        FileList files = drive.files().list().setQ(query).execute();
+        FileList files = createListRequest(query).execute();
         if (files.getFiles().isEmpty()) {
             return Collections.emptyList();
         }
@@ -139,18 +196,20 @@ public class GoogleDriveUtils {
         return result;
     }
 
-    public List<String> getFolderIds(String folderName, boolean searchInTrash) throws IOException {
+    public List<String> getFolderIds(String folderName, boolean searchInTrash, boolean includeSharedItems)
+            throws IOException {
         LOG.debug("[getFolderIds] (folderName = [{}], searchInTrash = [{}]).", folderName, searchInTrash);
         List<String> result = new ArrayList<>();
         if (DRIVE_ROOT_FOLDER.equals(folderName) || ROOT_FOLDER_SEPARATOR.equals(folderName) || folderName.isEmpty()) {
             result.add(DRIVE_ROOT_FOLDER);
             return result;
         }
+        this.includeSharedItems = includeSharedItems;
         List<String> path = getExplodedPath(folderName);
         String start = path.get(0);
         result = checkPath(0, path, start, "root", searchInTrash);
         LOG.debug("[getFolderIds] checkPath returned : {}", result);
-        if (result.isEmpty() && !folderName.contains(PATH_SEPARATOR)){
+        if (result.isEmpty() && !folderName.contains(PATH_SEPARATOR)) {
             LOG.debug("[getFolderIds] Searching with global search...");
             result = new ArrayList<>();
             result.add(findResourceByGlobalSearch(folderName, FOLDER_TYPE));
@@ -192,13 +251,16 @@ public class GoogleDriveUtils {
         String fileName = path.get(path.size() - 1);
         String parentId = DRIVE_ROOT_FOLDER;
         String query;
-        LOG.debug("[findResourceByPath] Searching for {} [{}]. Path: {}; FileName:{}", resourceName, type.toUpperCase(), path,
-                fileName);
+        LOG
+                .debug("[findResourceByPath] Searching for {} [{}]. Path: {}; FileName:{}", resourceName,
+                        type.toUpperCase(), path,
+                        fileName);
         switch (type) {
         case FILE_TYPE:
             // We may have the case of "/FileA". So parentId is root and otherwise :
             if (path.size() > 1) {
-                parentId = handleCheckPathResult(checkPath(0, path.subList(0, (path.size() - 1)), path.get(0), "root", true));
+                parentId = handleCheckPathResult(
+                        checkPath(0, path.subList(0, (path.size() - 1)), path.get(0), "root", true));
             }
             query = format(Q_NAME, fileName) + Q_AND + //
                     format(Q_IN_PARENTS, parentId) + Q_AND + //
@@ -215,7 +277,8 @@ public class GoogleDriveUtils {
             }
             // try path + fileName
             LOG.debug("[findResourceByPath] Searching for fileName because did not find a full path");
-            parentId = handleCheckPathResult(checkPath(0, path.subList(0, (path.size() - 1)), path.get(0), "root", true));
+            parentId =
+                    handleCheckPathResult(checkPath(0, path.subList(0, (path.size() - 1)), path.get(0), "root", true));
             query = format(Q_NAME, fileName) + Q_AND + //
                     format(Q_IN_PARENTS, parentId) + Q_AND + //
                     Q_MIME_NOT_FOLDER;
@@ -245,19 +308,22 @@ public class GoogleDriveUtils {
      * @return the folder ID value
      * @throws IOException when the folder doesn't exist or there are more than one folder named like {@code folderName}
      */
-    public String getFolderId(String folderName, boolean searchInTrash) throws IOException {
+    public String getFolderId(String folderName, boolean searchInTrash, boolean includeSharedItems) throws IOException {
         if (DRIVE_ROOT_FOLDER.equals(folderName) || ROOT_FOLDER_SEPARATOR.equals(folderName) || folderName.isEmpty()) {
             return DRIVE_ROOT_FOLDER;
         }
+        this.includeSharedItems = includeSharedItems;
         return findResourceByName(folderName, FOLDER_TYPE);
     }
 
     /**
      * @param fileName searched fileName name
      * @return the fileName ID value
-     * @throws IOException when the fileName doesn't exist or there are more than one fileName named like {@code fileName}
+     * @throws IOException when the fileName doesn't exist or there are more than one fileName named like
+     * {@code fileName}
      */
-    public String getFileId(String fileName) throws IOException {
+    public String getFileId(String fileName, boolean includeSharedItems) throws IOException {
+        this.includeSharedItems = includeSharedItems;
         return findResourceByName(fileName, FILE_TYPE);
     }
 
@@ -267,7 +333,8 @@ public class GoogleDriveUtils {
      * @throws IOException when the fileName/folder doesn't exist or there are more than one fileName/folder named like
      * {@code fileOrFolderName}
      */
-    public String getFileOrFolderId(String fileOrFolderName) throws IOException {
+    public String getFileOrFolderId(String fileOrFolderName, boolean includeSharedItems) throws IOException {
+        this.includeSharedItems = includeSharedItems;
         return findResourceByName(fileOrFolderName, FILEFOLDER_TYPE);
     }
 
@@ -285,7 +352,13 @@ public class GoogleDriveUtils {
         createdFolder.setMimeType(MIME_TYPE_FOLDER);
         createdFolder.setParents(Collections.singletonList(parentFolderId));
 
-        return drive.files().create(createdFolder).setFields("id").execute().getId();
+        return drive
+                .files()
+                .create(createdFolder)
+                .setFields("id")
+                .setSupportsAllDrives(includeSharedDrives)
+                .execute()
+                .getId();
     }
 
     /**
@@ -296,18 +369,26 @@ public class GoogleDriveUtils {
      * @return copied fileName ID
      * @throws IOException when copy fails
      */
-    public String copyFile(String fileId, String destinationFolderId, String newName, boolean deleteOriginal) throws IOException {
-        LOG.debug("[copyFile] fileId: {}; destinationFolderId: {}, newName: {}; deleteOriginal: {}.", fileId, destinationFolderId,
-                newName, deleteOriginal);
+    public String copyFile(String fileId, String destinationFolderId, String newName, boolean deleteOriginal)
+            throws IOException {
+        LOG
+                .debug("[copyFile] fileId: {}; destinationFolderId: {}, newName: {}; deleteOriginal: {}.", fileId,
+                        destinationFolderId,
+                        newName, deleteOriginal);
         File copy = new File();
         copy.setParents(Collections.singletonList(destinationFolderId));
         if (!newName.isEmpty()) {
             copy.setName(newName);
         }
-        File resultFile = drive.files().copy(fileId, copy).setFields("id, parents").execute();
+        File resultFile = drive
+                .files()
+                .copy(fileId, copy)
+                .setFields("id, parents")
+                .setSupportsAllDrives(includeSharedDrives)
+                .execute();
         String copiedResourceId = resultFile.getId();
         if (deleteOriginal) {
-            drive.files().delete(fileId).execute();
+            drive.files().delete(fileId).setSupportsAllDrives(includeSharedDrives).execute();
         }
 
         return copiedResourceId;
@@ -321,13 +402,15 @@ public class GoogleDriveUtils {
      * @throws IOException when operation fails
      */
     public String copyFolder(String sourceFolderId, String destinationFolderId, String newName) throws IOException {
-        LOG.debug("[copyFolder] sourceFolderId: {}; destinationFolderId: {}; newName: {}", sourceFolderId, destinationFolderId,
-                newName);
+        LOG
+                .debug("[copyFolder] sourceFolderId: {}; destinationFolderId: {}; newName: {}", sourceFolderId,
+                        destinationFolderId,
+                        newName);
         // create a new folder
         String newFolderId = createFolder(destinationFolderId, newName);
         // Make a recursive copy of all files/folders inside the source folder
         String query = format(Q_IN_PARENTS, sourceFolderId) + Q_AND + Q_NOT_TRASHED;
-        FileList originals = drive.files().list().setQ(query).execute();
+        FileList originals = createListRequest(query).execute();
         LOG.debug("[copyFolder] Searching for copy {}", query);
         for (File file : originals.getFiles()) {
             if (file.getMimeType().equals(MIME_TYPE_FOLDER)) {
@@ -342,29 +425,29 @@ public class GoogleDriveUtils {
 
     private String removeResource(String resourceId, boolean useTrash) throws IOException {
         if (useTrash) {
-            drive.files().update(resourceId, new File().setTrashed(true)).execute();
+            LOG.info(messages.getMessage("message.trashing.resource", resourceId, resourceId));
+            drive
+                    .files()
+                    .update(resourceId, new File().setTrashed(true))
+                    .setSupportsAllDrives(includeSharedDrives)
+                    .execute();
         } else {
-            drive.files().delete(resourceId).execute();
+            LOG.info(messages.getMessage("message.deleting.resource", resourceId, resourceId));
+            drive
+                    .files()
+                    .delete(resourceId)
+                    .setSupportsAllDrives(includeSharedDrives)
+                    .execute();
         }
         return resourceId;
     }
 
-    public String deleteResourceByName(String resourceName, boolean useTrash) throws IOException {
-        String resourceId = getFileOrFolderId(resourceName);
-        if (useTrash) {
-            LOG.info(messages.getMessage("message.trashing.resource", resourceName, resourceId));
-        } else {
-            LOG.info(messages.getMessage("message.deleting.resource", resourceName, resourceId));
-        }
-        return removeResource(resourceId, useTrash);
+    public String deleteResourceByName(String resourceName, boolean useTrash, boolean includeSharedItems)
+            throws IOException {
+        return removeResource(getFileOrFolderId(resourceName, includeSharedItems), useTrash);
     }
 
     public String deleteResourceById(String resourceId, boolean useTrash) throws IOException {
-        if (useTrash) {
-            LOG.info(messages.getMessage("message.trashing.resource", resourceId, resourceId));
-        } else {
-            LOG.info(messages.getMessage("message.deleting.resource", resourceId, resourceId));
-        }
         return removeResource(resourceId, useTrash);
     }
 
@@ -373,8 +456,10 @@ public class GoogleDriveUtils {
         File file = getMetadata(fileId, "id,mimeType,fileExtension");
         String fileMimeType = file.getMimeType();
         String outputFileExt = "." + file.getFileExtension();
-        LOG.debug("[getResource] Found fileName `{}` [id: {}, mime: {}, ext: {}]", parameters.getResourceId(), fileId,
-                fileMimeType, file.getFileExtension());
+        LOG
+                .debug("[getResource] Found fileName `{}` [id: {}, mime: {}, ext: {}]", parameters.getResourceId(),
+                        fileId,
+                        fileMimeType, file.getFileExtension());
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         /* Google Apps types */
         if (GoogleDriveMimeTypes.GOOGLE_DRIVE_APPS.contains(fileMimeType)) {
@@ -382,7 +467,7 @@ public class GoogleDriveUtils {
             outputFileExt = parameters.getMimeType().get(fileMimeType).getExtension();
             drive.files().export(fileId, exportFormat).executeMediaAndDownloadTo(outputStream);
         } else { /* Standard fileName */
-            drive.files().get(fileId).executeMediaAndDownloadTo(outputStream);
+            drive.files().get(fileId).setSupportsAllDrives(includeSharedDrives).executeMediaAndDownloadTo(outputStream);
         }
         byte[] content = outputStream.toByteArray();
         if (parameters.isStoreToLocal()) {
@@ -404,10 +489,12 @@ public class GoogleDriveUtils {
         String folderId = parameters.getDestinationFolderId();
         File putFile = new File();
         putFile.setParents(Collections.singletonList(folderId));
-        Files.List fileRequest = drive.files().list()
-                .setQ(format(QUERY_NOTTRASHED_NAME_NOTMIME_INPARENTS, parameters.getResourceName(), MIME_TYPE_FOLDER, folderId));
-        LOG.debug("[putResource] `{}` Exists in `{}` ? with `{}`.", parameters.getResourceName(),
-                parameters.getDestinationFolderId(), fileRequest.getQ());
+        Files.List fileRequest = createListRequest(
+                format(QUERY_NOTTRASHED_NAME_NOTMIME_INPARENTS, parameters.getResourceName(), MIME_TYPE_FOLDER,
+                        folderId));
+        LOG
+                .debug("[putResource] `{}` Exists in `{}` ? with `{}`.", parameters.getResourceName(),
+                        parameters.getDestinationFolderId(), fileRequest.getQ());
         FileList existingFiles = fileRequest.execute();
         if (existingFiles.getFiles().size() > 1) {
             throw new IOException(messages.getMessage("error.file.more.than.one", parameters.getResourceName()));
@@ -417,19 +504,33 @@ public class GoogleDriveUtils {
                 throw new IOException(messages.getMessage("error.file.already.exist", parameters.getResourceName()));
             }
             LOG.debug("[putResource] {} will be overwritten...", parameters.getResourceName());
-            drive.files().delete(existingFiles.getFiles().get(0).getId()).execute();
+            drive
+                    .files()
+                    .delete(existingFiles.getFiles().get(0).getId())
+                    .setSupportsAllDrives(includeSharedDrives)
+                    .execute();
         }
         putFile.setName(parameters.getResourceName());
         String metadata = "id,parents,name";
         if (!StringUtils.isEmpty(parameters.getFromLocalFilePath())) {
             // Reading content from local fileName
             FileContent fContent = new FileContent(null, new java.io.File(parameters.getFromLocalFilePath()));
-            putFile = drive.files().create(putFile, fContent).setFields(metadata).execute();
+            putFile = drive
+                    .files()
+                    .create(putFile, fContent)
+                    .setFields(metadata)
+                    .setSupportsAllDrives(includeSharedDrives)
+                    .execute();
             //
 
         } else if (parameters.getFromBytes() != null) {
             AbstractInputStreamContent content = new ByteArrayContent(null, parameters.getFromBytes());
-            putFile = drive.files().create(putFile, content).setFields(metadata).execute();
+            putFile = drive
+                    .files()
+                    .create(putFile, content)
+                    .setFields(metadata)
+                    .setSupportsAllDrives(includeSharedDrives)
+                    .execute();
         }
         return putFile;
     }

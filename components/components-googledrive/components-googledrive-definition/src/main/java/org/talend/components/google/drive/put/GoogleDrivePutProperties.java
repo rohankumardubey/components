@@ -105,6 +105,7 @@ public class GoogleDrivePutProperties extends GoogleDriveComponentProperties {
         mainForm.addRow(uploadMode);
         mainForm.addRow(widget(localFilePath).setWidgetType(Widget.FILE_WIDGET_TYPE));
         mainForm.addRow(schemaMain.getForm(Form.REFERENCE));
+
     }
 
     @Override
@@ -112,12 +113,22 @@ public class GoogleDrivePutProperties extends GoogleDriveComponentProperties {
         super.refreshLayout(form);
 
         if (Form.MAIN.equals(form.getName())) {
-            form.getWidget(localFilePath.getName()).setVisible(UploadMode.UPLOAD_LOCAL_FILE.equals(uploadMode.getValue()));
+            form
+                    .getWidget(localFilePath.getName())
+                    .setVisible(UploadMode.UPLOAD_LOCAL_FILE.equals(uploadMode.getValue()));
+        } else if (Form.ADVANCED.equals(form.getName())) {
+            form
+                    .getWidget(includeSharedItems.getName())
+                    .setHidden(checkIdAccessMethod(destinationFolderAccessMethod.getValue()));
         }
     }
 
     public void afterUploadMode() {
         refreshLayout(getForm(Form.MAIN));
+    }
+
+    public void afterDestinationFolderAccessMethod() {
+        refreshLayout(getForm(Form.ADVANCED));
     }
 
 }

@@ -54,7 +54,11 @@ public class GoogleDriveInputReaderTest extends GoogleDriveDataBaseTest {
         doReturn(utils).when(dataSource).getDriveUtils();
 
         List mockList = mock(List.class, RETURNS_DEEP_STUBS);
-        when(drive.files().list()).thenReturn(mockList);
+        when(drive
+                .files()
+                .list()
+                .setSupportsAllDrives(false)
+                .setIncludeItemsFromAllDrives(false)).thenReturn(mockList);
         //
         // String qA = "name='A' and 'root' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false";
         //

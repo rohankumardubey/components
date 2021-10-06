@@ -19,6 +19,7 @@ import static org.talend.daikon.properties.property.PropertyFactory.newInteger;
 import static org.talend.daikon.properties.property.PropertyFactory.newString;
 
 import java.util.Date;
+import java.util.Iterator;
 
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
@@ -50,6 +51,10 @@ public class GoogleDriveListProperties extends GoogleDriveComponentProperties {
 
     public Property<Boolean> includeTrashedFiles = newBoolean("includeTrashedFiles");
 
+    public Property<Boolean> useQuery = newBoolean("useQuery", false);
+
+    public Property<String> query = newString("query");
+
     public Property<Integer> pageSize = newInteger("pageSize", 1000);
 
     private static final I18nMessages messages = GlobalI18N.getI18nMessageProvider()
@@ -57,7 +62,7 @@ public class GoogleDriveListProperties extends GoogleDriveComponentProperties {
 
     /*
      * TODO new feature to add: orderBy [in main]
-     * 
+     *
      * orderBy string A comma-separated list of sort keys. Valid keys are 'createdTime', 'folder', 'modifiedByMeTime',
      * 'modifiedTime', 'name', 'quotaBytesUsed', 'recency', 'sharedWithMeTime', 'starred', and 'viewedByMeTime'. Each key
      * sorts ascending by default, but may be reversed with the 'desc' modifier. Example usage: ?orderBy=folder,modifiedTime
@@ -67,7 +72,7 @@ public class GoogleDriveListProperties extends GoogleDriveComponentProperties {
 
     /*
      * TODO new feature to add: spaces [in advanced]
-     * 
+     *
      * spaces string A comma-separated list of spaces to query within the corpus. Supported values are 'drive',
      * 'appDataFolder' and 'photos'.
      */
@@ -135,9 +140,40 @@ public class GoogleDriveListProperties extends GoogleDriveComponentProperties {
         mainForm.addRow(includeSubDirectories);
         mainForm.addRow(schemaMain.getForm(Form.REFERENCE));
 
+        // We can't redefine the property place after added to Form.
         Form advancedForm = getForm(Form.ADVANCED);
+        advancedForm.clearForm();
+        advancedForm.addRow(connection.getForm(Form.ADVANCED));
+        advancedForm.addRow(useQuery);
+        advancedForm.addRow(query);
+        advancedForm.addRow(includeSharedItems);
         advancedForm.addRow(includeTrashedFiles);
+        advancedForm.addRow(includeSharedDrives);
+        advancedForm.addRow(Widget.widget(corpora).setWidgetType(Widget.ENUMERATION_WIDGET_TYPE));
+        advancedForm.addColumn(driveId);
         advancedForm.addRow(pageSize);
+    }
+
+    @Override
+    public void refreshLayout(Form form) {
+        super.refreshLayout(form);
+
+        final boolean useCustomQuery = useQuery.getValue();
+        if (form.getName().equals(Form.MAIN)) {
+            form.getWidget(folder.getName()).setHidden(useCustomQuery);
+            form.getWidget(folderAccessMethod.getName()).setHidden(useCustomQuery);
+            form.getWidget(includeSubDirectories.getName()).setHidden(useCustomQuery);
+        } else if (form.getName().equals(Form.ADVANCED)) {
+            form.getWidget(includeSharedItems.getName()).setHidden(useCustomQuery
+                    || checkIdAccessMethod(folderAccessMethod.getValue()));
+            form.getWidget(query.getName()).setHidden(!useCustomQuery);
+            form.getWidget(includeTrashedFiles.getName()).setHidden(useCustomQuery);
+        }
+    }
+
+    public void afterUseQuery() {
+        refreshLayout(getForm(Form.MAIN));
+        refreshLayout(getForm(Form.ADVANCED));
     }
 
 }

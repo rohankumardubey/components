@@ -21,6 +21,7 @@ import org.apache.avro.SchemaBuilder;
 import org.talend.components.google.drive.GoogleDriveComponentProperties;
 import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.properties.presentation.Form;
+import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
 
 public class GoogleDriveCopyProperties extends GoogleDriveComponentProperties {
@@ -102,7 +103,16 @@ public class GoogleDriveCopyProperties extends GoogleDriveComponentProperties {
                 form.getWidget(deleteSourceFile.getName()).setVisible(false);
             }
             form.getWidget(newName.getName()).setVisible(rename.getValue());
+        } else if (Form.ADVANCED.equals(form.getName())) {
+            form
+                    .getWidget(includeSharedItems.getName())
+                    .setHidden(checkIdAccessMethod(destinationFolderAccessMethod.getValue())
+                            && checkIdAccessMethod(sourceAccessMethod.getValue()));
         }
+    }
+
+    public void afterSourceAccessMethod() {
+        refreshLayout(getForm(Form.ADVANCED));
     }
 
     public void afterCopyMode() {

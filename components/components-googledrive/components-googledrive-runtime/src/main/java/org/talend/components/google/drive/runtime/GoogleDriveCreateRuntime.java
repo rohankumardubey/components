@@ -56,9 +56,14 @@ public class GoogleDriveCreateRuntime extends GoogleDriveRuntime implements Comp
     public void createFolder(RuntimeContainer container) {
         try {
             final GoogleDriveUtils utils = getDriveUtils();
+            utils.setIncludeSharedDrives(properties.includeSharedDrives.getValue());
+            if (properties.includeSharedDrives.getValue()) {
+                utils.setCorpora(properties.corpora.getValue());
+                utils.setDriveId(properties.driveId.getValue());
+            }
             String parentFolder = properties.parentFolder.getValue();
             parentFolderId = properties.parentFolderAccessMethod.getValue().equals(AccessMethod.Id) ? parentFolder
-                    : utils.getFolderId(parentFolder, false);
+                    : utils.getFolderId(parentFolder, false, properties.includeSharedItems.getValue());
             newFolderId = utils.createFolder(parentFolderId, properties.newFolder.getValue());
         } catch (IOException | GeneralSecurityException e) {
             LOG.error(e.getLocalizedMessage());

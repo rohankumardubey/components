@@ -21,6 +21,7 @@ import org.apache.avro.SchemaBuilder;
 import org.talend.components.google.drive.GoogleDriveComponentProperties;
 import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.properties.presentation.Form;
+import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
 
 public class GoogleDriveDeleteProperties extends GoogleDriveComponentProperties {
@@ -61,6 +62,20 @@ public class GoogleDriveDeleteProperties extends GoogleDriveComponentProperties 
         mainForm.addColumn(deleteMode);
         mainForm.addRow(useTrash);
         mainForm.addRow(schemaMain.getForm(Form.REFERENCE));
+    }
+
+    @Override
+    public void refreshLayout(Form form) {
+        super.refreshLayout(form);
+        if (Form.ADVANCED.equals(form.getName())) {
+            form
+                    .getWidget(includeSharedItems.getName())
+                    .setHidden(checkIdAccessMethod(deleteMode.getValue()));
+        }
+    }
+
+    public void afterDeleteMode() {
+        refreshLayout(getForm(Form.ADVANCED));
     }
 
 }

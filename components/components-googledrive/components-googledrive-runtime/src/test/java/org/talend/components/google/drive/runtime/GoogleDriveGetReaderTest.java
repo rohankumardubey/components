@@ -43,13 +43,23 @@ public class GoogleDriveGetReaderTest extends GoogleDriveTestBaseRuntime {
         f.setId(FILE_GET_ID);
         files.add(f);
         fileList.setFiles(files);
-        when(drive.files().list().setQ(anyString()).execute()).thenReturn(fileList);
+        when(drive
+                .files()
+                .list()
+                .setQ(anyString())
+                .setSupportsAllDrives(false)
+                .setIncludeItemsFromAllDrives(false)
+                .execute()).thenReturn(fileList);
 
         File file = new File();
         file.setId(FILE_GET_ID);
         file.setMimeType(GoogleDriveMimeTypes.MIME_TYPE_JSON);
         file.setFileExtension("json");
-        when(drive.files().get(anyString()).setFields(anyString()).execute()).thenReturn(file);
+        when(drive
+                .files()
+                .get(anyString())
+                .setFields(anyString())
+                .setSupportsAllDrives(false).execute()).thenReturn(file);
 
     }
 

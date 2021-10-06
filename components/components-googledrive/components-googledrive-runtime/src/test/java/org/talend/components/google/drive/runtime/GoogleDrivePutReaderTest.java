@@ -1,8 +1,10 @@
 package org.talend.components.google.drive.runtime;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 import java.nio.file.Paths;
@@ -47,17 +49,28 @@ public class GoogleDrivePutReaderTest extends GoogleDriveTestBaseRuntime {
         properties.uploadMode.setValue(UploadMode.UPLOAD_LOCAL_FILE);
         properties.fileName.setValue(FILE_PUT_NAME);
         properties.localFilePath
-                .setValue(Paths.get(getClass().getClassLoader().getResource("service_account.json").toURI()).toString());
+                .setValue(
+                        Paths.get(getClass().getClassLoader().getResource("service_account.json").toURI()).toString());
         properties.overwrite.setValue(true);
         properties.destinationFolder.setValue("root");
 
-        when(drive.files().list().setQ(anyString()).execute()).thenReturn(emptyFileList);
+        when(drive
+                .files()
+                .list()
+                .setQ(anyString())
+                .setSupportsAllDrives(false)
+                .setIncludeItemsFromAllDrives(false).execute()).thenReturn(emptyFileList);
         //
         File putFile = new File();
         putFile.setId(PUT_FILE_ID);
         putFile.setParents(Collections.singletonList(PUT_FILE_PARENT_ID));
-        when(drive.files().create(any(File.class), any(AbstractInputStreamContent.class)).setFields(anyString()).execute())
-                .thenReturn(putFile);
+        when(drive
+                .files()
+                .create(any(File.class), any(AbstractInputStreamContent.class))
+                .setFields(anyString())
+                .setSupportsAllDrives(false)
+                .execute())
+                        .thenReturn(putFile);
 
     }
 

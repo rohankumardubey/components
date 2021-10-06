@@ -53,20 +53,25 @@ public class GoogleDriveCopyReader extends GoogleDriveReader {
         String destinationFolder = properties.destinationFolder.getValue();
         String newName = properties.rename.getValue() ? properties.newName.getValue() : "";
         boolean deleteSourceFile = properties.deleteSourceFile.getValue();
-
+        utils.setIncludeSharedDrives(properties.includeSharedDrives.getValue());
+        if (properties.includeSharedDrives.getValue()) {
+            utils.setCorpora(properties.corpora.getValue());
+            utils.setDriveId(properties.driveId.getValue());
+        }
         /* check for destination folder */
         String destinationFolderId = properties.destinationFolderAccessMethod.getValue().equals(AccessMethod.Id)
                 ? destinationFolder
-                : utils.getFolderId(destinationFolder, false);
+                : utils.getFolderId(destinationFolder, false, properties.includeSharedItems.getValue());
         /* work on a fileName */
         if (CopyMode.File.equals(copyMode)) {
             /* check for managed resource */
-            sourceId = properties.sourceAccessMethod.getValue().equals(AccessMethod.Id) ? source : utils.getFileId(source);
+            sourceId = properties.sourceAccessMethod.getValue().equals(AccessMethod.Id) ? source
+                    : utils.getFileId(source, properties.includeSharedItems.getValue());
             destinationId = utils.copyFile(sourceId, destinationFolderId, newName, deleteSourceFile);
         } else {/* work on a folder */
             /* check for managed resource */
             sourceId = properties.sourceAccessMethod.getValue().equals(AccessMethod.Id) ? source
-                    : utils.getFolderId(source, false);
+                    : utils.getFolderId(source, false, properties.includeSharedItems.getValue());
             if (newName.isEmpty()) {
                 List<String> paths = utils.getExplodedPath(source);
                 newName = paths.get(paths.size() - 1);

@@ -20,6 +20,7 @@ import org.apache.avro.SchemaBuilder;
 import org.talend.components.google.drive.GoogleDriveComponentProperties;
 import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.properties.presentation.Form;
+import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
 
 public class GoogleDriveCreateProperties extends GoogleDriveComponentProperties {
@@ -65,5 +66,17 @@ public class GoogleDriveCreateProperties extends GoogleDriveComponentProperties 
         mainForm.addRow(newFolder);
         mainForm.addRow(schemaMain.getForm(Form.REFERENCE));
     }
+    @Override
+    public void refreshLayout(Form form) {
+        super.refreshLayout(form);
+        if (Form.ADVANCED.equals(form.getName())) {
+            form
+                    .getWidget(includeSharedItems.getName())
+                    .setHidden(checkIdAccessMethod(parentFolderAccessMethod.getValue()));
+        }
+    }
 
+    public void afterParentFolderAccessMethod() {
+        refreshLayout(getForm(Form.ADVANCED));
+    }
 }

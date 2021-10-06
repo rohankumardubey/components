@@ -36,8 +36,16 @@ public class GoogleDriveDeleteReaderTest extends GoogleDriveTestBaseRuntime {
         //
         properties.file.setValue(FOLDER_DELETE);
 
-        when(drive.files().update(anyString(), any(File.class)).execute()).thenReturn(null);
-        when(drive.files().delete(anyString()).execute()).thenReturn(null);
+        when(drive
+                .files()
+                .update(anyString(), any(File.class))
+                .setSupportsAllDrives(false)
+                .execute()).thenReturn(null);
+        when(drive
+                .files()
+                .delete(anyString())
+                .setSupportsAllDrives(false)
+                .execute()).thenReturn(null);
 
         FileList fileList = new FileList();
         List<File> files = new ArrayList<>();
@@ -46,7 +54,12 @@ public class GoogleDriveDeleteReaderTest extends GoogleDriveTestBaseRuntime {
         files.add(f);
         fileList.setFiles(files);
 
-        when(drive.files().list().setQ(anyString()).execute()).thenReturn(fileList);
+        when(drive
+                .files()
+                .list()
+                .setQ(anyString())
+                .setSupportsAllDrives(false)
+                .setIncludeItemsFromAllDrives(false).execute()).thenReturn(fileList);
     }
 
     private void delete() throws java.io.IOException {

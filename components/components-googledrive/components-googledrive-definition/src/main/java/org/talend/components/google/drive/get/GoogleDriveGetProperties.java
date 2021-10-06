@@ -123,11 +123,16 @@ public class GoogleDriveGetProperties extends GoogleDriveComponentProperties {
         }
         if (Form.ADVANCED.equals(form.getName())) {
             form.getWidget(setOutputExt.getName()).setVisible(storeToLocal.getValue());
+            form.getWidget(includeSharedItems.getName()).setHidden(checkIdAccessMethod(fileAccessMethod.getValue()));
         }
     }
 
     public void afterStoreToLocal() {
         refreshLayout(getForm(Form.MAIN));
+        refreshLayout(getForm(Form.ADVANCED));
+    }
+
+    public void afterFileAccessMethod() {
         refreshLayout(getForm(Form.ADVANCED));
     }
 }

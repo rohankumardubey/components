@@ -7,6 +7,8 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
@@ -36,16 +38,43 @@ public class GoogleDriveListReaderTest extends GoogleDriveTestBaseRuntime {
 
     String qC = "name='C' and 'B' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false";
 
+    String customQuery = "name='test.csv' and ('A' in parents) and mimeType!='application/vnd.google-apps.folder'";
+
     @Before
     public void setUp() throws Exception {
         super.setUp();
         // stubbing
         mockList = mock(List.class, RETURNS_DEEP_STUBS);
-        when(drive.files().list()).thenReturn(mockList);
-        when(drive.files().list().setQ(eq(qA)).execute()).thenReturn(createFolderFileList("A", false));
-        when(drive.files().list().setQ(eq(qGSA)).execute()).thenReturn(createFolderFileList("A", false));
-        when(drive.files().list().setQ(eq(qB)).execute()).thenReturn(createFolderFileList("B", false));
-        when(drive.files().list().setQ(eq(qC)).execute()).thenReturn(createFolderFileList("C", false));
+        when(drive.files().list()
+                .setSupportsAllDrives(false)
+                .setIncludeItemsFromAllDrives(false)).thenReturn(mockList);
+        when(drive
+                .files()
+                .list()
+                .setQ(eq(qA))
+                .setSupportsAllDrives(false)
+                .setIncludeItemsFromAllDrives(false)
+                .execute()).thenReturn(createFolderFileList("A", false));
+        when(drive
+                .files()
+                .list()
+                .setQ(eq(qGSA))
+                .setSupportsAllDrives(false)
+                .setIncludeItemsFromAllDrives(false)
+                .execute()).thenReturn(createFolderFileList("A", false));
+        when(drive
+                .files()
+                .list()
+                .setQ(eq(qB))
+                .setSupportsAllDrives(false)
+                .setIncludeItemsFromAllDrives(false)
+                .execute()).thenReturn(createFolderFileList("B", false));
+        when(drive
+                .files()
+                .list()
+                .setQ(eq(qC))
+                .setSupportsAllDrives(false)
+                .setIncludeItemsFromAllDrives(false).execute()).thenReturn(createFolderFileList("C", false));
 
         //
         properties = new GoogleDriveListProperties("test");
@@ -113,9 +142,26 @@ public class GoogleDriveListReaderTest extends GoogleDriveTestBaseRuntime {
 
     @Test
     public void testCheckPathWithEmptyPath() throws Exception {
-        when(drive.files().list().setQ(eq(qA)).execute()).thenReturn(emptyFileList);
-        when(drive.files().list().setQ(eq(qB)).execute()).thenReturn(emptyFileList);
-        when(drive.files().list().setQ(eq(qC)).execute()).thenReturn(emptyFileList);
+        when(drive
+                .files()
+                .list()
+                .setQ(eq(qA))
+                .setSupportsAllDrives(false)
+                .setIncludeItemsFromAllDrives(false)
+                .execute()).thenReturn(emptyFileList);
+        when(drive
+                .files()
+                .list()
+                .setQ(eq(qB))
+                .setSupportsAllDrives(false)
+                .setIncludeItemsFromAllDrives(false)
+                .execute()).thenReturn(emptyFileList);
+        when(drive
+                .files()
+                .list()
+                .setQ(eq(qC))
+                .setSupportsAllDrives(false)
+                .setIncludeItemsFromAllDrives(false).execute()).thenReturn(emptyFileList);
 
         properties.folder.setValue("/A/B/C");
         source.initialize(container, properties);
@@ -125,9 +171,26 @@ public class GoogleDriveListReaderTest extends GoogleDriveTestBaseRuntime {
 
     @Test
     public void testCheckPathWithDuplicatedPath() throws Exception {
-        when(drive.files().list().setQ(eq(qA)).execute()).thenReturn(createFolderFileList("A", false));
-        when(drive.files().list().setQ(eq(qB)).execute()).thenReturn(createFolderFileList("B", true));
-        when(drive.files().list().setQ(eq(qC)).execute()).thenReturn(createFolderFileList("C", false));
+        when(drive
+                .files()
+                .list()
+                .setQ(eq(qA))
+                .setSupportsAllDrives(false)
+                .setIncludeItemsFromAllDrives(false)
+                .execute()).thenReturn(createFolderFileList("A", false));
+        when(drive
+                .files()
+                .list()
+                .setQ(eq(qB))
+                .setSupportsAllDrives(false)
+                .setIncludeItemsFromAllDrives(false)
+                .execute()).thenReturn(createFolderFileList("B", true));
+        when(drive
+                .files()
+                .list()
+                .setQ(eq(qC))
+                .setSupportsAllDrives(false)
+                .setIncludeItemsFromAllDrives(false).execute()).thenReturn(createFolderFileList("C", false));
         when(mockList.execute()).thenReturn(emptyFileList);
         //
         properties.folder.setValue("/A/B/C");
@@ -138,9 +201,27 @@ public class GoogleDriveListReaderTest extends GoogleDriveTestBaseRuntime {
 
     @Test
     public void testCheckPathWithDuplicatedPathLastLevel() throws Exception {
-        when(drive.files().list().setQ(eq(qA)).execute()).thenReturn(createFolderFileList("A", false));
-        when(drive.files().list().setQ(eq(qB)).execute()).thenReturn(createFolderFileList("B", false));
-        when(drive.files().list().setQ(eq(qC)).execute()).thenReturn(createFolderFileList("C", true));
+        when(drive
+                .files()
+                .list()
+                .setQ(eq(qA))
+                .setSupportsAllDrives(false)
+                .setIncludeItemsFromAllDrives(false)
+                .execute()).thenReturn(createFolderFileList("A", false));
+        when(drive
+                .files()
+                .list()
+                .setQ(eq(qB))
+                .setSupportsAllDrives(false)
+                .setIncludeItemsFromAllDrives(false)
+                .execute()).thenReturn(createFolderFileList("B", false));
+        when(drive
+                .files()
+                .list()
+                .setQ(eq(qC))
+                .setSupportsAllDrives(false)
+                .setIncludeItemsFromAllDrives(false)
+                .execute()).thenReturn(createFolderFileList("C", true));
         when(mockList.execute()).thenReturn(emptyFileList);
         //
         properties.folder.setValue("/A/B/C");
@@ -173,6 +254,18 @@ public class GoogleDriveListReaderTest extends GoogleDriveTestBaseRuntime {
         properties.pageSize.setValue(1000);
         source.initialize(container, properties);
         assertEquals(Result.OK, source.validate(container).getStatus());
+    }
+
+    @Test
+    public void testUseCustomQuery() throws Exception {
+        when(mockList.execute()).thenReturn(createFolderFileList("TestFolder", false));
+        properties.useQuery.setValue(true);
+        properties.query.setValue(customQuery);
+        source.initialize(container, properties);
+        GoogleDriveListReader reader = ((GoogleDriveListReader) source.createReader(container));
+        assertTrue(reader.start());
+        reader.close();
+        verify(mockList, times(1)).setQ(eq(customQuery));
     }
 
 }
