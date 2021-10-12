@@ -26,7 +26,7 @@ MAJOR=$(echo ${RELEASE_VERSION} | cut -d. -f1)
 PREVIOUS_RELEASE_VERSION=${MAJOR}.${MINOR}.${PATCH}
 echo "Previous release version ${PREVIOUS_RELEASE_VERSION}"
 LAST_COMMIT_HASH=$(git log --format="%H" release/${PREVIOUS_RELEASE_VERSION}...release/${RELEASE_VERSION} | head -n -1 | tail -n 1)
-
+#Test comment
 if [[ -z "${LAST_COMMIT_HASH}" ]]; then
     echo "Cannot evaluate last commit hash. Changelog won't be generated."
 else
