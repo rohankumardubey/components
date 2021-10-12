@@ -21,7 +21,7 @@ def artifactoryCredentials = usernamePassword(
 def branch = env.BRANCH_NAME
 def repo = 'components'
 def slackChannel = 'components-ci'
-def escaped_branch = branch.toLowerCase().replaceAll("/", "_")    
+def escaped_branch = branch.toLowerCase().replaceAll("/", "_")
 def PRODUCTION_DEPLOYMENT_REPOSITORY = "snapshots"
 def deploymentSuffix = (env.BRANCH_NAME == "master" || env.BRANCH_NAME.startsWith("maintenance/")) ? "${PRODUCTION_DEPLOYMENT_REPOSITORY}" : "dev_branch_snapshots/branch_${escaped_branch}"
 def m2 = "/tmp/jenkins/tdi/m2/${deploymentSuffix}"
@@ -77,6 +77,7 @@ spec:
   environment {
     MAVEN_OPTS = "-Dmaven.artifact.threads=128 -Dorg.slf4j.simpleLogger.showThreadName=true -Dorg.slf4j.simpleLogger.showDateTime=true -Dorg.slf4j.simpleLogger.dateTimeFormat=HH:mm:ss -Dtalend.maven.decrypter.m2.location=${WORKSPACE}/.jenkins/"
     ARTIFACTORY_REGISTRY = "artifactory.datapwn.com"
+    REPOSITORY = 'components'
   }
 
   options {
@@ -90,6 +91,7 @@ spec:
     choice(name: 'Action',
             choices: ['STANDARD', 'RELEASE'],
             description: 'Kind of running : \nSTANDARD (default), normal building \nRELEASE : build release')
+    booleanParam(name: 'DRAFT', defaultValue: true, description: 'Create a draft changelog.')
   }
 
   stages {
@@ -117,11 +119,12 @@ spec:
       steps {
         container('main') {
           withCredentials([gitCredentials, nexusCredentials, dockerCredentials, artifactoryCredentials]) {
-            sh '''#!/bin/bash
+            env.RELEASE_VERSION = sh(returnStdout: true, script: "mvn org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=project.version -q -DforceStdout | cut -d- -f1").trim()
+            /*sh '''#!/bin/bash
             docker version
             echo $ARTIFACTORY_PASSWORD | docker login $ARTIFACTORY_REGISTRY -u $ARTIFACTORY_LOGIN --password-stdin
             mvn clean -B -U -V -s ci/settings.xml deploy
-            '''
+            '''*/
             // -Dgit_branch="${escaped_branch}" \
             // -Dbigquery.project="${bigquery_project}" \
             // -Dbigquery.service.account.file="${service_account_file}" \
@@ -129,6 +132,19 @@ spec:
             // -Dorg.talend.components.google.drive.service_account_file="${google_drive_service_account_file}"
           }
         }
+      }
+      post {
+          success {
+              container('main') {
+                  withCredentials([gitCredentials]) {
+                      script {
+                          env.DRAFT = params.DRAFT
+                          env.BRANCH_NAME = 'master'
+                          sh "sh .jenkins/changelog.sh"
+                      }
+                  }
+              }
+          }
       }
     }
   }
