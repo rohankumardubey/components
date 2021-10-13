@@ -119,12 +119,14 @@ spec:
       steps {
         container('main') {
           withCredentials([gitCredentials, nexusCredentials, dockerCredentials, artifactoryCredentials]) {
-            env.RELEASE_VERSION = sh(returnStdout: true, script: "mvn org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=project.version -q -DforceStdout | cut -d- -f1").trim()
-            /*sh '''#!/bin/bash
+            script {
+                  env.RELEASE_VERSION = sh(returnStdout: true, script: "mvn org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=project.version -q -DforceStdout | cut -d- -f1").trim()
+            }
+            sh '''#!/bin/bash
             docker version
             echo $ARTIFACTORY_PASSWORD | docker login $ARTIFACTORY_REGISTRY -u $ARTIFACTORY_LOGIN --password-stdin
             mvn clean -B -U -V -s ci/settings.xml deploy
-            '''*/
+            '''
             // -Dgit_branch="${escaped_branch}" \
             // -Dbigquery.project="${bigquery_project}" \
             // -Dbigquery.service.account.file="${service_account_file}" \
@@ -139,8 +141,7 @@ spec:
                   withCredentials([gitCredentials]) {
                       script {
                           env.DRAFT = params.DRAFT
-                          env.BRANCH_NAME = 'master'
-                          sh "sh .jenkins/changelog.sh"
+                          sh "sh ci/changelog.sh"
                       }
                   }
               }
