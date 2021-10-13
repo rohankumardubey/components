@@ -1,15 +1,17 @@
 package org.talend.components.salesforce.runtime;
 
+import com.talend.csv.CSVReader;
+
 import java.io.IOException;
 import java.util.List;
 
 public class BulkResultSet {
 
-    com.csvreader.CsvReader reader;
+    CSVReader reader;
 
     List<String> header;
 
-    public BulkResultSet(com.csvreader.CsvReader reader, List<String> header) {
+    public BulkResultSet(CSVReader reader, List<String> header) {
         this.reader = reader;
         this.header = header;
     }
@@ -18,7 +20,7 @@ public class BulkResultSet {
 
         boolean hasNext = false;
         try {
-            hasNext = reader.readRecord();
+            hasNext = reader.readNext();
         } catch (IOException e) {
             if (this.reader != null) {
                 this.reader.close();

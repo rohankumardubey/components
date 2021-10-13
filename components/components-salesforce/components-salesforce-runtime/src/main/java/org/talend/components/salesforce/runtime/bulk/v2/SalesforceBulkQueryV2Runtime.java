@@ -33,7 +33,7 @@ import org.talend.daikon.exception.error.DefaultErrorCode;
 import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
 
-import com.csvreader.CsvReader;
+import com.talend.csv.CSVReader;
 import com.sforce.async.ContentType;
 import com.sforce.async.JobStateEnum;
 import com.sforce.async.OperationEnum;
@@ -143,10 +143,10 @@ public class SalesforceBulkQueryV2Runtime {
     }
 
     public BulkResultSet getResultSet(InputStream input) throws IOException {
-        CsvReader reader = new CsvReader(new InputStreamReader(input), ',');
+        CSVReader reader = new CSVReader(new InputStreamReader(input), ',');
         reader.setSafetySwitch(safetySwitch);
         List<String> baseFileHeader = null;
-        if (reader.readRecord()) {
+        if (reader.readNext()) {
             baseFileHeader = Arrays.asList(reader.getValues());
         }
         return new BulkResultSet(reader, baseFileHeader);

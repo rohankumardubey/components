@@ -32,7 +32,7 @@ import org.talend.components.salesforce.tsalesforcebulkexec.TSalesforceBulkExecP
 import org.talend.daikon.i18n.GlobalI18N;
 import org.talend.daikon.i18n.I18nMessages;
 
-import com.csvreader.CsvReader;
+import com.talend.csv.CSVReader;
 import com.sforce.async.ContentType;
 import com.sforce.async.JobStateEnum;
 import com.sforce.async.OperationEnum;
@@ -153,10 +153,10 @@ public class SalesforceBulkV2Runtime {
     }
 
     public BulkResultSet getResultSet(InputStream input) throws IOException {
-        CsvReader reader = new CsvReader(new InputStreamReader(input), getDelimitedChar(columnDelimiter));
+        CSVReader reader = new CSVReader(new InputStreamReader(input), getDelimitedChar(columnDelimiter));
         reader.setSafetySwitch(safetySwitch);
         List<String> baseFileHeader = null;
-        if (reader.readRecord()) {
+        if (reader.readNext()) {
             baseFileHeader = Arrays.asList(reader.getValues());
             Collections.replaceAll(baseFileHeader, "sf__Id", "salesforce_id");
             Collections.replaceAll(baseFileHeader, "sf__Created", "salesforce_created");

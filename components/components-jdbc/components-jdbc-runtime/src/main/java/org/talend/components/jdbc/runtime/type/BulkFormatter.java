@@ -15,7 +15,7 @@ import org.talend.components.jdbc.CommonUtils;
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
 
-import com.csvreader.CsvWriter;
+import com.talend.csv.CSVWriter;
 
 public class BulkFormatter {
 
@@ -64,22 +64,24 @@ public class BulkFormatter {
             this.inputValueLocation = inputValueLocation;
         }
 
-        public void format(IndexedRecord input, String nullValue, CsvWriter writer) throws IOException {
+        public void format(IndexedRecord input, String nullValue, CSVWriter writer) throws IOException {
             // do nothing
         }
 
     }
     
-    private void fillNull(String nullValue, CsvWriter writer) throws IOException {
-        writer.setUseTextQualifier(false);
-        writer.setForceQualifier(false);
+    private void fillNull(String nullValue, CSVWriter writer) throws IOException {
+        writer.setQuoteStatus(CSVWriter.QuoteStatus.NO);
         if(nullValue!=null) {
-            writer.write(nullValue);
+            writer.writeColumn(nullValue);
         } else {
-            writer.write("");
+            writer.writeColumn("");
         }
-        writer.setUseTextQualifier(useTextEnclosure);
-        writer.setForceQualifier(useTextEnclosure);
+        if(useTextEnclosure) {
+            writer.setQuoteStatus(CSVWriter.QuoteStatus.FORCE);
+        } else {
+            writer.setQuoteStatus(CSVWriter.QuoteStatus.NO);
+        }
     }
 
     public class StringTypeWriter extends Formatter {
@@ -88,12 +90,12 @@ public class BulkFormatter {
             super(inputValueLocation);
         }
 
-        public void format(IndexedRecord input, String nullValue, CsvWriter writer) throws IOException {
+        public void format(IndexedRecord input, String nullValue, CSVWriter writer) throws IOException {
             Object inputValue = input.get(inputValueLocation);
             if(inputValue==null) {
                 fillNull(nullValue, writer);
             } else {
-                writer.write(String.valueOf(inputValue), true);
+                writer.writeColumn(String.valueOf(inputValue));
             }
         }
     }
@@ -107,12 +109,12 @@ public class BulkFormatter {
             this.pattern = pattern;
         }
 
-        public void format(IndexedRecord input, String nullValue, CsvWriter writer) throws IOException {
+        public void format(IndexedRecord input, String nullValue, CSVWriter writer) throws IOException {
             Object inputValue = input.get(inputValueLocation);
             if(inputValue==null) {
                 fillNull(nullValue, writer);
             } else {
-                writer.write(FormatterUtils.formatDate((Date)inputValue, pattern), true);
+                writer.writeColumn(FormatterUtils.formatDate((Date)inputValue, pattern));
             }
         }
 
@@ -127,12 +129,12 @@ public class BulkFormatter {
             super(inputValueLocation);
         }
 
-        public void format(IndexedRecord input, String nullValue, CsvWriter writer) throws IOException {
+        public void format(IndexedRecord input, String nullValue, CSVWriter writer) throws IOException {
             Object inputValue = input.get(inputValueLocation);
             if(inputValue==null) {
                 fillNull(nullValue, writer);
             } else {
-                writer.write(charset.decode(ByteBuffer.wrap((byte[])inputValue)).toString(), true);
+                writer.writeColumn(charset.decode(ByteBuffer.wrap((byte[])inputValue)).toString());
             }
         }
 

@@ -33,7 +33,7 @@ import org.talend.components.jdbc.runtime.type.BulkFormatter;
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
 
-import com.csvreader.CsvWriter;
+import com.talend.csv.CSVWriter;
 
 /**
  * Generate bulk file
@@ -50,7 +50,7 @@ public class JDBCBulkFileWriter implements Writer<Result> {
     
     private AllSetting setting;
 
-    private CsvWriter csvWriter;
+    private CSVWriter csvWriter;
 
     private String charset = "UTF-8";
 
@@ -96,21 +96,21 @@ public class JDBCBulkFileWriter implements Writer<Result> {
         if(setting.fieldSeparator.length()>1) {
             throw new RuntimeException("only support one char field separator");
         }
-        csvWriter = new CsvWriter(new OutputStreamWriter(new java.io.FileOutputStream(file, isAppend), charset), setting.fieldSeparator.charAt(0));
-        csvWriter.setRecordDelimiter(setting.rowSeparator.charAt(0));
+        csvWriter = new CSVWriter(new OutputStreamWriter(new java.io.FileOutputStream(file, isAppend), charset));
+        csvWriter.setSeparator(setting.fieldSeparator.charAt(0));
+        csvWriter.setLineEnd(setting.rowSeparator.substring(0, 1));
+
         if(setting.setTextEnclosure) {
             if(setting.textEnclosure.length()>1) {
                 throw new RuntimeException("only support one char text enclosure");
             }
-            csvWriter.setUseTextQualifier(true);
             //not let it to do the "smart" thing, avoid to promise too much for changing api in future
-            csvWriter.setForceQualifier(true);
-            csvWriter.setTextQualifier(setting.textEnclosure.charAt(0));
+            csvWriter.setQuoteStatus(CSVWriter.QuoteStatus.FORCE);
+            csvWriter.setQuoteChar(setting.textEnclosure.charAt(0));
         } else {
-            csvWriter.setUseTextQualifier(false);
-            csvWriter.setForceQualifier(false);
+            csvWriter.setQuoteStatus(CSVWriter.QuoteStatus.NO);
         }
-        csvWriter.setEscapeMode(com.csvreader.CsvWriter.ESCAPE_MODE_BACKSLASH);
+        csvWriter.setEscapeChar('\\');
 
         fileIsEmpty = (file.length() == 0);
     }
@@ -138,7 +138,7 @@ public class JDBCBulkFileWriter implements Writer<Result> {
         }
 
         if (includeHeader && !headerIsReady && (!isAppend || fileIsEmpty)) {
-            csvWriter.writeRecord(getHeaders(currentSchema));
+            csvWriter.writeNext(getHeaders(currentSchema));
             headerIsReady = true;
         }
 
@@ -177,6 +177,6 @@ public class JDBCBulkFileWriter implements Writer<Result> {
         for (int i=0;i<fields.size();i++) {
             bulkFormatter.getFormatter(i).format(input, nullValue, csvWriter);
         }
-        csvWriter.endRecord();
+        csvWriter.endRow();
     }
 }

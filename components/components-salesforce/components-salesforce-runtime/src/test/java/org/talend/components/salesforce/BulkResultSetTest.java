@@ -19,12 +19,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 
@@ -33,8 +28,8 @@ import org.junit.Test;
 import org.talend.components.salesforce.runtime.BulkResult;
 import org.talend.components.salesforce.runtime.BulkResultSet;
 
-import com.csvreader.CsvReader;
-import com.csvreader.CsvWriter;
+import com.talend.csv.CSVReader;
+import com.talend.csv.CSVWriter;
 
 /**
  *
@@ -47,11 +42,11 @@ public class BulkResultSetTest {
         final int recordCount = 100;
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        CsvWriter csvWriter = new CsvWriter(new BufferedOutputStream(out),
-                ',', Charset.forName("UTF-8"));
+        CSVWriter csvWriter = new CSVWriter(new OutputStreamWriter(new BufferedOutputStream(out), "UTF-8"));
+        csvWriter.setSeparator(',');
 
         for (int i = 0; i < recordCount; i++) {
-            csvWriter.writeRecord(new String[]{
+            csvWriter.writeNext(new String[]{
                     "fieldValueA" + i,
                     "fieldValueB" + i,
                     "fieldValueC" + i
@@ -59,9 +54,9 @@ public class BulkResultSetTest {
         }
         csvWriter.close();
 
-        CsvReader csvReader = new CsvReader(
+        CSVReader csvReader = new CSVReader(
                 new BufferedInputStream(new ByteArrayInputStream(out.toByteArray())),
-                ',', Charset.forName("UTF-8"));
+                ',', "UTF-8");
 
         BulkResultSet resultSet = new BulkResultSet(csvReader, Arrays.asList("fieldA", "fieldB", "fieldC"));
 
@@ -82,8 +77,8 @@ public class BulkResultSetTest {
     public void testSafetySwitchTrueFailure() throws IOException {
         try {
             prepareSafetySwitchTest(true, 100_001);
-        } catch (IOException ioe) {
-            Assert.assertTrue(ioe.getMessage().startsWith("Maximum column length of 100,000 exceeded"));
+        } catch (Exception ioe) {
+            Assert.assertTrue(ioe.getMessage().contains("safetySwitch"));
         }
     }
 
@@ -95,18 +90,18 @@ public class BulkResultSetTest {
 
     private int prepareSafetySwitchTest(boolean safetySwitchParameter, int columnLength) throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        CsvWriter csvWriter = new CsvWriter(new BufferedOutputStream(out), ',', Charset.forName("UTF-8"));
+        CSVWriter csvWriter = new CSVWriter(new OutputStreamWriter(new BufferedOutputStream(out), "UTF-8"));
+        csvWriter.setSeparator(',');
 
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < columnLength; i++) {
             sb.append("a");
         }
         String[] data = new String[] { "fieldValueA", "fieldValueB", sb.toString() };
-        csvWriter.writeRecord(data);
+        csvWriter.writeNext(data);
         csvWriter.close();
 
-        CsvReader csvReader = new CsvReader(new BufferedInputStream(new ByteArrayInputStream(out.toByteArray())), ',',
-                Charset.forName("UTF-8"));
+        CSVReader csvReader = new CSVReader(new BufferedInputStream(new ByteArrayInputStream(out.toByteArray())), ',',"UTF-8");
         csvReader.setSafetySwitch(safetySwitchParameter);
         BulkResultSet resultSet = new BulkResultSet(csvReader, Arrays.asList("fieldA", "fieldB", "fieldC"));
         BulkResult result = resultSet.next();
@@ -120,7 +115,7 @@ public class BulkResultSetTest {
         doThrow(new IOException("I/O ERROR")).when(in).read();
         when(in.read(any(byte[].class))).thenThrow(new IOException("I/O ERROR"));
 
-        CsvReader csvReader = new CsvReader(in, ',', Charset.forName("UTF-8"));
+        CSVReader csvReader = new CSVReader(in, ',', "UTF-8");
 
         BulkResultSet resultSet = new BulkResultSet(csvReader, Arrays.asList("fieldA", "fieldB", "fieldC"));
 

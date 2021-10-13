@@ -102,7 +102,7 @@ public class SalesforceBulkRuntime {
 
     private JobInfo job;
 
-    private com.csvreader.CsvReader baseFileReader;
+    private com.talend.csv.CSVReader baseFileReader;
 
     private List<String> baseFileHeader;
 
@@ -241,9 +241,9 @@ public class SalesforceBulkRuntime {
 
     private void prepareCSVLog() throws IOException {
         br = new BufferedReader(new InputStreamReader(new FileInputStream(bulkFileName), FILE_ENCODING));
-        baseFileReader = new com.csvreader.CsvReader(br, ',');
+        baseFileReader = new com.talend.csv.CSVReader(br, ',');
         baseFileReader.setSafetySwitch(safetySwitch);
-        if (baseFileReader.readRecord()) {
+        if (baseFileReader.readNext()) {
             baseFileHeader = Arrays.asList(baseFileReader.getValues());
         }
     }
@@ -583,7 +583,7 @@ public class SalesforceBulkRuntime {
      */
     private BulkResult getBaseFileRow() throws IOException {
         BulkResult dataInfo = new BulkResult();
-        if (baseFileReader.readRecord()) {
+        if (baseFileReader.readNext()) {
             List<String> row = Arrays.asList(baseFileReader.getValues());
             for (int i = 0; i < row.size(); i++) {
                 dataInfo.setValue(baseFileHeader.get(i), row.get(i));
@@ -801,12 +801,12 @@ public class SalesforceBulkRuntime {
     }
 
     public BulkResultSet getQueryResultSet(String resultId) throws AsyncApiException, IOException, ConnectionException {
-        baseFileReader = new com.csvreader.CsvReader(new BufferedReader(
+        baseFileReader = new com.talend.csv.CSVReader(new BufferedReader(
                 new InputStreamReader(getQueryResultStream(job.getId(), batchInfoList.get(0).getId(), resultId), FILE_ENCODING)),
                 ',');
 
         baseFileReader.setSafetySwitch(safetySwitch);
-        if (baseFileReader.readRecord()) {
+        if (baseFileReader.readNext()) {
             baseFileHeader = Arrays.asList(baseFileReader.getValues());
         }
         return new BulkResultSet(baseFileReader, baseFileHeader);

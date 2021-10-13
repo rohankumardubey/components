@@ -29,7 +29,7 @@ import org.talend.components.common.BulkFileProperties;
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.converter.IndexedRecordConverter;
 
-import com.csvreader.CsvWriter;
+import com.talend.csv.CSVWriter;
 
 /**
  * Generate bulk file
@@ -48,7 +48,7 @@ public class BulkFileWriter implements Writer<Result> {
 
     private String uId;
 
-    private CsvWriter csvWriter;
+    private CSVWriter csvWriter;
 
     private char separator = ',';
 
@@ -76,7 +76,8 @@ public class BulkFileWriter implements Writer<Result> {
         }
         File file = new File(bulkProperties.bulkFilePath.getStringValue());
         file.getParentFile().mkdirs();
-        csvWriter = new CsvWriter(new OutputStreamWriter(new java.io.FileOutputStream(file, isAppend), charset), separator);
+        csvWriter = new CSVWriter(new OutputStreamWriter(new java.io.FileOutputStream(file, isAppend), charset));
+        csvWriter.setSeparator(separator);
 
         fileIsEmpty = (file.length() == 0);
     }
@@ -99,12 +100,12 @@ public class BulkFileWriter implements Writer<Result> {
                 schema = record.getSchema();
             }
 
-            csvWriter.writeRecord(getHeaders(schema));
+            csvWriter.writeNext(getHeaders(schema));
             headerIsReady = true;
         }
 
         List<String> values = getValues(datum);
-        csvWriter.writeRecord(values.toArray(new String[values.size()]));
+        csvWriter.writeNext(values.toArray(new String[values.size()]));
         result.totalCount++;
     }
 
