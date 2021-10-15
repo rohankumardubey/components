@@ -9,7 +9,7 @@
         <relativePath>../../../components-parent/pom.xml</relativePath>
     </parent>
     <properties>
-        <partner.version>47.0.0</partner.version>
+        <partner.version>53.0.0</partner.version>
         <coverage.sonar.reportRoot>${project.basedir}/..</coverage.sonar.reportRoot>
     </properties>
 
@@ -46,12 +46,16 @@
         </dependency>
         <!-- include the avro dependencies manually with fixes for those know CVEs -->
         <dependency>
-            <groupId>org.codehaus.jackson</groupId>
-            <artifactId>jackson-core-asl</artifactId>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.codehaus.jackson</groupId>
-            <artifactId>jackson-mapper-asl</artifactId>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
         </dependency>
         <!-- the following 2 deps are required for the com.force.api above -->
         <dependency>
