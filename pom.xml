@@ -7,6 +7,14 @@
     <artifactId>components</artifactId>
     <packaging>pom</packaging>
 
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>https://github.com/Talend/components/blob/master/LICENSE</url>
+            <distribution>may be downloaded from the Maven repository</distribution>
+        </license>
+    </licenses>
+
     <properties>
         <!-- repositories -->
         <talend.snapshots.repo>https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceSnapshot/</talend.snapshots.repo>
@@ -30,7 +38,7 @@
         <url>${talend.releases.repo}</url>
       </repository>
     </distributionManagement>
-	
+
     <name>Component Aggregator</name>
     <modules>
         <module>components-parent</module>
