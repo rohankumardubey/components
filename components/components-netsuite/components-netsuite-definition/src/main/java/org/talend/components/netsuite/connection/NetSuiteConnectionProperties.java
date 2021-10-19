@@ -42,11 +42,13 @@ import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.serialize.PostDeserializeSetup;
 
+import org.talend.daikon.serialize.migration.SerializeSetVersion;
+
 /**
  * Properties of NetSuite connection component.
  */
 public class NetSuiteConnectionProperties extends ComponentPropertiesImpl
-        implements NetSuiteProvideConnectionProperties {
+        implements NetSuiteProvideConnectionProperties, SerializeSetVersion {
 
     private static final Logger LOG = LoggerFactory.getLogger(NetSuiteConnectionProperties.class);
 
@@ -61,7 +63,7 @@ public class NetSuiteConnectionProperties extends ComponentPropertiesImpl
      * List of versions supported by NetSuite components.
      */
     public static final List<String> API_VERSIONS =
-            Collections.unmodifiableList(Arrays.asList("2019.2", "2018.2", "2016.2", "2014.2"));
+            Collections.unmodifiableList(Arrays.asList("2019.2"));
 
     public final Property<String> name = newString("name").setRequired();
 
@@ -284,6 +286,14 @@ public class NetSuiteConnectionProperties extends ComponentPropertiesImpl
     public boolean postDeserialize(int version, PostDeserializeSetup setup, boolean persistent) {
         boolean migrated = super.postDeserialize(version, setup, persistent);
         migrateApiVersion();
+
+        if(version < 1) {
+            if ((apiVersion.getValue()==null) || "2018.2,2016.2,2014.2".contains(apiVersion.getValue())) {
+                apiVersion.setValue("2019.2");
+                migrated = true;
+            }
+        }
+
         return migrated;
     }
 
@@ -306,7 +316,14 @@ public class NetSuiteConnectionProperties extends ComponentPropertiesImpl
                 }
             }
         }
+        
         // Initialize possible values for apiVersion property.
         apiVersion.setPossibleValues(API_VERSIONS);
     }
+
+    @Override
+    public int getVersionNumber() {
+        return 1;
+    }
+    
 }

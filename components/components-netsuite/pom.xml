@@ -17,9 +17,6 @@
         <module>components-netsuite-definition</module>
         <module>components-netsuite-runtime</module>
         <module>components-netsuite-runtime_2019_2</module>
-        <module>components-netsuite-runtime_2018_2</module>
-        <module>components-netsuite-runtime_2016_2</module>
-        <module>components-netsuite-runtime_2014_2</module>
     </modules>
 
     <build>
@@ -43,9 +40,6 @@
                                     <includes>
                                         <include>components-netsuite-definition/target/jacoco.exec</include>
                                         <include>components-netsuite-runtime/target/jacoco.exec</include>
-                                        <include>components-netsuite-runtime_2014_2/target/jacoco.exec</include>
-                                        <include>components-netsuite-runtime_2016_2/target/jacoco.exec</include>
-                                        <include>components-netsuite-runtime_2018_2/target/jacoco.exec</include>
                                         <include>components-netsuite-runtime_2019_2/target/jacoco.exec</include>
                                     </includes>
                                 </fileSet>
@@ -66,9 +60,6 @@
                                     <includes>
                                         <include>components-netsuite-definition/target/jacoco-it.exec</include>
                                         <include>components-netsuite-runtime/target/jacoco-it.exec</include>
-                                        <include>components-netsuite-runtime_2014_2/target/jacoco-it.exec</include>
-                                        <include>components-netsuite-runtime_2016_2/target/jacoco-it.exec</include>
-                                        <include>components-netsuite-runtime_2018_2/target/jacoco-it.exec</include>
                                         <include>components-netsuite-runtime_2019_2/target/jacoco-it.exec</include>
                                     </includes>
                                 </fileSet>

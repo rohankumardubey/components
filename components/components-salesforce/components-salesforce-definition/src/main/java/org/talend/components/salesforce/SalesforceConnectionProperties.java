@@ -134,6 +134,8 @@ public class SalesforceConnectionProperties extends ComponentPropertiesImpl
         apiVersion.setValue(DEFAULT_API_VERSION);
         timeout.setValue(60000);
         httpChunked.setValue(true);
+        oauth2FlowType.setPossibleValues(JWT_Flow);
+        oauth2FlowType.setValue(JWT_Flow);
         oauth2JwtFlow.audience.setValue("https://login.salesforce.com");
     }
 
@@ -233,6 +235,8 @@ public class SalesforceConnectionProperties extends ComponentPropertiesImpl
         boolean useOtherConnection = refComponentIdValue != null
                 && refComponentIdValue.startsWith(TSalesforceConnectionDefinition.COMPONENT_NAME);
         if (form.getName().equals(Form.MAIN) || form.getName().equals(FORM_WIZARD)) {
+            oauth2FlowType.setPossibleValues(JWT_Flow);
+
             if (useOtherConnection) {
                 form.getWidget(loginType.getName()).setHidden(true);
                 hideOauth2Properties(form, true);
@@ -333,20 +337,20 @@ public class SalesforceConnectionProperties extends ComponentPropertiesImpl
 
     @Override
     public int getVersionNumber() {
-        return 4;
+        return 5;
     }
 
     @Override
     public boolean postDeserialize(int version, PostDeserializeSetup setup, boolean persistent) {
         boolean migrated = super.postDeserialize(version, setup, persistent);
-        if(version < this.getVersionNumber()){
+        if(version < 4){
             if(oauth2JwtFlow.audience.getValue() == null || oauth2JwtFlow.audience.getValue().isEmpty()) {
                 oauth2JwtFlow.audience.setValue("\"https://login.salesforce.com\"");
                 migrated = true;
             }
         }
 
-        if (version < this.getVersionNumber()) {
+        if (version < 4) {
             if (apiVersion.getValue() == null) {
                 apiVersion.setValue("\"34.0\"");
                 migrated = true;
@@ -369,6 +373,12 @@ public class SalesforceConnectionProperties extends ComponentPropertiesImpl
                     migrated = true;
                 }
             }
+        }
+
+        if(version < 5) {
+            oauth2FlowType.setPossibleValues(JWT_Flow);
+            oauth2FlowType.setValue(JWT_Flow);
+            migrated = true;
         }
 
         return migrated;

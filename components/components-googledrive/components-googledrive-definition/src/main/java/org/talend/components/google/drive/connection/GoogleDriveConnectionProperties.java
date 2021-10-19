@@ -16,6 +16,8 @@ import static org.talend.components.google.drive.GoogleDriveComponentDefinition.
 import static org.talend.components.google.drive.GoogleDriveComponentDefinition.getSandboxedInstance;
 import static org.talend.components.google.drive.connection.GoogleDriveConnectionProperties.OAuthMethod.InstalledApplicationWithIdAndSecret;
 import static org.talend.components.google.drive.connection.GoogleDriveConnectionProperties.OAuthMethod.InstalledApplicationWithJSON;
+import static org.talend.components.google.drive.connection.GoogleDriveConnectionProperties.OAuthMethod.ServiceAccount;
+import static org.talend.components.google.drive.connection.GoogleDriveConnectionProperties.OAuthMethod.AccessToken;
 import static org.talend.daikon.properties.presentation.Widget.widget;
 import static org.talend.daikon.properties.property.PropertyFactory.newBoolean;
 import static org.talend.daikon.properties.property.PropertyFactory.newEnum;
@@ -25,6 +27,7 @@ import static org.talend.daikon.properties.property.PropertyFactory.newString;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.EnumSet;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,7 +70,9 @@ public class GoogleDriveConnectionProperties extends ComponentPropertiesImpl imp
             .getI18nMessages(GoogleDriveConnectionProperties.class);
 
     public enum OAuthMethod {
+        @Deprecated
         AccessToken,
+
         InstalledApplicationWithIdAndSecret,
         InstalledApplicationWithJSON,
         ServiceAccount
@@ -125,8 +130,8 @@ public class GoogleDriveConnectionProperties extends ComponentPropertiesImpl imp
 
         name.setValue("");
         applicationName.setValue("");
-        oAuthMethod.setPossibleValues(OAuthMethod.values());
-        oAuthMethod.setValue(OAuthMethod.InstalledApplicationWithIdAndSecret);
+        oAuthMethod.setPossibleValues(getValidOAuthMethodValues());
+        oAuthMethod.setValue(InstalledApplicationWithIdAndSecret);
         accessToken.setValue("");
         clientId.setValue("");
         clientSecret.setValue("");
@@ -210,6 +215,8 @@ public class GoogleDriveConnectionProperties extends ComponentPropertiesImpl imp
         boolean useOtherConnection = refComponentIdValue != null
                 && refComponentIdValue.startsWith(GoogleDriveConnectionDefinition.COMPONENT_NAME);
         if (form.getName().equals(Form.MAIN) || form.getName().equals(FORM_WIZARD)) {
+            oAuthMethod.setPossibleValues(getValidOAuthMethodValues());
+
             // hides everything...
             form.getWidget(applicationName.getName()).setHidden(true);
             form.getWidget(oAuthMethod.getName()).setHidden(true);
@@ -384,12 +391,25 @@ public class GoogleDriveConnectionProperties extends ComponentPropertiesImpl imp
             readTimeout.setValue(DEFAULT_READ_TIMEOUT);
             migrated = true;
         }
+
+        if (version < 2) {
+            oAuthMethod.setPossibleValues(getValidOAuthMethodValues());
+            if(oAuthMethod.getValue() == null || oAuthMethod.getValue() == AccessToken) {
+                oAuthMethod.setValue(InstalledApplicationWithIdAndSecret);
+            }
+            migrated = true;
+        }
+
         return migrated;
+    }
+
+    private List<OAuthMethod> getValidOAuthMethodValues() {
+        return Arrays.asList(InstalledApplicationWithIdAndSecret,InstalledApplicationWithJSON,ServiceAccount);
     }
 
     @Override
     public int getVersionNumber() {
-        return 1;
+        return 2;
     }
 
 }
