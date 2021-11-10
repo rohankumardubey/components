@@ -220,7 +220,7 @@
                                 </Include-Resource>
                                 <Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
                                 <Import-Package>!com.google.crypto.tink*,!com.sun.net.httpserver.*,!net.shibboleth.utilities.java.support.xml*,!org.bouncycastle.*,
-                                    !org.cryptomator.siv.*,!org.opensaml.*,*</Import-Package>
+                                    !org.cryptomator.siv.*,!org.opensaml.*,!javax.servlet.*,*</Import-Package>
                                 <Embed-Transitive>true</Embed-Transitive>
                             </instructions>
                         </configuration>
