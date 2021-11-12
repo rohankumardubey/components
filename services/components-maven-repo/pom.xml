@@ -115,7 +115,7 @@
         </repository>
         <repository>
             <id>redshift</id>
-            <url>http://redshift-maven-repository.s3-website-us-east-1.amazonaws.com/release</url>
+            <url>https://redshift-maven-repository.s3-website-us-east-1.amazonaws.com/release</url>
         </repository>
     </repositories>
 
