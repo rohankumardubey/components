@@ -10,7 +10,6 @@
     <name>Component BOM</name>
     <properties>
         <components.version>0.38.0-SNAPSHOT</components.version>
-        <components-api-service-rest.version>0.28.14</components-api-service-rest.version>
         <daikon.version>0.31.12</daikon.version>
         <!-- repositories -->
         <talend_snapshots_deployment>https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceSnapshot/</talend_snapshots_deployment>
@@ -33,6 +32,8 @@
         <aws.version>1.11.848</aws.version>
         <azure-keyvault-core.version>0.9.7</azure-keyvault-core.version>
         <azure-storage.version>8.6.0</azure-storage.version>
+        <azure-storage-blob.version>12.9.0</azure-storage-blob.version>
+        <azure-identity.version>1.2.0</azure-identity.version>
         <msla4j.version>1.10.1</msla4j.version>
         <org.bouncycastle.version>1.69</org.bouncycastle.version>
         <bcmail-jdk15on.version>${org.bouncycastle.version}</bcmail-jdk15on.version>
@@ -443,6 +444,16 @@
                 <groupId>com.microsoft.azure</groupId>
                 <artifactId>msal4j</artifactId>
                 <version>${msla4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.azure</groupId>
+                <artifactId>azure-storage-blob</artifactId>
+                <version>${azure-storage-blob.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.azure</groupId>
+                <artifactId>azure-identity</artifactId>
+                <version>${azure-identity.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.squareup</groupId>
@@ -1453,18 +1464,18 @@
             <dependency>
                 <groupId>org.talend.components</groupId>
                 <artifactId>components-api-service-rest</artifactId>
-                <version>${components-api-service-rest.version}</version>
+                <version>${components.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.talend.components</groupId>
                 <artifactId>components-api-service-rest</artifactId>
-                <version>${components-api-service-rest.version}</version>
+                <version>${components.version}</version>
                 <classifier>lib</classifier>
             </dependency>
             <dependency>
                 <groupId>org.talend.components</groupId>
                 <artifactId>components-api-service-rest</artifactId>
-                <version>${components-api-service-rest.version}</version>
+                <version>${components.version}</version>
                 <type>test-jar</type>
             </dependency>
             <dependency>

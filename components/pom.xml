@@ -16,17 +16,9 @@
 
     <modules>
         <module>components-azurestorage</module>
-        <module>components-couchbase</module>
         <module>components-jdbc</module>
-        <module>components-splunk</module>
-        <module>components-jira</module>
-        <module>components-marketo</module>
-        <module>components-hadoopcluster</module>
-        <module>components-marklogic</module>
-        <module>components-googledrive</module>
+        <module>components-azure-dls-gen2-blob</module>
         <!-- Slow-building components are built last. -->
-        <module>components-netsuite</module>
         <module>components-salesforce</module>
-        <module>components-snowflake</module>
     </modules>
 </project>
