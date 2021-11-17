@@ -118,6 +118,10 @@ public class TJDBCOutputProperties extends FixedConnectorsComponentProperties im
 
     public Property<Integer> batchSize = PropertyFactory.newInteger("batchSize").setRequired();
 
+    public Property<Boolean> useQueryTimeout = PropertyFactory.newBoolean("useQueryTimeout").setRequired();
+
+    public Property<Integer> queryTimeout = PropertyFactory.newInteger("queryTimeout").setRequired();
+
     public void updateOutputSchemas() {
         Schema inputSchema = main.schema.getValue();
 
@@ -177,6 +181,9 @@ public class TJDBCOutputProperties extends FixedConnectorsComponentProperties im
         advancedForm.addRow(debug);
         advancedForm.addRow(useBatch);
         advancedForm.addRow(batchSize);
+
+        advancedForm.addRow(useQueryTimeout);
+        advancedForm.addRow(queryTimeout);
     }
 
     @Override
@@ -193,6 +200,8 @@ public class TJDBCOutputProperties extends FixedConnectorsComponentProperties im
         tableSelection.setConnection(this);
 
         connection.setNotRequired();
+
+        queryTimeout.setValue(30);
     }
 
     @Override
@@ -223,6 +232,7 @@ public class TJDBCOutputProperties extends FixedConnectorsComponentProperties im
                 form.getWidget(batchSize.getName()).setHidden(true);
             }
             form.getWidget(fieldOptions.getName()).setVisible(enableFieldOptions.getValue());
+            form.getWidget(queryTimeout.getName()).setHidden(!useQueryTimeout.getValue());
 
             updateReferenceColumns();
             updateFieldOptions();
@@ -261,6 +271,10 @@ public class TJDBCOutputProperties extends FixedConnectorsComponentProperties im
     }
 
     public void afterEnableFieldOptions() {
+        refreshLayout(getForm(Form.ADVANCED));
+    }
+
+    public void afterUseQueryTimeout() {
         refreshLayout(getForm(Form.ADVANCED));
     }
 
@@ -397,6 +411,8 @@ public class TJDBCOutputProperties extends FixedConnectorsComponentProperties im
         setting.setDebug(this.debug.getValue());
         setting.setUseBatch(this.useBatch.getValue());
         setting.setBatchSize(this.batchSize.getValue());
+        setting.setUseQueryTimeout(this.useQueryTimeout.getValue());
+        setting.setQueryTimeout(this.queryTimeout.getValue());
 
         setting.setNewDBColumnNames4AdditionalParameters(this.additionalColumns.names.getValue());
         setting.setSqlExpressions4AdditionalParameters(this.additionalColumns.sqlExpressions.getValue());
