@@ -539,7 +539,7 @@ public class AllSetting implements Serializable, JDBCAvroRegistryInfluencer {
     }
 
     public Boolean getUseQueryTimeout() {
-        return useQueryTimeout;
+        return useQueryTimeout != null && useQueryTimeout;
     }
 
     public void setUseQueryTimeout(Boolean useQueryTimeout) {
