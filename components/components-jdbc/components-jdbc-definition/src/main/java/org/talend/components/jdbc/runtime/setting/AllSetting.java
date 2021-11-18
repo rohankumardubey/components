@@ -117,9 +117,9 @@ public class AllSetting implements Serializable, JDBCAvroRegistryInfluencer {
     
     public String escapeChar;
 
-    public Boolean useQueryTimeout;
+    public Boolean useQueryTimeout = false;
 
-    public Integer queryTimeout;
+    public Integer queryTimeout = 30;
 
     public String getJdbcUrl() {
         return jdbcUrl;
