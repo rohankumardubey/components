@@ -74,6 +74,10 @@ public class JDBCRowReader extends AbstractBoundedReader<IndexedRecord> {
 
     private Schema rejectSchema;
 
+    private Boolean useQueryTimeout;
+
+    private Integer queryTimeout;
+
     public JDBCRowReader(RuntimeContainer container, JDBCRowSource source, RuntimeSettingProvider props) {
         super(source);
         this.container = container;
@@ -88,6 +92,9 @@ public class JDBCRowReader extends AbstractBoundedReader<IndexedRecord> {
 
         outSchema = CommonUtils.getOutputSchema((ComponentProperties) properties);
         rejectSchema = CommonUtils.getRejectSchema((ComponentProperties) properties);
+
+        useQueryTimeout = setting.getUseQueryTimeout();
+        queryTimeout = setting.getQueryTimeout();
     }
 
     @Override
@@ -125,6 +132,10 @@ public class JDBCRowReader extends AbstractBoundedReader<IndexedRecord> {
                 LOG.debug("Prepared statement: "+setting.getSql());
                 prepared_statement = conn.prepareStatement(sql);
 
+                if (usePreparedStatement) {
+                    prepared_statement.setQueryTimeout(queryTimeout);
+                }
+
                 JdbcRuntimeUtils.setPreparedStatement(prepared_statement, setting.getIndexs(), setting.getTypes(),
                         setting.getValues());
 
@@ -135,6 +146,10 @@ public class JDBCRowReader extends AbstractBoundedReader<IndexedRecord> {
                 }
             } else {
                 statement = conn.createStatement();
+
+                if (usePreparedStatement) {
+                    statement.setQueryTimeout(queryTimeout);
+                }
 
                 LOG.debug("Executing the query: '{}'",setting.getSql());
                 if (propagateQueryResultSet) {
