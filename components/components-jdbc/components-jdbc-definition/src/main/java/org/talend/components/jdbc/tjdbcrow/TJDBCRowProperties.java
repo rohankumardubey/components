@@ -100,6 +100,10 @@ public class TJDBCRowProperties extends FixedConnectorsComponentProperties imple
 
     public Property<Boolean> detectErrorOnMultipleSQL = PropertyFactory.newBoolean("detectErrorOnMultipleSQL").setRequired();
 
+    public Property<Boolean> useQueryTimeout = PropertyFactory.newBoolean("useQueryTimeout").setRequired();
+
+    public Property<Integer> queryTimeout = PropertyFactory.newInteger("queryTimeout").setRequired(true);
+
     @Override
     public void setupLayout() {
         super.setupLayout();
@@ -133,6 +137,9 @@ public class TJDBCRowProperties extends FixedConnectorsComponentProperties imple
         advancedForm.addRow(detectErrorOnMultipleSQL);
         advancedForm.addRow(commitEvery);
 
+        advancedForm.addRow(useQueryTimeout);
+        advancedForm.addRow(queryTimeout);
+
     }
 
     @Override
@@ -146,6 +153,8 @@ public class TJDBCRowProperties extends FixedConnectorsComponentProperties imple
         connection.setNotRequired();
 
         sql.setTaggedValue(org.talend.components.common.ComponentConstants.LINE_SEPARATOR_REPLACED_TO, " ");
+
+        queryTimeout.setValue(30);
     }
 
     @Override
@@ -170,6 +179,7 @@ public class TJDBCRowProperties extends FixedConnectorsComponentProperties imple
 
             form.getWidget(useColumn.getName()).setHidden(!propagateQueryResultSet.getValue());
             form.getWidget(preparedStatementTable.getName()).setHidden(!usePreparedStatement.getValue());
+            form.getWidget(queryTimeout.getName()).setHidden(!useQueryTimeout.getValue());
         }
     }
 
@@ -187,6 +197,10 @@ public class TJDBCRowProperties extends FixedConnectorsComponentProperties imple
     }
 
     public void afterUsePreparedStatement() {
+        refreshLayout(getForm(Form.ADVANCED));
+    }
+
+    public void afterUseQueryTimeout() {
         refreshLayout(getForm(Form.ADVANCED));
     }
 
@@ -289,6 +303,8 @@ public class TJDBCRowProperties extends FixedConnectorsComponentProperties imple
 
         setting.setDetectErrorOnMultipleSQL(this.detectErrorOnMultipleSQL.getValue());
 
+        setting.setUseQueryTimeout(this.useQueryTimeout.getValue());
+        setting.setQueryTimeout(this.queryTimeout.getValue());
         return setting;
     }
 
