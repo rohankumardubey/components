@@ -116,7 +116,11 @@ public class AllSetting implements Serializable, JDBCAvroRegistryInfluencer {
     public String textEnclosure;
     
     public String escapeChar;
-    
+
+    public Boolean useQueryTimeout;
+
+    public Integer queryTimeout;
+
     public String getJdbcUrl() {
         return jdbcUrl;
     }
@@ -372,6 +376,7 @@ public class AllSetting implements Serializable, JDBCAvroRegistryInfluencer {
         this.detectErrorOnMultipleSQL = detectErrorOnMultipleSQL;
     }
 
+
     @Override
     public boolean trim() {
         return trimStringOrCharColumns != null && trimStringOrCharColumns;
@@ -533,6 +538,22 @@ public class AllSetting implements Serializable, JDBCAvroRegistryInfluencer {
         this.trimMap = trimMap;
     }
 
+    public Boolean getUseQueryTimeout() {
+        return useQueryTimeout != null && useQueryTimeout;
+    }
+
+    public void setUseQueryTimeout(Boolean useQueryTimeout) {
+        this.useQueryTimeout = useQueryTimeout;
+    }
+
+    public Integer getQueryTimeout() {
+        return queryTimeout;
+    }
+
+    public void setQueryTimeout(Integer queryTimeout) {
+        this.queryTimeout = queryTimeout;
+    }
+
     @Override
     public boolean isTrim(int index) {
         if (trimMap == null || trimMap.isEmpty()) {
@@ -667,6 +688,8 @@ public class AllSetting implements Serializable, JDBCAvroRegistryInfluencer {
                 ", propagateQueryResultSet=" + propagateQueryResultSet +
                 ", useColumn='" + useColumn + '\'' +
                 ", usePreparedStatement=" + usePreparedStatement +
+                ", useQueryTimeout=" + useQueryTimeout +
+                ", queryTimeout=" + queryTimeout +
                 ", detectErrorOnMultipleSQL=" + detectErrorOnMultipleSQL +
                 ", indexs=" + indexs +
                 ", types=" + types +

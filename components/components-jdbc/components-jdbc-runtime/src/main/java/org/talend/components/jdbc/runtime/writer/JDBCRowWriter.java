@@ -102,6 +102,10 @@ public class JDBCRowWriter implements WriterWithFeedback<Result, IndexedRecord, 
 
     private Schema rejectSchema;
 
+    private Boolean useQueryTimeout;
+
+    private Integer queryTimeout;
+
     public JDBCRowWriter(WriteOperation<Result> writeOperation, RuntimeContainer runtime) {
         this.writeOperation = writeOperation;
         this.runtime = runtime;
@@ -126,6 +130,9 @@ public class JDBCRowWriter implements WriterWithFeedback<Result, IndexedRecord, 
         outSchema = CommonUtils.getOutputSchema((ComponentProperties) properties);
 
         rejectSchema = CommonUtils.getRejectSchema((ComponentProperties) properties);
+
+        useQueryTimeout = setting.getUseQueryTimeout();
+        queryTimeout = setting.getQueryTimeout();
     }
 
     public void open(String uId) throws IOException {
@@ -138,8 +145,14 @@ public class JDBCRowWriter implements WriterWithFeedback<Result, IndexedRecord, 
             if (usePreparedStatement) {
                 LOG.debug("Prepared statement: "+setting.getSql());
                 prepared_statement = conn.prepareStatement(sql);
+                if (useQueryTimeout) {
+                    prepared_statement.setQueryTimeout(queryTimeout);
+                }
             } else {
                 statement = conn.createStatement();
+                if (useQueryTimeout) {
+                    statement.setQueryTimeout(queryTimeout);
+                }
             }
         } catch (SQLException | ClassNotFoundException e) {
             throw CommonUtils.newComponentException(e);
