@@ -236,10 +236,6 @@ public class JDBCInputReader extends AbstractBoundedReader<IndexedRecord> {
                 }
             }
 
-            if (setting.getUseQueryTimeout()) {
-                LOG.debug("Query timeout: "+setting.getQueryTimeout());
-                statement.setQueryTimeout(setting.getQueryTimeout());
-            }
 
             if (setting.getUseCursor()) {
                 LOG.debug("Fetch size: " +setting.getCursor());

@@ -193,12 +193,9 @@ public class JDBCSourceOrSink extends JdbcRuntimeSourceOrSinkDefault {
     }
 
     public Schema getSchemaFromQuery(RuntimeContainer runtime, String query) {
-        try (Connection conn = connect(runtime)) {
-            Statement statement = conn.createStatement();
-            if (setting.getUseQueryTimeout()) {
-                statement.setQueryTimeout(setting.getQueryTimeout());
-            }
-            ResultSet resultset = statement.executeQuery(query);
+        try (Connection conn = connect(runtime);
+                Statement statement = conn.createStatement();
+                ResultSet resultset = statement.executeQuery(query)) {
             ResultSetMetaData metadata = resultset.getMetaData();
             return infer(metadata, runtime);
         } catch (SQLSyntaxErrorException sqlSyntaxException) {

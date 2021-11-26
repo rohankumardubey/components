@@ -116,10 +116,6 @@ public class TJDBCInputProperties extends FixedConnectorsComponentProperties imp
 
     public PreparedStatementTable preparedStatementTable = new PreparedStatementTable("preparedStatementTable");
 
-    public Property<Boolean> useQueryTimeout = PropertyFactory.newBoolean("useQueryTimeout").setRequired();
-
-    public Property<Integer> queryTimeout = PropertyFactory.newInteger("queryTimeout").setRequired(true);
-
     @Override
     public void setupLayout() {
         super.setupLayout();
@@ -151,8 +147,6 @@ public class TJDBCInputProperties extends FixedConnectorsComponentProperties imp
         advancedForm.addRow(enableSpecialTableName);
         advancedForm.addRow(usePreparedStatement);
         advancedForm.addRow(widget(preparedStatementTable).setWidgetType(Widget.TABLE_WIDGET_TYPE));
-        advancedForm.addRow(useQueryTimeout);
-        advancedForm.addRow(queryTimeout);
     }
 
     @Override
@@ -188,9 +182,6 @@ public class TJDBCInputProperties extends FixedConnectorsComponentProperties imp
         // It prevents this property to be recognized as simple boolean value (List<Boolean> is Boolean, null is false)
         // org.talend.designer.core.generic.utils.ComponentsUtils.getParameterValue
         trimTable.trim.setValue(Collections.emptyList());
-
-        useQueryTimeout.setValue(false);
-        queryTimeout.setValue(30);
     }
 
     @Override
@@ -215,7 +206,6 @@ public class TJDBCInputProperties extends FixedConnectorsComponentProperties imp
             form.getWidget(trimTable.getName()).setHidden(trimStringOrCharColumns.getValue());
             form.getWidget(dbMapping.getName()).setVisible(enableDBMapping.getValue());
             form.getWidget(preparedStatementTable.getName()).setHidden(!usePreparedStatement.getValue());
-            form.getWidget(queryTimeout.getName()).setHidden(!useQueryTimeout.getValue());
 
             updateTrimTable();
         }
@@ -278,10 +268,6 @@ public class TJDBCInputProperties extends FixedConnectorsComponentProperties imp
 
     public void beforePreparedStatementTable(){
         preparedStatementTable.types.setPossibleValues(PreparedStatementTable.Type.values());
-    }
-
-    public void afterUseQueryTimeout() {
-        refreshLayout(getForm(Form.ADVANCED));
     }
 
     @Override
@@ -370,9 +356,6 @@ public class TJDBCInputProperties extends FixedConnectorsComponentProperties imp
         setting.setTypes(this.preparedStatementTable.types.getValue());
         setting.setValues(this.preparedStatementTable.values.getValue());
         setting.setEnableSpecialTableName(this.enableSpecialTableName.getValue());
-
-        setting.setUseQueryTimeout(this.useQueryTimeout.getValue());
-        setting.setQueryTimeout(this.queryTimeout.getValue());
 
         return setting;
     }

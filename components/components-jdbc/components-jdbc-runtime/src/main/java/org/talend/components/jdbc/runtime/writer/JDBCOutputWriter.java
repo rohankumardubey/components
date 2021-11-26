@@ -107,10 +107,6 @@ abstract public class JDBCOutputWriter implements WriterWithFeedback<Result, Ind
     
     protected boolean isDynamic;
 
-    protected Boolean useQueryTimeout;
-
-    protected Integer queryTimeout;
-
     public JDBCOutputWriter(WriteOperation<Result> writeOperation, RuntimeContainer runtime) {
         this.writeOperation = writeOperation;
         this.runtime = runtime;
@@ -143,11 +139,6 @@ abstract public class JDBCOutputWriter implements WriterWithFeedback<Result, Ind
 
         dieOnError = setting.getDieOnError();
 
-        useQueryTimeout = setting.getUseQueryTimeout();
-        if (useQueryTimeout) {
-            queryTimeout = setting.getQueryTimeout();
-        }
-
         result = new Result();
     }
 
@@ -172,9 +163,6 @@ abstract public class JDBCOutputWriter implements WriterWithFeedback<Result, Ind
         try {
             conn = sink.getConnection(runtime);
             try (Statement statement = conn.createStatement()) {
-                if (useQueryTimeout) {
-                    statement.setQueryTimeout(queryTimeout);
-                }
                 LOG.debug("Executing the query: '{}'",setting.getSql());
                 deleteCount += statement.executeUpdate(sql);
             }
@@ -343,9 +331,6 @@ abstract public class JDBCOutputWriter implements WriterWithFeedback<Result, Ind
                 count = executeBatchAndGetCount(statement);
             }
         } else {
-            if (useQueryTimeout) {
-                statement.setQueryTimeout(queryTimeout);
-            }
             LOG.debug("Executing statement");
             count = statement.executeUpdate();
             
@@ -361,9 +346,6 @@ abstract public class JDBCOutputWriter implements WriterWithFeedback<Result, Ind
         int result = 0;
 
         try {
-            if (useQueryTimeout) {
-                statement.setQueryTimeout(queryTimeout);
-            }
             LOG.debug("Executing batch");
             int[] batchResult = statement.executeBatch();
             result += sum(batchResult);

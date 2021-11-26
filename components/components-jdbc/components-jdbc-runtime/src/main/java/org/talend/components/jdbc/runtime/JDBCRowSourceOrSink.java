@@ -49,10 +49,6 @@ public class JDBCRowSourceOrSink extends JdbcRuntimeSourceOrSinkDefault {
 
     private Integer commitEvery;
 
-    private Boolean useQueryTimeout;
-
-    private Integer queryTimeout;
-
     @Override
     public ValidationResult initialize(RuntimeContainer runtime, ComponentProperties properties) {
         LOG.debug("Parameters: [{}]",getLogString(properties));
@@ -62,11 +58,6 @@ public class JDBCRowSourceOrSink extends JdbcRuntimeSourceOrSinkDefault {
 
         commitEvery = setting.getCommitEvery();
         useCommit = !useExistedConnection && commitEvery != null && commitEvery != 0;
-
-        useQueryTimeout = setting.getUseQueryTimeout();
-        if (useQueryTimeout) {
-            queryTimeout = setting.getQueryTimeout();
-        }
         return ValidationResult.OK;
     }
 
@@ -97,9 +88,6 @@ public class JDBCRowSourceOrSink extends JdbcRuntimeSourceOrSinkDefault {
             if (usePreparedStatement) {
                 LOG.debug("Prepared statement: "+sql);
                 try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-                    if (useQueryTimeout) {
-                        pstmt.setQueryTimeout(queryTimeout);
-                    }
                     JdbcRuntimeUtils.setPreparedStatement(pstmt, setting.getIndexs(), setting.getTypes(), setting.getValues());
                     pstmt.execute();
                     //In order to retrieve all the error messages, the method 'getMoreResults' needs to be called in loop.
@@ -110,9 +98,6 @@ public class JDBCRowSourceOrSink extends JdbcRuntimeSourceOrSinkDefault {
                 }
             } else {
                 try (Statement stmt = conn.createStatement()) {
-                    if (useQueryTimeout) {
-                        stmt.setQueryTimeout(queryTimeout);
-                    }
                     LOG.debug("Executing the query: '{}'",sql);
                     stmt.execute(sql);
                     if (detectErrorOnMultipleSQL) {
