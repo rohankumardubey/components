@@ -109,6 +109,8 @@ final class SalesforceWriter implements WriterWithFeedback<Result, IndexedRecord
 
     private transient Schema mainSchema;
 
+    private transient List<String> moduleFieldsNameUpperCase =  new ArrayList<>();
+
     private final List<IndexedRecord> successfulWrites = new ArrayList<>();
 
     private final List<IndexedRecord> rejectedWrites = new ArrayList<>();
@@ -154,6 +156,9 @@ final class SalesforceWriter implements WriterWithFeedback<Result, IndexedRecord
             if (AvroUtils.isIncludeAllFields(mainSchema)) {
                 mainSchema = moduleSchema;
             } // else schema is fully specified
+            moduleSchema.getFields()
+                    .stream()
+                    .forEach(field -> moduleFieldsNameUpperCase.add(field.name().toUpperCase()));
         }
         upsertKeyColumn = sprops.upsertKeyColumn.getStringValue();
 
@@ -204,10 +209,20 @@ final class SalesforceWriter implements WriterWithFeedback<Result, IndexedRecord
             if (!("Id".equals(f.name())
                     && SalesforceOutputProperties.OutputAction.INSERT.equals(sprops.outputAction.getValue()))) {
                 Object value = input.get(f.pos());
-                Schema.Field se = moduleSchema.getField(f.name());
+                Schema.Field se = mainSchema.getField(f.name());
                 if (se != null) {
                     if (value != null && !value.toString().isEmpty()) {
-                        addSObjectField(so, se.schema(), se.name(), value);
+                        Schema.Field fieldInModule = moduleSchema.getField(se.name());
+                        if (fieldInModule != null) {
+                            addSObjectField(so, fieldInModule.schema(), se.name(), value);
+                        } else {
+                            if (moduleFieldsNameUpperCase.indexOf(se.name().toUpperCase()) < 0) {
+                                continue;
+                            } else {
+                                // only consider case insensitive issue
+                                addSObjectField(so, se.schema(), se.name(), value);
+                            }
+                        }
                     } else {
                         if (UPDATE.equals(sprops.outputAction.getValue())) {
                             nullValueFields.add(f.name());
