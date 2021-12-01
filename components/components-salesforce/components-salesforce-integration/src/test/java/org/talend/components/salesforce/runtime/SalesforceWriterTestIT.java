@@ -93,6 +93,12 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
             .name("BillingCity").type().stringType().noDefault() //
             .name("BillingState").type().stringType().noDefault().endRecord();
 
+    /** Test schema for insert/update accounts case insensitive. */
+    public static Schema SCHEMA_ACCOUNT_CASE_INSENSITIVE = SchemaBuilder.builder().record("Schema").fields() //
+            .name("Id").type().stringType().noDefault() //
+            .name("NamE").type().stringType().noDefault() //
+            .name("test").type().stringType().noDefault().endRecord();
+
     public static Schema SCHEMA_INSERT_EVENT = SchemaBuilder.builder().record("Schema").fields() //
             .name("StartDateTime").type().stringType().noDefault() // Actual type:dateTime
             .name("EndDateTime").type().stringType().noDefault() // Actual type:dateTime
@@ -1603,6 +1609,73 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
         // Finish the Writer, WriteOperation and Sink.
         Result wr1 = sfWriter.close();
         sfWriteOp.finalize(Arrays.asList(wr1), container);
+    }
+
+    @Test
+    public void testUpdateColumnInsensitive() throws Throwable {
+
+        String random = createNewRandom();
+        ComponentDefinition sfDef = new TSalesforceOutputDefinition();
+        TSalesforceOutputProperties sfProps = (TSalesforceOutputProperties) sfDef.createRuntimeProperties();
+        SalesforceTestBase.setupProps(sfProps.connection, false);
+        sfProps.module.setValue("moduleName", "Account");
+        sfProps.outputAction.setValue(OutputAction.INSERT);
+        sfProps.module.main.schema.setValue(SCHEMA_ACCOUNT_CASE_INSENSITIVE);
+        sfProps.retrieveInsertId.setValue(true);
+        sfProps.extendInsert.setValue(false);
+        sfProps.ceaseForError.setValue(false);
+        sfProps.module.schemaListener.afterSchema();
+        List records = new ArrayList<IndexedRecord>();
+        try {
+            // insert
+            IndexedRecord r1 = new GenericData.Record(SCHEMA_ACCOUNT_CASE_INSENSITIVE);
+            r1.put(1, "name_1_" + random);
+            r1.put(2, "test_1_" + random);
+
+            records.add(r1);
+
+            SalesforceSink salesforceSink = new SalesforceSink();
+            salesforceSink.initialize(adaptor, sfProps);
+            salesforceSink.validate(adaptor);
+            Writer<Result> batchWriter = salesforceSink.createWriteOperation().createWriter(adaptor);
+
+            writeRows(batchWriter, records);
+            assertEquals(1, ((SalesforceWriter) batchWriter).getSuccessfulWrites().size());
+
+            IndexedRecord insertResult = ((SalesforceWriter) batchWriter).getSuccessfulWrites().get(0);
+
+            String recordId = String.valueOf(insertResult.get(3));
+
+            // update
+            sfProps.outputAction.setValue(OutputAction.UPDATE);
+            records.clear();
+            r1 = new GenericData.Record(SCHEMA_ACCOUNT_CASE_INSENSITIVE);
+            r1.put(0, recordId);
+            r1.put(1, "name_1_update_" + random);
+            r1.put(2, "test_1_update_" + random);
+            records.add(r1);
+
+            SalesforceSink salesforceSink2 = new SalesforceSink();
+            salesforceSink2.initialize(adaptor, sfProps);
+            salesforceSink2.validate(adaptor);
+            Writer<Result> batchWriter2 = salesforceSink2.createWriteOperation().createWriter(adaptor);
+
+            writeRows(batchWriter2, records);
+
+            System.out.println(((SalesforceWriter) batchWriter2).getRejectedWrites());
+            assertEquals(1, ((SalesforceWriter) batchWriter2).getSuccessfulWrites().size());
+
+            IndexedRecord updateResult = ((SalesforceWriter) batchWriter2).getSuccessfulWrites().get(0);
+
+            assertEquals("name_1_update_" + random, updateResult.get(1));
+        } finally {
+            TSalesforceInputProperties sfInputProps = getSalesforceInputProperties();
+            sfInputProps.copyValuesFrom(sfProps);
+            sfInputProps.condition.setValue("Name = '%" + random + "%");
+            sfInputProps.module.main.schema.setValue(SCHEMA_ACCOUNT_CASE_INSENSITIVE);
+            deleteRows(records, sfInputProps);
+        }
+
     }
 
     public String getFirstCreatedAccountRecordId() throws Exception {
