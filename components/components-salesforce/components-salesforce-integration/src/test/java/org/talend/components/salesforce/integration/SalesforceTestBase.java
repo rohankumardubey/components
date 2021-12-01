@@ -355,7 +355,7 @@ public class SalesforceTestBase extends AbstractComponentTest {
         return result;
     }
 
-    protected static void writeRows(List<IndexedRecord> outputRows) throws Exception {
+    private static void writeRows(List<IndexedRecord> outputRows) throws Exception {
         TSalesforceOutputProperties outputProps = createSalesforceoutputProperties(EXISTING_MODULE_NAME);// $NON-NLS-1$
         outputProps.outputAction.setValue(TSalesforceOutputProperties.OutputAction.INSERT);
         doWriteRows(outputProps, outputRows);

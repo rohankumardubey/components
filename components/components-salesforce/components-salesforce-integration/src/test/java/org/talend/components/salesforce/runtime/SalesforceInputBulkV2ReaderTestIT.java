@@ -42,6 +42,7 @@ import org.talend.components.salesforce.SalesforceConnectionModuleProperties;
 import org.talend.components.salesforce.integration.SalesforceTestBase;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputDefinition;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
+import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputProperties;
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
 
@@ -66,8 +67,11 @@ public class SalesforceInputBulkV2ReaderTestIT extends SalesforceTestBase {
             row.put("BillingPostalCode", createNewRandom());
             outputRows.add(row);
         }
-
-        writeRows(outputRows);
+        TSalesforceOutputProperties props = (TSalesforceOutputProperties) new TSalesforceOutputProperties("foo").init();
+        setupProps(props.connection, !ADD_QUOTES);
+        props.module.moduleName.setValue(EXISTING_MODULE_NAME);
+        props.module.main.schema.setValue(getSchema(false));
+        doWriteRows(props,outputRows);
     }
 
     @AfterClass

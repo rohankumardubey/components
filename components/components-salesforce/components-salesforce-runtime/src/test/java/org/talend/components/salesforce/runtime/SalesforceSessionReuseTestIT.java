@@ -90,8 +90,11 @@ public class SalesforceSessionReuseTestIT extends SalesforceTestBase {
             row.put("BillingPostalCode", createNewRandom());
             outputRows.add(row);
         }
-
-        writeRows(outputRows);
+        TSalesforceOutputProperties props = (TSalesforceOutputProperties) new TSalesforceOutputProperties("foo").init();
+        setupProps(props.connection, !ADD_QUOTES);
+        props.module.moduleName.setValue(EXISTING_MODULE_NAME);
+        props.module.main.schema.setValue(getSchema(false));
+        doWriteRows(props,outputRows);
     }
 
     @AfterClass
