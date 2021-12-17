@@ -88,8 +88,8 @@ spec:
 
   parameters {
     choice(name: 'Action',
-            choices: ['STANDARD', 'RELEASE'],
-            description: 'Kind of running : \nSTANDARD (default), normal building \nRELEASE : build release')
+            choices: ['STANDARD'],
+            description: 'Kind of running : \nSTANDARD (default),[ Compile | Test] for all branch build, and [ Nexus deployment ]for master and maintenance branch  \n(Other actions are under development)')
   }
 
   stages {
@@ -109,10 +109,13 @@ spec:
         }
       }
     }
-
-    stage('Compile | Test | Deploy') {
+    
+    stage('Nexus Deployment') {
       when {
-        expression { params.Action == 'RELEASE' }
+        anyOf {
+          expression { env.BRANCH_NAME == "master" }
+          expression { env.BRANCH_NAME.startsWith('maintenance/') }
+        }
       }
       steps {
         container('main') {
@@ -120,13 +123,8 @@ spec:
             sh '''#!/bin/bash
             docker version
             echo $ARTIFACTORY_PASSWORD | docker login $ARTIFACTORY_REGISTRY -u $ARTIFACTORY_LOGIN --password-stdin
-            mvn clean -B -U -V -s ci/settings.xml deploy
+            mvn clean -B -U -V -s ci/settings.xml deploy -DskipTests -DskipITs
             '''
-            // -Dgit_branch="${escaped_branch}" \
-            // -Dbigquery.project="${bigquery_project}" \
-            // -Dbigquery.service.account.file="${service_account_file}" \
-            // -Dbigquery.gcp.temp.folder="${bigquery_gcp_temp_folder}" \
-            // -Dorg.talend.components.google.drive.service_account_file="${google_drive_service_account_file}"
           }
         }
       }
