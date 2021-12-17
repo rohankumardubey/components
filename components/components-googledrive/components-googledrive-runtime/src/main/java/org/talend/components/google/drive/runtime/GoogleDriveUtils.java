@@ -221,7 +221,27 @@ public class GoogleDriveUtils {
 
     public String findResourceByName(String resource, String type) throws IOException {
         if (resource.contains(PATH_SEPARATOR)) {
-            return findResourceByPath(resource, type);
+            long backoffValue = 0;
+            while (backoffValue <= 4000) {
+                if (backoffValue > 0) {
+                    LOG.debug("[findResourceByName] Error detected! Attempting retry in {} second(s).", backoffValue);
+                    try {
+                        Thread.sleep(backoffValue);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                try {
+                    return findResourceByPath(resource, type);
+                } catch (IOException e) {
+                    if (backoffValue == 4000) {
+                        throw e;
+                    } else {
+                        backoffValue = backoffValue == 0 ? 1000 : backoffValue * 2;
+                    }
+                }
+            }
+            return null;
         } else {
             return findResourceByGlobalSearch(resource, type);
         }
@@ -478,7 +498,6 @@ public class GoogleDriveUtils {
             LOG.info(messages.getMessage("message.writing.resource", parameters.getResourceId(), localFile));
             try (FileOutputStream fout = new FileOutputStream(localFile)) {
                 fout.write(content);
-                fout.close();
             }
         }
 
