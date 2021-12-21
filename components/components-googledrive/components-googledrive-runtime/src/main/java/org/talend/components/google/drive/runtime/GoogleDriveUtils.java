@@ -222,12 +222,13 @@ public class GoogleDriveUtils {
 
     public String findResourceByName(String resource, String type) throws IOException {
         if (resource.contains(PATH_SEPARATOR)) {
-            long backoffValue = 0;
-            while (backoffValue <= 4) {
-                if (backoffValue > 0) {
-                    LOG.debug("[findResourceByName] Error detected! Attempting retry in {} second(s).", backoffValue);
+            long tries = 0;
+            while (tries <= 3) {
+                if (tries > 0) {
+                	long sleepTime = 1 << (tries - 1);
+                    LOG.debug("[findResourceByName] Error detected! Attempting retry in {} second(s).", sleepTime);
                     try {
-                        TimeUnit.SECONDS.sleep(backoffValue);
+                        TimeUnit.SECONDS.sleep(sleepTime);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -235,10 +236,10 @@ public class GoogleDriveUtils {
                 try {
                     return findResourceByPath(resource, type);
                 } catch (IOException e) {
-                    if (backoffValue == 4) {
+                    if (tries == 3) {
                         throw e;
                     } else {
-                        backoffValue = backoffValue == 0 ? 1 : backoffValue * 2;
+                        tries++;
                     }
                 }
             }
