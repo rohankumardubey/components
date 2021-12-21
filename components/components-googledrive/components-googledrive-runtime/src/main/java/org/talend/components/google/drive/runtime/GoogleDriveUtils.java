@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -222,11 +223,11 @@ public class GoogleDriveUtils {
     public String findResourceByName(String resource, String type) throws IOException {
         if (resource.contains(PATH_SEPARATOR)) {
             long backoffValue = 0;
-            while (backoffValue <= 4000) {
+            while (backoffValue <= 4) {
                 if (backoffValue > 0) {
                     LOG.debug("[findResourceByName] Error detected! Attempting retry in {} second(s).", backoffValue);
                     try {
-                        Thread.sleep(backoffValue);
+                        TimeUnit.SECONDS.sleep(backoffValue);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -234,10 +235,10 @@ public class GoogleDriveUtils {
                 try {
                     return findResourceByPath(resource, type);
                 } catch (IOException e) {
-                    if (backoffValue == 4000) {
+                    if (backoffValue == 4) {
                         throw e;
                     } else {
-                        backoffValue = backoffValue == 0 ? 1000 : backoffValue * 2;
+                        backoffValue = backoffValue == 0 ? 1 : backoffValue * 2;
                     }
                 }
             }
