@@ -241,7 +241,7 @@ public class GoogleDriveUtils {
                     }
                 }
             }
-            return null;
+            return "";
         } else {
             return findResourceByGlobalSearch(resource, type);
         }
