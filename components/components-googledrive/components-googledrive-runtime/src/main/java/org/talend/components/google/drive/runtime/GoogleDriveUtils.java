@@ -225,7 +225,7 @@ public class GoogleDriveUtils {
             long tries = 0;
             while (tries <= 3) {
                 if (tries > 0) {
-                	long sleepTime = 1 << (tries - 1);
+                    long sleepTime = 1 << (tries - 1);
                     LOG.debug("[findResourceByName] Error detected! Attempting retry in {} second(s).", sleepTime);
                     try {
                         TimeUnit.SECONDS.sleep(sleepTime);
