@@ -15,7 +15,6 @@ package org.talend.components.snowflake.runtime;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Collections;
 import java.util.Set;
 
 import org.apache.avro.LogicalTypes;
@@ -25,9 +24,7 @@ import org.apache.avro.SchemaBuilder;
 import org.apache.commons.lang3.StringUtils;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.components.common.avro.JDBCAvroRegistry;
-import org.talend.daikon.avro.AvroNamesValidationHelper;
 import org.talend.daikon.avro.AvroUtils;
-import org.talend.daikon.avro.NameUtil;
 import org.talend.daikon.avro.SchemaConstants;
 
 public class SnowflakeAvroRegistry extends JDBCAvroRegistry {
@@ -72,6 +69,7 @@ public class SnowflakeAvroRegistry extends JDBCAvroRegistry {
         return defaultValue;
     }
 
+    //about date/time/timestamp precision, we align to mapping_Snowflake.xml, not pass it, though precision is allowed, but not common for usage
     @Override
     protected Field sqlType2Avro(int size, int scale, int dbtype, boolean nullable, String name, String dbColumnName,
             Object defaultValue, boolean isKey, boolean isAutoIncremented) {
@@ -87,18 +85,24 @@ public class SnowflakeAvroRegistry extends JDBCAvroRegistry {
         case java.sql.Types.CHAR:
             schema = AvroUtils._string();
             field = wrap(name, schema, nullable, defaultValue);
-            field.addProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH, size);
+            if(size!=0) {//0 mean no need to set that
+                field.addProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH, String.valueOf(size));
+            }
             break;
         case java.sql.Types.INTEGER:
-        case java.sql.Types.DECIMAL:
         case java.sql.Types.BIGINT:
-        case java.sql.Types.NUMERIC:
         case java.sql.Types.TINYINT:
         case java.sql.Types.SMALLINT:
-            schema = AvroUtils._decimal();
+        case java.sql.Types.DECIMAL:
+        case java.sql.Types.NUMERIC:
+            schema = AvroUtils._decimal();//TODO check why here use decimal map to all that types, now not touch it as dangerous
+            //they are both NUMBER but with different precision and scale
+            //https://docs.snowflake.com/en/sql-reference/data-types-numeric.html
             field = wrap(name, schema, nullable, defaultValue);
-            field.addProp(SchemaConstants.TALEND_COLUMN_PRECISION, size);
-            field.addProp(SchemaConstants.TALEND_COLUMN_SCALE, scale);
+            if(size!=0) {//0 mean no need to set that
+                field.addProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH, String.valueOf(size));
+                field.addProp(SchemaConstants.TALEND_COLUMN_PRECISION, String.valueOf(scale));
+            }
             break;
         case java.sql.Types.DOUBLE:
         case java.sql.Types.FLOAT:
@@ -137,12 +141,22 @@ public class SnowflakeAvroRegistry extends JDBCAvroRegistry {
             schema = AvroUtils._boolean();
             field = wrap(name, schema, nullable, defaultValue);
             break;
+        case java.sql.Types.BINARY:
+        case java.sql.Types.VARBINARY:
+            schema = AvroUtils._string();//here keep like before for no regression, not right?
+            field = wrap(name, schema, nullable, defaultValue);
+            if(size!=0) {//0 mean no need to set that
+                field.addProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH, String.valueOf(size));
+            }
+            break;
         default:
             schema = AvroUtils._string();
             field = wrap(name, schema, nullable, defaultValue);
             break;
         }
 
+        //not fix by set it to string as not necessary now and we should not store that key value, need more think especially for old job migration
+        //see JDBC SchemaInferer class
         field.addProp(SchemaConstants.TALEND_COLUMN_DB_TYPE, dbtype);
         field.addProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME, dbColumnName);
 
@@ -152,7 +166,7 @@ public class SnowflakeAvroRegistry extends JDBCAvroRegistry {
         }
 
         if (defaultValue != null) {
-            field.addProp(SchemaConstants.TALEND_COLUMN_DEFAULT, defaultValue);
+            field.addProp(SchemaConstants.TALEND_COLUMN_DEFAULT, String.valueOf(defaultValue));
         }
 
         if (isKey) {

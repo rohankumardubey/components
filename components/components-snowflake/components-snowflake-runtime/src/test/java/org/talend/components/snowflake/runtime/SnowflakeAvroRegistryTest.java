@@ -95,6 +95,36 @@ public class SnowflakeAvroRegistryTest {
     }
 
     /**
+     * Check if sql types converted properly to Avro types with right properties setting
+     */
+    @Test
+    public void testSqlType4BasicProperties() {
+        for (Map.Entry<Integer, Schema> entry : testPairsForAvroTypes.entrySet()) {
+            Schema.Field field = snowflakeAvroRegistry
+                    .sqlType2Avro(size, scale, entry.getKey(), nullable, FIELD_NAME, DB_COLUMN_NAME, DEFAULT_VALUE);
+
+            Assert.assertEquals(FIELD_NAME, field.name());
+            Assert.assertEquals(-1, field.pos());
+            Assert.assertEquals(entry.getKey(), field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_TYPE));
+            Assert.assertEquals(DB_COLUMN_NAME, field.getObjectProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME));
+            Assert.assertTrue(AvroUtils.isSameType(AvroUtils.unwrapIfNullable(field.schema()), entry.getValue()));
+
+            //need to use getProp as now studio use that, so the value must be string, if not, will return null
+            switch (entry.getKey()) {
+                case Types.VARCHAR:
+                    Assert.assertEquals(String.valueOf(size), field.getProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH));
+                    break;
+                case Types.DECIMAL:
+                    Assert.assertEquals(String.valueOf(size), field.getProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH));
+                    Assert.assertEquals(String.valueOf(scale), field.getProp(SchemaConstants.TALEND_COLUMN_PRECISION));
+                    break;
+            }
+
+            Assert.assertEquals(DEFAULT_VALUE, field.getProp(SchemaConstants.TALEND_COLUMN_DEFAULT));
+        }
+    }
+
+    /**
      * Checks {@link SnowflakeAvroRegistry#sqlType2Avro(int, int, int, boolean, String, String, Object)}
      * returns the {@link org.apache.avro.Schema.Field} with logical DATE type
      */
