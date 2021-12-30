@@ -50,7 +50,6 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <version>2.2.15</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -156,7 +155,7 @@
                                 <Embed-Dependency>
                                     !org.osgi.core;scope=compile|runtime,*;scope=compile|runtime;inline=false;artifactId=!slf4j-api|javax.servlet-api|javax.inject|crypto-utils|daikon|pax-url-aether
                                 </Embed-Dependency>
-                                <_exportcontents>!*.internal,!*.osgi,org.talend.*</_exportcontents>
+                                <_exportcontents>!*.internal,!*.osgi,!org.talend.daikon.exception*,org.talend.*</_exportcontents>
                                 <!-- used to remove the spring classes -->
                                 <Private-Package>!org.talend.components.*.spring,org.talend.components.*</Private-Package>
                             </instructions>
