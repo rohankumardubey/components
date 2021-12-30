@@ -61,6 +61,7 @@ public class JarRuntimeInfo implements RuntimeInfo, SandboxControl {
                 System.setProperty("org.ops4j.pax.url.mvn.localRepository", mvnLocalRepo);
             }
             // remove warnings on illegal reflective access using Unsafe... :-D
+            //TODO remove this for security as this disable security warn, and need to consider all java 8+ verison like java8/11/17
             try {
                 Field theUnsafe = Unsafe.class.getDeclaredField("theUnsafe");
                 theUnsafe.setAccessible(true);
@@ -74,49 +75,43 @@ public class JarRuntimeInfo implements RuntimeInfo, SandboxControl {
             // If the URL above failed, the mvn protocol needs to be installed.
             // not advice create a wrap URLStreamHandlerFactory class now
             try {
-                final Field factoryField = URL.class.getDeclaredField("factory");
-                factoryField.setAccessible(true);
-                final Field lockField = URL.class.getDeclaredField("streamHandlerLock");
-                lockField.setAccessible(true);
+                //see https://github.com/AdoptOpenJDK/openjdk-jdk8u/blob/master/jdk/src/share/classes/java/net/URL.java#L1132-L1144
+                //so no need to call reflect to get the lock and factory
 
-                synchronized (lockField.get(null)) {
-                    final URLStreamHandlerFactory factory = (URLStreamHandlerFactory) factoryField.get(null);
-                    // avoid the factory already defined error
-                    if (factory == null) {
-                        URL.setURLStreamHandlerFactory(new URLStreamHandlerFactory() {
+                URL.setURLStreamHandlerFactory(new URLStreamHandlerFactory() {
 
+                    @Override
+                    public URLStreamHandler createURLStreamHandler(String protocol) {
+                        if (!ServiceConstants.PROTOCOL.equals(protocol)) {
+                            return null;
+                        }
+                        return new URLStreamHandler() {
                             @Override
-                            public URLStreamHandler createURLStreamHandler(String protocol) {
-                                if (!ServiceConstants.PROTOCOL.equals(protocol)) {
-                                    return null;
-                                }
-                                return new URLStreamHandler() {
-                                    @Override
-                                    public URLConnection openConnection(URL url) throws IOException {
-                                        MavenResolver resolver = MavenResolvers.createMavenResolver(null, ServiceConstants.PID);
-                                        // java11 adds #runtime spec for (classloader) resource loading and breaks pax
-                                        Connection conn = new Connection(new URL(url.toExternalForm().replace("#runtime", "")), resolver);
-                                        conn.setUseCaches(false);// to avoid concurent thread to have an IllegalStateException.
-                                        return conn;
-                                    }
-
-                                    @Override
-                                    protected void parseURL(URL u, String spec, int start, int limit) {
-                                        if (!"mvn:".equals(u.toString())) {// remove the spec to only return the url.
-                                            LOG.debug("ignoring specs for parseUrl with url[" + u + "] and spec[" + spec + "]");
-                                            super.parseURL(u, "", 0, 0);
-                                        } else {// simple url being "mvn:" and the rest is specs.
-                                            super.parseURL(u, spec, start, limit);
-                                        }
-                                    }
-                                };
+                            public URLConnection openConnection(URL url) throws IOException {
+                                MavenResolver resolver = MavenResolvers.createMavenResolver(null, ServiceConstants.PID);
+                                // java11 adds #runtime spec for (classloader) resource loading and breaks pax
+                                Connection conn = new Connection(new URL(url.toExternalForm().replace("#runtime", "")), resolver);
+                                conn.setUseCaches(false);// to avoid concurent thread to have an IllegalStateException.
+                                return conn;
                             }
 
-                        });
+                            @Override
+                            protected void parseURL(URL u, String spec, int start, int limit) {
+                                if (!"mvn:".equals(u.toString())) {// remove the spec to only return the url.
+                                    LOG.debug("ignoring specs for parseUrl with url[" + u + "] and spec[" + spec + "]");
+                                    super.parseURL(u, "", 0, 0);
+                                } else {// simple url being "mvn:" and the rest is specs.
+                                    super.parseURL(u, spec, start, limit);
+                                }
+                            }
+                        };
                     }
-                }
+
+                });
             } catch (Exception exception) {
                 LOG.warn(exception.getMessage());
+            } catch (Error err) {
+                // avoid the factory already defined error
             }
         }
 
