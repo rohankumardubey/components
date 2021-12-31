@@ -22,6 +22,7 @@
         <marklogic-client-api.version>4.0.4</marklogic-client-api.version>
         <marklogic.mlcp.version>9.0.5</marklogic.mlcp.version>
         <okio.version>1.14.0</okio.version>
+        <libthrift.version>0.15.0</libthrift.version>
     </properties>
 
     <repositories>
@@ -78,6 +79,11 @@
             <groupId>com.marklogic</groupId>
             <artifactId>marklogic-client-api</artifactId>
             <version>${marklogic-client-api.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.thrift</groupId>
+            <artifactId>libthrift</artifactId>
+            <version>${libthrift.version}</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/dom4j/dom4j -->
         <dependency>
