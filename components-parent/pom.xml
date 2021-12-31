@@ -35,7 +35,7 @@
         <jacoco-maven-plugin.version>0.8.7</jacoco-maven-plugin.version>
         <maven-antrun-plugin.version>1.8</maven-antrun-plugin.version>
         <maven-assembly-plugin.version>3.0.0</maven-assembly-plugin.version>
-        <maven-bundle-plugin.version>5.1.2</maven-bundle-plugin.version>
+        <maven-bundle-plugin.version>4.1.0</maven-bundle-plugin.version><!-- be careful to upgrade it as it will introduce more OSGI import-package, so strange -->
         <maven-dependency-plugin.version>3.0.2</maven-dependency-plugin.version>
         <maven-failsafe-plugin-paxexam.version>2.20-PAXEXAM-PATCH</maven-failsafe-plugin-paxexam.version>
         <maven-failsafe-plugin.version>2.18</maven-failsafe-plugin.version>
