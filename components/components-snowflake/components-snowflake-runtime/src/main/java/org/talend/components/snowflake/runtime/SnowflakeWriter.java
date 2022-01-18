@@ -497,7 +497,9 @@ public class SnowflakeWriter implements WriterWithFeedback<Result, IndexedRecord
     @Override
     public Result close() throws IOException {
         try {
-            loader.finish();
+            if(null != loader) {
+                loader.finish();
+            }
         } catch (Exception ex) {
             throw new IOException(ex);
         }
