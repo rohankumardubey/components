@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -221,7 +222,28 @@ public class GoogleDriveUtils {
 
     public String findResourceByName(String resource, String type) throws IOException {
         if (resource.contains(PATH_SEPARATOR)) {
-            return findResourceByPath(resource, type);
+            long tries = 0;
+            while (tries <= 3) {
+                if (tries > 0) {
+                    long sleepTime = 1 << (tries - 1);
+                    LOG.debug("[findResourceByName] Error detected! Attempting retry in {} second(s).", sleepTime);
+                    try {
+                        TimeUnit.SECONDS.sleep(sleepTime);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                try {
+                    return findResourceByPath(resource, type);
+                } catch (IOException e) {
+                    if (tries == 3) {
+                        throw e;
+                    } else {
+                        tries++;
+                    }
+                }
+            }
+            return "";
         } else {
             return findResourceByGlobalSearch(resource, type);
         }
@@ -478,7 +500,6 @@ public class GoogleDriveUtils {
             LOG.info(messages.getMessage("message.writing.resource", parameters.getResourceId(), localFile));
             try (FileOutputStream fout = new FileOutputStream(localFile)) {
                 fout.write(content);
-                fout.close();
             }
         }
 
