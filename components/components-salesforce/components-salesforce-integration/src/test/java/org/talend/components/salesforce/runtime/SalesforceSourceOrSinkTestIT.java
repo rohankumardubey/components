@@ -148,9 +148,9 @@ public class SalesforceSourceOrSinkTestIT extends SalesforceTestBase {
         salesforceSourceOrSink.initialize(null, properties);
 
         ConnectorConfig config = new ConnectorConfig();
-        config.setUsername(StringUtils.strip(USER_ID_EXPIRED, "\""));
-        String password = StringUtils.strip(PASSWORD_EXPIRED, "\"");
-        String securityKey = StringUtils.strip(SECURITY_KEY_EXPIRED, "\"");
+        config.setUsername(USER_ID_EXPIRED);
+        String password = PASSWORD_EXPIRED;
+        String securityKey = SECURITY_KEY_EXPIRED;
         if (StringUtils.isNotEmpty(securityKey)) {
             password = password + securityKey;
         }
