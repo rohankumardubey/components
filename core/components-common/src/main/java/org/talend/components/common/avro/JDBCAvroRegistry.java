@@ -339,22 +339,18 @@ public class JDBCAvroRegistry extends AvroRegistry {
 
                 @Override
                 public Object convertToAvro(ResultSet value) {
-                    java.util.Date date = null;
-
                     try {
+                        if(value.getObject(index) == null){
+                            return null;
+                        }
                         return value.getTimestamp(index);
                     } catch (Exception e1) {
                         try {
-                            date = value.getDate(index);
+                            return value.getDate(index).getTime();
                         } catch (SQLException e2) {
                             throw new ComponentException(e2);
                         }
                     }
-
-                    if (date == null) {
-                        return null;
-                    }
-                    return date.getTime();
                 }
 
             };
@@ -663,22 +659,18 @@ public class JDBCAvroRegistry extends AvroRegistry {
 
                 @Override
                 public Object convertToAvro(CallableStatement value) {
-                    java.util.Date date = null;
-
                     try {
+                        if(value.getObject(index) == null){
+                            return null;
+                        }
                         return value.getTimestamp(index);
                     } catch (Exception e1) {
                         try {
-                            date = value.getDate(index);
+                            return value.getDate(index).getTime();
                         } catch (SQLException e2) {
                             throw new ComponentException(e2);
                         }
                     }
-
-                    if (date == null) {
-                        return null;
-                    }
-                    return date.getTime();
                 }
 
             };
