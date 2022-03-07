@@ -364,6 +364,9 @@ public class JDBCAvroRegistry extends AvroRegistry {
                 @Override
                 public Object convertToAvro(ResultSet value) {
                     try {
+                        if(value.getObject(index) == null){
+                            return null;
+                        }
                         return value.getBigDecimal(index);
                     } catch (SQLException e) {
                         throw new ComponentException(e);
@@ -684,6 +687,9 @@ public class JDBCAvroRegistry extends AvroRegistry {
                 @Override
                 public Object convertToAvro(CallableStatement value) {
                     try {
+                        if(value.getObject(index) == null){
+                            return null;
+                        }
                         return value.getBigDecimal(index);
                     } catch (SQLException e) {
                         throw new ComponentException(e);
