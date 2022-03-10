@@ -21,6 +21,7 @@ import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.component.runtime.WriterWithFeedback;
 import org.talend.components.api.container.RuntimeContainer;
+import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.common.avro.JDBCAvroRegistry;
 import org.talend.components.jdbc.CommonUtils;
@@ -32,6 +33,7 @@ import org.talend.components.jdbc.runtime.setting.JDBCSQLBuilder;
 import org.talend.components.jdbc.tjdbcoutput.TJDBCOutputProperties.DataAction;
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.converter.IndexedRecordConverter;
+import org.talend.daikon.properties.ValidationResult;
 
 import java.io.IOException;
 import java.sql.BatchUpdateException;
@@ -162,6 +164,11 @@ abstract public class JDBCOutputWriter implements WriterWithFeedback<Result, Ind
         //if not dynamic, we can computer it now for "fail soon" way, not fail in main part if fail
         if(!isDynamic) {
             columnList = JDBCSQLBuilder.getInstance().createColumnList(setting, componentSchema);
+        }
+
+        ValidationResult vr = sink.validate(runtime);
+        if (vr.getStatus() != ValidationResult.Result.OK) {
+            throw new ComponentException(new IllegalStateException(vr.getMessage()));
         }
 
         if (!setting.getClearDataInTable()) {
