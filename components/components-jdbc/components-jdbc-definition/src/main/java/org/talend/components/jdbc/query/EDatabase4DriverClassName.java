@@ -59,7 +59,7 @@ public enum EDatabase4DriverClassName {
     ORACLE_CUSTOM(EDatabaseTypeName.ORACLE_CUSTOM, "oracle.jdbc.OracleDriver", "oracle.jdbc.driver.OracleDriver"), //$NON-NLS-1$ //$NON-NLS-2$
 
     PARACCEL(EDatabaseTypeName.PARACCEL, "com.paraccel.Driver"), //$NON-NLS-1$
-    REDSHIFT(EDatabaseTypeName.REDSHIFT, "com.amazon.redshift.jdbc41.Driver"), //$NON-NLS-1$
+    REDSHIFT(EDatabaseTypeName.REDSHIFT, new String[]{"com.amazon.redshift.jdbc41.Driver", "com.amazon.redshift.jdbc.Driver"}, new String[0]), //$NON-NLS-1$
 
     // Take care, PSQL is set as first here since actually the audit will take the first db with the postgresql driver
     // if change the order, it might break the audit for PSQL.
