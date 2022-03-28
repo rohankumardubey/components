@@ -79,7 +79,7 @@ public final class OauthTokenUtils {
         try {
             postRequest.setEntity(new UrlEncodedFormEntity(urlEncodedProperties, CONTENT_ENCODING));
 
-            HttpClient httpClient = HttpClientBuilder.create().build();
+            HttpClient httpClient = HttpClientBuilder.create().useSystemProperties().build();
             HttpResponse response = httpClient.execute(postRequest);
             ObjectMapper mapper = new ObjectMapper();
             JsonNode node = mapper.readTree(response.getEntity().getContent());
