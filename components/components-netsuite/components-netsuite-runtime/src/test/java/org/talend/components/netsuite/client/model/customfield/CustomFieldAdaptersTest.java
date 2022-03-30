@@ -86,7 +86,7 @@ public class CustomFieldAdaptersTest {
 
         ItemOptionCustomFieldAdapter adapter1 = new ItemOptionCustomFieldAdapter();
         assertTrue(adapter1.appliesTo(RecordType.PURCHASE_ORDER.value(), customField));
-        assertEquals(CustomFieldRefType.SELECT, adapter1.apply(customField));
+        assertEquals(CustomFieldRefType.STRING, adapter1.apply(customField));
 
         assertFalse(adapter1.appliesTo(RecordType.OPPORTUNITY.value(), customField));
     }

@@ -53,7 +53,7 @@ public enum CustomFieldRefType {
         customFieldRefTypeMap.put("_freeFormText", CustomFieldRefType.STRING);
         customFieldRefTypeMap.put("_help", CustomFieldRefType.STRING);
         customFieldRefTypeMap.put("_hyperlink", CustomFieldRefType.STRING);
-        customFieldRefTypeMap.put("_image", CustomFieldRefType.SELECT); // not a string in customer case: TDI-47641
+        customFieldRefTypeMap.put("_image", CustomFieldRefType.STRING);
         customFieldRefTypeMap.put("_inlineHTML", CustomFieldRefType.STRING);
         customFieldRefTypeMap.put("_integerNumber", CustomFieldRefType.LONG);
         customFieldRefTypeMap.put("_listRecord", CustomFieldRefType.SELECT);
