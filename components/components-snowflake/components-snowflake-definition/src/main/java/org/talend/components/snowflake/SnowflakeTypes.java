@@ -33,6 +33,8 @@ public final class SnowflakeTypes {
 
     public static final DbmsType CHARACTER = new DbmsType("CHARACTER", false, true);
 
+    public static final DbmsType CHAR = new DbmsType("CHAR", false, true);
+
     public static final DbmsType DATE = new DbmsType("DATE");
 
     public static final DbmsType DATETIME = new DbmsType("DATETIME");
@@ -92,6 +94,7 @@ public final class SnowflakeTypes {
         allTypes.put("BINARY", BINARY);
         allTypes.put("BOOLEAN", BOOLEAN);
         allTypes.put("CHARACTER", CHARACTER);
+        allTypes.put("CHAR", CHAR);
         allTypes.put("DATE", DATE);
         allTypes.put("DATETIME", DATETIME);
         allTypes.put("DECIMAL", DECIMAL);
