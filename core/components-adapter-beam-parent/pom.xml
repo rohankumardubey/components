@@ -18,8 +18,7 @@
         <avro.version>1.8.1</avro.version>
         <beam.version>2.9.0</beam.version>
         <spark.version>2.4.6</spark.version>
-        <hadoop.version>3.2.2</hadoop.version>
-        <hadoop-talend.version>3.2.2</hadoop-talend.version>
+        <hadoop.version>3.2.3</hadoop.version>
     </properties>
 
     <!-- Necessary if you want to compile with a SNAPSHOT of beam. -->
