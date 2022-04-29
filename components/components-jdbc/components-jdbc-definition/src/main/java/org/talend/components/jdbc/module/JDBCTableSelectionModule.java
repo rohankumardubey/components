@@ -16,6 +16,7 @@ import static org.talend.daikon.properties.presentation.Widget.widget;
 import static org.talend.daikon.properties.property.PropertyFactory.newString;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 
 import org.talend.components.api.component.runtime.SourceOrSink;
@@ -32,12 +33,15 @@ import org.talend.daikon.properties.presentation.Widget;
 import org.talend.daikon.properties.property.StringProperty;
 import org.talend.daikon.runtime.RuntimeUtil;
 import org.talend.daikon.sandbox.SandboxedInstance;
+import org.talend.daikon.serialize.PostDeserializeSetup;
+import org.talend.daikon.serialize.migration.PostDeserializeHandler;
+import org.talend.daikon.serialize.migration.SerializeSetVersion;
 
 /**
  * common database table selection properties
  *
  */
-public class JDBCTableSelectionModule extends PropertiesImpl {
+public class JDBCTableSelectionModule extends PropertiesImpl implements SerializeSetVersion, PostDeserializeHandler {
 
     public StringProperty tablename = newString("tablename");
 
@@ -75,8 +79,27 @@ public class JDBCTableSelectionModule extends PropertiesImpl {
         return ValidationResult.OK;
     }
 
+    //clear the big list, no need to ser it in item file
+    public void afterTablename() {
+        tablename.setPossibleNamedThingValues(Collections.emptyList());
+    }
+
     public void setConnection(RuntimeSettingProvider connection) {
         this.connection = connection;
     }
 
+    @Override
+    public boolean postDeserialize(int version, PostDeserializeSetup setup, boolean persistent) {
+        boolean migrated = super.postDeserialize(version, setup, persistent);
+        if(version < 2 && tablename!=null){
+            tablename.setPossibleNamedThingValues(Collections.emptyList());
+            migrated = true;
+        }
+        return migrated;
+    }
+
+    @Override
+    public int getVersionNumber() {
+        return 2;
+    }
 }
