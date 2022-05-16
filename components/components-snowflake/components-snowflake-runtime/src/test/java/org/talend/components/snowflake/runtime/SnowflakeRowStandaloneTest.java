@@ -20,6 +20,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -75,16 +76,47 @@ public class SnowflakeRowStandaloneTest {
     public void testRunAtDriverWithoutPreparedStatementUsage() throws SQLException {
         properties.usePreparedStatement.setValue(false);
         Statement statement = Mockito.mock(Statement.class);
-        Mockito.when(statement.execute(Mockito.any())).thenReturn(false);
-        Mockito.when(statement.getMoreResults()).thenReturn(false);
-        Mockito.when(statement.getUpdateCount()).thenReturn(-1);
-
         Mockito.when(connection.createStatement()).thenReturn(statement);
 
         standalone.runAtDriver(container);
 
         Mockito.verify(statement).execute(QUERY);
-        Assert.assertEquals(null, container.getComponentData(container.getCurrentComponentId(), SnowflakeRowStandalone.NB_LINE));
+        Assert.assertEquals(0, container.getComponentData(container.getCurrentComponentId(), SnowflakeRowStandalone.NB_LINE));
+    }
+
+    @Test
+    public void testRunAtDriverWithoutPreparedStatementUsageUpdateCount() throws SQLException {
+        final int expectedCount = 5;
+        properties.usePreparedStatement.setValue(false);
+        Statement statement = Mockito.mock(Statement.class);
+        Mockito.when(connection.createStatement()).thenReturn(statement);
+        Mockito.when(statement.execute(Mockito.any())).thenReturn(false);
+        Mockito.when(statement.getUpdateCount()).thenReturn(expectedCount);
+
+        standalone.runAtDriver(container);
+
+        Mockito.verify(statement).execute(QUERY);
+        Assert.assertEquals(expectedCount, container.getComponentData(container.getCurrentComponentId(), SnowflakeRowStandalone.NB_LINE));
+    }
+
+    @Test
+    public void testRunAtDriverWithoutPreparedStatementUsageMultiStatementUpdateCount() throws SQLException {
+        final int expectedCount = 6;
+        properties.usePreparedStatement.setValue(false);
+        Statement statement = Mockito.mock(Statement.class);
+        Mockito.when(connection.createStatement()).thenReturn(statement);
+        Mockito.when(statement.execute(Mockito.any())).thenReturn(false);
+        final AtomicInteger moreResultsWereInvoked = new AtomicInteger(0);
+        Mockito.when(statement.getUpdateCount()).thenAnswer(arg -> moreResultsWereInvoked.get() == 1 ? expectedCount : -1);
+        Mockito.when(statement.getMoreResults()).thenAnswer(arg -> {
+            moreResultsWereInvoked.incrementAndGet();
+            return false;
+        });
+
+        standalone.runAtDriver(container);
+
+        Mockito.verify(statement).execute(QUERY);
+        Assert.assertEquals(expectedCount, container.getComponentData(container.getCurrentComponentId(), SnowflakeRowStandalone.NB_LINE));
     }
 
     @Test
@@ -92,7 +124,7 @@ public class SnowflakeRowStandaloneTest {
         properties.usePreparedStatement.setValue(true);
         List<Integer> indexes = Arrays.asList(1, 2, 3);
         List<String> types = Arrays.asList(Type.Int.name(), Type.String.name(), Type.Double.name());
-        List<Object> values = Arrays.asList(new Object[] { 3, "value", 0.1 });
+        List<Object> values = Arrays.asList(new Object[]{3, "value", 0.1});
         properties.preparedStatementTable.indexes.setValue(indexes);
         properties.preparedStatementTable.types.setValue(types);
         properties.preparedStatementTable.values.setValue(values);
@@ -156,9 +188,6 @@ public class SnowflakeRowStandaloneTest {
         properties.usePreparedStatement.setValue(false);
         Statement statement = Mockito.mock(Statement.class);
         Mockito.when(connection.createStatement()).thenReturn(statement);
-        Mockito.when(statement.execute(Mockito.any())).thenReturn(false);
-        Mockito.when(statement.getMoreResults()).thenReturn(false);
-        Mockito.when(statement.getUpdateCount()).thenReturn(-1);
 
         Mockito.when(connection.isClosed()).thenThrow(new SQLException("Cannot close already closed connection"));
 

@@ -18,6 +18,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,7 +37,6 @@ import org.talend.daikon.properties.ValidationResult;
 /**
  * This runtime class is responsible for executing query without propagating results.
  * It is created for performing action on {@link ConnectorTopology#NONE} topology without any links.
- *
  */
 public class SnowflakeRowStandalone extends SnowflakeRuntime implements ComponentDriverInitialization<ComponentProperties> {
 
@@ -79,11 +79,19 @@ public class SnowflakeRowStandalone extends SnowflakeRuntime implements Componen
                 try (Statement statement = connection.createStatement()) {
                     boolean isResultSet = statement.execute(rowProperties.getQuery());
                     int updateCount;
-                    while (isResultSet || (updateCount = statement.getUpdateCount()) != -1) {
-                        if (isResultSet) {
-                            storeReturnedRows(statement.getResultSet());
+                    if (isResultSet) {
+                        storeReturnedRows(statement.getResultSet());
+                    } else if ((updateCount = statement.getUpdateCount()) != -1) {
+                        addNBLine(updateCount);
+                    } else {
+                        // it might be multi-statement
+                        while (statement.getMoreResults() || (updateCount = statement.getUpdateCount()) != -1) {
+                            if (updateCount == -1) {
+                                storeReturnedRows(statement.getResultSet());
+                            } else {
+                                addNBLine(updateCount);
+                            }
                         }
-                        isResultSet = statement.getMoreResults();
                     }
                 }
             }
@@ -109,7 +117,14 @@ public class SnowflakeRowStandalone extends SnowflakeRuntime implements Componen
                 count++;
             }
         }
-        container.setComponentData(container.getCurrentComponentId(), NB_LINE, count);
+        addNBLine(count);
+    }
+
+    private void addNBLine(int count) {
+        final int prev = Optional.ofNullable(container.getComponentData(container.getCurrentComponentId(), NB_LINE))
+                .map(it -> (int) it)
+                .orElse(0);
+        container.setComponentData(container.getCurrentComponentId(), NB_LINE, count + prev);
     }
 
     private void throwComponentException(Exception ex, String messageProperty) {
