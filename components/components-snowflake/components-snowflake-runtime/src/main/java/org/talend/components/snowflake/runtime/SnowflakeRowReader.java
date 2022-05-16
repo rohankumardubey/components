@@ -45,7 +45,6 @@ import org.talend.daikon.i18n.I18nMessages;
 /**
  * This class implements {@link Reader} interface for SnowflakeRow component.
  * It can be used to retrieve data using simple query or prepared statement.
- *
  */
 public class SnowflakeRowReader implements Reader<IndexedRecord> {
 
@@ -183,8 +182,13 @@ public class SnowflakeRowReader implements Reader<IndexedRecord> {
             ResultSetMetaData rsMetadata = rs.getMetaData();
 
             if (CUD_RESULT_SET_COLUMN_NAMES.contains(rsMetadata.getColumnName(1))) {
-                result.totalCount++;
-                result.successCount++;
+                if (rs.next()) {
+                    result.totalCount += rs.getInt(1);
+                    result.successCount += rs.getInt(1);
+                } else {
+                    result.totalCount++;
+                    result.successCount++;
+                }
                 return false;
             }
             return true;
