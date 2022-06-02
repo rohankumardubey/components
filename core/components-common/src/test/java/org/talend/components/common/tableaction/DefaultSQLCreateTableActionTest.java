@@ -17,6 +17,7 @@ import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
 import org.junit.Before;
 import org.junit.Test;
+import org.talend.components.common.config.jdbc.DbmsType;
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
 
@@ -65,11 +66,22 @@ public class DefaultSQLCreateTableActionTest {
                 .endRecord();
     }
 
+    private TableActionConfig createTableActionConfig() {
+        TableActionConfig conf = new TableActionConfig();
+
+        //define all valid data type for current database. if user set a invalid data type which is not in DB_TYPES, will not use it
+        //also here provide info to ignore length or precision
+        conf.DB_TYPES.put("VARCHAR", new DbmsType("VARCHAR", false, true));
+        conf.DB_TYPES.put("MY_DOUBLE", new DbmsType("MY_DOUBLE", false, false));
+
+        return conf;
+    }
+
     @Test
     public void createTable() {
         DefaultSQLCreateTableAction action =
                 new DefaultSQLCreateTableAction(new String[] { "MyTable" }, schema, false, false, false);
-        TableActionConfig conf = new TableActionConfig();
+        TableActionConfig conf = createTableActionConfig();
         conf.SQL_ESCAPE_ENABLED = false;
         action.setConfig(conf);
         try {
@@ -91,7 +103,7 @@ public class DefaultSQLCreateTableActionTest {
 
         DefaultSQLCreateTableAction action =
                 new DefaultSQLCreateTableAction(new String[] { "MyTable" }, schema, false, false, false);
-        TableActionConfig conf = new TableActionConfig();
+        TableActionConfig conf = createTableActionConfig();
         conf.SQL_ESCAPE_ENABLED = false;
         action.setConfig(conf);
         try {
@@ -113,7 +125,7 @@ public class DefaultSQLCreateTableActionTest {
 
         DefaultSQLCreateTableAction action =
                 new DefaultSQLCreateTableAction(new String[] { "MyTable" }, schema, false, false, false);
-        TableActionConfig conf = new TableActionConfig();
+        TableActionConfig conf = createTableActionConfig();
         conf.SQL_ESCAPE_ENABLED = false;
         action.setConfig(conf);
 
@@ -136,7 +148,7 @@ public class DefaultSQLCreateTableActionTest {
     public void createTableIfNotExists() {
         DefaultSQLCreateTableAction action =
                 new DefaultSQLCreateTableAction(new String[] { "MyTable" }, schema, true, false, false);
-        TableActionConfig conf = new TableActionConfig();
+        TableActionConfig conf = createTableActionConfig();
         conf.SQL_ESCAPE_ENABLED = false;
         action.setConfig(conf);
         try {
@@ -154,7 +166,7 @@ public class DefaultSQLCreateTableActionTest {
     public void dropNCreateTable() {
         DefaultSQLCreateTableAction action =
                 new DefaultSQLCreateTableAction(new String[] { "MyTable" }, schema, false, true, false);
-        TableActionConfig conf = new TableActionConfig();
+        TableActionConfig conf = createTableActionConfig();
         conf.SQL_ESCAPE_ENABLED = false;
         conf.SQL_DROP_TABLE_SUFFIX = " CASCADE";
         action.setConfig(conf);
@@ -175,7 +187,7 @@ public class DefaultSQLCreateTableActionTest {
     public void dropIfExistsNCreateTable() {
         DefaultSQLCreateTableAction action =
                 new DefaultSQLCreateTableAction(new String[] { "MyTable" }, schema, false, false, true);
-        TableActionConfig conf = new TableActionConfig();
+        TableActionConfig conf = createTableActionConfig();
         conf.SQL_ESCAPE_ENABLED = false;
         conf.SQL_DROP_TABLE_SUFFIX = " CASCADE";
         action.setConfig(conf);
@@ -196,7 +208,7 @@ public class DefaultSQLCreateTableActionTest {
     public void dropIfExistsNCreateTableUppercase() {
         DefaultSQLCreateTableAction action =
                 new DefaultSQLCreateTableAction(new String[] { "MyTable" }, schema, false, false, true);
-        TableActionConfig conf = new TableActionConfig();
+        TableActionConfig conf = createTableActionConfig();
         conf.SQL_ESCAPE_ENABLED = false;
         conf.SQL_DROP_TABLE_SUFFIX = " CASCADE";
         conf.SQL_UPPERCASE_IDENTIFIER = true;
@@ -218,7 +230,7 @@ public class DefaultSQLCreateTableActionTest {
     public void dropIfExistsNCreateTableWithConfig() {
         DefaultSQLCreateTableAction action =
                 new DefaultSQLCreateTableAction(new String[] { "MyTable" }, schema, true, false, true);
-        TableActionConfig conf = new TableActionConfig();
+        TableActionConfig conf = createTableActionConfig();
         conf.SQL_ESCAPE_ENABLED = false;
         conf.SQL_DROP_TABLE_PREFIX = "SQL_DROP_TABLE_PREFIX ";
         conf.SQL_DROP_TABLE = "SQL_DROP_TABLE";
@@ -290,7 +302,7 @@ public class DefaultSQLCreateTableActionTest {
 
         DefaultSQLCreateTableAction action =
                 new DefaultSQLCreateTableAction(new String[] { "MyTable" }, schema, false, false, true);
-        TableActionConfig conf = new TableActionConfig();
+        TableActionConfig conf = createTableActionConfig();
 
         conf.CONVERT_JAVATYPE_TO_SQLTYPE.put("java.util.Date", CUSTOMIZED_SQL_TYPE_DATETIMETZ);
         conf.CONVERT_LOGICALTYPE_TO_SQLTYPE.put(LogicalTypes.date(), CUSTOMIZED_SQL_TYPE_DATETIMETZ);
@@ -338,7 +350,7 @@ public class DefaultSQLCreateTableActionTest {
     public void createTableWithDBType() {
         DefaultSQLCreateTableAction action =
                 new DefaultSQLCreateTableAction(new String[] { "MyTable" }, schema, false, false, true);
-        TableActionConfig conf = new TableActionConfig();
+        TableActionConfig conf = createTableActionConfig();
         conf.SQL_ESCAPE_ENABLED = false;
         conf.SQL_DROP_TABLE_SUFFIX = " CASCADE";
         conf.SQL_UPPERCASE_IDENTIFIER = true;
@@ -397,7 +409,7 @@ public class DefaultSQLCreateTableActionTest {
 
         DefaultSQLCreateTableAction action =
                 new DefaultSQLCreateTableAction(new String[] { "MyTable" }, schema, false, false, true);
-        TableActionConfig conf = new TableActionConfig();
+        TableActionConfig conf = createTableActionConfig();
 
         conf.CONVERT_JAVATYPE_TO_SQLTYPE.put("java.util.Date", CUSTOMIZED_SQL_TYPE_DATETIMETZ);
         conf.CONVERT_LOGICALTYPE_TO_SQLTYPE.put(LogicalTypes.date(), CUSTOMIZED_SQL_TYPE_DATETIMETZ);

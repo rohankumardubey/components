@@ -36,11 +36,15 @@ public class SnowflakeTableActionConfig extends TableActionConfig {
         this.SQL_DROP_TABLE_SUFFIX = " CASCADE";
 
         this.CONVERT_AVROTYPE_TO_SQLTYPE.put(Schema.Type.FLOAT, Types.FLOAT);
+
+        //not java.sql.Types.DOUBLE?
         this.CONVERT_AVROTYPE_TO_SQLTYPE.put(Schema.Type.DOUBLE, Types.FLOAT);
 
+        //where to use this? not adjust now as decimal(32, 0) is ok for float, seems no data loss
         this.CONVERT_LOGICALTYPE_TO_SQLTYPE.put(LogicalTypes.decimal(32), Types.FLOAT);
 
-        this.CONVERT_JAVATYPE_TO_SQLTYPE.put("java.math.BigDecimal", Types.FLOAT);
+        //before we map to Types.FLOAT, not right as data loss
+        this.CONVERT_JAVATYPE_TO_SQLTYPE.put("java.math.BigDecimal", Types.DECIMAL);
 
         this.CONVERT_SQLTYPE_TO_ANOTHER_SQLTYPE.put(Types.BLOB, Types.BINARY);
 

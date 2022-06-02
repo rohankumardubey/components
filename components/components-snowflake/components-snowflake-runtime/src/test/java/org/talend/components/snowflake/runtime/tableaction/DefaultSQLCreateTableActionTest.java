@@ -47,7 +47,7 @@ public class DefaultSQLCreateTableActionTest {
                 "\"INT\" INTEGER, " +
                 "\"LONG\" INTEGER, " +
                 "\"STR\" VARCHAR(32), " +
-                "\"DEC\" FLOAT, " +
+                "\"DEC\" DECIMAL(10, 0), " +
                 "\"FLOAT\" FLOAT, " +
                 "\"DOUBLE\" FLOAT, " +
                 "\"DATE\" DATE)";
@@ -109,6 +109,31 @@ public class DefaultSQLCreateTableActionTest {
 
         Map<String, String> dbTypeMapping = new HashMap<>();
         dbTypeMapping.put("dec", "NUMERIC");
+        action.setDbTypeMap(dbTypeMapping);
+
+        List<String> queries = action.getQueries();
+        assertEquals(1, queries.size());
+        assertEquals(expectedQuery, queries.get(0));
+    }
+
+    /**
+     * Sometimes, the model pass a hidden invalid db type in schema, we should not use that
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testInvalidDBType() throws Exception {
+        String expectedQuery = "CREATE TABLE IF NOT EXISTS \"TEST_TABLE\" " +
+                "(\"DEC\" DECIMAL(10, 2))";
+
+        Schema schema = createDecimalSchemaWithInvalidDBType();
+        String[] tableName = new String[]{"TEST_TABLE"};
+        DefaultSQLCreateTableAction action =
+                new DefaultSQLCreateTableAction(tableName, schema, true, false, false);
+        TableActionConfig conf = new SnowflakeTableActionConfig(true);
+        action.setConfig(conf);
+
+        Map<String, String> dbTypeMapping = new HashMap<>();
         action.setDbTypeMap(dbTypeMapping);
 
         List<String> queries = action.getQueries();
@@ -430,6 +455,18 @@ public class DefaultSQLCreateTableActionTest {
                 .prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "32")
                 .prop(SchemaConstants.TALEND_COLUMN_PRECISION, "4")
                 .type(Schema.createUnion(AvroUtils._string(), Schema.create(Schema.Type.NULL)))
+                .noDefault()
+
+                .endRecord();
+    }
+
+    private Schema createDecimalSchemaWithInvalidDBType() {
+        return SchemaBuilder.builder().record("main").fields()
+                .name("dec")
+                .prop(SchemaConstants.TALEND_COLUMN_DB_TYPE, "BIG_DECIMAL")//this is type which not valid in snowflake
+                .prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "10")
+                .prop(SchemaConstants.TALEND_COLUMN_PRECISION, "2")
+                .type(Schema.createUnion(AvroUtils._decimal(), Schema.create(Schema.Type.NULL)))
                 .noDefault()
 
                 .endRecord();
