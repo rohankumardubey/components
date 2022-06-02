@@ -133,11 +133,21 @@ public class DefaultSQLCreateTableAction extends TableAction {
             sb.append(escape(updateCaseIdentifier(name)));
             sb.append(" ");
 
-
+            //get db type from the component setting : "Custom DB Type"
             String sDBType = this.getDbTypeMap().get(f.name());
 
+            //else get it from component schema
             if(isNullOrEmpty(sDBType)){
                 sDBType = f.getProp(SchemaConstants.TALEND_COLUMN_DB_TYPE);
+                //though this is a common class, but now only snowflake component use it
+                //and we fill all snowflake types to the DB_TYPES in snowflake's implement : SnowflakeTableActionConfig
+                //so if not find the mapping below, mean the db type name not exists in snowflake, is wrong, so not use it, see TDI-48045
+                if (!isNullOrEmpty(sDBType)) {
+                    DbmsType dbmsType = getConfig().DB_TYPES.get(sDBType);
+                    if (dbmsType == null) {
+                        sDBType = null;
+                    }
+                }
             }
 
             if (isNullOrEmpty(sDBType)) {
@@ -145,7 +155,6 @@ public class DefaultSQLCreateTableAction extends TableAction {
                 sDBType = convertAvroToSQL.convertToSQLTypeString(f.schema());
             }
             sb.append(updateCaseIdentifier(sDBType));
-
 
             buildLengthPrecision(sb, f, sDBType);
 
