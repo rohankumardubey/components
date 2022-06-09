@@ -13,6 +13,7 @@
 package org.talend.components.common.tableaction;
 
 import org.apache.avro.Schema;
+import org.talend.components.common.config.jdbc.Dbms;
 
 import java.sql.Connection;
 import java.util.HashMap;
@@ -25,9 +26,17 @@ public class TableActionManager {
 
     public final static List<String> buildQueries(TableAction.TableActionEnum action, String[] fullTableName,
             Schema schema, TableActionConfig config, Map<String, String> dbTypeMap) throws Exception {
+        return buildQueries(action, fullTableName, schema, config, dbTypeMap, null);
+    }
+
+    public final static List<String> buildQueries(TableAction.TableActionEnum action, String[] fullTableName,
+                                                  Schema schema, TableActionConfig config, Map<String, String> dbTypeMap, Dbms dbms) throws Exception {
         TableAction tableAction = create(action, fullTableName, schema);
         tableAction.setConfig(config);
         tableAction.setDbTypeMap(dbTypeMap);
+        if(dbms!=null) {
+            tableAction.setDbms(dbms);
+        }
         return tableAction.getQueries();
     }
 
@@ -63,6 +72,13 @@ public class TableActionManager {
     public static void exec(Connection connection, TableAction.TableActionEnum action, String[] fullTableName,
             Schema schema, TableActionConfig config, Map<String, String> dbTypeMap) throws Exception {
         for (String q : buildQueries(action, fullTableName, schema, config, dbTypeMap)) {
+            connection.createStatement().execute(q);
+        }
+    }
+
+    public static void exec(Connection connection, TableAction.TableActionEnum action, String[] fullTableName,
+                            Schema schema, TableActionConfig config, Map<String, String> dbTypeMap, Dbms dbms) throws Exception {
+        for (String q : buildQueries(action, fullTableName, schema, config, dbTypeMap, dbms)) {
             connection.createStatement().execute(q);
         }
     }

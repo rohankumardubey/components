@@ -12,11 +12,7 @@
 //============================================================================
 package org.talend.components.jdbc;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -35,8 +31,8 @@ import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.ComponentReferenceProperties;
 import org.talend.components.api.properties.ComponentReferenceProperties.ReferenceType;
+import org.talend.components.common.DBMappingUtils;
 import org.talend.components.common.config.jdbc.Dbms;
-import org.talend.components.common.config.jdbc.MappingFileLoader;
 import org.talend.components.jdbc.module.DBTypes;
 import org.talend.components.jdbc.module.JDBCConnectionModule;
 import org.talend.components.jdbc.query.EDatabase4DriverClassName;
@@ -435,66 +431,7 @@ public class CommonUtils {
             mappingFileSubfix = "Mysql";
         }
 
-        MappingFileLoader fileLoader = new MappingFileLoader();
-        Dbms dbms = null;
-
-        try {
-            dbms = loadFromStream(fileLoader, mappingFilesDir, mappingFileSubfix);
-        } catch(Exception e) {
-            //Fallback to old solution
-            LOG.warn("Couldn't load mapping from stream. Trying to read as File.", e);
-            dbms = loadFromFile(fileLoader, mappingFilesDir, mappingFileSubfix);
-        }
-
-        return dbms;
-    }
-
-    private static Dbms loadFromFile(final MappingFileLoader fileLoader, final URL mappingFilesDir, final String mappingFileSubfix) {
-        File mappingFileFullPath = new File(mappingFilesDir.getFile(), "mapping_" + mappingFileSubfix + ".xml");
-        if (!mappingFileFullPath.exists()) {
-            mappingFileFullPath =
-                    new File(mappingFilesDir.getFile(), "mapping_" + mappingFileSubfix.toLowerCase() + ".xml");
-        }
-        return fileLoader.load(mappingFileFullPath).get(0);
-    }
-
-    private static Dbms loadFromStream(final MappingFileLoader fileLoader, final URL mappingFilesDir, final String mappingFileSubfix)
-            throws IOException, URISyntaxException {
-        Dbms dbms = null;
-        InputStream mappingStream = null;
-        try {
-            mappingStream = getStream(mappingFilesDir, mappingFileSubfix);
-            dbms = fileLoader.load(mappingStream).get(0);
-        } finally {
-            if (mappingStream != null) {
-                try {
-                    mappingStream.close();
-                } catch (IOException e) {
-                    LOG.warn("Couldn't close stream.", e);
-                }
-            }
-        }
-        return dbms;
-    }
-
-    private static InputStream getStream(final URL mappingFileDir, final String mappingFileSubfix)
-            throws IOException, URISyntaxException {
-        if(mappingFileDir == null) {
-            throw new IllegalArgumentException("Mapping file directory URL cannot be null!");
-        }
-        URL mappingFileDirUrl = mappingFileDir;
-        InputStream mappingStream = null;
-        if(!mappingFileDirUrl.toString().endsWith("/")) {
-            mappingFileDirUrl = new URL(mappingFileDirUrl.toString() + "/");
-        }
-        try {
-            URL mappingFileFullUrl = mappingFileDirUrl.toURI().resolve("mapping_" + mappingFileSubfix + ".xml").toURL();
-            mappingStream = mappingFileFullUrl.openStream();
-        } catch (URISyntaxException | IOException e) {
-            URL mappingFileFullUrl = mappingFileDirUrl.toURI().resolve("mapping_" + mappingFileSubfix.toLowerCase() + ".xml").toURL();
-            mappingStream = mappingFileFullUrl.openStream();
-        }
-        return mappingStream;
+        return DBMappingUtils.getMapping(mappingFilesDir, mappingFileSubfix);
     }
 
     public static Dbms getMapping(String mappingFilesDir, AllSetting setting,

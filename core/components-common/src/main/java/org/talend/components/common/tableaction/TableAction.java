@@ -12,6 +12,8 @@
 //============================================================================
 package org.talend.components.common.tableaction;
 
+import org.talend.components.common.config.jdbc.Dbms;
+
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -44,6 +46,9 @@ public abstract class TableAction {
     // Map association to define db type if SchemaConstants.TALEND_COLUMN_DB_TYPE is not set in schema
     private Map<String, String> dbTypeMap = new HashMap<>();
 
+    // object which store Talend Studio db mapping info
+    private Dbms dbms = null;
+
     /**
      *
      * @return List<String> List of queries to execute.
@@ -58,12 +63,20 @@ public abstract class TableAction {
         this.dbTypeMap = dbTypeMap;
     }
 
+    public void setDbms(Dbms dbms){
+        this.dbms = dbms;
+    }
+
     public TableActionConfig getConfig(){
         return this.config;
     }
 
     public Map<String, String> getDbTypeMap(){
         return this.dbTypeMap;
+    }
+
+    public Dbms getDbms(){
+        return this.dbms;
     }
 
     public String escape(String value){

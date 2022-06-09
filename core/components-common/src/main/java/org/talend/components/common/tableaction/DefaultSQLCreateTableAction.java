@@ -16,10 +16,15 @@ import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.avro.LogicalType;
+import org.apache.avro.LogicalTypes;
 import org.apache.avro.Schema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.common.config.jdbc.DbmsType;
+import org.talend.components.common.config.jdbc.MappingType;
+import org.talend.components.common.config.jdbc.TalendType;
+import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
 
 public class DefaultSQLCreateTableAction extends TableAction {
@@ -106,6 +111,10 @@ public class DefaultSQLCreateTableAction extends TableAction {
         return sb.toString();
     }
 
+    private final static String TALEND_TYPE = "di.column.talendType";
+    private static final String LOGICAL_TIME_TYPE_AS = "LOGICAL_TIME_TYPE_AS";
+    private static final String AS_TALEND_DATE = "TALEND_DATE";
+
     private StringBuilder buildColumns() {
         ConvertAvroTypeToSQL convertAvroToSQL = new ConvertAvroTypeToSQL(this.getConfig());
         StringBuilder sb = new StringBuilder();
@@ -118,11 +127,8 @@ public class DefaultSQLCreateTableAction extends TableAction {
                 sb.append(this.getConfig().SQL_CREATE_TABLE_FIELD_SEP);
             }
 
-
-            String sDBLength = f.getProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH);
             String sDBName = f.getProp(SchemaConstants.TALEND_COLUMN_DB_COLUMN_NAME);
             String sDBDefault = f.getProp(SchemaConstants.TALEND_COLUMN_DEFAULT);
-            String sDBPrecision = f.getProp(SchemaConstants.TALEND_COLUMN_PRECISION);
             boolean sDBIsKey = Boolean.valueOf(f.getProp(SchemaConstants.TALEND_COLUMN_IS_KEY)).booleanValue();
             boolean sDBNullable = isNullable(f.schema());
 
@@ -133,8 +139,80 @@ public class DefaultSQLCreateTableAction extends TableAction {
             sb.append(escape(updateCaseIdentifier(name)));
             sb.append(" ");
 
-            //get db type from the component setting : "Custom DB Type"
-            String sDBType = this.getDbTypeMap().get(f.name());
+            String sDBType = null;
+
+            DbmsType dbmsType = null;
+
+            if(this.getDbms()!=null) {
+                //see studio MetadataToolAvroHelper.convertFromAvro method, here only follow it
+                final Schema basicSchema = AvroUtils.unwrapIfNullable(f.schema());
+                final LogicalType logicalType = LogicalTypes.fromSchemaIgnoreInvalid(basicSchema);
+
+                String talendTypeName = f.getProp(TALEND_TYPE);
+                if(talendTypeName==null || talendTypeName.isEmpty()) {
+                    TalendType talendType = null;
+
+                    if (AvroUtils.isSameType(basicSchema, AvroUtils._boolean())) {
+                        talendType = TalendType.BOOLEAN;
+                    } else if (AvroUtils.isSameType(basicSchema, AvroUtils._byte())) {
+                        talendType = TalendType.BYTE;
+                    } else if (AvroUtils.isSameType(basicSchema, AvroUtils._bytes())) {
+                        talendType = TalendType.BYTES;
+                    } else if (AvroUtils.isSameType(basicSchema, AvroUtils._character())) {
+                        talendType = TalendType.CHARACTER;
+                    } else if (AvroUtils.isSameType(basicSchema, AvroUtils._date())) {
+                        talendType = TalendType.DATE;
+                    } else if (AvroUtils.isSameType(basicSchema, AvroUtils._decimal())) {
+                        talendType = TalendType.BIG_DECIMAL;
+                    } else if (AvroUtils.isSameType(basicSchema, AvroUtils._double())) {
+                        talendType = TalendType.DOUBLE;
+                    } else if (AvroUtils.isSameType(basicSchema, AvroUtils._float())) {
+                        talendType = TalendType.FLOAT;
+                    } else if (AvroUtils.isSameType(basicSchema, AvroUtils._int())) {
+                        if (logicalType == LogicalTypes.date()) {
+                            talendType = TalendType.DATE;
+                        } else if (logicalType == LogicalTypes.timeMillis()) {
+                            String logical_time_type_as = f.getProp(LOGICAL_TIME_TYPE_AS);
+                            if (AS_TALEND_DATE.equals(logical_time_type_as)) {
+                                talendType = TalendType.DATE;
+                            } else {
+                                talendType = TalendType.INTEGER;
+                            }
+                        } else {
+                            // The logical type time maps to this as well
+                            talendType = TalendType.INTEGER;
+                        }
+                    } else if (AvroUtils.isSameType(basicSchema, AvroUtils._long())) {
+                        if (logicalType == LogicalTypes.timestampMillis()) {
+                            talendType = TalendType.DATE;
+                        } else {
+                            talendType = TalendType.LONG;
+                        }
+                    } else if (AvroUtils.isSameType(basicSchema, AvroUtils._short())) {
+                        talendType = TalendType.SHORT;
+                    } else if (AvroUtils.isSameType(basicSchema, AvroUtils._string())) {
+                        talendType = TalendType.STRING;
+                    } else if (basicSchema.getProp(SchemaConstants.JAVA_CLASS_FLAG) != null) {
+                        talendType = TalendType.OBJECT;
+                    }
+
+                    talendTypeName = talendType.getName();
+                }
+
+                if(talendTypeName!=null && !talendTypeName.isEmpty()) {
+                    MappingType<TalendType, DbmsType> mt = this.getDbms().getTalendMapping(talendTypeName);
+
+                    dbmsType = mt.getDefaultType();
+
+                    sDBType = dbmsType.getName();
+
+                    //TODO support default length, default precision, preBeforeLength in future, now only snowflake mapping use this, but not set default length or precision, or preBeforeLength,
+                    //also here need to consider align with other db component, so not do them now
+                }
+            } else {
+                //get db type from the component setting : "Custom DB Type"
+                sDBType = this.getDbTypeMap().get(f.name());
+            }
 
             //else get it from component schema
             if(isNullOrEmpty(sDBType)){
@@ -143,8 +221,7 @@ public class DefaultSQLCreateTableAction extends TableAction {
                 //and we fill all snowflake types to the DB_TYPES in snowflake's implement : SnowflakeTableActionConfig
                 //so if not find the mapping below, mean the db type name not exists in snowflake, is wrong, so not use it, see TDI-48045
                 if (!isNullOrEmpty(sDBType)) {
-                    DbmsType dbmsType = getConfig().DB_TYPES.get(sDBType);
-                    if (dbmsType == null) {
+                    if (getConfig().DB_TYPES.get(sDBType) == null) {
                         sDBType = null;
                     }
                 }
@@ -156,7 +233,7 @@ public class DefaultSQLCreateTableAction extends TableAction {
             }
             sb.append(updateCaseIdentifier(sDBType));
 
-            buildLengthPrecision(sb, f, sDBType);
+            buildLengthPrecision(sb, f, sDBType, dbmsType);
 
             if(!sDBNullable){
                 sb.append(this.getConfig().SQL_CREATE_TABLE_NOT_NULL);
@@ -211,11 +288,18 @@ public class DefaultSQLCreateTableAction extends TableAction {
      * @param field Schema field
      * @param dbType Snowflake database type to be used
      */
-    private void buildLengthPrecision(StringBuilder sb, Schema.Field field, String dbType) {
+    private void buildLengthPrecision(StringBuilder sb, Schema.Field field, String dbType, DbmsType dbmsTypeFromDBMappingFile) {
         String length = field.getProp(SchemaConstants.TALEND_COLUMN_DB_LENGTH);
         String precision = field.getProp(SchemaConstants.TALEND_COLUMN_PRECISION);
 
-        DbmsType dbmsType = getConfig().DB_TYPES.get(dbType);
+        final DbmsType dbmsType;
+        if(dbmsTypeFromDBMappingFile == null) {
+            //use static java code db mapping
+            dbmsType = getConfig().DB_TYPES.get(dbType);
+        } else {
+            //use studio db mapping file
+            dbmsType = dbmsTypeFromDBMappingFile;
+        }
 
         boolean ignoreLength = false;
         boolean ignorePrecision = false;
