@@ -149,7 +149,7 @@ public class DefaultSQLCreateTableAction extends TableAction {
                 final LogicalType logicalType = LogicalTypes.fromSchemaIgnoreInvalid(basicSchema);
 
                 String talendTypeName = f.getProp(TALEND_TYPE);
-                if(talendTypeName==null || talendTypeName.isEmpty()) {
+                if(isNullOrEmpty(talendTypeName)) {
                     TalendType talendType = null;
 
                     if (AvroUtils.isSameType(basicSchema, AvroUtils._boolean())) {
@@ -199,7 +199,7 @@ public class DefaultSQLCreateTableAction extends TableAction {
                     talendTypeName = talendType.getName();
                 }
 
-                if(talendTypeName!=null && !talendTypeName.isEmpty()) {
+                if(!isNullOrEmpty(talendTypeName)) {
                     MappingType<TalendType, DbmsType> mt = this.getDbms().getTalendMapping(talendTypeName);
 
                     dbmsType = mt.getDefaultType();

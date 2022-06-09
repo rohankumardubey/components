@@ -32,6 +32,11 @@ import org.talend.daikon.avro.SchemaConstants;
  */
 public class DefaultSQLCreateTableActionTest {
 
+    /**
+     * Use db mapping file to decide the db type by talend type
+     *
+     * @throws Exception
+     */
     @Test
     public void testGetQueriesWithDBMappingFile() throws Exception {
         String expectedQuery = "CREATE TABLE IF NOT EXISTS \"TEST_TABLE\" " +
