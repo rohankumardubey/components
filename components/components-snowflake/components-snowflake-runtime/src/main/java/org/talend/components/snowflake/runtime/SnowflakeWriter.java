@@ -15,6 +15,7 @@ package org.talend.components.snowflake.runtime;
 import static org.talend.components.snowflake.tsnowflakeoutput.TSnowflakeOutputProperties.OutputAction.UPSERT;
 
 import java.io.IOException;
+import java.net.URL;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -36,6 +37,9 @@ import org.talend.components.api.component.runtime.Result;
 import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.component.runtime.WriterWithFeedback;
 import org.talend.components.api.container.RuntimeContainer;
+import org.talend.components.common.ComponentConstants;
+import org.talend.components.common.DBMappingUtils;
+import org.talend.components.common.config.jdbc.Dbms;
 import org.talend.components.common.runtime.DynamicSchemaUtils;
 import org.talend.components.common.tableaction.TableAction;
 import org.talend.components.common.tableaction.TableAction.TableActionEnum;
@@ -267,11 +271,15 @@ public class SnowflakeWriter implements WriterWithFeedback<Result, IndexedRecord
         Map<String, String> dbTypeMap = getDbTypeMap();
 
         try {
+            //make the option conflict with any other db type convert, for easy migration for future
+            boolean useMappingFile = sprops.useDBMappingFile.getValue() && !sprops.usePersonalDBType.getValue() && !sprops.useDateMapping.getValue();
+            Dbms dbms = useMappingFile ? DBMappingUtils.getMapping(container, "Snowflake") : null;
+
             TableActionManager
                     .exec(processingConnection, sprops.tableAction.getValue(),
                             new String[] { connectionProperties.db.getValue(),
                                     connectionProperties.schemaName.getValue(), sprops.getTableName() },
-                            schemaForCreateTable, conf, dbTypeMap);
+                            schemaForCreateTable, conf, dbTypeMap, dbms);
         } catch (IOException e) {
             throw e;
         } catch (Exception e) {

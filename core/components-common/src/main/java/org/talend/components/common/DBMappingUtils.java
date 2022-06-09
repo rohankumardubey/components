@@ -14,6 +14,7 @@ package org.talend.components.common;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.common.config.jdbc.Dbms;
 import org.talend.components.common.config.jdbc.MappingFileLoader;
 
@@ -27,6 +28,21 @@ import java.net.URL;
 public class DBMappingUtils {
 
     private static Logger LOG = LoggerFactory.getLogger(DBMappingUtils.class);
+
+    public static Dbms getMapping(final RuntimeContainer container, final String mappingFileSuffix) {
+        Dbms dbms = null;
+        if(container!=null) {
+            try {
+                URL mappingFileDir = (URL) container.getComponentData(container.getCurrentComponentId(),
+                        ComponentConstants.MAPPING_URL_SUFFIX);
+                dbms = DBMappingUtils.getMapping(mappingFileDir, mappingFileSuffix);
+            } catch(Exception e) {
+                //ignore any exception
+                LOG.warn("fail to load db mapping info : " + e.getMessage());
+            }
+        }
+        return dbms;
+    }
 
     public static Dbms getMapping(final String mappingFilesDir, final String mappingFileSuffix) {
         try {

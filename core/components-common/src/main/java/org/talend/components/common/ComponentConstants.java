@@ -20,4 +20,10 @@ public class ComponentConstants {
      */
     public static final String LINE_SEPARATOR_REPLACED_TO = "LINE_SEPARATOR_REPLACED_TO";
 
+    /**
+     * Studio mapping file url suffix
+     *
+     */
+    public static final String MAPPING_URL_SUFFIX = "MAPPINGS_URL";
+
 }

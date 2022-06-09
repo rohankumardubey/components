@@ -74,6 +74,8 @@ public class TSnowflakeOutputProperties extends SnowflakeConnectionTableProperti
     public Property<Boolean> usePersonalDBType = newBoolean("usePersonalDBType");
     public SnowflakeDbTypeProperties dbtypeTable = new SnowflakeDbTypeProperties("dbtypeTable");
 
+    public Property<Boolean> useDBMappingFile = newBoolean("useDBMappingFile");
+
     public Property<Boolean> convertEmptyStringsToNull = newBoolean("convertEmptyStringsToNull");
 
     /**
@@ -162,6 +164,8 @@ public class TSnowflakeOutputProperties extends SnowflakeConnectionTableProperti
         useDateMapping.setValue(false);
         dateMapping.setValue(DateMapping.DATE);
 
+        useDBMappingFile.setValue(false);
+
         useSchemaDatePattern.setValue(false);
     }
 
@@ -197,6 +201,9 @@ public class TSnowflakeOutputProperties extends SnowflakeConnectionTableProperti
         Widget dateMappingWidget = new Widget(dateMapping);
         dateMappingWidget.setVisible(false);
         advancedForm.addColumn(dateMappingWidget);
+
+        advancedForm.addRow(useDBMappingFile);
+        widget(useDBMappingFile).setVisible(false);
     }
 
     public void afterOutputAction() {
@@ -221,11 +228,13 @@ public class TSnowflakeOutputProperties extends SnowflakeConnectionTableProperti
 
             Form advForm = getForm(Form.ADVANCED);
             if (advForm != null) {
-                advForm.getWidget(dbtypeTable.getName()).setVisible(usePersonalDBType.getValue() && isCreateTableAction);
-                advForm.getWidget(usePersonalDBType.getName()).setVisible(isCreateTableAction);
-                advForm.getWidget(useDateMapping.getName()).setVisible(isCreateTableAction && isDesignSchemaDynamic());
+                advForm.getWidget(useDBMappingFile.getName()).setVisible(isCreateTableAction && !usePersonalDBType.getValue() && !useDateMapping.getValue());
+
+                advForm.getWidget(dbtypeTable.getName()).setVisible(usePersonalDBType.getValue() && isCreateTableAction  && !useDBMappingFile.getValue());
+                advForm.getWidget(usePersonalDBType.getName()).setVisible(isCreateTableAction && !useDBMappingFile.getValue());
+                advForm.getWidget(useDateMapping.getName()).setVisible(isCreateTableAction && isDesignSchemaDynamic() && !useDBMappingFile.getValue());
                 advForm.getWidget(dateMapping.getName()).setVisible(useDateMapping.getValue() && isCreateTableAction
-                        && isDesignSchemaDynamic());
+                        && isDesignSchemaDynamic() && !useDBMappingFile.getValue());
 
                 boolean isUpsert = OutputAction.UPSERT.equals(outputAction.getValue());
                 boolean isUseSchemaKeysForUpsert = useSchemaKeysForUpsert.getValue();
@@ -266,6 +275,10 @@ public class TSnowflakeOutputProperties extends SnowflakeConnectionTableProperti
     }
 
     public void afterUsePersonalDBType(){
+        refreshLayout(getForm(Form.MAIN));
+    }
+
+    public void afterUseDBMappingFile(){
         refreshLayout(getForm(Form.MAIN));
     }
 
