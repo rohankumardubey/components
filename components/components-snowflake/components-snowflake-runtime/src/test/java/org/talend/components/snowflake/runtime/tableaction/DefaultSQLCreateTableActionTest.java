@@ -21,6 +21,7 @@ import java.util.Map;
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
 import org.junit.Test;
+import org.talend.components.common.config.jdbc.DBMappingUtils;
 import org.talend.components.common.tableaction.DefaultSQLCreateTableAction;
 import org.talend.components.common.tableaction.TableActionConfig;
 import org.talend.daikon.avro.AvroUtils;
@@ -30,6 +31,34 @@ import org.talend.daikon.avro.SchemaConstants;
  * Tests Snowflake Create table SQL queries
  */
 public class DefaultSQLCreateTableActionTest {
+
+    @Test
+    public void testGetQueriesWithDBMappingFile() throws Exception {
+        String expectedQuery = "CREATE TABLE IF NOT EXISTS \"TEST_TABLE\" " +
+                "(\"BOOL\" BOOLEAN, " +
+                "\"CHAR\" CHAR(10), " +
+                "\"BYTE\" SMALLINT, " +
+                "\"SHORT\" SMALLINT, " +
+                "\"INT\" INTEGER, " +
+                "\"LONG\" BIGINT, " +
+                "\"STR\" STRING(32), " +
+                "\"DEC\" DECIMAL(10, 0), " +
+                "\"FLOAT\" REAL, " +
+                "\"DOUBLE\" DOUBLE PRECISION, " +
+                "\"DATE\" DATE)";
+
+        Schema schema = createAllTypesSchema();
+        String[] tableName = new String[]{"TEST_TABLE"};
+        DefaultSQLCreateTableAction action =
+                new DefaultSQLCreateTableAction(tableName, schema, true, false, false);
+        TableActionConfig conf = new SnowflakeTableActionConfig(true);
+        action.setConfig(conf);
+        action.setDbms(DBMappingUtils.getMapping(getClass().getResource("/xmlMappings"), "Snowflake"));
+
+        List<String> queries = action.getQueries();
+        assertEquals(1, queries.size());
+        assertEquals(expectedQuery, queries.get(0));
+    }
 
     /**
      * Checks that CREATE TABLE IF NOT EXISTS query creation sets length and precision only in case db type
@@ -47,7 +76,7 @@ public class DefaultSQLCreateTableActionTest {
                 "\"INT\" INTEGER, " +
                 "\"LONG\" INTEGER, " +
                 "\"STR\" VARCHAR(32), " +
-                "\"DEC\" DECIMAL(10, 0), " +
+                "\"DEC\" FLOAT, " +
                 "\"FLOAT\" FLOAT, " +
                 "\"DOUBLE\" FLOAT, " +
                 "\"DATE\" DATE)";
@@ -124,7 +153,7 @@ public class DefaultSQLCreateTableActionTest {
     @Test
     public void testInvalidDBType() throws Exception {
         String expectedQuery = "CREATE TABLE IF NOT EXISTS \"TEST_TABLE\" " +
-                "(\"DEC\" DECIMAL(10, 2))";
+                "(\"DEC\" FLOAT)";
 
         Schema schema = createDecimalSchemaWithInvalidDBType();
         String[] tableName = new String[]{"TEST_TABLE"};

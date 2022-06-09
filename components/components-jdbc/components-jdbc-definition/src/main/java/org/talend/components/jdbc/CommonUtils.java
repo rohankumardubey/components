@@ -31,7 +31,7 @@ import org.talend.components.api.exception.ComponentException;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.ComponentReferenceProperties;
 import org.talend.components.api.properties.ComponentReferenceProperties.ReferenceType;
-import org.talend.components.common.DBMappingUtils;
+import org.talend.components.common.config.jdbc.DBMappingUtils;
 import org.talend.components.common.config.jdbc.Dbms;
 import org.talend.components.jdbc.module.DBTypes;
 import org.talend.components.jdbc.module.JDBCConnectionModule;

@@ -204,7 +204,9 @@ public class DefaultSQLCreateTableAction extends TableAction {
 
                     dbmsType = mt.getDefaultType();
 
-                    sDBType = dbmsType.getName();
+                    if(dbmsType!=null) {
+                        sDBType = dbmsType.getName();
+                    }
 
                     //TODO support default length, default precision, preBeforeLength in future, now only snowflake mapping use this, but not set default length or precision, or preBeforeLength,
                     //also here need to consider align with other db component, so not do them now

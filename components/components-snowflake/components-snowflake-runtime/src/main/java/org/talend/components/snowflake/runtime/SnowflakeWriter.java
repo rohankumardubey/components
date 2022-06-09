@@ -38,7 +38,7 @@ import org.talend.components.api.component.runtime.WriteOperation;
 import org.talend.components.api.component.runtime.WriterWithFeedback;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.common.ComponentConstants;
-import org.talend.components.common.DBMappingUtils;
+import org.talend.components.common.config.jdbc.DBMappingUtils;
 import org.talend.components.common.config.jdbc.Dbms;
 import org.talend.components.common.runtime.DynamicSchemaUtils;
 import org.talend.components.common.tableaction.TableAction;

@@ -10,13 +10,12 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 //============================================================================
-package org.talend.components.common;
+package org.talend.components.common.config.jdbc;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.container.RuntimeContainer;
-import org.talend.components.common.config.jdbc.Dbms;
-import org.talend.components.common.config.jdbc.MappingFileLoader;
+import org.talend.components.common.ComponentConstants;
 
 import java.io.File;
 import java.io.IOException;
