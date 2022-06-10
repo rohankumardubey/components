@@ -14,10 +14,10 @@
     <packaging>bundle</packaging>
 
     <properties>
-        <couchbase-core.version>1.6.2</couchbase-core.version>
-        <couchbase-client.version>2.6.2</couchbase-client.version>
+        <couchbase-core.version>1.7.23</couchbase-core.version>
+        <couchbase-client.version>2.7.23</couchbase-client.version>
         <couchbase-client-encryption.version>1.0.0</couchbase-client-encryption.version>
-        <couchbase-dcp.version>0.19.0</couchbase-dcp.version>
+        <couchbase-dcp.version>0.26.0</couchbase-dcp.version>
         <rx.version>1.3.8</rx.version>
         <opentracing-api.version>0.31.0</opentracing-api.version>
         <couchbase.docker.image.name>couchbase:5.1.1</couchbase.docker.image.name>
@@ -195,6 +195,29 @@
             <artifactId>powermock-module-junit4</artifactId>
             <scope>test</scope>
         </dependency>
+        
+        <!-- Dependencies for OSGI bundle -->
+        <dependency>
+            <groupId>org.lz4</groupId>
+            <artifactId>lz4-java</artifactId>
+            <version>1.8.0</version>
+        </dependency>
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-buffer</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-transport</artifactId>
+            </dependency>
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-resolver</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
@@ -269,11 +292,11 @@
                                 <Require-Capability>osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version=1.7))"</Require-Capability>
                                 <Bundle-SymbolicName>org.talend.components.couchbase</Bundle-SymbolicName>
                                 <Service-Component>*</Service-Component>
-                                <Import-Package>!com.couchbase.client.encryption.*, !org.apache.hadoop.*, !org.apache.http.*, !com.fasterxml.jackson.databind.*, !android.os,
+                                <Import-Package>!io.micrometer.core.instrument.*,!com.aayushatharva.brotli4j.*,!lzma.sdk.*,!reactor.blockhound.*,!com.oracle.svm.core.annotate.*,!com.ning.compress.*,!com.google.protobuf.nano.*,!com.github.luben.zstd.*,!com.couchbase.client.deps.com.fasterxml.aalto.*,!com.couchbase.client.encryption.*, !org.apache.hadoop.*, !org.apache.http.*, !com.fasterxml.jackson.databind.*, !android.os,
                                     !org.apache.logging.log4j.*,!com.couchbase.client.deps.io.netty.internal.tcnative,!org.conscrypt,!com.barchart.udt,!com.barchart.udt.nio,!com.google.protobuf,!com.jcraft.jzlib,!com.sun.*,!sun.*,!gnu.io,!javassist,!org.jboss.*,!org.joda.*,!org.apache.logging.log4j,!org.apache.tomcat,!org.apache.tomcat.jni,!org.bouncycastle.*,!org.eclipse.*,*
                                 </Import-Package>
                                 <Export-Package>
-                                    !com.couchbase.client.deps,org.talend.components.couchbase,org.talend.components.couchbase.input,org.talend.components.couchbase.output
+                                    !io.micrometer.core.instrument.*,!com.aayushatharva.brotli4j.*,!lzma.sdk.*,!reactor.blockhound.*,!com.oracle.svm.core.annotate.*,!com.ning.compress.*,!com.google.protobuf.nano.*,!com.github.luben.zstd.*,!com.couchbase.client.deps.com.fasterxml.aalto.*,!com.couchbase.client.deps,org.talend.components.couchbase,org.talend.components.couchbase.input,org.talend.components.couchbase.output
                                 </Export-Package>
                                 <Embed-Dependency>*;scope=compile|runtime;inline=false;artifactId=!components*|encryption
                                 </Embed-Dependency>
