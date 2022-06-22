@@ -1,38 +1,42 @@
+def nexusCredentials = usernamePassword(
+        credentialsId: 'nexus-artifact-zl-credentials',
+        usernameVariable: 'NEXUS_USER',
+        passwordVariable: 'NEXUS_PASSWORD')
+
 def veracodeCredentials = usernamePassword(
         credentialsId: 'veracode-api-credentials',
         passwordVariable: 'VERACODE_KEY',
         usernameVariable: 'VERACODE_ID')
 
-def slackChannel = 'components-ci'
+def slackChannel = 'tmp-tdp-10480-bump-tcompv0'
 
 def podLabel = "components-scan-${UUID.randomUUID().toString()}".take(53)
+
+final String podDescription = """
+    apiVersion: v1
+    kind: Pod
+    spec:
+      containers:
+        - name: main
+          image: artifactory.datapwn.com/tlnd-docker-dev/talend/common/tsbi/jdk8-svc-springboot-builder:2.10.1-2.7-20220602093416
+          command: [cat]
+          tty: true
+          volumeMounts: [{name: docker, mountPath: /var/run/docker.sock}, {name: m2main, mountPath: /root/.m2/repository}]
+          resources: {requests: {memory: 3G, cpu: '2'}, limits: {memory: 8G, cpu: '2'}}
+      volumes:
+        - name: docker
+          hostPath: {path: /var/run/docker.sock}
+        - name: m2main
+          hostPath: { path: /tmp/jenkins/tdi/m2/ }
+      imagePullSecrets:
+        - name: talend-registry
+""".stripIndent()
 
 pipeline {
     agent {
         kubernetes {
-            label podLabel
-            yaml """
-apiVersion: v1
-kind: Pod
-spec:
-    containers:
-        -
-            name: main
-            image: '${env.TSBI_IMAGE}'
-            command: [cat]
-            tty: true
-            volumeMounts: [{name: docker, mountPath: /var/run/docker.sock}, {name: m2main, mountPath: /root/.m2/repository}]
-            resources: {requests: {memory: 3G, cpu: '2'}, limits: {memory: 8G, cpu: '2'}}
-    volumes:
-        -
-            name: docker
-            hostPath: {path: /var/run/docker.sock}
-        -
-            name: m2main
-            hostPath: { path: /tmp/jenkins/tdi/m2/ }
-    imagePullSecrets:
-        - name: talend-registry
-"""
+            yaml podDescription
+            defaultContainer 'main'
         }
     }
 
@@ -56,14 +60,39 @@ spec:
     }
 
     stages {
+         stage('Prepare') {
+            steps {
+                configFileProvider([configFile(fileId: 'maven-settings-nexus-zl', variable: 'MAVEN_SETTINGS')]) {
+                    sh '''#! /bin/bash
+                        # Pass the maven credentials to the sourceclear command for the maven build, using an agent configuration file
+                        # Unfortunately there seems to be no simpler way
+                        # See configuration options here: https://help.veracode.com/reader/hHHR3gv0wYc2WbCclECf_A/7kaHTtCxKiogPGnzcDk0eA
+                        echo "customMavenOptions: --settings ${MAVEN_SETTINGS}" > agent-override.yml
+                        chmod 600 agent-override.yml
+
+                        mvn clean package \
+                          --batch-mode \
+                          --threads 1C \
+                          --update-snapshots \
+                          --define 'skipTests' \
+                          --define 'maven.javadoc.skip=true' \
+                          --settings "$MAVEN_SETTINGS"
+                    '''
+                }
+            }
+        }
         stage("SourceClear analysis") {
             steps {
-                container('main') {
-                    withCredentials([string(credentialsId: 'veracode-token', variable: 'SRCCLR_API_TOKEN')]) {
-                        sh '''#!/bin/bash
-                          curl -sSL https://download.sourceclear.com/ci.sh | SRCCLR_API_TOKEN=${SRCCLR_API_TOKEN} DEBUG=1 sh -s -- scan --allow-dirty --recursive --skip-collectors npm;
-                        '''
-                    }
+                withCredentials([string(credentialsId: 'veracode-token', variable: 'SRCCLR_API_TOKEN')]) {
+                    sh '''#!/bin/bash
+                      curl -sSL https://download.sourceclear.com/ci.sh \
+                        | SRCCLR_API_TOKEN=${SRCCLR_API_TOKEN} DEBUG=1 sh -s -- \
+                            --config agent-override.yml \
+                            scan \
+                            --allow-dirty \
+                            --recursive \
+                            --skip-collectors npm;
+                    '''
                 }
             }
         }
