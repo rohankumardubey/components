@@ -21,11 +21,15 @@
         <sonar.jacoco.reportPath>${coverage.sonar.reportRoot}/target/jacoco.exec</sonar.jacoco.reportPath>
         <sonar.jacoco.itReportPath>${coverage.sonar.reportRoot}/target/jacoco-it.exec</sonar.jacoco.itReportPath>
         <!-- repositories -->
-        <talend_snapshots_deployment>https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceSnapshot/</talend_snapshots_deployment>
-        <talend.snapshots.repo>https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceSnapshot/</talend.snapshots.repo>
-        <talend.releases.repo>https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceRelease/</talend.releases.repo>
+        <talend_snapshots_deployment>
+            https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceSnapshot/
+        </talend_snapshots_deployment>
+        <talend.snapshots.repo>https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceSnapshot/
+        </talend.snapshots.repo>
+        <talend.releases.repo>https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceRelease/
+        </talend.releases.repo>
 
-        <components.version>0.38.0-SNAPSHOT</components.version>
+        <project.version>0.38.0-SNAPSHOT</project.version>
         <daikon.version>0.31.12</daikon.version>
 
         <!-- plugin versions -->
@@ -110,7 +114,7 @@
             <dependency>
                 <groupId>org.talend.components</groupId>
                 <artifactId>components-bom</artifactId>
-                <version>${components.version}</version>
+                <version>${project.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -174,9 +178,11 @@
                     <extensions>true</extensions>
                     <configuration>
                         <instructions>
-                            <_dsannotations-options>nocapabilities,norequirements,version;minimum=1.2.0</_dsannotations-options>
+                            <_dsannotations-options>nocapabilities,norequirements,version;minimum=1.2.0
+                            </_dsannotations-options>
                             <_noee>true</_noee>
-                            <Require-Capability>osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version=1.7))"</Require-Capability>
+                            <Require-Capability>osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version=1.7))"
+                            </Require-Capability>
                             <DynamicImport-Package>org.talend.daikon.*</DynamicImport-Package>
                         </instructions>
                     </configuration>
@@ -252,9 +258,10 @@
                         <phase>process-resources</phase>
                         <configuration>
                             <tasks>
-                                <echo file="target/classes/META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt"
-                                      message="${project.groupId}:${project.artifactId}:jar:${project.version}:runtime"
-                                      append="true" encoding="UTF-8"/>
+                                <echo
+                                    file="target/classes/META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt"
+                                    message="${project.groupId}:${project.artifactId}:jar:${project.version}:runtime"
+                                    append="true" encoding="UTF-8"/>
                             </tasks>
                         </configuration>
                         <goals>
@@ -434,7 +441,7 @@
                             <dependency>
                                 <groupId>org.talend.components</groupId>
                                 <artifactId>components-p2update-assembly</artifactId>
-                                <version>${components.version}</version>
+                                <version>${project.version}</version>
                             </dependency>
                         </dependencies>
                         <executions>

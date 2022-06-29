@@ -40,7 +40,7 @@
             <dependency>
                 <groupId>org.talend.components</groupId>
                 <artifactId>components-bom</artifactId>
-                <version>${components.version}</version>
+                <version>${project.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -51,17 +51,17 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-jdbc-runtime</artifactId>
-            <version>${components.version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-jdbc-runtime-beam</artifactId>
-            <version>${components.version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-salesforce-runtime</artifactId>
-            <version>${components.version}</version>
+            <version>${project.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.eclipse.jetty</groupId>
@@ -72,7 +72,7 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-azure-dls-gen2-blob</artifactId>
-            <version>${components.version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.derby</groupId>
@@ -175,20 +175,36 @@
                         <configuration>
                             <extraArtifacts>
                                 <!-- Components runtime -->
-                                <extraArtifact>org.talend.components:components-salesforce-runtime:${components.version}:jar</extraArtifact>
-                                <extraArtifact>org.talend.components:components-jdbc-runtime:${components.version}:jar</extraArtifact>
-                                <extraArtifact>org.talend.components:components-jdbc-runtime-beam:${components.version}:jar</extraArtifact>
-                                <extraArtifact>org.talend.components:components-azure-dls-gen2-blob:${components.version}:jar</extraArtifact>
+                                <extraArtifact>
+                                    org.talend.components:components-salesforce-runtime:${project.version}:jar
+                                </extraArtifact>
+                                <extraArtifact>org.talend.components:components-jdbc-runtime:${project.version}:jar
+                                </extraArtifact>
+                                <extraArtifact>
+                                    org.talend.components:components-jdbc-runtime-beam:${project.version}:jar
+                                </extraArtifact>
+                                <extraArtifact>
+                                    org.talend.components:components-azure-dls-gen2-blob:${project.version}:jar
+                                </extraArtifact>
                                 <!-- JDBC drivers -->
                                 <extraArtifact>org.apache.derby:derbyclient:${derby.driver.version}:jar</extraArtifact>
-                                <extraArtifact>org.mariadb.jdbc:mariadb-java-client:${mariadb.driver.version}:jar</extraArtifact>
-                                <extraArtifact>org.postgresql:postgresql:${postgresql.driver.version}:jar</extraArtifact>
+                                <extraArtifact>org.mariadb.jdbc:mariadb-java-client:${mariadb.driver.version}:jar
+                                </extraArtifact>
+                                <extraArtifact>org.postgresql:postgresql:${postgresql.driver.version}:jar
+                                </extraArtifact>
                                 <extraArtifact>net.sourceforge.jtds:jtds:${jtds.driver.version}:jar</extraArtifact>
-                                <extraArtifact>net.snowflake:snowflake-jdbc:${snowflake.driver.version}:jar</extraArtifact>
-                                <extraArtifact>com.amazon.redshift:redshift-jdbc42-no-awssdk:${redshift.driver.version}:jar</extraArtifact>
-                                <extraArtifact>com.amazonaws:aws-java-sdk-core:${redshift.aws.driver.exts.version}:jar</extraArtifact>
-                                <extraArtifact>com.amazonaws:aws-java-sdk-redshift:${redshift.aws.driver.exts.version}:jar</extraArtifact>
-                                <extraArtifact>com.amazonaws:aws-java-sdk-sts:${redshift.aws.driver.exts.version}:jar</extraArtifact>
+                                <extraArtifact>net.snowflake:snowflake-jdbc:${snowflake.driver.version}:jar
+                                </extraArtifact>
+                                <extraArtifact>
+                                    com.amazon.redshift:redshift-jdbc42-no-awssdk:${redshift.driver.version}:jar
+                                </extraArtifact>
+                                <extraArtifact>com.amazonaws:aws-java-sdk-core:${redshift.aws.driver.exts.version}:jar
+                                </extraArtifact>
+                                <extraArtifact>
+                                    com.amazonaws:aws-java-sdk-redshift:${redshift.aws.driver.exts.version}:jar
+                                </extraArtifact>
+                                <extraArtifact>com.amazonaws:aws-java-sdk-sts:${redshift.aws.driver.exts.version}:jar
+                                </extraArtifact>
                             </extraArtifacts>
                             <pomIncludes>
                                 <pomInclude>*/pom.xml</pomInclude>
@@ -210,9 +226,12 @@
                             <goal>wget</goal>
                         </goals>
                         <configuration>
-                            <url>https://s3.amazonaws.com/athena-downloads/drivers/JDBC/SimbaAthenaJDBC_2.0.7/AthenaJDBC41_2.0.7.jar</url>
+                            <url>
+                                https://s3.amazonaws.com/athena-downloads/drivers/JDBC/SimbaAthenaJDBC_2.0.7/AthenaJDBC41_2.0.7.jar
+                            </url>
                             <outputFileName>AthenaJDBC41-2.0.7.jar</outputFileName>
-                            <outputDirectory>${project.build.directory}/mvn-repo/Athena/AthenaJDBC41/2.0.7/</outputDirectory>
+                            <outputDirectory>${project.build.directory}/mvn-repo/Athena/AthenaJDBC41/2.0.7/
+                            </outputDirectory>
                         </configuration>
                     </execution>
                 </executions>
@@ -266,17 +285,17 @@
                                 <artifact>
                                     <groupId>org.talend.components</groupId>
                                     <artifactId>components-jdbc-definition</artifactId>
-                                    <version>${components.version}</version>
+                                    <version>${project.version}</version>
                                 </artifact>
                                 <artifact>
                                     <groupId>org.talend.components</groupId>
                                     <artifactId>components-salesforce-definition</artifactId>
-                                    <version>${components.version}</version>
+                                    <version>${project.version}</version>
                                 </artifact>
                                 <artifact>
                                     <groupId>org.talend.components</groupId>
                                     <artifactId>components-azure-dls-gen2-blob</artifactId>
-                                    <version>${components.version}</version>
+                                    <version>${project.version}</version>
                                 </artifact>
                             </artifacts>
                         </configuration>
@@ -300,8 +319,8 @@
                             <tasks>
                                 <echo message="tcomp.components.list=${components.list}"/>
                                 <echo
-                                        file="${project.build.directory}${file.separator}config${file.separator}components.list"
-                                        message="tcomp.components.list=${components.list}"/>
+                                    file="${project.build.directory}${file.separator}config${file.separator}components.list"
+                                    message="tcomp.components.list=${components.list}"/>
                             </tasks>
                         </configuration>
                     </execution>

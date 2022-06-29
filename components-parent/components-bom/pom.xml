@@ -9,12 +9,15 @@
     <packaging>pom</packaging>
     <name>Component BOM</name>
     <properties>
-        <components.version>0.38.0-SNAPSHOT</components.version>
         <daikon.version>0.31.12</daikon.version>
         <!-- repositories -->
-        <talend_snapshots_deployment>https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceSnapshot/</talend_snapshots_deployment>
-        <talend.snapshots.repo>https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceSnapshot/</talend.snapshots.repo>
-        <talend.releases.repo>https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceRelease/</talend.releases.repo>
+        <talend_snapshots_deployment>
+            https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceSnapshot/
+        </talend_snapshots_deployment>
+        <talend.snapshots.repo>https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceSnapshot/
+        </talend.snapshots.repo>
+        <talend.releases.repo>https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceRelease/
+        </talend.releases.repo>
         <!-- NOTE: if you modify versions here you may want to update them there: https://github.com/Talend/studio-se-master/blob/master/build/dependencies.p2/dependencies.p2.tos/pom.xml -->
         <aggdesigner-algorithm.version>6.0</aggdesigner-algorithm.version>
         <avatica.avatica-core.version>${avatica.version}</avatica.avatica-core.version>
@@ -46,7 +49,8 @@
         <com.google.http-client.version>1.38.0</com.google.http-client.version>
         <google-http-client-jdo.version>1.28.0</google-http-client-jdo.version>
         <com.yahoo.datasketches.memory.version>${com.yahoo.datasketches.version}</com.yahoo.datasketches.memory.version>
-        <com.yahoo.datasketches.sketches-core.version>${com.yahoo.datasketches.version}</com.yahoo.datasketches.sketches-core.version>
+        <com.yahoo.datasketches.sketches-core.version>${com.yahoo.datasketches.version}
+        </com.yahoo.datasketches.sketches-core.version>
         <com.yahoo.datasketches.version>0.9.0</com.yahoo.datasketches.version>
         <commons-beanutils.version>1.9.4</commons-beanutils.version>
         <commons-cli.version>1.2</commons-cli.version>
@@ -91,7 +95,8 @@
         <google-api-client.version>1.31.1</google-api-client.version>
         <google-oauth-client.version>1.31.0</google-oauth-client.version>
         <google-api-services-bigquery.version>v2-rev20201030-1.31.0</google-api-services-bigquery.version>
-        <google-api-services-cloudresourcemanager.version>v1-rev20201207-1.31.0</google-api-services-cloudresourcemanager.version>
+        <google-api-services-cloudresourcemanager.version>v1-rev20201207-1.31.0
+        </google-api-services-cloudresourcemanager.version>
         <google-api-services-drive.version>v3-rev20201130-1.31.0</google-api-services-drive.version>
         <google-api-services-pubsub.version>v1-rev20201201-1.31.0</google-api-services-pubsub.version>
         <google-api-services-storage.version>v1-rev20201112-1.31.0</google-api-services-storage.version>
@@ -170,7 +175,8 @@
         <netty.version>3.10.6.Final</netty.version>
         <nimbus-jose-jwt.version>8.11</nimbus-jose-jwt.version>
         <okio.version>1.14.0</okio.version>
-        <org.codehaus.janino.commons-compiler.version>${org.codehaus.janino.version}</org.codehaus.janino.commons-compiler.version>
+        <org.codehaus.janino.commons-compiler.version>${org.codehaus.janino.version}
+        </org.codehaus.janino.commons-compiler.version>
         <org.codehaus.janino.janino.version>${org.codehaus.janino.version}</org.codehaus.janino.janino.version>
         <org.codehaus.janino.version>2.7.6</org.codehaus.janino.version>
         <org.json.version>20140107</org.json.version>
@@ -590,7 +596,7 @@
                 <artifactId>jaxws-api</artifactId>
                 <version>${javax.xml.ws.version}</version>
             </dependency>
-             <dependency>
+            <dependency>
                 <groupId>javax.annotation</groupId>
                 <artifactId>javax.annotation-api</artifactId>
                 <version>${javax.annotation-api.version}</version>
@@ -1408,108 +1414,108 @@
             <dependency>
                 <groupId>org.talend.components</groupId>
                 <artifactId>components-adapter-beam</artifactId>
-                <version>${components.version}</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.talend.components</groupId>
                 <artifactId>components-api</artifactId>
-                <version>${components.version}</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.talend.components</groupId>
                 <artifactId>components-api</artifactId>
-                <version>${components.version}</version>
+                <version>${project.version}</version>
                 <type>test-jar</type>
             </dependency>
             <dependency>
                 <groupId>org.talend.components</groupId>
                 <artifactId>components-api</artifactId>
-                <version>${components.version}</version>
+                <version>${project.version}</version>
                 <classifier>tests</classifier>
             </dependency>
             <dependency>
                 <groupId>org.talend.components</groupId>
                 <artifactId>components-api</artifactId>
-                <version>${components.version}</version>
+                <version>${project.version}</version>
                 <classifier>bundle</classifier>
             </dependency>
             <dependency>
                 <groupId>org.talend.components</groupId>
                 <artifactId>components-api-service-common</artifactId>
-                <version>${components.version}</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.talend.components</groupId>
                 <artifactId>components-api-service-common</artifactId>
-                <version>${components.version}</version>
+                <version>${project.version}</version>
                 <type>test-jar</type>
             </dependency>
             <dependency>
                 <groupId>org.talend.components</groupId>
                 <artifactId>components-api-service-common</artifactId>
-                <version>${components.version}</version>
+                <version>${project.version}</version>
                 <classifier>tests</classifier>
             </dependency>
             <dependency>
                 <groupId>org.talend.components</groupId>
                 <artifactId>components-api-service-osgi</artifactId>
-                <version>${components.version}</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.talend.components</groupId>
                 <artifactId>components-api-service-osgi</artifactId>
-                <version>${components.version}</version>
+                <version>${project.version}</version>
                 <classifier>tests</classifier>
             </dependency>
             <dependency>
                 <groupId>org.talend.components</groupId>
                 <artifactId>components-api-service-rest</artifactId>
-                <version>${components.version}</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.talend.components</groupId>
                 <artifactId>components-api-service-rest</artifactId>
-                <version>${components.version}</version>
+                <version>${project.version}</version>
                 <classifier>lib</classifier>
             </dependency>
             <dependency>
                 <groupId>org.talend.components</groupId>
                 <artifactId>components-api-service-rest</artifactId>
-                <version>${components.version}</version>
+                <version>${project.version}</version>
                 <type>test-jar</type>
             </dependency>
             <dependency>
                 <groupId>org.talend.components</groupId>
                 <artifactId>components-common</artifactId>
-                <version>${components.version}</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.talend.components</groupId>
                 <artifactId>components-common</artifactId>
-                <version>${components.version}</version>
+                <version>${project.version}</version>
                 <classifier>bundle</classifier>
             </dependency>
             <dependency>
                 <groupId>org.talend.components</groupId>
                 <artifactId>components-common</artifactId>
-                <version>${components.version}</version>
+                <version>${project.version}</version>
                 <classifier>tests</classifier>
             </dependency>
             <dependency>
                 <groupId>org.talend.components</groupId>
                 <artifactId>components-common-oauth</artifactId>
-                <version>${components.version}</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.talend.components</groupId>
                 <artifactId>components-common-oauth</artifactId>
-                <version>${components.version}</version>
+                <version>${project.version}</version>
                 <classifier>bundle</classifier>
             </dependency>
             <dependency>
                 <groupId>org.talend.components</groupId>
                 <artifactId>components-osgitest</artifactId>
-                <version>${components.version}</version>
+                <version>${project.version}</version>
             </dependency>
             <!-- -->
             <dependency>

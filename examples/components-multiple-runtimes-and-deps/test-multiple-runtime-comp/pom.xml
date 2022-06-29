@@ -84,7 +84,7 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>multiple-runtime-comp</artifactId>
-            <version>${components.version}</version>
+            <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>

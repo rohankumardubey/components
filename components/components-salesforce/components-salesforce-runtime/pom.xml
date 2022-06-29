@@ -20,14 +20,14 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-salesforce-definition</artifactId>
-            <version>${components.version}</version>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>
             <groupId>com.force.api</groupId>
             <artifactId>force-wsc</artifactId>
         </dependency>
-         <!-- for bulk v2 -->
+        <!-- for bulk v2 -->
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
@@ -252,9 +252,11 @@
                         </goals>
                         <configuration>
                             <instructions>
-                                <_dsannotations-options>nocapabilities,norequirements,version;minimum=1.2.0</_dsannotations-options>
+                                <_dsannotations-options>nocapabilities,norequirements,version;minimum=1.2.0
+                                </_dsannotations-options>
                                 <_noee>true</_noee>
-                                <Require-Capability>osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version=1.7))"</Require-Capability>
+                                <Require-Capability>osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version=1.7))"
+                                </Require-Capability>
                                 <Bundle-SymbolicName>org.talend.components.salesforce.runtime.lib</Bundle-SymbolicName>
                                 <Bundle-Name>${project.name} lib</Bundle-Name>
                                 <Service-Component>*</Service-Component>
@@ -274,9 +276,11 @@
                         <configuration>
                             <classifier>bundle</classifier>
                             <instructions>
-                                <_dsannotations-options>nocapabilities,norequirements,version;minimum=1.2.0</_dsannotations-options>
+                                <_dsannotations-options>nocapabilities,norequirements,version;minimum=1.2.0
+                                </_dsannotations-options>
                                 <_noee>true</_noee>
-                                <Require-Capability>osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version=1.7))"</Require-Capability>
+                                <Require-Capability>osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version=1.7))"
+                                </Require-Capability>
                                 <Bundle-SymbolicName>org.talend.components.salesforce.runtime</Bundle-SymbolicName>
                                 <Import-Package>
                                     !*internal,org.talend*,org.slf4j*,javax.xml.namespace,org.apache.commons*,org.apache.http.*,org.apache.avro.*,org.apache.oltu.oauth2*,org.codehaus.jackson*

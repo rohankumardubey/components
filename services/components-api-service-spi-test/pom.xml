@@ -15,7 +15,7 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api-service-spi</artifactId>
-            <version>${components.version}</version>
+            <version>${project.version}</version>
         </dependency>
 
         <!-- Component families to test. -->
@@ -61,8 +61,10 @@
                 <configuration>
                     <trimStackTrace>false</trimStackTrace>
                     <classpathDependencyExcludes>
-                        <classpathDependencyExclude>org.talend.components:multiple-runtime-comp</classpathDependencyExclude>
-                        <classpathDependencyExclude>org.talend.components:components-jdbc-definition</classpathDependencyExclude>
+                        <classpathDependencyExclude>org.talend.components:multiple-runtime-comp
+                        </classpathDependencyExclude>
+                        <classpathDependencyExclude>org.talend.components:components-jdbc-definition
+                        </classpathDependencyExclude>
                     </classpathDependencyExcludes>
                 </configuration>
             </plugin>

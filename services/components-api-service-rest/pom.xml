@@ -7,7 +7,7 @@
         <groupId>org.talend.daikon</groupId>
         <artifactId>service-parent</artifactId>
         <version>0.31.10</version>
-        <relativePath />
+        <relativePath/>
     </parent>
 
     <groupId>org.talend.components</groupId>
@@ -21,11 +21,13 @@
         <maven.compiler.target>1.8</maven.compiler.target>
 
         <!-- repositories -->
-        <talend.snapshots.repo>https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceSnapshot/</talend.snapshots.repo>
-        <talend.releases.repo>https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceRelease/</talend.releases.repo>
+        <talend.snapshots.repo>https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceSnapshot/
+        </talend.snapshots.repo>
+        <talend.releases.repo>https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceRelease/
+        </talend.releases.repo>
         <spring.releases.repo>https://repo.spring.io/libs-release/</spring.releases.repo>
 
-        <components.version>0.38.0-SNAPSHOT</components.version>
+        <project.version>0.38.0-SNAPSHOT</project.version>
         <daikon.version>0.31.10</daikon.version>
         <!-- Used for Docker images name -->
         <git_branch>local</git_branch>
@@ -103,12 +105,12 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api-service-spi</artifactId>
-            <version>${components.version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-common</artifactId>
-            <version>${components.version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.osgi</groupId>
@@ -147,7 +149,7 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api-service-common</artifactId>
-            <version>${components.version}</version>
+            <version>${project.version}</version>
             <classifier>tests</classifier>
             <scope>test</scope>
         </dependency>
@@ -207,13 +209,13 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-jdbc-runtime</artifactId>
-            <version>${components.version}</version>
+            <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-jdbc-runtime</artifactId>
-            <version>${components.version}</version>
+            <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -329,7 +331,7 @@
             <dependency>
                 <groupId>org.talend.components</groupId>
                 <artifactId>components-bom</artifactId>
-                <version>${components.version}</version>
+                <version>${project.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -494,7 +496,8 @@
                         <configuration>
                             <trimStackTrace>false</trimStackTrace>
                             <classpathDependencyExcludes>
-                                <classpathDependencyExclude>org.talend.components:components-jdbc-runtime</classpathDependencyExclude>
+                                <classpathDependencyExclude>org.talend.components:components-jdbc-runtime
+                                </classpathDependencyExclude>
                             </classpathDependencyExcludes>
                         </configuration>
                     </execution>
@@ -559,7 +562,8 @@
                                                 ${talend_docker_registry}/talend/tcomp-${project.artifactId}
                                             </name>
                                             <build>
-                                                <from>${talend_docker_registry}/talend/microservices-base:1.0-20181017125147-gc446fd5
+                                                <from>
+                                                    ${talend_docker_registry}/talend/microservices-base:1.0-20181017125147-gc446fd5
                                                 </from>
                                                 <tags>
                                                     <tag>${project.version}-${maven.build.timestamp}</tag>
@@ -584,7 +588,9 @@
                                                 <env>
                                                     <LOG_PATH>/maven/logs</LOG_PATH>
                                                     <FILEBEAT_CONSOLE_OUTPUT>false</FILEBEAT_CONSOLE_OUTPUT>
-                                                    <OPS4J_PAX_OPTS>-Dorg.ops4j.pax.url.mvn.useFallbackRepositories=false</OPS4J_PAX_OPTS>
+                                                    <OPS4J_PAX_OPTS>
+                                                        -Dorg.ops4j.pax.url.mvn.useFallbackRepositories=false
+                                                    </OPS4J_PAX_OPTS>
                                                 </env>
                                                 <labels>
                                                     <name>Talend Component REST API</name>
@@ -593,13 +599,16 @@
                                                     <com.talend.application>tcomp</com.talend.application>
                                                     <com.talend.service>${project.artifactId}</com.talend.service>
                                                     <com.talend.version>${project.version}</com.talend.version>
-                                                    <com.talend.git.repositories>https://github.com/talend/components</com.talend.git.repositories>
+                                                    <com.talend.git.repositories>https://github.com/talend/components
+                                                    </com.talend.git.repositories>
                                                     <com.talend.git.branches>${git_branch}</com.talend.git.branches>
                                                     <com.talend.git.commits>${git.commid.id}</com.talend.git.commits>
-                                                    <com.talend.description>Talend Component REST API</com.talend.description>
+                                                    <com.talend.description>Talend Component REST API
+                                                    </com.talend.description>
                                                     <com.talend.url>https://www.talend.com/</com.talend.url>
                                                     <com.talend.vendor>Talend</com.talend.vendor>
-                                                    <com.talend.build-date>${maven.build.timestamp}</com.talend.build-date>
+                                                    <com.talend.build-date>${maven.build.timestamp}
+                                                    </com.talend.build-date>
                                                     <com.talend.docker.cmd></com.talend.docker.cmd>
                                                     <com.talend.docker.params></com.talend.docker.params>
                                                     <com.talend.docker.healthcheck></com.talend.docker.healthcheck>
