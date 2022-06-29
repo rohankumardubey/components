@@ -28,8 +28,7 @@
         </talend.snapshots.repo>
         <talend.releases.repo>https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceRelease/
         </talend.releases.repo>
-
-        <project.version>0.38.0-SNAPSHOT</project.version>
+        
         <daikon.version>0.31.12</daikon.version>
 
         <!-- plugin versions -->

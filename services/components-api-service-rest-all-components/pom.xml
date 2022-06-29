@@ -30,7 +30,6 @@
         </talend.releases.repo>
         <spring.releases.repo>https://repo.spring.io/libs-release/</spring.releases.repo>
         <!-- Dependency versions -->
-        <project.version>0.38.0-SNAPSHOT</project.version>
         <daikon.version>0.31.10</daikon.version>
         <snakeyaml.version>1.26</snakeyaml.version>
         <!-- Used for Docker images name -->
