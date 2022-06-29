@@ -12,19 +12,11 @@
 // ============================================================================
 package org.talend.components.api;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
-import static org.ops4j.pax.exam.CoreOptions.composite;
-import static org.ops4j.pax.exam.CoreOptions.linkBundle;
-import static org.ops4j.pax.exam.CoreOptions.options;
-
+import javax.inject.Inject;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-
-import javax.inject.Inject;
-
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.Configuration;
@@ -42,11 +34,19 @@ import org.talend.components.api.service.ComponentService;
 import org.talend.daikon.definition.Definition;
 import org.talend.daikon.definition.service.DefinitionRegistryService;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+import static org.ops4j.pax.exam.CoreOptions.composite;
+import static org.ops4j.pax.exam.CoreOptions.linkBundle;
+import static org.ops4j.pax.exam.CoreOptions.options;
+
 /**
  * created by sgandon on 7 sept. 2015 Detailled comment
  */
 @RunWith(DisablablePaxExam.class)
 @ExamReactorStrategy(PerClass.class)
+@Ignore
 public class OsgiComponentServiceTest {
 
     static final Logger LOG = LoggerFactory.getLogger(OsgiComponentServiceTest.class);
@@ -62,7 +62,7 @@ public class OsgiComponentServiceTest {
                     , linkBundle("org.ops4j.pax.url-pax-url-commons")//
                     , linkBundle("org.ops4j.pax.url-pax-url-link")//
                     , linkBundle("org.ops4j.pax.url-pax-url-classpath")//
-            // , mavenBundle("org.talend.components", "components-api-full-example")//
+                    // , mavenBundle("org.talend.components", "components-api-full-example")//
             );
         } catch (Exception e) {
             throw e;
@@ -84,7 +84,8 @@ public class OsgiComponentServiceTest {
     }
 
     @Test
-    public void testRegistryServiceDynamicLoadOfComponent() throws BundleException, MalformedURLException, URISyntaxException {
+    public void testRegistryServiceDynamicLoadOfComponent()
+            throws BundleException, MalformedURLException, URISyntaxException {
         // inside eclipse the bundle context can be retrieved from the Activator.start method or using the FrameworkUtil
         // class.
         BundleContext bundleContext = FrameworkUtil.getBundle(getClass()).getBundleContext();

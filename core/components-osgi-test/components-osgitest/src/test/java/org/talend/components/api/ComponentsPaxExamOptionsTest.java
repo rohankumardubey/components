@@ -13,7 +13,7 @@
 package org.talend.components.api;
 
 import java.util.Properties;
-
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.Configuration;
@@ -25,6 +25,7 @@ import org.talend.components.api.test.ComponentTestUtils;
 
 @RunWith(DisablablePaxExam.class)
 @ExamReactorStrategy(PerClass.class)
+@Ignore
 public class ComponentsPaxExamOptionsTest {
 
     @Configuration
