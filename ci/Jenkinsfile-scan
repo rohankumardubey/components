@@ -75,7 +75,6 @@ pipeline {
                           --threads 1C \
                           --update-snapshots \
                           --define 'skipTests' \
-                          --define 'maven.javadoc.skip=true' \
                           --settings "$MAVEN_SETTINGS"
                     '''
                 }
