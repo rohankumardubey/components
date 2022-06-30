@@ -42,7 +42,6 @@
         <maven-dependency-plugin.version>3.0.2</maven-dependency-plugin.version>
         <maven-failsafe-plugin-paxexam.version>2.20-PAXEXAM-PATCH</maven-failsafe-plugin-paxexam.version>
         <maven-failsafe-plugin.version>2.18</maven-failsafe-plugin.version>
-        <maven-javadoc-plugin.version>2.10.4</maven-javadoc-plugin.version>
         <maven-resources-plugin.version>3.0.2</maven-resources-plugin.version>
         <maven-scm-plugin.version>1.9.4</maven-scm-plugin.version>
         <maven-source-plugin.version>3.0.1</maven-source-plugin.version>
@@ -196,22 +195,6 @@
                 <executions>
                     <execution>
                         <id>attach-sources</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.10.4</version>
-                <configuration>
-                    <failOnError>false</failOnError>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>attach-javadoc</id>
                         <goals>
                             <goal>jar</goal>
                         </goals>
