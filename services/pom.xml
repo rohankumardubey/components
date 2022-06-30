@@ -69,6 +69,12 @@
                 <enabled>false</enabled>
             </snapshots>
         </repository>
+
+        <!-- Required to get the forked 2.0.1-TALEND version of the maven-invoker-plugin -->
+        <repository>
+            <id>talend-opensource-release</id>
+            <url>https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceRelease</url>
+        </repository>
     </repositories>
 
     <modules>
