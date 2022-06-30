@@ -69,13 +69,15 @@
                 <enabled>false</enabled>
             </snapshots>
         </repository>
+    </repositories>
 
+    <pluginRepositories>
         <!-- Required to get the forked 2.0.1-TALEND version of the maven-invoker-plugin -->
-        <repository>
+        <pluginRepository>
             <id>talend-opensource-release</id>
             <url>https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceRelease</url>
-        </repository>
-    </repositories>
+        </pluginRepository>
+    </pluginRepositories>
 
     <modules>
         <module>components-api-service-common</module>
