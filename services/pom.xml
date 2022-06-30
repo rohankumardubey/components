@@ -9,6 +9,54 @@
     <packaging>pom</packaging>
 
     <name>Component Services Aggregator</name>
+
+    <properties>
+        <!-- /!\ START Spring BOM PROPERTIES /!\ -->
+        <!-- /!\ To update the properties below, refer to the documentation in /doc/development.md#upgrading-spring -->
+        <talend.springboot.bom.version>0.0.1</talend.springboot.bom.version>
+        <talend.springboot.bom.artifactId>2.7</talend.springboot.bom.artifactId>
+        <!-- /!\ END Spring BOM PROPERTIES /!\ -->
+
+        <daikon.version>6.8.2</daikon.version>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.talend.tsbi.java.springboot-bom</groupId>
+                <artifactId>${talend.springboot.bom.artifactId}</artifactId>
+                <version>${talend.springboot.bom.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.junit.jupiter</groupId>
+                        <artifactId>junit-jupiter-engine</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.junit.vintage</groupId>
+                        <artifactId>junit-vintage-engine</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
+            <dependency>
+                <groupId>org.talend.components</groupId>
+                <artifactId>components-bom</artifactId>
+                <version>${project.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!-- Force JUnit 4 version as we don't want to migrate all of our tests -->
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>4.12</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <modules>
         <module>components-api-service-common</module>
         <module>components-api-service-osgi</module>
@@ -18,6 +66,7 @@
         <module>components-api-service-spi</module>
         <module>components-maven-repo</module>
     </modules>
+
     <build>
         <!-- skip the deployment for this aggregator, not necessary -->
         <plugins>

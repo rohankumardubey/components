@@ -13,16 +13,13 @@
 
 package org.talend.components.service.rest.impl;
 
-import static java.util.stream.StreamSupport.stream;
-import static org.slf4j.LoggerFactory.getLogger;
-
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RestController;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.runtime.ExecutionEngine;
 import org.talend.components.common.datastore.DatastoreDefinition;
@@ -30,17 +27,19 @@ import org.talend.components.service.rest.DefinitionType;
 import org.talend.components.service.rest.DefinitionsController;
 import org.talend.components.service.rest.dto.ConnectorTypology;
 import org.talend.components.service.rest.dto.DefinitionDTO;
-import org.talend.daikon.annotation.ServiceImplementation;
 import org.talend.daikon.definition.Definition;
 import org.talend.daikon.definition.service.DefinitionRegistryService;
 import org.talend.daikon.i18n.tag.HasTags;
 import org.talend.daikon.i18n.tag.Tag;
 import org.talend.daikon.i18n.tag.TagUtils;
 
+import static java.util.stream.StreamSupport.stream;
+import static org.slf4j.LoggerFactory.getLogger;
+
 /**
  * Definition controller..
  */
-@ServiceImplementation
+@RestController
 public class DefinitionsControllerImpl implements DefinitionsController {
 
     /** This class' logger. */
@@ -52,7 +51,8 @@ public class DefinitionsControllerImpl implements DefinitionsController {
     /**
      * Return all known definitions that match the given type.
      *
-     * @param type the wanted definition type.
+     * @param type
+     *         the wanted definition type.
      * @return all known definitions that match the given type.
      * @returnWrapped java.lang.Iterable<org.talend.components.service.rest.dto.DefinitionDTO>
      */
@@ -92,8 +92,10 @@ public class DefinitionsControllerImpl implements DefinitionsController {
     /**
      * Return components that match the given typology and/or execution engine.
      *
-     * @param typology the wanted typology.
-     * @param executionEngine the wanted execution engine.
+     * @param typology
+     *         the wanted typology.
+     * @param executionEngine
+     *         the wanted execution engine.
      * @return the list of all definitions that match the wanted typology.
      * @returnWrapped java.lang.Iterable<org.talend.components.service.rest.dto.DefinitionDTO>
      */

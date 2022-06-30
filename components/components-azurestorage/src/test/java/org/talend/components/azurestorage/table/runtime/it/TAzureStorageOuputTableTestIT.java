@@ -12,14 +12,7 @@
 // ============================================================================
 package org.talend.components.azurestorage.table.runtime.it;
 
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.hasSize;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import com.microsoft.azure.storage.StorageException;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -27,12 +20,11 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.IndexedRecord;
-import org.apache.commons.lang.RandomStringUtils;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.After;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -51,7 +43,14 @@ import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
 import org.talend.daikon.properties.ValidationResult;
 
-import com.microsoft.azure.storage.StorageException;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.hasSize;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 @Ignore
 public class TAzureStorageOuputTableTestIT extends AzureStorageTableBaseTestIT {
@@ -64,8 +63,9 @@ public class TAzureStorageOuputTableTestIT extends AzureStorageTableBaseTestIT {
 
     private Date testTimestamp;
 
-    private String filter = String.format("(PartitionKey eq '%s') or (PartitionKey eq '%s') or (PartitionKey eq '%s')", pk_test1,
-            pk_test2, pk_test3);
+    private String filter =
+            String.format("(PartitionKey eq '%s') or (PartitionKey eq '%s') or (PartitionKey eq '%s')", pk_test1,
+                    pk_test2, pk_test3);
 
     public TAzureStorageOuputTableTestIT() {
         super("tAzureStorageOutputTableTest");
@@ -104,7 +104,8 @@ public class TAzureStorageOuputTableTestIT extends AzureStorageTableBaseTestIT {
     @SuppressWarnings("rawtypes")
     public BoundedReader createReader(String table, String combinedFilter, boolean useMappings) {
         TAzureStorageInputTableProperties props = new TAzureStorageInputTableProperties("tests");
-        props = (TAzureStorageInputTableProperties) setupConnectionProperties((AzureStorageProvideConnectionProperties) props);
+        props = (TAzureStorageInputTableProperties) setupConnectionProperties(
+                (AzureStorageProvideConnectionProperties) props);
         props.tableName.setValue(table);
         props.useFilterExpression.setValue(true);
         // TODO manage properly the filter...
@@ -127,16 +128,26 @@ public class TAzureStorageOuputTableTestIT extends AzureStorageTableBaseTestIT {
     }
 
     public Schema getSimpleTestSchema() {
-        return SchemaBuilder.record("Main").fields()
+        return SchemaBuilder.record("Main")
+                .fields()
                 //
-                .name("PartitionKey").prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255")// $NON-NLS-3$
-                .prop(SchemaConstants.TALEND_IS_LOCKED, "true").type(AvroUtils._string()).noDefault()
-                //
-                .name("RowKey").prop(SchemaConstants.TALEND_COLUMN_IS_KEY, "true")
+                .name("PartitionKey")
                 .prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255")// $NON-NLS-3$
-                .prop(SchemaConstants.TALEND_IS_LOCKED, "true").type(AvroUtils._string()).noDefault()
+                .prop(SchemaConstants.TALEND_IS_LOCKED, "true")
+                .type(AvroUtils._string())
+                .noDefault()
                 //
-                .name("StringValue").prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "50").type(AvroUtils._string()).noDefault()
+                .name("RowKey")
+                .prop(SchemaConstants.TALEND_COLUMN_IS_KEY, "true")
+                .prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "255")// $NON-NLS-3$
+                .prop(SchemaConstants.TALEND_IS_LOCKED, "true")
+                .type(AvroUtils._string())
+                .noDefault()
+                //
+                .name("StringValue")
+                .prop(SchemaConstants.TALEND_COLUMN_DB_LENGTH, "50")
+                .type(AvroUtils._string())
+                .noDefault()
                 //
                 .endRecord();
     }
@@ -332,12 +343,12 @@ public class TAzureStorageOuputTableTestIT extends AzureStorageTableBaseTestIT {
     @SuppressWarnings("rawtypes")
     public void testNameMappings() throws Throwable {
         currentTable = tbl_test + "InsertWithNameMappings";
-        
+
         properties.nameMapping.schemaColumnName.setValue(schemaMappings);
         properties.nameMapping.entityPropertyName.setValue(propertyMappings);
 
         insertTestValues(currentTable);
-        
+
         properties.nameMapping.schemaColumnName.setValue(new ArrayList<String>());
         properties.nameMapping.entityPropertyName.setValue(new ArrayList<String>());
 

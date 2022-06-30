@@ -13,26 +13,20 @@
 
 package org.talend.components.service.rest;
 
-import static java.util.Collections.singletonList;
-import static java.util.Collections.singletonMap;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.when;
-import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.restassured.RestAssured;
 
+import javax.inject.Inject;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.inject.Inject;
-
 import org.junit.Before;
 import org.junit.runner.RunWith;
-import org.springframework.boot.context.embedded.LocalServerPort;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.talend.components.common.dataset.DatasetDefinition;
@@ -51,9 +45,12 @@ import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.PropertiesImpl;
 import org.talend.daikon.properties.presentation.Form;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectReader;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import static java.util.Collections.singletonList;
+import static java.util.Collections.singletonMap;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.when;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 /**
  * Created so that integration tests shares the same spring context instead of recreating it each time.
@@ -62,6 +59,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 @SpringBootTest(classes = Application.class, webEnvironment = RANDOM_PORT)
 @TestPropertySource(properties = { "server.contextPath=" })
 public abstract class AbstractSpringIntegrationTests {
+
     static {
         if (System.getProperty("sun.boot.class.path") == null) {
             System.setProperty("sun.boot.class.path", System.getProperty("java.class.path"));
@@ -123,7 +121,8 @@ public abstract class AbstractSpringIntegrationTests {
 
         // TODO: map the dataset definition on the correct name
 
-        when(delegate.getDefinitionForPropertiesType(MockDatasetProperties.class)).thenReturn(singletonList(datasetDefinition));
+        when(delegate.getDefinitionForPropertiesType(MockDatasetProperties.class)).thenReturn(
+                singletonList(datasetDefinition));
         when(delegate.getDefinitionForPropertiesType(MockDatastoreProperties.class))
                 .thenReturn(singletonList(datastoreDefinition));
 

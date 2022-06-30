@@ -4,13 +4,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.talend.daikon</groupId>
-        <artifactId>service-parent</artifactId>
-        <version>0.31.10</version>
-        <relativePath/>
+        <groupId>org.talend.components</groupId>
+        <artifactId>components-api-service-aggregator</artifactId>
+        <version>0.38.0-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <groupId>org.talend.components</groupId>
     <artifactId>components-api-service-rest</artifactId>
     <version>0.38.0-SNAPSHOT</version>
     <name>Component REST API</name>
@@ -26,12 +25,12 @@
         <talend.releases.repo>https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceRelease/
         </talend.releases.repo>
         <spring.releases.repo>https://repo.spring.io/libs-release/</spring.releases.repo>
-        
-        <daikon.version>0.31.10</daikon.version>
+
         <!-- Used for Docker images name -->
         <git_branch>local</git_branch>
         <talend_docker_registry>registry.datapwn.com</talend_docker_registry>
 
+        <aspectj.version>1.9.9.1</aspectj.version>
         <groovy.version>2.5.6</groovy.version> <!-- spring boot sucks with its bom -->
         <snakeyaml.version>1.26</snakeyaml.version>
         <osgi.core.version>6.0.0</osgi.core.version>
@@ -71,33 +70,53 @@
             <artifactId>jaxb-runtime</artifactId>
         </dependency>
 
-        <!-- spring dependencies -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-jetty</artifactId>
-        </dependency>
+        <!-- Spring dependencies - managed through TSBI BOM -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
             <exclusions>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>log4j-over-slf4j</artifactId>
-                </exclusion>
                 <exclusion>
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-starter-tomcat</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
-        <!-- added explicytly cause it is in the scope provided by the parent -->
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-        </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-actuator</artifactId>
+            <artifactId>spring-boot-starter-jetty</artifactId>
+            <exclusions>
+                <!-- Remove Websocket support (unnecessary) -->
+                <exclusion>
+                    <artifactId>websocket-server</artifactId>
+                    <groupId>org.eclipse.jetty.websocket</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>javax-websocket-client-impl</artifactId>
+                    <groupId>org.eclipse.jetty.websocket</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>javax-websocket-server-impl</artifactId>
+                    <groupId>org.eclipse.jetty.websocket</groupId>
+                </exclusion>
+                <exclusion>
+                    <groupId>jakarta.websocket</groupId>
+                    <artifactId>jakarta.websocket-api</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <!-- AspectJ -->
+        <dependency>
+            <groupId>org.aspectj</groupId>
+            <artifactId>aspectjrt</artifactId>
+            <version>${aspectj.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.aspectj</groupId>
+            <artifactId>aspectjweaver</artifactId>
+            <version>${aspectj.version}</version>
         </dependency>
 
         <!-- talend dependencies -->
@@ -229,12 +248,6 @@
             <classifier>tests</classifier>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.talend.daikon</groupId>
-            <artifactId>daikon-spring-utils</artifactId>
-            <version>${daikon.version}</version>
-            <scope>test</scope>
-        </dependency>
         <!-- Drivers needed for embedded database -->
         <dependency>
             <groupId>org.apache.derby</groupId>
@@ -339,6 +352,26 @@
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>aspectj-maven-plugin</artifactId>
+                <version>1.14.0</version>
+                <configuration>
+                    <complianceLevel>1.8</complianceLevel>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                    <encoding>UTF-8</encoding>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>compile</goal>
+                            <goal>test-compile</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
             <!-- To get the GIT information for version endpoint. -->
             <plugin>
                 <groupId>pl.project13.maven</groupId>

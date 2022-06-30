@@ -13,25 +13,23 @@
 
 package org.talend.components.service.rest;
 
-import static org.springframework.web.bind.annotation.RequestMethod.GET;
-
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 import org.talend.components.service.rest.dto.VersionDto;
-import org.talend.daikon.annotation.ApiVersion;
-import org.talend.daikon.annotation.Service;
+
+import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
 /**
  * Definition controller..
  */
-@Service(name = "VersionController")
-@RequestMapping("version")
-@ApiVersion(ServiceConstants.V0)
+@RestController(value = "VersionController")
+@RequestMapping(ServiceConstants.V0 + "/version")
 public interface VersionController {
 
     /**
      * Get the version information for this service.
-     * 
+     *
      * @return a Version object containing the current git information at time of build.
      */
     @RequestMapping(method = GET)

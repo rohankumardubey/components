@@ -13,23 +13,16 @@
 
 package org.talend.components.service.rest.impl;
 
-import static java.util.Collections.emptyList;
-import static org.apache.commons.lang3.Validate.notNull;
-import static org.slf4j.LoggerFactory.getLogger;
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
-import static org.springframework.http.HttpStatus.OK;
-
+import javax.activation.MimetypesFileTypeMap;
 import java.io.InputStream;
 import java.util.List;
-
-import javax.activation.MimetypesFileTypeMap;
-
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RestController;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.service.ComponentService;
 import org.talend.components.common.dataset.DatasetProperties;
@@ -41,7 +34,6 @@ import org.talend.components.service.rest.dto.SerPropertiesDto;
 import org.talend.components.service.rest.dto.UiSpecsPropertiesDto;
 import org.talend.components.service.rest.dto.ValidationResultsDto;
 import org.talend.components.service.rest.serialization.JsonSerializationHelper;
-import org.talend.daikon.annotation.ServiceImplementation;
 import org.talend.daikon.definition.Definition;
 import org.talend.daikon.definition.DefinitionImageType;
 import org.talend.daikon.definition.service.DefinitionRegistryService;
@@ -51,7 +43,13 @@ import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.serialize.jsonschema.PropertyTrigger;
 
-@ServiceImplementation
+import static java.util.Collections.emptyList;
+import static org.apache.commons.lang3.Validate.notNull;
+import static org.slf4j.LoggerFactory.getLogger;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.OK;
+
+@RestController
 public class PropertiesControllerImpl implements PropertiesController {
 
     private static final Logger log = getLogger(PropertiesControllerImpl.class);
@@ -75,7 +73,8 @@ public class PropertiesControllerImpl implements PropertiesController {
         notNull(definition, "Could not find connection definition of name %s", definitionName);
         log.debug("Found connection definition {} for {}", definition, definitionName);
         return jsonSerializationHelper.toJson(
-                definitionServiceDelegate.createProperties(definition, definitionName + " properties"), formName, definitionName);
+                definitionServiceDelegate.createProperties(definition, definitionName + " properties"), formName,
+                definitionName);
     }
 
     @Override
@@ -189,10 +188,12 @@ public class PropertiesControllerImpl implements PropertiesController {
             default:
                 throw new IllegalArgumentException("This enum does not contain this value: " + trigger);
             }
-            response = jsonSerializationHelper.toJson(updatedProperties, formName, propertiesContainer.getDefinitionName());
+            response = jsonSerializationHelper.toJson(updatedProperties, formName,
+                    propertiesContainer.getDefinitionName());
         } catch (IllegalStateException e) {
-            log.info("Tried to execute an undefined trigger. It show either a bug in the calling client or the definition"
-                    + " properties advertised a non-existent trigger", e);
+            log.info(
+                    "Tried to execute an undefined trigger. It show either a bug in the calling client or the definition"
+                            + " properties advertised a non-existent trigger", e);
             throw new UndefinedTriggerException(propertiesContainer.getDefinitionName(), property, trigger);
         } catch (Throwable throwable) {
             Exception exception = handleErrors(throwable);
@@ -237,7 +238,8 @@ public class PropertiesControllerImpl implements PropertiesController {
     @Override
     public String getDatasetProperties(String formName, UiSpecsPropertiesDto propertiesContainer) {
         String definitionName = propertiesContainer.getDefinitionName();
-        DatastoreDefinition<DatastoreProperties> datastoreDefinition = propertiesHelpers.getDataStoreDefinition(definitionName);
+        DatastoreDefinition<DatastoreProperties> datastoreDefinition =
+                propertiesHelpers.getDataStoreDefinition(definitionName);
         notNull(datastoreDefinition, "Could not find connection definition of name %s", definitionName);
         DatastoreProperties properties = propertiesHelpers.propertiesFromDto(propertiesContainer);
         DatasetProperties<?> datasetProperties = datastoreDefinition.createDatasetProperties(properties);

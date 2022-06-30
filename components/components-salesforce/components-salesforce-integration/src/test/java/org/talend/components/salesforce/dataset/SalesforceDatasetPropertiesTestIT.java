@@ -2,18 +2,18 @@ package org.talend.components.salesforce.dataset;
 
 import java.io.IOException;
 import java.util.List;
-
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.rules.TestRule;
-import org.talend.components.salesforce.integration.DisableIfMissingConfig;
 import org.talend.components.salesforce.dataset.SalesforceDatasetProperties.SourceType;
 import org.talend.components.salesforce.datastore.SalesforceDatastoreProperties;
+import org.talend.components.salesforce.integration.DisableIfMissingConfig;
 import org.talend.components.salesforce.integration.SalesforceTestBase;
 
 public class SalesforceDatasetPropertiesTestIT extends SalesforceTestBase {
+
     @ClassRule
     public static final TestRule DISABLE_IF_NEEDED = new DisableIfMissingConfig();
 
@@ -46,13 +46,14 @@ public class SalesforceDatasetPropertiesTestIT extends SalesforceTestBase {
 
         modules = dataset.moduleName.getPossibleValues();
         for (Object object : modules) {
-            if(SalesforceDatasetProperties.MODULE_LIST_WHICH_NOT_SUPPORT_BULK_API.contains((String)object)){
+            if (SalesforceDatasetProperties.MODULE_LIST_WHICH_NOT_SUPPORT_BULK_API.contains((String) object)) {
                 Assert.fail(object + " is not supported by Bulk API");
             }
         }
         Assert.assertTrue("the module list is empty after calling 'afterSourceType' method, not right",
                 modules != null && !modules.isEmpty());
-        Assert.assertTrue("the module value must be empty at this point", StringUtils.isEmpty(dataset.moduleName.getValue()));
+        Assert.assertTrue("the module value must be empty at this point",
+                StringUtils.isEmpty(dataset.moduleName.getValue()));
         Assert.assertTrue("the list of selected columns or fields must be null or empty",
                 dataset.selectColumnIds.getValue() == null || dataset.selectColumnIds.getValue().isEmpty());
         Assert.assertTrue("the query value must be empty", StringUtils.isEmpty(dataset.query.getValue()));

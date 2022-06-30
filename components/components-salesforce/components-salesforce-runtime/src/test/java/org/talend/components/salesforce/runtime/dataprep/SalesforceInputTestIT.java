@@ -12,16 +12,11 @@
 // ============================================================================
 package org.talend.components.salesforce.runtime.dataprep;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
-
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-
 import org.apache.avro.generic.IndexedRecord;
-import org.apache.commons.lang.SerializationUtils;
+import org.apache.commons.lang3.SerializationUtils;
 import org.junit.Assert;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -37,7 +32,12 @@ import org.talend.components.salesforce.datastore.SalesforceDatastoreDefinition;
 import org.talend.components.salesforce.datastore.SalesforceDatastoreProperties;
 import org.talend.components.salesforce.runtime.DisableIfMissingConfig;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
 public class SalesforceInputTestIT {
+
     @ClassRule
     public static final TestRule DISABLE_IF_NEEDED = new DisableIfMissingConfig();
 

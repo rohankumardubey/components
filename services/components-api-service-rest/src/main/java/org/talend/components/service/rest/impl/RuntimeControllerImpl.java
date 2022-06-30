@@ -13,24 +13,20 @@
 
 package org.talend.components.service.rest.impl;
 
-import static com.google.common.collect.Lists.newArrayList;
-import static java.util.Collections.emptyList;
-import static org.talend.components.api.component.ConnectorTopology.INCOMING;
-import static org.talend.components.api.component.runtime.ExecutionEngine.BEAM;
-import static org.talend.components.api.component.runtime.ExecutionEngine.DI;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Iterator;
 import java.util.function.Function;
-
 import org.apache.avro.generic.IndexedRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RestController;
 import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.runtime.ExecutionEngine;
 import org.talend.components.api.component.runtime.Sink;
@@ -47,7 +43,6 @@ import org.talend.components.service.rest.RuntimesController;
 import org.talend.components.service.rest.dto.SerPropertiesDto;
 import org.talend.components.service.rest.dto.UiSpecsPropertiesDto;
 import org.talend.components.service.rest.dto.ValidationResultsDto;
-import org.talend.daikon.annotation.ServiceImplementation;
 import org.talend.daikon.exception.TalendRuntimeException;
 import org.talend.daikon.exception.error.CommonErrorCodes;
 import org.talend.daikon.properties.Properties;
@@ -55,9 +50,13 @@ import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.runtime.RuntimeUtil;
 import org.talend.daikon.sandbox.SandboxedInstance;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import static com.google.common.collect.Lists.newArrayList;
+import static java.util.Collections.emptyList;
+import static org.talend.components.api.component.ConnectorTopology.INCOMING;
+import static org.talend.components.api.component.runtime.ExecutionEngine.BEAM;
+import static org.talend.components.api.component.runtime.ExecutionEngine.DI;
 
-@ServiceImplementation
+@RestController
 @SuppressWarnings("unchecked")
 public class RuntimeControllerImpl implements RuntimesController {
 
@@ -82,7 +81,8 @@ public class RuntimeControllerImpl implements RuntimesController {
     }
 
     private ResponseEntity<ValidationResultsDto> doValidateDatastoreConnection(DatastoreProperties properties) {
-        DatastoreDefinition<DatastoreProperties> definition = propertiesHelpers.getFirstDefinitionFromProperties(properties);
+        DatastoreDefinition<DatastoreProperties> definition =
+                propertiesHelpers.getFirstDefinitionFromProperties(properties);
         try (SandboxedInstance instance = RuntimeUtil.createRuntimeClass(definition.getRuntimeInfo(properties),
                 properties.getClass().getClassLoader())) {
             DatastoreRuntime<DatastoreProperties> datastoreRuntime = (DatastoreRuntime) instance.getInstance();
@@ -91,7 +91,8 @@ public class RuntimeControllerImpl implements RuntimesController {
 
             ValidationResultsDto response = new ValidationResultsDto(
                     healthChecks == null ? emptyList() : newArrayList(healthChecks));
-            HttpStatus httpStatus = response.getStatus() == ValidationResult.Result.OK ? HttpStatus.OK : HttpStatus.BAD_REQUEST;
+            HttpStatus httpStatus =
+                    response.getStatus() == ValidationResult.Result.OK ? HttpStatus.OK : HttpStatus.BAD_REQUEST;
 
             return new ResponseEntity<>(response, httpStatus);
         }
@@ -170,7 +171,8 @@ public class RuntimeControllerImpl implements RuntimesController {
             ComponentProperties componentProperties = (ComponentProperties) properties;
 
             // 3) Retrieve component definition to be able to create the runtime
-            final ComponentDefinition definition = propertiesHelpers.getDefinition(ComponentDefinition.class, definitionName);
+            final ComponentDefinition definition =
+                    propertiesHelpers.getDefinition(ComponentDefinition.class, definitionName);
 
             // 4) Get the execution engine
             ExecutionEngine executionEngine;
@@ -186,13 +188,15 @@ public class RuntimeControllerImpl implements RuntimesController {
                     Iterator<IndexedRecord> data = payload.getData();
                     WriteOperation writeOperation = datasetRuntimeInstance.createWriteOperation();
                     // Supplier return null to signify end of data stream => see WriterDataSupplier.writeData
-                    WriterDataSupplier<?, IndexedRecord> stringWriterDataSupplier = new WriterDataSupplier<Object, IndexedRecord>(
-                            writeOperation, () -> data.hasNext() ? data.next() : null, null);
+                    WriterDataSupplier<?, IndexedRecord> stringWriterDataSupplier =
+                            new WriterDataSupplier<Object, IndexedRecord>(
+                                    writeOperation, () -> data.hasNext() ? data.next() : null, null);
 
                     stringWriterDataSupplier.writeData();
                 }
             } else if (definition.isSupportingExecutionEngines(BEAM)) {
-                throw new UnsupportedOperationException("Beam runtime is not available for dataset write through HTTP API.");
+                throw new UnsupportedOperationException(
+                        "Beam runtime is not available for dataset write through HTTP API.");
             } else {
                 throw new TalendRuntimeException(CommonErrorCodes.UNREGISTERED_DEFINITION);
             }
@@ -202,14 +206,17 @@ public class RuntimeControllerImpl implements RuntimesController {
         }
     }
 
-    private <T> T useDatasetRuntime(final DatasetDefinition<DatasetProperties<DatastoreProperties>> datasetDefinition, //
+    private <T> T useDatasetRuntime(final DatasetDefinition<DatasetProperties<DatastoreProperties>> datasetDefinition,
+            //
             DatasetProperties datasetProperties, //
             Function<DatasetRuntime<DatasetProperties<DatastoreProperties>>, T> consumer) {
 
-        try (SandboxedInstance instance = RuntimeUtil.createRuntimeClass(datasetDefinition.getRuntimeInfo(datasetProperties),
+        try (SandboxedInstance instance = RuntimeUtil.createRuntimeClass(
+                datasetDefinition.getRuntimeInfo(datasetProperties),
                 datasetProperties.getClass().getClassLoader())) {
-            DatasetRuntime<DatasetProperties<DatastoreProperties>> datasetRuntimeInstance = (DatasetRuntime<DatasetProperties<DatastoreProperties>>) instance
-                    .getInstance();
+            DatasetRuntime<DatasetProperties<DatastoreProperties>> datasetRuntimeInstance =
+                    (DatasetRuntime<DatasetProperties<DatastoreProperties>>) instance
+                            .getInstance();
 
             datasetRuntimeInstance.initialize(null, datasetProperties);
 

@@ -13,27 +13,24 @@
 
 package org.talend.components.service.rest;
 
-import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
-import static org.springframework.web.bind.annotation.RequestMethod.POST;
-import static org.springframework.web.bind.annotation.RequestMethod.PUT;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.talend.components.service.rest.dto.SerPropertiesDto;
 import org.talend.components.service.rest.dto.UiSpecsPropertiesDto;
 import org.talend.components.service.rest.dto.ValidationResultsDto;
-import org.talend.daikon.annotation.ApiVersion;
-import org.talend.daikon.annotation.Service;
 
-@Service(name = "RuntimesController")
-@RequestMapping("runtimes")
-@ApiVersion(ServiceConstants.V0)
+import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
+import static org.springframework.web.bind.annotation.RequestMethod.POST;
+import static org.springframework.web.bind.annotation.RequestMethod.PUT;
+
+@RestController(value = "RuntimesController")
+@RequestMapping(ServiceConstants.V0 + "/runtimes")
 public interface RuntimesController {
 
     /**
@@ -57,7 +54,8 @@ public interface RuntimesController {
     /** Validate connection to datastore from ui-specs */
     @RequestMapping(value = "check", method = POST, consumes = { APPLICATION_JSON_UTF8_VALUE,
             ServiceConstants.UI_SPEC_CONTENT_TYPE })
-    ResponseEntity<ValidationResultsDto> validateDataStoreConnection(@RequestBody UiSpecsPropertiesDto propertiesContainer);
+    ResponseEntity<ValidationResultsDto> validateDataStoreConnection(
+            @RequestBody UiSpecsPropertiesDto propertiesContainer);
 
     /** Validate connection to datastore from jsonio */
     @RequestMapping(value = "check", method = POST, consumes = ServiceConstants.JSONIO_CONTENT_TYPE)
@@ -75,8 +73,8 @@ public interface RuntimesController {
     /** Get dataset content from ui-specs */
     @RequestMapping(value = "data", method = POST, consumes = { APPLICATION_JSON_UTF8_VALUE,
             ServiceConstants.UI_SPEC_CONTENT_TYPE }, produces = { APPLICATION_JSON_UTF8_VALUE,
-                    AVRO_JSON_MIME_TYPE_OFFICIAL_INVALID, AVRO_JSON_MIME_TYPES_UNOFFICIAL_VALID,
-                    AVRO_JSON_MIME_TYPES_UNOFFICIAL_VALID_REGISTERED })
+            AVRO_JSON_MIME_TYPE_OFFICIAL_INVALID, AVRO_JSON_MIME_TYPES_UNOFFICIAL_VALID,
+            AVRO_JSON_MIME_TYPES_UNOFFICIAL_VALID_REGISTERED })
     Void getDatasetData(@RequestBody UiSpecsPropertiesDto connectionInfo,
             @RequestParam(value = "from", required = false) Integer from,
             @RequestParam(value = "limit", required = false) Integer limit, OutputStream response);
@@ -92,7 +90,7 @@ public interface RuntimesController {
     /** get dataset content in binary form from ui-specs */
     @RequestMapping(value = "data", method = POST, consumes = { APPLICATION_JSON_UTF8_VALUE,
             ServiceConstants.UI_SPEC_CONTENT_TYPE }, produces = { AVRO_BINARY_MIME_TYPE_OFFICIAL_INVALID,
-                    AVRO_BINARY_MIME_TYPES_UNOFFICIAL_VALID, AVRO_BINARY_MIME_TYPES_UNOFFICIAL_VALID_REGISTERED })
+            AVRO_BINARY_MIME_TYPES_UNOFFICIAL_VALID, AVRO_BINARY_MIME_TYPES_UNOFFICIAL_VALID_REGISTERED })
     Void getDatasetDataAsBinary(@RequestBody UiSpecsPropertiesDto connectionInfo,
             @RequestParam(value = "from", required = false) Integer from,
             @RequestParam(value = "limit", required = false) Integer limit, OutputStream response);

@@ -13,13 +13,7 @@
 
 package org.talend.components.service.rest;
 
-import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
-import static org.springframework.http.MediaType.IMAGE_PNG_VALUE;
-import static org.springframework.web.bind.annotation.RequestMethod.GET;
-import static org.springframework.web.bind.annotation.RequestMethod.POST;
-
 import java.util.List;
-
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -27,19 +21,22 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.talend.components.service.rest.dto.ConnectorDto;
 import org.talend.components.service.rest.dto.SerPropertiesDto;
 import org.talend.components.service.rest.dto.UiSpecsPropertiesDto;
 import org.talend.components.service.rest.dto.ValidationResultsDto;
-import org.talend.daikon.annotation.ApiVersion;
-import org.talend.daikon.annotation.Service;
 import org.talend.daikon.definition.DefinitionImageType;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.serialize.jsonschema.PropertyTrigger;
 
-@Service(name = "PropertiesController")
-@RequestMapping("properties")
-@ApiVersion(ServiceConstants.V0)
+import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
+import static org.springframework.http.MediaType.IMAGE_PNG_VALUE;
+import static org.springframework.web.bind.annotation.RequestMethod.GET;
+import static org.springframework.web.bind.annotation.RequestMethod.POST;
+
+@RestController(value = "PropertiesController")
+@RequestMapping(ServiceConstants.V0 + "/properties")
 public interface PropertiesController {
 
     /**
@@ -78,18 +75,22 @@ public interface PropertiesController {
     /**
      * Gets an image resource for the properties described by the given definition.
      *
-     * @param definitionName The definition to get resources from.
-     * @param imageType The type of image fetched.
+     * @param definitionName
+     *         The definition to get resources from.
+     * @param imageType
+     *         The type of image fetched.
      * @return The image as a resource or 404 if the definitionName exists, but does not provide this resource.
      */
-    @RequestMapping(value = "{definitionName}/icon/{imageType}", method = GET, produces = { IMAGE_PNG_VALUE, IMAGE_SVG_VALUE })
+    @RequestMapping(value = "{definitionName}/icon/{imageType}", method = GET, produces = { IMAGE_PNG_VALUE,
+            IMAGE_SVG_VALUE })
     ResponseEntity<InputStreamResource> getIcon(@PathVariable("definitionName") String definitionName,
             @PathVariable("imageType") DefinitionImageType imageType);
 
     /**
      * Gets connector information for the properties and a given definition.
      *
-     * @param definitionName The definition to use when getting connectors for some properties..
+     * @param definitionName
+     *         The definition to use when getting connectors for some properties..
      * @return
      */
     @RequestMapping(value = "{definitionName}/connectors", method = GET, produces = ServiceConstants.UI_SPEC_CONTENT_TYPE)
@@ -116,7 +117,8 @@ public interface PropertiesController {
             @RequestBody SerPropertiesDto propertiesContainer);
 
     /** Serialize the ui-specs into a json-io persitable representation of properties **/
-    @RequestMapping(value = "serialize", method = POST, consumes = ServiceConstants.UI_SPEC_CONTENT_TYPE, produces = ServiceConstants.JSONIO_CONTENT_TYPE) SerPropertiesDto serialize(
+    @RequestMapping(value = "serialize", method = POST, consumes = ServiceConstants.UI_SPEC_CONTENT_TYPE, produces = ServiceConstants.JSONIO_CONTENT_TYPE)
+    SerPropertiesDto serialize(
             @RequestBody UiSpecsPropertiesDto propertiesContainer);
 
 }

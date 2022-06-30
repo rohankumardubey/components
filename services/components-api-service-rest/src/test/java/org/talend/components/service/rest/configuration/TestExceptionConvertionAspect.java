@@ -1,21 +1,22 @@
 package org.talend.components.service.rest.configuration;
 
-import static io.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.equalTo;
-
 import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 import org.talend.components.service.rest.AbstractSpringIntegrationTests;
-import org.talend.daikon.annotation.ServiceImplementation;
 import org.talend.daikon.exception.error.CommonErrorCodes;
+
+import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
 
 public class TestExceptionConvertionAspect extends AbstractSpringIntegrationTests {
 
-    @ServiceImplementation
-    public static class RestProcessingExceptionThrowingController implements RestProcessingExceptionThrowingControllerI {
+    @RestController
+    public static class RestProcessingExceptionThrowingController
+            implements RestProcessingExceptionThrowingControllerI {
 
         @Override
         public @ResponseBody String find() {

@@ -13,13 +13,9 @@
 
 package org.talend.components.service.rest;
 
-import static io.restassured.RestAssured.given;
-import static java.util.Collections.singletonList;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.type.TypeFactory;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
 
@@ -32,7 +28,6 @@ import java.sql.Statement;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
-
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericDatumReader;
 import org.apache.avro.generic.GenericRecord;
@@ -46,8 +41,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.context.embedded.LocalServerPort;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
@@ -61,14 +56,18 @@ import org.talend.components.service.rest.dto.UiSpecsPropertiesDto;
 import org.talend.components.service.rest.impl.ApiError;
 import org.talend.daikon.properties.test.PropertiesTestUtils;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.type.TypeFactory;
+import static io.restassured.RestAssured.given;
+import static java.util.Collections.singletonList;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class, webEnvironment = RANDOM_PORT)
 @TestPropertySource(properties = { "server.contextPath=" })
 public class JdbcComponentTestIT {
+
     static {
         if (System.getProperty("sun.boot.class.path") == null) {
             System.setProperty("sun.boot.class.path", System.getProperty("java.class.path"));
@@ -99,9 +98,13 @@ public class JdbcComponentTestIT {
 
     @Before
     public void setUp() throws Exception {
-        db = new EmbeddedDatabaseBuilder().generateUniqueName(true).setType(EmbeddedDatabaseType.DERBY).setName("testdb")
-                .setScriptEncoding("UTF-8").addScript("/org/talend/components/service/rest/schema.sql")
-                .addScript("/org/talend/components/service/rest/data_users.sql").build();
+        db = new EmbeddedDatabaseBuilder().generateUniqueName(true)
+                .setType(EmbeddedDatabaseType.DERBY)
+                .setName("testdb")
+                .setScriptEncoding("UTF-8")
+                .addScript("/org/talend/components/service/rest/schema.sql")
+                .addScript("/org/talend/components/service/rest/data_users.sql")
+                .build();
         // addresss: Starting embedded database:
         // url='jdbc:derby:memory:2dc86c66-5d3a-48fd-b903-56aa27d20e3b;create=true',
         // username='sa'
@@ -158,14 +161,16 @@ public class JdbcComponentTestIT {
 
         // when
         Response schemaResponse = given().body(propertiesDto).contentType(APPLICATION_JSON_UTF8_VALUE) //
-                                         .accept(APPLICATION_JSON_UTF8_VALUE) //
-                                         .post(getVersionPrefix() + "/runtimes/schema");
+                .accept(APPLICATION_JSON_UTF8_VALUE) //
+                .post(getVersionPrefix() + "/runtimes/schema");
         schemaResponse.then().statusCode(200).log().ifError();
 
         Schema schema = new Schema.Parser().parse(schemaResponse.asInputStream());
 
-        Response response = given().body(propertiesDto).contentType(APPLICATION_JSON_UTF8_VALUE) //
-                .accept(RuntimesController.AVRO_BINARY_MIME_TYPE_OFFICIAL_INVALID).post(getVersionPrefix() + "/runtimes/data"); //
+        Response response = given().body(propertiesDto)
+                .contentType(APPLICATION_JSON_UTF8_VALUE) //
+                .accept(RuntimesController.AVRO_BINARY_MIME_TYPE_OFFICIAL_INVALID)
+                .post(getVersionPrefix() + "/runtimes/data"); //
         response.then().statusCode(200).log().ifError();
 
         // then
@@ -204,7 +209,8 @@ public class JdbcComponentTestIT {
         assertRecordsEqualsToTestValues(reader, decoder);
     }
 
-    private void assertRecordsEqualsToTestValues(GenericDatumReader<GenericRecord> reader, Decoder decoder) throws IOException {
+    private void assertRecordsEqualsToTestValues(GenericDatumReader<GenericRecord> reader, Decoder decoder)
+            throws IOException {
         try (Stream<String[]> insertedValues = getInsertedValues()) {
             insertedValues.forEach((value) -> {
                 try {
@@ -233,7 +239,8 @@ public class JdbcComponentTestIT {
     private Stream<String[]> getInsertedValues() throws IOException {
         BufferedReader bufferedReader = new BufferedReader(
                 new InputStreamReader(getClass().getResourceAsStream("data_users.sql")));
-        return bufferedReader.lines().map(in -> in.substring(in.indexOf("VALUES (") + "VALUES (".length(), in.lastIndexOf("');")))
+        return bufferedReader.lines()
+                .map(in -> in.substring(in.indexOf("VALUES (") + "VALUES (".length(), in.lastIndexOf("');")))
                 .map(in -> in.split("'?\\s*,\\s*'?"));
     }
 
@@ -262,14 +269,15 @@ public class JdbcComponentTestIT {
 
         UiSpecsPropertiesDto datasetConnectionInfo = new UiSpecsPropertiesDto();
         datasetConnectionInfo.setProperties(mapper.readValue(
-                getClass().getResourceAsStream("jdbc_data_set_properties_no_schema_wrong_table_name.json"), ObjectNode.class));
+                getClass().getResourceAsStream("jdbc_data_set_properties_no_schema_wrong_table_name.json"),
+                ObjectNode.class));
         datasetConnectionInfo.setDependencies(singletonList(getJdbcDataStoreProperties()));
 
         // when
         final Response responseApiError = given().body(datasetConnectionInfo)
-                                     .contentType(APPLICATION_JSON_UTF8_VALUE) //
-                                     .accept(APPLICATION_JSON_UTF8_VALUE)
-                                     .post(getVersionPrefix() + "/runtimes/schema");
+                .contentType(APPLICATION_JSON_UTF8_VALUE) //
+                .accept(APPLICATION_JSON_UTF8_VALUE)
+                .post(getVersionPrefix() + "/runtimes/schema");
         responseApiError.then().statusCode(400).log().ifValidationFails();
         ApiError response = responseApiError.as(ApiError.class);
 
@@ -309,7 +317,8 @@ public class JdbcComponentTestIT {
 
     private ObjectNode getJdbcDataStoreProperties() throws java.io.IOException {
         return mapper.readValue(
-                IOUtils.toString(getClass().getResourceAsStream("jdbc_data_store_properties.json")).replace("JDBC_URL", dbUrl),
+                IOUtils.toString(getClass().getResourceAsStream("jdbc_data_store_properties.json"))
+                        .replace("JDBC_URL", dbUrl),
                 ObjectNode.class);
     }
 
@@ -342,7 +351,7 @@ public class JdbcComponentTestIT {
     public void getJdbcProperties() throws java.io.IOException {
         // when
         Response response = given().accept(ServiceConstants.UI_SPEC_CONTENT_TYPE) //
-                                   .get(getVersionPrefix() + "/properties/{definitionName}", DATA_STORE_DEFINITION_NAME);
+                .get(getVersionPrefix() + "/properties/{definitionName}", DATA_STORE_DEFINITION_NAME);
         response.then().statusCode(200).log().ifError();
 
         // then

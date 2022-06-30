@@ -12,28 +12,27 @@
 // ============================================================================
 package org.talend.components.azurestorage.table.avro;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import com.microsoft.azure.storage.table.DynamicTableEntity;
+import com.microsoft.azure.storage.table.EntityProperty;
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
 import org.apache.avro.generic.IndexedRecord;
-import org.apache.commons.lang.RandomStringUtils;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Test;
 import org.talend.components.azurestorage.table.avro.AzureStorageDTEConverters.DTEConverter;
 import org.talend.components.azurestorage.table.runtime.it.AzureStorageTableBaseTestIT;
 import org.talend.daikon.avro.AvroUtils;
 import org.talend.daikon.avro.SchemaConstants;
 
-import com.microsoft.azure.storage.table.DynamicTableEntity;
-import com.microsoft.azure.storage.table.EntityProperty;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class AzureStorageAvroRegistryTest extends AzureStorageTableBaseTestIT {
 
@@ -113,8 +112,7 @@ public class AzureStorageAvroRegistryTest extends AzureStorageTableBaseTestIT {
     }
 
     /**
-     *
-     * @see org.talend.components.azurestorage.table.avro.AzureStorageAvroRegistry#getAvroMapping(String,EntityProperty)
+     * @see org.talend.components.azurestorage.table.avro.AzureStorageAvroRegistry#getAvroMapping(String, EntityProperty)
      */
     @Test
     public void testGetAvroMapping() {
@@ -152,8 +150,7 @@ public class AzureStorageAvroRegistryTest extends AzureStorageTableBaseTestIT {
     }
 
     /**
-     *
-     * @see org.talend.components.azurestorage.table.avro.AzureStorageAvroRegistry#getConverter(Field,String)
+     * @see org.talend.components.azurestorage.table.avro.AzureStorageAvroRegistry#getConverter(Field, String)
      */
     @Test
     public void testGetConverter() {

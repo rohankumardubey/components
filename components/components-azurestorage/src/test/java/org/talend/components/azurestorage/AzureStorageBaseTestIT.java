@@ -13,8 +13,7 @@
 package org.talend.components.azurestorage;
 
 import javax.inject.Inject;
-
-import org.apache.commons.lang.RandomStringUtils;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.ErrorCollector;
@@ -93,8 +92,10 @@ public abstract class AzureStorageBaseTestIT {
     /**
      * createBoundedReader.
      *
-     * @param <T> the generic type
-     * @param props {@link ComponentProperties} props
+     * @param <T>
+     *         the generic type
+     * @param props
+     *         {@link ComponentProperties} props
      * @return <code>BoundedReader</code> {@link BoundedReader} bounded reader
      */
     @SuppressWarnings("unchecked")
@@ -108,7 +109,8 @@ public abstract class AzureStorageBaseTestIT {
     /**
      * setupContainerProperties - return Connection properties filled in.
      *
-     * @param properties {@link AzureStorageProperties} properties
+     * @param properties
+     *         {@link AzureStorageProperties} properties
      * @return <code>AzureStorageProperties</code> {@link AzureStorageProperties} azure storage properties
      */
     public static AzureStorageProvideConnectionProperties setupConnectionProperties(
