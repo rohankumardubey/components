@@ -197,6 +197,7 @@
         <talend-proxy.version>1.0.2</talend-proxy.version>
         <xstream.version>1.4.19</xstream.version>
         <zookeeper.version>3.4.14</zookeeper.version>
+        <woodstox.version>6.2.8</woodstox.version>
     </properties>
 
     <distributionManagement>
@@ -1433,6 +1434,11 @@
                 <groupId>com.google.j2objc</groupId>
                 <artifactId>j2objc-annotations</artifactId>
                 <version>${j2objc-annotations.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.woodstox</groupId>
+                <artifactId>woodstox-core</artifactId>
+                <version>${woodstox.version}</version>
             </dependency>
 
             <!-- Components modules -->
