@@ -3,6 +3,8 @@
 ## Dependency management
 
 - `components.version` Maven property has been removed & replaced by Maven's built-in `project.version`
+- Spring Boot dependencies have bean cleaned up from `components-bom`, keeping only the `spring-boot-starter-test` one
+  since it seems to be used by some integration tests in components...
 
 ## Ignored tests
 

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.talend.components</groupId>
@@ -112,8 +113,8 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-test</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -168,7 +169,8 @@
                     <systemPropertyVariables>
                         <azurestorage.account.key>${azurestorage.account.key}</azurestorage.account.key>
                         <azurestorage.account.name>${azurestorage.account.name}</azurestorage.account.name>
-                        <azurestorage.sharedaccesssignature>${azurestorage.sharedaccesssignature}</azurestorage.sharedaccesssignature>
+                        <azurestorage.sharedaccesssignature>${azurestorage.sharedaccesssignature}
+                        </azurestorage.sharedaccesssignature>
                         <azurestorage.usesas>${azurestorage.usesas}</azurestorage.usesas>
                     </systemPropertyVariables>
                 </configuration>
@@ -186,9 +188,11 @@
                         </goals>
                         <configuration>
                             <instructions>
-                                <_dsannotations-options>nocapabilities,norequirements,version;minimum=1.2.0</_dsannotations-options>
+                                <_dsannotations-options>nocapabilities,norequirements,version;minimum=1.2.0
+                                </_dsannotations-options>
                                 <_noee>true</_noee>
-                                <Require-Capability>osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version=1.7))"</Require-Capability>
+                                <Require-Capability>osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version=1.7))"
+                                </Require-Capability>
                                 <Bundle-SymbolicName>org.talend.components.azurestorage.lib</Bundle-SymbolicName>
                                 <Bundle-Name>${project.name} lib</Bundle-Name>
                                 <Include-Resource>
@@ -208,19 +212,24 @@
                         <configuration>
                             <classifier>bundle</classifier>
                             <instructions>
-                                <_dsannotations-options>nocapabilities,norequirements,version;minimum=1.2.0</_dsannotations-options>
+                                <_dsannotations-options>nocapabilities,norequirements,version;minimum=1.2.0
+                                </_dsannotations-options>
                                 <_noee>true</_noee>
-                                <Require-Capability>osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version=1.7))"</Require-Capability>
+                                <Require-Capability>osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version=1.7))"
+                                </Require-Capability>
                                 <Bundle-SymbolicName>org.talend.components.azurestorage</Bundle-SymbolicName>
                                 <Service-Component>*</Service-Component>
-                                <Embed-Dependency>*;artifactId=!components*|!slf4j*|commons-lang3*|jackson-core*;scope=compile|runtime;inline=false;
+                                <Embed-Dependency>
+                                    *;artifactId=!components*|!slf4j*|commons-lang3*|jackson-core*;scope=compile|runtime;inline=false;
                                 </Embed-Dependency>
                                 <Include-Resource>
                                     {maven-resources},META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt=target/classes/META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt
                                 </Include-Resource>
                                 <Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
-                                <Import-Package>!com.google.crypto.tink*,!com.sun.net.httpserver.*,!net.shibboleth.utilities.java.support.xml*,!org.bouncycastle.*,
-                                    !org.cryptomator.siv.*,!org.opensaml.*,!javax.servlet.*,*</Import-Package>
+                                <Import-Package>
+                                    !com.google.crypto.tink*,!com.sun.net.httpserver.*,!net.shibboleth.utilities.java.support.xml*,!org.bouncycastle.*,
+                                    !org.cryptomator.siv.*,!org.opensaml.*,!javax.servlet.*,*
+                                </Import-Package>
                                 <Embed-Transitive>true</Embed-Transitive>
                             </instructions>
                         </configuration>
