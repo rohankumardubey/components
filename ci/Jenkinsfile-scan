@@ -70,7 +70,7 @@ pipeline {
                         echo "customMavenOptions: --settings ${MAVEN_SETTINGS}" > agent-override.yml
                         chmod 600 agent-override.yml
 
-                        mvn clean package \
+                        mvn clean install \
                           --batch-mode \
                           --threads 1C \
                           --update-snapshots \
