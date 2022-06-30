@@ -96,35 +96,6 @@ pipeline {
                 }
             }
         }
-        stage('Vera code') {
-            steps {
-                container('main') {
-                    withCredentials([veracodeCredentials]) {
-                        sh "mvn -U -B clean install -pl core -Dmaven.test.skip=true"
-                        sh "mvn -U -B clean install -f components/components-jdbc/pom.xml -pl components-jdbc-runtime-beam"
-                        sh "mvn -U -B clean package -f components/pom.xml"
-                        veracode applicationName: "$VERACODE_SANDBOX",
-                            teams: "Components",
-                            canFailJob: true,
-                            createProfile: true,
-                            criticality: "High",
-                            debug: true,
-                            copyRemoteFiles: true,
-                            fileNamePattern: '',
-                            useProxy: false,
-                            replacementPattern: '',
-                            scanExcludesPattern: '',
-                            scanIncludesPattern: '',
-                            scanName: "master-${currentBuild.number}-${currentBuild.startTimeInMillis}",
-                            uploadExcludesPattern: '',
-                            uploadIncludesPattern: '**/*.jar',
-                            waitForScan: true,
-                            vid: "$VERACODE_ID",
-                            vkey: "$VERACODE_KEY"
-                    }
-                }
-            }
-        }
     }
     post {
         success {
