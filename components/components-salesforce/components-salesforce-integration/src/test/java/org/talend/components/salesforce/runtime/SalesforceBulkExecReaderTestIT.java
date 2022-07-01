@@ -364,7 +364,7 @@ public class SalesforceBulkExecReaderTestIT extends SalesforceTestBase {
         props.module.main.schema.setValue(getMakeRowSchema(false));
         props.schemaFlow.schema.setValue(getMakeRowSchema(false));
 
-        setupProps(props.connection, !ADD_QUOTES);
+        setupProps(props.connection);
         props.module.moduleName.setValue(EXISTING_MODULE_NAME);
         ComponentTestUtils.checkSerialize(props, errorCollector);
         return props;
@@ -396,7 +396,7 @@ public class SalesforceBulkExecReaderTestIT extends SalesforceTestBase {
         props.module.main.schema.setValue(getMakeRowSchema(false));
         props.schemaFlow.schema.setValue(getMakeRowSchema(false));
 
-        setupProps(props.connection, !ADD_QUOTES);
+        setupProps(props.connection);
         props.module.moduleName.setValue(EXISTING_MODULE_NAME);
         ComponentTestUtils.checkSerialize(props, errorCollector);
         return props;

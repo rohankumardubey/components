@@ -57,7 +57,7 @@ public class SalesforceSourceOrSinkTestIT extends SalesforceTestBase {
     @Test
     public void testValidate() {
         // check validate is OK with proper credentials
-        SalesforceConnectionProperties props = setupProps(null, !ADD_QUOTES);
+        SalesforceConnectionProperties props = setupProps(null);
         SalesforceSourceOrSink salesforceSourceOrSink = new SalesforceSourceOrSink();
         salesforceSourceOrSink.initialize(null, props);
         assertEquals(Result.OK, salesforceSourceOrSink.validate(null).getStatus());
@@ -81,7 +81,7 @@ public class SalesforceSourceOrSinkTestIT extends SalesforceTestBase {
     @Test
     public void testGetConnectionProperties() {
         // using SalesforceConnectionProperties
-        SalesforceConnectionProperties scp = setupProps(null, !ADD_QUOTES);
+        SalesforceConnectionProperties scp = setupProps(null);
         SalesforceSourceOrSink salesforceSourceOrSink = new SalesforceSourceOrSink();
         salesforceSourceOrSink.initialize(null, scp);
         assertEquals(scp, salesforceSourceOrSink.getConnectionProperties());
@@ -111,7 +111,7 @@ public class SalesforceSourceOrSinkTestIT extends SalesforceTestBase {
     }
 
     private void prepareAndGetConnectionHolder(boolean isBulk) throws Exception {
-        final SalesforceConnectionProperties connectionProperties = setupProps(null, false);
+        final SalesforceConnectionProperties connectionProperties = setupProps(null);
         connectionProperties.bulkConnection.setValue(isBulk);
         RuntimeContainer container = new DefaultComponentRuntimeContainerImpl() {
 

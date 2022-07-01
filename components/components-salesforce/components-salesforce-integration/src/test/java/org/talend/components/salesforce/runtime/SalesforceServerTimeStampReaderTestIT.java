@@ -40,7 +40,7 @@ public class SalesforceServerTimeStampReaderTestIT extends SalesforceTestBase {
     public Calendar getServerTimestamp() throws Throwable {
         TSalesforceGetServerTimestampProperties props = (TSalesforceGetServerTimestampProperties) new TSalesforceGetServerTimestampProperties(
                 "foo").init();
-        setupProps(props.connection, !ADD_QUOTES);
+        setupProps(props.connection);
         BoundedReader<IndexedRecord> bounderReader = createBoundedReader(props);
         try {
             assertTrue(bounderReader.start());

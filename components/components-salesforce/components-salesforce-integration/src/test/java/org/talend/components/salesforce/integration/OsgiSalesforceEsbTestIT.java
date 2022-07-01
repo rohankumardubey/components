@@ -111,20 +111,20 @@ public class OsgiSalesforceEsbTestIT extends SalesforceTestBase {
 
     @Test
     public void checkStaticValidate() {
-        SalesforceConnectionProperties props = setupProps(null, !ADD_QUOTES);
+        SalesforceConnectionProperties props = setupProps(null);
         assertEquals(ValidationResult.Result.OK, SalesforceSourceOrSink.validateConnection(props).getStatus());
     }
 
     @Test
     public void testStaticGetSchemaNames() throws IOException {
-        SalesforceConnectionProperties scp = setupProps(null, !ADD_QUOTES);
+        SalesforceConnectionProperties scp = setupProps(null);
         List<NamedThing> schemaNames = SalesforceSourceOrSink.getSchemaNames(null, scp);
         assertTrue(schemaNames.size() > 50);
     }
 
     @Test
     public void testStaticGetSchema() throws IOException {
-        SalesforceConnectionProperties scp = setupProps(null, !ADD_QUOTES);
+        SalesforceConnectionProperties scp = setupProps(null);
         Schema schema = SalesforceSourceOrSink.getSchema(null, scp, EXISTING_MODULE_NAME);
         assertNotNull(schema);
         assertThat(schema.getFields(), hasSize(greaterThan(10)));
@@ -133,7 +133,7 @@ public class OsgiSalesforceEsbTestIT extends SalesforceTestBase {
 
     @Test
     public void testStaticGetSchemaFail() throws IOException {
-        SalesforceConnectionProperties scp = setupProps(null, !ADD_QUOTES);
+        SalesforceConnectionProperties scp = setupProps(null);
         try {
             Schema schema = SalesforceSourceOrSink.getSchema(null, scp, "module that does not exist");
             fail("Should have throw an exception when not finding the module");

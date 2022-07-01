@@ -105,7 +105,7 @@ public class SalesforceAnyTypeFieldTestIT extends SalesforceTestBase {
 
     private TSalesforceOutputProperties getOutputProperties(String moduleName) throws Exception {
         TSalesforceOutputProperties outProps = (TSalesforceOutputProperties) new TSalesforceOutputProperties("foo").init();
-        setupProps(outProps.connection, !ADD_QUOTES);
+        setupProps(outProps.connection);
         outProps.module.moduleName.setValue(moduleName);
         // save time for testing
         if(possibleValues == null){
@@ -214,7 +214,7 @@ public class SalesforceAnyTypeFieldTestIT extends SalesforceTestBase {
 
     public void testQueryAnyTypeHistory(boolean isBulkQuery, boolean isRetrieveSchema) throws Exception {
         TSalesforceInputProperties inputProps = (TSalesforceInputProperties) new TSalesforceInputProperties("bar").init();
-        setupProps(inputProps.connection, !ADD_QUOTES);
+        setupProps(inputProps.connection);
         inputProps.module.moduleName.setValue(CUSTOM_MODULE_HISTORY);
         if (isRetrieveSchema) {
             // save time for testing

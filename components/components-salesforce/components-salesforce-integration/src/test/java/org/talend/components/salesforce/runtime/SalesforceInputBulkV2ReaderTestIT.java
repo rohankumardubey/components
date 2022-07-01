@@ -68,7 +68,7 @@ public class SalesforceInputBulkV2ReaderTestIT extends SalesforceTestBase {
             outputRows.add(row);
         }
         TSalesforceOutputProperties props = (TSalesforceOutputProperties) new TSalesforceOutputProperties("foo").init();
-        setupProps(props.connection, !ADD_QUOTES);
+        setupProps(props.connection);
         props.module.moduleName.setValue(EXISTING_MODULE_NAME);
         props.module.main.schema.setValue(getSchema(false));
         doWriteRows(props,outputRows);
@@ -174,13 +174,13 @@ public class SalesforceInputBulkV2ReaderTestIT extends SalesforceTestBase {
             props.query.setValue(
                     "select Id,Name,ShippingStreet,ShippingPostalCode,BillingStreet,BillingState,BillingPostalCode,CreatedDate from Account");
 
-            setupProps(props.connection, !ADD_QUOTES);
+            setupProps(props.connection);
 
             props.module.moduleName.setValue(EXISTING_MODULE_NAME);
             props.module.main.schema.setValue(getMakeRowSchema(false));
 
         } else {
-            setupProps(props.connection, !ADD_QUOTES);
+            setupProps(props.connection);
             if (emptySchema) {
                 setupModuleWithEmptySchema(props.module, EXISTING_MODULE_NAME);
             } else {
