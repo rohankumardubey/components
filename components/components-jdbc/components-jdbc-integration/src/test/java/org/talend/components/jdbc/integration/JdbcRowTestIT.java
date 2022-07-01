@@ -12,17 +12,12 @@
 // ============================================================================
 package org.talend.components.jdbc.integration;
 
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.hasSize;
-import static org.junit.Assert.*;
-
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.IndexedRecord;
@@ -50,9 +45,12 @@ import org.talend.components.jdbc.tjdbcinput.TJDBCInputProperties;
 import org.talend.components.jdbc.tjdbcrow.TJDBCRowDefinition;
 import org.talend.components.jdbc.tjdbcrow.TJDBCRowProperties;
 import org.talend.daikon.properties.ValidationResult;
-import org.talend.daikon.properties.test.PropertiesTestUtils;
 import org.talend.daikon.runtime.RuntimeUtil;
 import org.talend.daikon.sandbox.SandboxedInstance;
+
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.hasSize;
+import static org.junit.Assert.assertThat;
 
 public class JdbcRowTestIT {
 
@@ -130,8 +128,9 @@ public class JdbcRowTestIT {
         properties.usePreparedStatement.setValue(true);
         properties.preparedStatementTable.indexs.setValue(Arrays.asList(1, 2));
         properties.preparedStatementTable.types
-                .setValue(Arrays.asList(PreparedStatementTable.Type.Int.name(), PreparedStatementTable.Type.String.name()));
-        properties.preparedStatementTable.values.setValue(Arrays.<Object> asList(4, "momo"));
+                .setValue(Arrays.asList(PreparedStatementTable.Type.Int.name(),
+                        PreparedStatementTable.Type.String.name()));
+        properties.preparedStatementTable.values.setValue(Arrays.<Object>asList(4, "momo"));
 
         try (SandboxedInstance sandboxedInstance = RuntimeUtil.createRuntimeClassWithCurrentJVMProperties(
                 definition.getRuntimeInfo(ExecutionEngine.DI, properties, ConnectorTopology.NONE),
@@ -188,8 +187,9 @@ public class JdbcRowTestIT {
         properties.dieOnError.setValue(true);
         randomCommit(properties);
 
-        properties.propagateQueryResultSet.setValue(true);// the field is the unique reason to use the component as a input
-                                                          // component
+        properties.propagateQueryResultSet.setValue(
+                true);// the field is the unique reason to use the component as a input
+        // component
         properties.beforeUseColumn();
         properties.useColumn.setValue(properties.useColumn.getPossibleValues().get(0).toString());
 
@@ -245,15 +245,16 @@ public class JdbcRowTestIT {
         properties.dieOnError.setValue(true);
         randomCommit(properties);
 
-        properties.propagateQueryResultSet.setValue(true);// the field is the unique reason to use the component as a input
-                                                          // component
+        properties.propagateQueryResultSet.setValue(
+                true);// the field is the unique reason to use the component as a input
+        // component
         properties.beforeUseColumn();
         properties.useColumn.setValue(properties.useColumn.getPossibleValues().get(0).toString());
 
         properties.usePreparedStatement.setValue(true);
         properties.preparedStatementTable.indexs.setValue(Arrays.asList(1));
         properties.preparedStatementTable.types.setValue(Arrays.asList(PreparedStatementTable.Type.Int.name()));
-        properties.preparedStatementTable.values.setValue(Arrays.<Object> asList(1));
+        properties.preparedStatementTable.values.setValue(Arrays.<Object>asList(1));
 
         try (SandboxedInstance sandboxedInstance = RuntimeUtil.createRuntimeClassWithCurrentJVMProperties(
                 definition.getRuntimeInfo(ExecutionEngine.DI, properties, ConnectorTopology.OUTGOING),
@@ -299,8 +300,9 @@ public class JdbcRowTestIT {
         properties.dieOnError.setValue(false);
         randomCommit(properties);
 
-        properties.propagateQueryResultSet.setValue(true);// the field is the unique reason to use the component as a input
-                                                          // component
+        properties.propagateQueryResultSet.setValue(
+                true);// the field is the unique reason to use the component as a input
+        // component
         properties.beforeUseColumn();
         properties.useColumn.setValue(properties.useColumn.getPossibleValues().get(0).toString());
 
@@ -353,8 +355,9 @@ public class JdbcRowTestIT {
         properties.usePreparedStatement.setValue(true);
         properties.preparedStatementTable.indexs.setValue(Arrays.asList(1, 2));
         properties.preparedStatementTable.types
-                .setValue(Arrays.asList(PreparedStatementTable.Type.Int.name(), PreparedStatementTable.Type.String.name()));
-        properties.preparedStatementTable.values.setValue(Arrays.<Object> asList(4, "momo"));
+                .setValue(Arrays.asList(PreparedStatementTable.Type.Int.name(),
+                        PreparedStatementTable.Type.String.name()));
+        properties.preparedStatementTable.values.setValue(Arrays.<Object>asList(4, "momo"));
 
         try (SandboxedInstance sandboxedInstance = RuntimeUtil.createRuntimeClassWithCurrentJVMProperties(
                 definition.getRuntimeInfo(ExecutionEngine.DI, properties, ConnectorTopology.INCOMING_AND_OUTGOING),
@@ -420,8 +423,9 @@ public class JdbcRowTestIT {
         properties.usePreparedStatement.setValue(true);
         properties.preparedStatementTable.indexs.setValue(Arrays.asList(1, 2));
         properties.preparedStatementTable.types
-                .setValue(Arrays.asList(PreparedStatementTable.Type.Int.name(), PreparedStatementTable.Type.String.name()));
-        properties.preparedStatementTable.values.setValue(Arrays.<Object> asList(4, "a too long value"));
+                .setValue(Arrays.asList(PreparedStatementTable.Type.Int.name(),
+                        PreparedStatementTable.Type.String.name()));
+        properties.preparedStatementTable.values.setValue(Arrays.<Object>asList(4, "a too long value"));
 
         try (SandboxedInstance sandboxedInstance = RuntimeUtil.createRuntimeClassWithCurrentJVMProperties(
                 definition.getRuntimeInfo(ExecutionEngine.DI, properties, ConnectorTopology.INCOMING_AND_OUTGOING),
@@ -444,14 +448,14 @@ public class JdbcRowTestIT {
 
                 List<IndexedRecord> rejects = writer.getRejectedWrites();
                 assertThat(rejects, hasSize(1));
-                
+
                 IndexedRecord reject = rejects.get(0);
                 Assert.assertEquals(4, reject.get(0));
                 Assert.assertEquals("xiaoming", reject.get(1));
                 Assert.assertNotNull(reject.get(2));
                 Assert.assertNotNull(reject.get(3));
                 assertThat(writer.getSuccessfulWrites(), empty());
-                
+
                 writer.cleanWrites();
 
                 IndexedRecord r2 = new GenericData.Record(properties.main.schema.getValue());
@@ -461,7 +465,7 @@ public class JdbcRowTestIT {
 
                 rejects = writer.getRejectedWrites();
                 assertThat(rejects, hasSize(1));
-                
+
                 reject = rejects.get(0);
                 Assert.assertEquals(5, reject.get(0));
                 Assert.assertEquals("xiaobai", reject.get(1));
@@ -470,7 +474,7 @@ public class JdbcRowTestIT {
                 assertThat(writer.getSuccessfulWrites(), empty());
 
                 writer.cleanWrites();
-                
+
                 writer.close();
             } finally {
                 writer.close();
@@ -496,8 +500,9 @@ public class JdbcRowTestIT {
         properties.usePreparedStatement.setValue(true);
         properties.preparedStatementTable.indexs.setValue(Arrays.asList(1, 2));
         properties.preparedStatementTable.types
-                .setValue(Arrays.asList(PreparedStatementTable.Type.Int.name(), PreparedStatementTable.Type.String.name()));
-        properties.preparedStatementTable.values.setValue(Arrays.<Object> asList(4, "a too long value"));
+                .setValue(Arrays.asList(PreparedStatementTable.Type.Int.name(),
+                        PreparedStatementTable.Type.String.name()));
+        properties.preparedStatementTable.values.setValue(Arrays.<Object>asList(4, "a too long value"));
 
         try (SandboxedInstance sandboxedInstance = RuntimeUtil.createRuntimeClassWithCurrentJVMProperties(
                 definition.getRuntimeInfo(ExecutionEngine.DI, properties, ConnectorTopology.INCOMING_AND_OUTGOING),
@@ -545,7 +550,7 @@ public class JdbcRowTestIT {
         properties.usePreparedStatement.setValue(true);
         properties.preparedStatementTable.indexs.setValue(Arrays.asList(1));
         properties.preparedStatementTable.types.setValue(Arrays.asList(PreparedStatementTable.Type.Int.name()));
-        properties.preparedStatementTable.values.setValue(Arrays.<Object> asList(3));
+        properties.preparedStatementTable.values.setValue(Arrays.<Object>asList(3));
 
         properties.propagateQueryResultSet.setValue(true);
         properties.beforeUseColumn();
@@ -573,7 +578,7 @@ public class JdbcRowTestIT {
                 assertThat(writer.getRejectedWrites(), empty());
                 List<IndexedRecord> successfulWrites = writer.getSuccessfulWrites();
                 assertThat(successfulWrites, hasSize(1));
-                
+
                 IndexedRecord successRecord = successfulWrites.get(0);
                 Assert.assertEquals(4, successRecord.get(0));
                 Assert.assertEquals("xiaoming", successRecord.get(1));
@@ -583,7 +588,7 @@ public class JdbcRowTestIT {
                 Assert.assertEquals(3, resultSet.getInt(1));
                 Assert.assertEquals("dabao", resultSet.getString(2));
                 resultSet.close();
-                
+
                 writer.cleanWrites();
 
                 IndexedRecord r2 = new GenericData.Record(properties.main.schema.getValue());
@@ -594,7 +599,7 @@ public class JdbcRowTestIT {
                 assertThat(writer.getRejectedWrites(), empty());
                 successfulWrites = writer.getSuccessfulWrites();
                 assertThat(successfulWrites, hasSize(1));
-                
+
                 successRecord = successfulWrites.get(0);
                 Assert.assertEquals(5, successRecord.get(0));
                 Assert.assertEquals("xiaobai", successRecord.get(1));
@@ -604,7 +609,7 @@ public class JdbcRowTestIT {
                 Assert.assertEquals(3, resultSet.getInt(1));
                 Assert.assertEquals("dabao", resultSet.getString(2));
                 resultSet.close();
-                
+
                 writer.cleanWrites();
 
                 writer.close();

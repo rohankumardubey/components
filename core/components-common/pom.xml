@@ -57,6 +57,15 @@
             <artifactId>javax.inject</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-core-asl</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-mapper-asl</artifactId>
+        </dependency>
+
     </dependencies>
     <build>
         <plugins>
@@ -103,9 +112,11 @@
                         </goals>
                         <configuration>
                             <instructions>
-                                <_dsannotations-options>nocapabilities,norequirements,version;minimum=1.2.0</_dsannotations-options>
+                                <_dsannotations-options>nocapabilities,norequirements,version;minimum=1.2.0
+                                </_dsannotations-options>
                                 <_noee>true</_noee>
-                                <Require-Capability>osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version=1.7))"</Require-Capability>
+                                <Require-Capability>osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version=1.7))"
+                                </Require-Capability>
                                 <Bundle-SymbolicName>org.talend.components.common.lib</Bundle-SymbolicName>
                                 <Bundle-Name>${project.name} lib</Bundle-Name>
                             </instructions>
@@ -122,9 +133,11 @@
                             <outputDirectory>unexisting_ouput_directory_to_avoid_classes_to_be_embedded
                             </outputDirectory>
                             <instructions>
-                                <_dsannotations-options>nocapabilities,norequirements,version;minimum=1.2.0</_dsannotations-options>
+                                <_dsannotations-options>nocapabilities,norequirements,version;minimum=1.2.0
+                                </_dsannotations-options>
                                 <_noee>true</_noee>
-                                <Require-Capability>osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version=1.7))"</Require-Capability>
+                                <Require-Capability>osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version=1.7))"
+                                </Require-Capability>
                                 <Import-Package>
                                     !*internal,org.talend*,org.slf4j*,javax.xml.namespace,org.junit*,org.hamcrest*
                                 </Import-Package>
@@ -148,9 +161,11 @@
                         <configuration>
                             <classifier>bundle</classifier>
                             <instructions>
-                                <_dsannotations-options>nocapabilities,norequirements,version;minimum=1.2.0</_dsannotations-options>
+                                <_dsannotations-options>nocapabilities,norequirements,version;minimum=1.2.0
+                                </_dsannotations-options>
                                 <_noee>true</_noee>
-                                <Require-Capability>osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version=1.7))"</Require-Capability>
+                                <Require-Capability>osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version=1.7))"
+                                </Require-Capability>
                                 <Bundle-SymbolicName>org.talend.components.common</Bundle-SymbolicName>
                                 <Import-Package>
                                     org.talend*,org.slf4j*,org.apache.commons*,org.apache.avro*,javax.inject*

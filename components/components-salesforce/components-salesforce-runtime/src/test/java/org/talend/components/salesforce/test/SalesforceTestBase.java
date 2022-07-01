@@ -12,16 +12,10 @@
 // ============================================================================
 package org.talend.components.salesforce.test;
 
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
-
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
 import org.apache.avro.generic.GenericData;
@@ -42,6 +36,7 @@ import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.service.common.ComponentServiceImpl;
 import org.talend.components.api.service.common.DefinitionRegistry;
 import org.talend.components.api.test.AbstractComponentTest;
+import org.talend.components.api.test.DaikonLegacyAssertions;
 import org.talend.components.salesforce.SalesforceConnectionModuleProperties;
 import org.talend.components.salesforce.SalesforceConnectionProperties;
 import org.talend.components.salesforce.SalesforceFamilyDefinition;
@@ -58,7 +53,11 @@ import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.property.Property;
-import org.talend.daikon.properties.test.PropertiesTestUtils;
+
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 @SuppressWarnings("nls")
 public class SalesforceTestBase extends AbstractComponentTest {
@@ -105,7 +104,8 @@ public class SalesforceTestBase extends AbstractComponentTest {
         return componentService;
     }
 
-    protected ComponentProperties checkAndAfter(Form form, String propName, ComponentProperties props) throws Throwable {
+    protected ComponentProperties checkAndAfter(Form form, String propName, ComponentProperties props)
+            throws Throwable {
         assertTrue(form.getWidget(propName).isCallAfter());
         ComponentProperties afterProperty = (ComponentProperties) getComponentService().afterProperty(propName, props);
         assertEquals(
@@ -122,7 +122,8 @@ public class SalesforceTestBase extends AbstractComponentTest {
         Properties userPassword = (Properties) props.getProperty("userPassword");
         ((Property) userPassword.getProperty("userId")).setValue(addQuotes ? "\"" + userId + "\"" : userId);
         ((Property) userPassword.getProperty("password")).setValue(addQuotes ? "\"" + password + "\"" : password);
-        ((Property) userPassword.getProperty("securityKey")).setValue(addQuotes ? "\"" + securityKey + "\"" : securityKey);
+        ((Property) userPassword.getProperty("securityKey")).setValue(
+                addQuotes ? "\"" + securityKey + "\"" : securityKey);
         return props;
     }
 
@@ -134,16 +135,18 @@ public class SalesforceTestBase extends AbstractComponentTest {
 
     protected void setupModule(SalesforceModuleProperties moduleProps, String module) throws Throwable {
         Form f = moduleProps.getForm(Form.REFERENCE);
-        moduleProps = (SalesforceModuleProperties) PropertiesTestUtils.checkAndBeforeActivate(getComponentService(), f,
-                "moduleName", moduleProps);
+        moduleProps =
+                (SalesforceModuleProperties) DaikonLegacyAssertions.checkAndBeforeActivate(getComponentService(), f,
+                        "moduleName", moduleProps);
         moduleProps.moduleName.setValue(module);
         moduleProps = (SalesforceModuleProperties) checkAndAfter(f, "moduleName", moduleProps);
     }
 
     protected void setupModuleWithEmptySchema(SalesforceModuleProperties moduleProps, String module) throws Throwable {
         Form f = moduleProps.getForm(Form.REFERENCE);
-        moduleProps = (SalesforceModuleProperties) PropertiesTestUtils.checkAndBeforeActivate(getComponentService(), f,
-                "moduleName", moduleProps);
+        moduleProps =
+                (SalesforceModuleProperties) DaikonLegacyAssertions.checkAndBeforeActivate(getComponentService(), f,
+                        "moduleName", moduleProps);
         moduleProps.moduleName.setValue(module);
         Schema emptySchema = Schema.createRecord(module, null, null, false);
         emptySchema.setFields(new ArrayList<Schema.Field>());
@@ -221,7 +224,8 @@ public class SalesforceTestBase extends AbstractComponentTest {
                 }
             }
 
-            LOGGER.debug("check: " + row.get(iName) + " id: " + row.get(iId) + " post: " + row.get(iBillingPostalCode) + " st: "
+            LOGGER.debug("check: " + row.get(iName) + " id: " + row.get(iId) + " post: " + row.get(iBillingPostalCode)
+                    + " st: "
                     + " post: " + row.get(iBillingStreet));
             String check = (String) row.get(iShippingStreet);
             if (check == null || !check.equals(SalesforceTestBase.TEST_KEY)) {
@@ -317,7 +321,8 @@ public class SalesforceTestBase extends AbstractComponentTest {
     }
 
     protected List<IndexedRecord> readRows(SalesforceConnectionModuleProperties props) throws IOException {
-        TSalesforceInputProperties inputProps = (TSalesforceInputProperties) new TSalesforceInputProperties("bar").init();
+        TSalesforceInputProperties inputProps =
+                (TSalesforceInputProperties) new TSalesforceInputProperties("bar").init();
         inputProps.connection = props.connection;
         inputProps.module = props.module;
         inputProps.batchSize.setValue(200);
@@ -326,17 +331,20 @@ public class SalesforceTestBase extends AbstractComponentTest {
         return inputRows;
     }
 
-    List<IndexedRecord> readAndCheckRows(String random, SalesforceConnectionModuleProperties props, int count) throws Exception {
+    List<IndexedRecord> readAndCheckRows(String random, SalesforceConnectionModuleProperties props, int count)
+            throws Exception {
         List<IndexedRecord> inputRows = readRows(props);
         return checkRows(random, inputRows, count);
     }
 
-    protected void checkRows(List<IndexedRecord> outputRows, SalesforceConnectionModuleProperties props) throws Exception {
+    protected void checkRows(List<IndexedRecord> outputRows, SalesforceConnectionModuleProperties props)
+            throws Exception {
         List<IndexedRecord> inputRows = readRows(props);
         assertThat(inputRows, containsInAnyOrder(outputRows.toArray()));
     }
 
-    protected void checkAndDelete(String random, SalesforceConnectionModuleProperties props, int count) throws Exception {
+    protected void checkAndDelete(String random, SalesforceConnectionModuleProperties props, int count)
+            throws Exception {
         List<IndexedRecord> inputRows = readAndCheckRows(random, props, count);
         deleteRows(inputRows, props);
         readAndCheckRows(random, props, 0);
@@ -362,7 +370,8 @@ public class SalesforceTestBase extends AbstractComponentTest {
     }
 
     // Returns the rows written (having been re-read so they have their Ids)
-    protected static void doWriteRows(SalesforceConnectionModuleProperties props, List<IndexedRecord> outputRows) throws Exception {
+    protected static void doWriteRows(SalesforceConnectionModuleProperties props, List<IndexedRecord> outputRows)
+            throws Exception {
         SalesforceSink salesforceSink = new SalesforceSink();
         salesforceSink.initialize(adaptor, props);
         salesforceSink.validate(adaptor);
@@ -370,6 +379,7 @@ public class SalesforceTestBase extends AbstractComponentTest {
         Writer<Result> saleforceWriter = writeOperation.createWriter(adaptor);
         writeRows(saleforceWriter, outputRows);
     }
+
     // Returns the rows written (having been re-read so they have their Ids)
     protected List<IndexedRecord> writeRows(String random, SalesforceConnectionModuleProperties props,
             List<IndexedRecord> outputRows) throws Exception {
@@ -388,7 +398,8 @@ public class SalesforceTestBase extends AbstractComponentTest {
         doWriteRows(deleteProperties, rows);
     }
 
-    public <T> BoundedReader<T> createSalesforceInputReaderFromModule(String moduleName, TSalesforceInputProperties properties) {
+    public <T> BoundedReader<T> createSalesforceInputReaderFromModule(String moduleName,
+            TSalesforceInputProperties properties) {
         if (null == properties) {
             properties = (TSalesforceInputProperties) new TSalesforceInputProperties("foo").init(); //$NON-NLS-1$
         }
@@ -396,7 +407,11 @@ public class SalesforceTestBase extends AbstractComponentTest {
         properties.batchSize.setValue(200);
         properties.module.moduleName.setValue(moduleName);
         properties.module.main.schema.setValue(
-                SchemaBuilder.builder().record("test").prop(SchemaConstants.INCLUDE_ALL_FIELDS, "true").fields().endRecord());
+                SchemaBuilder.builder()
+                        .record("test")
+                        .prop(SchemaConstants.INCLUDE_ALL_FIELDS, "true")
+                        .fields()
+                        .endRecord());
         return createBoundedReader(properties);
     }
 
@@ -408,7 +423,8 @@ public class SalesforceTestBase extends AbstractComponentTest {
     }
 
     public static void deleteAllAccountTestRows(String condition) throws Exception {
-        TSalesforceInputProperties properties = (TSalesforceInputProperties) new TSalesforceInputProperties("foo").init();
+        TSalesforceInputProperties properties =
+                (TSalesforceInputProperties) new TSalesforceInputProperties("foo").init();
         properties.condition.setValue("Name = '" + condition + "'");
         BoundedReader<?> salesforceInputReader = new SalesforceTestBase()
                 .createSalesforceInputReaderFromModule(EXISTING_MODULE_NAME, properties);

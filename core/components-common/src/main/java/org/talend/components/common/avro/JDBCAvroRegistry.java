@@ -12,6 +12,8 @@
 // ============================================================================
 package org.talend.components.common.avro;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 import java.sql.CallableStatement;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
@@ -22,11 +24,9 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
 import org.apache.avro.SchemaBuilder;
-import org.codehaus.jackson.JsonNode;
 import org.talend.components.api.exception.ComponentException;
 import org.talend.daikon.avro.AvroNamesValidationHelper;
 import org.talend.daikon.avro.AvroRegistry;
@@ -86,7 +86,7 @@ public class JDBCAvroRegistry extends AvroRegistry {
     //so will remove it after adjust snowflake runtime
     protected Schema inferSchemaResultSetMetaData(ResultSetMetaData metadata) throws SQLException {
         List<Field> fields = new ArrayList<>();
-        
+
         Set<String> existNames = new HashSet<String>();
         int index = 0;
 
@@ -102,9 +102,10 @@ public class JDBCAvroRegistry extends AvroRegistry {
 
             // not necessary for the result schema from the query statement
             boolean isKey = false;
-            
+
             //TODO consider remove AvroNamesValidationHelper.getAvroCompatibleName wrapper, here keep it as it's called for snowflake before, and current class only for snowflake
-            String validName = AvroNamesValidationHelper.getAvroCompatibleName(NameUtil.correct(fieldName, index++, existNames));
+            String validName =
+                    AvroNamesValidationHelper.getAvroCompatibleName(NameUtil.correct(fieldName, index++, existNames));
             existNames.add(validName);
 
             Field field = sqlType2Avro(size, scale, dbtype, nullable, validName, dbColumnName, null, isKey);
@@ -120,7 +121,7 @@ public class JDBCAvroRegistry extends AvroRegistry {
 
         Set<String> keys = getPrimaryKeys(databaseMetdata, tableMetadata.getCatalog(), tableMetadata.getDbSchema(),
                 tableMetadata.getTablename());
-        
+
         Set<String> existNames = new HashSet<String>();
         int index = 0;
 
@@ -144,21 +145,25 @@ public class JDBCAvroRegistry extends AvroRegistry {
 
                 String defaultValue = metadata.getString("COLUMN_DEF");
                 boolean isAutoIncremented = checkAutoIncremented(metadata);
-                
-                String validName = AvroNamesValidationHelper.getAvroCompatibleName(NameUtil.correct(columnName, index++, existNames));
+
+                String validName = AvroNamesValidationHelper.getAvroCompatibleName(
+                        NameUtil.correct(columnName, index++, existNames));
                 existNames.add(validName);
-                
-                Field field = sqlType2Avro(size, scale, dbtype, nullable, validName, columnName, defaultValue, isKey, isAutoIncremented);
+
+                Field field = sqlType2Avro(size, scale, dbtype, nullable, validName, columnName, defaultValue, isKey,
+                        isAutoIncremented);
 
                 fields.add(field);
             } while (metadata.next());
 
             return Schema.createRecord(
-                    AvroNamesValidationHelper.getAvroCompatibleName(NameUtil.correct(tablename, 0, Collections.<String>emptySet())), null, null, false, fields);
+                    AvroNamesValidationHelper.getAvroCompatibleName(
+                            NameUtil.correct(tablename, 0, Collections.<String>emptySet())), null, null, false, fields);
         }
     }
 
-    protected Set<String> getPrimaryKeys(DatabaseMetaData databaseMetdata, String catalogName, String schemaName, String tableName)
+    protected Set<String> getPrimaryKeys(DatabaseMetaData databaseMetdata, String catalogName, String schemaName,
+            String tableName)
             throws SQLException {
         Set<String> result = new HashSet<>();
 
@@ -333,7 +338,8 @@ public class JDBCAvroRegistry extends AvroRegistry {
                 }
 
             };
-        } else if (AvroUtils.isSameType(basicSchema, AvroUtils._date())) {// no date type in AVRO types, so we replace it by long
+        } else if (AvroUtils.isSameType(basicSchema,
+                AvroUtils._date())) {// no date type in AVRO types, so we replace it by long
             // type
             return new JDBCConverter() {
 
@@ -358,11 +364,10 @@ public class JDBCAvroRegistry extends AvroRegistry {
                 }
 
             };
-        } else if (AvroUtils.isSameType(basicSchema, AvroUtils._decimal()))
-
-        {// TODO why we use big decimal type though AVRO types
-         // don't contain it? No need to consider the
-         // serialization? But we do it for date type above
+        } else if (AvroUtils.isSameType(basicSchema,
+                AvroUtils._decimal())) {// TODO why we use big decimal type though AVRO types
+            // don't contain it? No need to consider the
+            // serialization? But we do it for date type above
             return new JDBCConverter() {
 
                 @Override
@@ -508,8 +513,8 @@ public class JDBCAvroRegistry extends AvroRegistry {
                 public Object convertToAvro(ResultSet value) {
                     try {
                         Object result = value.getBytes(index);
-                        if(value.wasNull()) {
-                        	return null;
+                        if (value.wasNull()) {
+                            return null;
                         }
                         return result;
                     } catch (SQLException e) {
@@ -521,14 +526,14 @@ public class JDBCAvroRegistry extends AvroRegistry {
         } else if (isObject(basicSchema)) {
             return new JDBCConverter() {
 
-              @Override
-              public Object convertToAvro(ResultSet value) {
-                  try {
-                      return value.getObject(index);
-                  } catch (SQLException e) {
-                      throw new ComponentException(e);
-                  }
-              }
+                @Override
+                public Object convertToAvro(ResultSet value) {
+                    try {
+                        return value.getObject(index);
+                    } catch (SQLException e) {
+                        throw new ComponentException(e);
+                    }
+                }
 
             };
         } else {
@@ -657,7 +662,8 @@ public class JDBCAvroRegistry extends AvroRegistry {
                 }
 
             };
-        } else if (AvroUtils.isSameType(basicSchema, AvroUtils._date())) {// no date type in AVRO types, so we replace it by long
+        } else if (AvroUtils.isSameType(basicSchema,
+                AvroUtils._date())) {// no date type in AVRO types, so we replace it by long
             // type
             return new JDBCSPConverter() {
 
@@ -682,11 +688,10 @@ public class JDBCAvroRegistry extends AvroRegistry {
                 }
 
             };
-        } else if (AvroUtils.isSameType(basicSchema, AvroUtils._decimal()))
-
-        {// TODO why we use big decimal type though AVRO types
-         // don't contain it? No need to consider the
-         // serialization? But we do it for date type above
+        } else if (AvroUtils.isSameType(basicSchema,
+                AvroUtils._decimal())) {// TODO why we use big decimal type though AVRO types
+            // don't contain it? No need to consider the
+            // serialization? But we do it for date type above
             return new JDBCSPConverter() {
 
                 @Override
@@ -826,9 +831,9 @@ public class JDBCAvroRegistry extends AvroRegistry {
                 @Override
                 public Object convertToAvro(CallableStatement value) {
                     try {
-                    	Object result = value.getBytes(index);
-                        if(value.wasNull()) {
-                        	return null;
+                        Object result = value.getBytes(index);
+                        if (value.wasNull()) {
+                            return null;
                         }
                         return result;
                     } catch (SQLException e) {
@@ -840,14 +845,14 @@ public class JDBCAvroRegistry extends AvroRegistry {
         } else if (isObject(basicSchema)) {
             return new JDBCSPConverter() {
 
-              @Override
-              public Object convertToAvro(CallableStatement value) {
-                  try {
-                      return value.getObject(index);
-                  } catch (SQLException e) {
-                      throw new ComponentException(e);
-                  }
-              }
+                @Override
+                public Object convertToAvro(CallableStatement value) {
+                    try {
+                        return value.getObject(index);
+                    } catch (SQLException e) {
+                        throw new ComponentException(e);
+                    }
+                }
 
             };
         } else {
@@ -872,12 +877,12 @@ public class JDBCAvroRegistry extends AvroRegistry {
     //org.talend.core.model.metadata.builder.connection.MetadataColumn convertFromAvro(Schema.Field field,
     //org.talend.core.model.metadata.builder.connection.MetadataColumn col)
     public static boolean isObject(Schema schema) {
-        if(schema == null) {
+        if (schema == null) {
             return false;
         }
 
-        if(schema.getType() == Schema.Type.STRING) {
-            if(schema.getProp(SchemaConstants.JAVA_CLASS_FLAG) != null) {
+        if (schema.getType() == Schema.Type.STRING) {
+            if (schema.getProp(SchemaConstants.JAVA_CLASS_FLAG) != null) {
                 return true;
             }
         }

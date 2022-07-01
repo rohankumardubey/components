@@ -9,7 +9,8 @@
     <packaging>pom</packaging>
     <name>Component BOM</name>
     <properties>
-        <daikon.version>0.31.12</daikon.version>
+        <daikon.version>6.8.2</daikon.version>
+
         <!-- repositories -->
         <talend_snapshots_deployment>
             https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceSnapshot/
@@ -1256,12 +1257,12 @@
             </dependency>
             <dependency>
                 <groupId>org.talend.daikon</groupId>
-                <artifactId>daikon-spring-utils</artifactId>
+                <artifactId>daikon</artifactId>
                 <version>${daikon.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.talend.daikon</groupId>
-                <artifactId>daikon</artifactId>
+                <artifactId>logging-event-layout</artifactId>
                 <version>${daikon.version}</version>
             </dependency>
             <dependency>
@@ -1269,6 +1270,13 @@
                 <artifactId>daikon</artifactId>
                 <version>${daikon.version}</version>
                 <classifier>tests</classifier>
+            </dependency>
+            <dependency>
+                <groupId>org.talend.daikon</groupId>
+                <artifactId>daikon-exception</artifactId>
+                <classifier>bundle</classifier>
+                <version>${daikon.version}</version>
+                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.talend.daikon</groupId>

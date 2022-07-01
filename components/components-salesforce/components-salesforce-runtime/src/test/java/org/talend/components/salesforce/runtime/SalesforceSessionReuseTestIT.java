@@ -12,18 +12,16 @@
 // ============================================================================
 package org.talend.components.salesforce.runtime;
 
-import static org.hamcrest.core.IsInstanceOf.instanceOf;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import com.sforce.async.AsyncApiException;
+import com.sforce.soap.partner.PartnerConnection;
+import com.sforce.soap.partner.fault.ExceptionCode;
+import com.sforce.soap.partner.fault.LoginFault;
+import com.sforce.ws.ConnectionException;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.IndexedRecord;
 import org.junit.AfterClass;
@@ -41,6 +39,7 @@ import org.talend.components.api.container.DefaultComponentRuntimeContainerImpl;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.test.ComponentTestUtils;
+import org.talend.components.api.test.DaikonLegacyAssertions;
 import org.talend.components.salesforce.SalesforceConnectionProperties;
 import org.talend.components.salesforce.runtime.common.ConnectionHolder;
 import org.talend.components.salesforce.test.SalesforceTestBase;
@@ -51,18 +50,19 @@ import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputPrope
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.property.Property;
-import org.talend.daikon.properties.test.PropertiesTestUtils;
 
-import com.sforce.async.AsyncApiException;
-import com.sforce.soap.partner.PartnerConnection;
-import com.sforce.soap.partner.fault.ExceptionCode;
-import com.sforce.soap.partner.fault.LoginFault;
-import com.sforce.ws.ConnectionException;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Test Salesforce connection session
  */
 public class SalesforceSessionReuseTestIT extends SalesforceTestBase {
+
     @ClassRule
     public static final TestRule DISABLE_IF_NEEDED = new DisableIfMissingConfig();
 
@@ -100,9 +100,9 @@ public class SalesforceSessionReuseTestIT extends SalesforceTestBase {
     }
 
     /*
-    * If the logic changes for this test please specify appropriate timeout.
-    * The average execution time for this test in range 1 - 3 sec.
-    */
+     * If the logic changes for this test please specify appropriate timeout.
+     * The average execution time for this test in range 1 - 3 sec.
+     */
     @Test(timeout = 30_000)
     public void testBasicLogin() throws Throwable {
         File sessionFolder = new File(tempFolder.getRoot().getPath() + "/tsalesforceconnection/");
@@ -173,7 +173,8 @@ public class SalesforceSessionReuseTestIT extends SalesforceTestBase {
                 .getComponentProperties(TSalesforceInputDefinition.COMPONENT_NAME);
         inProps.connection.referencedComponent.componentInstanceId.setValue(currentComponentName);
         inProps.connection.referencedComponent.setReference(connProps);
-        checkAndAfter(inProps.connection.referencedComponent.getReference().getForm(Form.REFERENCE), "referencedComponent",
+        checkAndAfter(inProps.connection.referencedComponent.getReference().getForm(Form.REFERENCE),
+                "referencedComponent",
                 inProps.connection);
 
         ComponentTestUtils.checkSerialize(inProps, errorCollector);
@@ -185,10 +186,12 @@ public class SalesforceSessionReuseTestIT extends SalesforceTestBase {
 
         try {
             // 3. input components would be get connection from connection session file
-            moduleProps = (ComponentProperties) PropertiesTestUtils.checkAndBeforeActivate(getComponentService(), f, "moduleName",
+            moduleProps = (ComponentProperties) DaikonLegacyAssertions.checkAndBeforeActivate(getComponentService(), f,
+                    "moduleName",
                     moduleProps);
 
-            Object connection = connContainer.getComponentData(currentComponentName, SalesforceSourceOrSink.KEY_CONNECTION);
+            Object connection =
+                    connContainer.getComponentData(currentComponentName, SalesforceSourceOrSink.KEY_CONNECTION);
             assertNotNull(connection);
             ((PartnerConnection) connection).getConfig().setPassword(WRONG_PWD);
             // Check whether the session disable by other test.
@@ -205,7 +208,8 @@ public class SalesforceSessionReuseTestIT extends SalesforceTestBase {
             // 4. invalid the session, then the session should be renew based on reference connection information(wrong pwd)
             // connect would be fail
 
-            moduleProps = (ComponentProperties) PropertiesTestUtils.checkAndBeforeActivate(getComponentService(), f, "moduleName",
+            moduleProps = (ComponentProperties) DaikonLegacyAssertions.checkAndBeforeActivate(getComponentService(), f,
+                    "moduleName",
                     moduleProps);
             assertEquals(ValidationResult.Result.ERROR, moduleProps.getValidationResult().getStatus());
             LOGGER.debug(moduleProps.getValidationResult().toString());
@@ -219,24 +223,27 @@ public class SalesforceSessionReuseTestIT extends SalesforceTestBase {
 
         // 5.set correct pwd back
         setupProps(connProps, !ADD_QUOTES);
-        moduleProps = (ComponentProperties) PropertiesTestUtils.checkAndBeforeActivate(getComponentService(), f, "moduleName",
-                moduleProps);
+        moduleProps =
+                (ComponentProperties) DaikonLegacyAssertions.checkAndBeforeActivate(getComponentService(), f,
+                        "moduleName",
+                        moduleProps);
         assertEquals(ValidationResult.Result.OK, moduleProps.getValidationResult().getStatus());
         LOGGER.debug(moduleProps.getValidationResult().toString());
 
     }
 
     /*
-    * If the logic changes for this test please specify appropriate timeout.
-    * The average execution time for this test 3.2-4.7 sec.
-    */
+     * If the logic changes for this test please specify appropriate timeout.
+     * The average execution time for this test 3.2-4.7 sec.
+     */
     @Test(timeout = 40_000)
     public void testInputReuseSession() throws Throwable {
         File sessionFolder = new File(tempFolder.getRoot().getPath() + "/tsalesforceinput/");
         assertEquals(0, sessionFolder.getTotalSpace());
         LOGGER.debug("session folder: " + sessionFolder.getAbsolutePath());
 
-        TSalesforceInputProperties props = (TSalesforceInputProperties) new TSalesforceInputProperties("foo").init(); //$NON-NLS-1$
+        TSalesforceInputProperties props =
+                (TSalesforceInputProperties) new TSalesforceInputProperties("foo").init(); //$NON-NLS-1$
         props.module.moduleName.setValue(EXISTING_MODULE_NAME);
         props.module.main.schema.setValue(getMakeRowSchema(false));
         props.connection = setupProps(null, !ADD_QUOTES);
@@ -299,7 +306,8 @@ public class SalesforceSessionReuseTestIT extends SalesforceTestBase {
     @Test
     public void testBulkSessionRenew() throws Exception {
 
-        TSalesforceInputProperties props = (TSalesforceInputProperties) new TSalesforceInputProperties("foo").init(); //$NON-NLS-1$
+        TSalesforceInputProperties props =
+                (TSalesforceInputProperties) new TSalesforceInputProperties("foo").init(); //$NON-NLS-1$
         props.module.moduleName.setValue(EXISTING_MODULE_NAME);
         props.module.main.schema.setValue(getMakeRowSchema(false));
         props.connection = setupProps(null, !ADD_QUOTES);
@@ -307,7 +315,7 @@ public class SalesforceSessionReuseTestIT extends SalesforceTestBase {
         // setup session function
         props.connection.bulkConnection.setValue(true);
         props.queryMode.setValue(TSalesforceInputProperties.QueryMode.Bulk);
-        props.condition.setValue("Name = '"+ randomizedValue + "'");
+        props.condition.setValue("Name = '" + randomizedValue + "'");
         // Init session
         assertEquals(ValidationResult.Result.OK, testConnection(props).getStatus());
 
@@ -316,8 +324,9 @@ public class SalesforceSessionReuseTestIT extends SalesforceTestBase {
 
         reader.start();
         // Invalid the session by session id
-        String sessionIdBeforeRenew = ((SalesforceBulkQueryInputReader) reader).bulkRuntime.getBulkConnection().getConfig()
-                .getSessionId();
+        String sessionIdBeforeRenew =
+                ((SalesforceBulkQueryInputReader) reader).bulkRuntime.getBulkConnection().getConfig()
+                        .getSessionId();
         reader.close();
 
         Thread.sleep(1000);
@@ -337,8 +346,9 @@ public class SalesforceSessionReuseTestIT extends SalesforceTestBase {
             }
         }
         // Check the renew session
-        String sessionIdAfterRenew = ((SalesforceBulkQueryInputReader) reader).bulkRuntime.getBulkConnection().getConfig()
-                .getSessionId();
+        String sessionIdAfterRenew =
+                ((SalesforceBulkQueryInputReader) reader).bulkRuntime.getBulkConnection().getConfig()
+                        .getSessionId();
         reader.close();
         assertNotEquals(sessionIdBeforeRenew, sessionIdAfterRenew);
 
@@ -351,7 +361,8 @@ public class SalesforceSessionReuseTestIT extends SalesforceTestBase {
         assertEquals(0, sessionFolder.getTotalSpace());
         LOGGER.debug("session folder: " + sessionFolder.getAbsolutePath());
 
-        TSalesforceOutputProperties props = (TSalesforceOutputProperties) new TSalesforceOutputProperties("foo").init(); //$NON-NLS-1$
+        TSalesforceOutputProperties props =
+                (TSalesforceOutputProperties) new TSalesforceOutputProperties("foo").init(); //$NON-NLS-1$
         props.module.moduleName.setValue(EXISTING_MODULE_NAME);
         props.module.main.schema.setValue(getMakeRowSchema(false));
         props.connection = setupProps(null, !ADD_QUOTES);

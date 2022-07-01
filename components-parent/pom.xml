@@ -29,8 +29,6 @@
         <talend.releases.repo>https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceRelease/
         </talend.releases.repo>
 
-        <daikon.version>0.31.12</daikon.version>
-
         <!-- plugin versions -->
         <osgi.core.version>6.0.0</osgi.core.version>
         <tycho-p2-extras-plugin.version>0.26.0</tycho-p2-extras-plugin.version>
@@ -89,8 +87,8 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.talend.daikon</groupId>
-            <artifactId>daikon-spring-utils</artifactId>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

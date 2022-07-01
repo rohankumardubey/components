@@ -16,8 +16,6 @@
         <talend.springboot.bom.version>0.0.1</talend.springboot.bom.version>
         <talend.springboot.bom.artifactId>2.7</talend.springboot.bom.artifactId>
         <!-- /!\ END Spring BOM PROPERTIES /!\ -->
-
-        <daikon.version>6.8.2</daikon.version>
     </properties>
 
     <dependencyManagement>

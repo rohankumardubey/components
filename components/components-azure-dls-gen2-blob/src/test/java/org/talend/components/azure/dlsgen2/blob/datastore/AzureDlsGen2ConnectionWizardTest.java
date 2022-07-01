@@ -12,19 +12,14 @@
 // ============================================================================
 package org.talend.components.azure.dlsgen2.blob.datastore;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
-
 import org.apache.avro.Schema;
 import org.junit.Test;
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.api.test.DaikonLegacyAssertions;
 import org.talend.components.api.wizard.ComponentWizard;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
 import org.talend.components.api.wizard.WizardImageType;
@@ -34,7 +29,11 @@ import org.talend.daikon.NamedThing;
 import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.service.Repository;
-import org.talend.daikon.properties.test.PropertiesTestUtils;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class AzureDlsGen2ConnectionWizardTest extends AzureDlsGen2BlobBase {
 
@@ -81,7 +80,8 @@ public class AzureDlsGen2ConnectionWizardTest extends AzureDlsGen2BlobBase {
         }
 
         @Override
-        public String storeProperties(Properties properties, String name, String repositoryLocation, String schemaPropertyName) {
+        public String storeProperties(Properties properties, String name, String repositoryLocation,
+                String schemaPropertyName) {
             if (name != null && Character.isDigit(name.charAt(0))) {
                 throw new IllegalArgumentException("Schema name cannot start with numberic in wizard.");
             }
@@ -127,10 +127,10 @@ public class AzureDlsGen2ConnectionWizardTest extends AzureDlsGen2BlobBase {
         connProps.setupProperties();
         Object image = getComponentService()
                 .getWizardPngImage(AzureDlsGen2ConnectionWizardDefinition.COMPONENT_NAME,
-                                   WizardImageType.TREE_ICON_16X16);
+                        WizardImageType.TREE_ICON_16X16);
         assertNotNull(image);
         image = getComponentService().getWizardPngImage(AzureDlsGen2ConnectionWizardDefinition.COMPONENT_NAME,
-                                                        WizardImageType.WIZARD_BANNER_75X66);
+                WizardImageType.WIZARD_BANNER_75X66);
         assertNotNull(image);
         // Check the non-top-level wizard
         // check password i18n
@@ -141,8 +141,8 @@ public class AzureDlsGen2ConnectionWizardTest extends AzureDlsGen2BlobBase {
         // check name i18n
         NamedThing nameProp = connFormWizard.getWidget("name").getContent(); //$NON-NLS-1$
         assertEquals("Name", nameProp.getDisplayName());
-        connProps = (AzureDlsGen2BlobDatastoreProperties) PropertiesTestUtils.checkAndValidate(getComponentService(),
-                                                                                               connFormWizard, "testConnection", connProps);
+        connProps = (AzureDlsGen2BlobDatastoreProperties) DaikonLegacyAssertions.checkAndValidate(getComponentService(),
+                connFormWizard, "testConnection", connProps);
         assertTrue(connFormWizard.isAllowForward());
     }
 

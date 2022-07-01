@@ -13,13 +13,13 @@
 package org.talend.components.jdbc.dataprep;
 
 import java.sql.Connection;
-
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.talend.components.api.test.DaikonLegacyAssertions;
 import org.talend.components.jdbc.common.DBTestUtils;
 import org.talend.components.jdbc.dataset.JDBCDatasetProperties;
 import org.talend.components.jdbc.datastore.JDBCDatastoreDefinition;
@@ -28,7 +28,6 @@ import org.talend.components.jdbc.runtime.JdbcRuntimeUtils;
 import org.talend.components.jdbc.runtime.dataprep.JDBCDatasetRuntime;
 import org.talend.components.jdbc.runtime.setting.AllSetting;
 import org.talend.daikon.java8.Consumer;
-import org.talend.daikon.properties.test.PropertiesTestUtils;
 
 public class JdbcDatasetTestIT {
 
@@ -36,12 +35,12 @@ public class JdbcDatasetTestIT {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        PropertiesTestUtils.setupPaxUrlFromMavenLaunch();
+        DaikonLegacyAssertions.setupPaxUrlFromMavenLaunch();
         allSetting = DBTestUtils.createAllSetting();
         try (Connection conn = JdbcRuntimeUtils.createConnection(allSetting)) {
-          DBTestUtils.createTestTable(conn, tablename);
-          DBTestUtils.loadTestData(conn, tablename);
-      }
+            DBTestUtils.createTestTable(conn, tablename);
+            DBTestUtils.loadTestData(conn, tablename);
+        }
     }
 
     private static final String tablename = "JDBCDATASETINTEGRATION";
@@ -74,7 +73,7 @@ public class JdbcDatasetTestIT {
         Schema schema = runtime.getSchema();
 
         Assert.assertNotNull(schema);
-        DBTestUtils.testMetadata(schema.getFields(),true);
+        DBTestUtils.testMetadata(schema.getFields(), true);
     }
 
     @Test

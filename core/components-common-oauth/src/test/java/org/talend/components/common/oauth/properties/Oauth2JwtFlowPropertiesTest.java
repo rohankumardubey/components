@@ -15,9 +15,9 @@ package org.talend.components.common.oauth.properties;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ErrorCollector;
+import org.talend.components.api.test.DaikonLegacyAssertions;
 import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.PropertiesImpl;
-import org.talend.daikon.properties.test.PropertiesTestUtils;
 
 public class Oauth2JwtFlowPropertiesTest {
 
@@ -30,6 +30,6 @@ public class Oauth2JwtFlowPropertiesTest {
         Class propertiesClass = Oauth2JwtFlowProperties.class;
         Properties props = PropertiesImpl.createNewInstance(propertiesClass, "root").init();
         // check all properties
-        PropertiesTestUtils.checkAllI18N(props, errorCollector);
+        DaikonLegacyAssertions.checkAllI18N(props, errorCollector);
     }
 }

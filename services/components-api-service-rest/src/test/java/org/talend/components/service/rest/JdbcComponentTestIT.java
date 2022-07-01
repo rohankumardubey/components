@@ -48,13 +48,13 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.talend.components.api.test.DaikonLegacyAssertions;
 import org.talend.components.jdbc.dataset.JDBCDatasetProperties;
 import org.talend.components.jdbc.datastore.JDBCDatastoreProperties;
 import org.talend.components.service.rest.dto.DefinitionDTO;
 import org.talend.components.service.rest.dto.SerPropertiesDto;
 import org.talend.components.service.rest.dto.UiSpecsPropertiesDto;
 import org.talend.components.service.rest.impl.ApiError;
-import org.talend.daikon.properties.test.PropertiesTestUtils;
 
 import static io.restassured.RestAssured.given;
 import static java.util.Collections.singletonList;
@@ -93,7 +93,7 @@ public class JdbcComponentTestIT {
 
     @BeforeClass
     public static void registerPaxUrlMavenHandler() {
-        PropertiesTestUtils.setupPaxUrlFromMavenLaunch();
+        DaikonLegacyAssertions.setupPaxUrlFromMavenLaunch();
     }
 
     @Before

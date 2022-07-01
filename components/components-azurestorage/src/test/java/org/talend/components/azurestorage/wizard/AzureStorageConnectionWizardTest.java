@@ -12,19 +12,14 @@
 // ============================================================================
 package org.talend.components.azurestorage.wizard;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
-
 import org.apache.avro.Schema;
 import org.junit.Test;
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.api.test.DaikonLegacyAssertions;
 import org.talend.components.api.wizard.ComponentWizard;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
 import org.talend.components.api.wizard.WizardImageType;
@@ -35,7 +30,10 @@ import org.talend.daikon.NamedThing;
 import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.properties.service.Repository;
-import org.talend.daikon.properties.test.PropertiesTestUtils;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 
 public class AzureStorageConnectionWizardTest extends AzureStorageGenericBase {
 
@@ -82,8 +80,9 @@ public class AzureStorageConnectionWizardTest extends AzureStorageGenericBase {
         }
 
         @Override
-        public String storeProperties(Properties properties, String name, String repositoryLocation, String schemaPropertyName) {
-            if(name!=null&&Character.isDigit(name.charAt(0))){
+        public String storeProperties(Properties properties, String name, String repositoryLocation,
+                String schemaPropertyName) {
+            if (name != null && Character.isDigit(name.charAt(0))) {
                 throw new IllegalArgumentException("Schema name cannot start with numberic in wizard.");
             }
             RepoProps rp = new RepoProps(properties, name, repositoryLocation, schemaPropertyName);
@@ -127,11 +126,13 @@ public class AzureStorageConnectionWizardTest extends AzureStorageGenericBase {
         assertEquals("Azure Storage Connection Settings", connFormWizard.getTitle());
         assertEquals("Fill in fields to configure connection.", connFormWizard.getSubtitle());
 
-        TAzureStorageConnectionProperties connProps = (TAzureStorageConnectionProperties) connFormWizard.getProperties();
+        TAzureStorageConnectionProperties connProps =
+                (TAzureStorageConnectionProperties) connFormWizard.getProperties();
         connProps.setupProperties();
 
-        Object image = getComponentService().getWizardPngImage(AzureStorageConnectionWizardDefinition.COMPONENT_WIZARD_NAME,
-                WizardImageType.TREE_ICON_16X16);
+        Object image =
+                getComponentService().getWizardPngImage(AzureStorageConnectionWizardDefinition.COMPONENT_WIZARD_NAME,
+                        WizardImageType.TREE_ICON_16X16);
         assertNotNull(image);
         image = getComponentService().getWizardPngImage(AzureStorageConnectionWizardDefinition.COMPONENT_WIZARD_NAME,
                 WizardImageType.WIZARD_BANNER_75X66);
@@ -148,7 +149,7 @@ public class AzureStorageConnectionWizardTest extends AzureStorageGenericBase {
         // check name i18n
         NamedThing nameProp = connFormWizard.getWidget("name").getContent(); //$NON-NLS-1$
         assertEquals("Name", nameProp.getDisplayName());
-        connProps = (TAzureStorageConnectionProperties) PropertiesTestUtils.checkAndValidate(getComponentService(),
+        connProps = (TAzureStorageConnectionProperties) DaikonLegacyAssertions.checkAndValidate(getComponentService(),
                 connFormWizard, "testConnection", connProps);
         assertFalse(connFormWizard.isAllowForward());
 
@@ -161,7 +162,8 @@ public class AzureStorageConnectionWizardTest extends AzureStorageGenericBase {
                 .getComponentWizard(AzureStorageConnectionWizardDefinition.COMPONENT_WIZARD_NAME, "nodeAzureStorage");
         List<Form> forms = wiz.getForms();
         Form connFormWizard = forms.get(0);
-        TAzureStorageConnectionProperties connProps = (TAzureStorageConnectionProperties) connFormWizard.getProperties();
+        TAzureStorageConnectionProperties connProps =
+                (TAzureStorageConnectionProperties) connFormWizard.getProperties();
 
         ComponentWizard[] subWizards = getComponentService().getComponentWizardsForProperties(connProps, "location")
                 .toArray(new ComponentWizard[1]);

@@ -26,13 +26,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.talend.components.api.test.DaikonLegacyAssertions;
 import org.talend.components.service.rest.ServiceConstants;
 import org.talend.components.service.rest.dto.SerPropertiesDto;
 import org.talend.components.service.rest.fullexample.dataset.FullExampleDatasetProperties;
 import org.talend.components.service.rest.fullexample.dataset.FullExampleDatasetProperties.SourceType;
 import org.talend.components.service.rest.fullexample.datastore.FullExampleDatastoreProperties;
 import org.talend.components.service.spring.SpringTestApp;
-import org.talend.daikon.properties.test.PropertiesTestUtils;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
@@ -53,7 +53,7 @@ public class FullExampleComponentTestIT {
 
     @BeforeClass
     public static void registerPaxUrlMavenHandler() {
-        PropertiesTestUtils.setupPaxUrlFromMavenLaunch();
+        DaikonLegacyAssertions.setupPaxUrlFromMavenLaunch();
     }
 
     @Before
