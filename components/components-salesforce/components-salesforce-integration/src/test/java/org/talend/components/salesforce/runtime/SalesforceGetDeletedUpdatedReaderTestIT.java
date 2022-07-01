@@ -128,7 +128,7 @@ public class SalesforceGetDeletedUpdatedReaderTestIT extends SalesforceTestBase 
         SalesforceGetDeletedUpdatedProperties props = (SalesforceGetDeletedUpdatedProperties) new SalesforceGetDeletedUpdatedProperties(
                 "foo").init(); //$NON-NLS-1$
         props.connection.timeout.setValue(120000);
-        setupProps(props.connection, !ADD_QUOTES);
+        setupProps(props.connection);
         if (emptySchema) {
             setupModuleWithEmptySchema(props.module, EXISTING_MODULE_NAME);
         } else {

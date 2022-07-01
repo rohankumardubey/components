@@ -316,7 +316,7 @@ public abstract class SalesforceComponentTestIT extends SalesforceTestBase {
         // check password i18n
         assertEquals("Name", connProps.getProperty("name").getDisplayName());
         connProps.name.setValue("connName");
-        setupProps(connProps, !ADD_QUOTES);
+        setupProps(connProps);
         Form userPassword = (Form) connFormWizard.getWidget("userPassword").getContent();
         Property passwordSe = (Property) userPassword.getWidget("password").getContent();
         assertEquals("Password", passwordSe.getDisplayName());
@@ -397,17 +397,7 @@ public abstract class SalesforceComponentTestIT extends SalesforceTestBase {
 
     @Test
     public void testLogin() throws Throwable {
-        SalesforceConnectionProperties props = setupProps(null, !ADD_QUOTES);
-        Form f = props.getForm(SalesforceConnectionProperties.FORM_WIZARD);
-        props = (SalesforceConnectionProperties) PropertiesTestUtils.checkAndValidate(getComponentService(), f, "testConnection",
-                props);
-        LOGGER.debug(props.getValidationResult().toString());
-        assertEquals(ValidationResult.Result.OK, props.getValidationResult().getStatus());
-    }
-
-    @Test
-    public void testLoginWithQuotes() throws Throwable {
-        SalesforceConnectionProperties props = setupProps(null, ADD_QUOTES);
+        SalesforceConnectionProperties props = setupProps(null);
         Form f = props.getForm(SalesforceConnectionProperties.FORM_WIZARD);
         props = (SalesforceConnectionProperties) PropertiesTestUtils.checkAndValidate(getComponentService(), f, "testConnection",
                 props);
@@ -421,7 +411,7 @@ public abstract class SalesforceComponentTestIT extends SalesforceTestBase {
      */
     @Test(timeout = 30_000)
     public void testLoginFail() throws Throwable {
-        SalesforceConnectionProperties props = setupProps(null, !ADD_QUOTES);
+        SalesforceConnectionProperties props = setupProps(null);
         props.userPassword.userId.setValue("blah");
         Form f = props.getForm(SalesforceConnectionProperties.FORM_WIZARD);
         props = (SalesforceConnectionProperties) PropertiesTestUtils.checkAndValidate(getComponentService(), f, "testConnection",
@@ -432,18 +422,7 @@ public abstract class SalesforceComponentTestIT extends SalesforceTestBase {
 
     @Test
     public void testBulkLogin() throws Throwable {
-        SalesforceConnectionProperties props = setupProps(null, !ADD_QUOTES);
-        props.bulkConnection.setValue(true);
-        Form f = props.getForm(SalesforceConnectionProperties.FORM_WIZARD);
-        props = (SalesforceConnectionProperties) PropertiesTestUtils.checkAndValidate(getComponentService(), f, "testConnection",
-                props);
-        assertEquals(ValidationResult.Result.OK, props.getValidationResult().getStatus());
-        LOGGER.debug(props.getValidationResult().toString());
-    }
-
-    @Test
-    public void testBulkLoginWithQuotes() throws Throwable {
-        SalesforceConnectionProperties props = setupProps(null, ADD_QUOTES);
+        SalesforceConnectionProperties props = setupProps(null);
         props.bulkConnection.setValue(true);
         Form f = props.getForm(SalesforceConnectionProperties.FORM_WIZARD);
         props = (SalesforceConnectionProperties) PropertiesTestUtils.checkAndValidate(getComponentService(), f, "testConnection",
@@ -496,7 +475,7 @@ public abstract class SalesforceComponentTestIT extends SalesforceTestBase {
     public void testModuleNames() throws Throwable {
         TSalesforceInputProperties props = (TSalesforceInputProperties) getComponentService()
                 .getComponentProperties(TSalesforceInputDefinition.COMPONENT_NAME);
-        setupProps(props.connection, !ADD_QUOTES);
+        setupProps(props.connection);
         ComponentTestUtils.checkSerialize(props, errorCollector);
 
         assertEquals(2, props.getForms().size());
@@ -539,20 +518,13 @@ public abstract class SalesforceComponentTestIT extends SalesforceTestBase {
         testSchemaWithAPIVersion("25.0");
         testSchemaWithAPIVersion("24.0");
         testSchemaWithAPIVersion("21.0");
-        testSchemaWithAPIVersion("19.0");
-        testSchemaWithAPIVersion("18.0");
-        // ignore it now as it fail and it seems the reason is the jar classpath issue, need to research on it, why before it
-        // success? i think
-        // the refactor make it up, but not from the code
-        // testSchemaWithAPIVersion("15.0");
-        // testSchemaWithAPIVersion("10.0");
     }
 
     protected void testSchemaWithAPIVersion(String version) throws Throwable {
         TSalesforceInputProperties props = (TSalesforceInputProperties) getComponentService()
                 .getComponentProperties(TSalesforceInputDefinition.COMPONENT_NAME);
         props.connection.endpoint.setValue("https://login.salesforce.com/services/Soap/u/" + version);
-        setupProps(props.connection, !ADD_QUOTES);
+        setupProps(props.connection);
 
         Form f = props.module.getForm(Form.REFERENCE);
         SalesforceModuleProperties moduleProps = (SalesforceModuleProperties) f.getProperties();
@@ -576,7 +548,7 @@ public abstract class SalesforceComponentTestIT extends SalesforceTestBase {
         ComponentDefinition definition = getComponentService().getComponentDefinition(TSalesforceOutputDefinition.COMPONENT_NAME);
         TSalesforceOutputProperties outputProps = (TSalesforceOutputProperties) getComponentService()
                 .getComponentProperties(TSalesforceOutputDefinition.COMPONENT_NAME);
-        setupProps(outputProps.connection, !ADD_QUOTES);
+        setupProps(outputProps.connection);
 
         outputProps.outputAction.setValue(OutputAction.DELETE);
         setupModule(outputProps.module, "Account");
@@ -602,7 +574,7 @@ public abstract class SalesforceComponentTestIT extends SalesforceTestBase {
         ComponentDefinition definition = getComponentService().getComponentDefinition(TSalesforceInputDefinition.COMPONENT_NAME);
         TSalesforceInputProperties props = (TSalesforceInputProperties) getComponentService()
                 .getComponentProperties(TSalesforceInputDefinition.COMPONENT_NAME);
-        setupProps(props.connection, !ADD_QUOTES);
+        setupProps(props.connection);
 
         SalesforceSourceOrSink salesforceSourceOrSink = new SalesforceSourceOrSink();
         salesforceSourceOrSink.initialize(null, props);
@@ -611,7 +583,7 @@ public abstract class SalesforceComponentTestIT extends SalesforceTestBase {
         // Referenced properties simulating salesforce connect component
         SalesforceConnectionProperties cProps = (SalesforceConnectionProperties) getComponentService()
                 .getComponentProperties(TSalesforceConnectionDefinition.COMPONENT_NAME);
-        setupProps(cProps, !ADD_QUOTES);
+        setupProps(cProps);
         cProps.userPassword.password.setValue("xxx");
 
         String compId = "comp1";
@@ -644,7 +616,7 @@ public abstract class SalesforceComponentTestIT extends SalesforceTestBase {
     public void testUseExistingConnection() throws Throwable {
         SalesforceConnectionProperties connProps = (SalesforceConnectionProperties) getComponentService()
                 .getComponentProperties(TSalesforceConnectionDefinition.COMPONENT_NAME);
-        setupProps(connProps, !ADD_QUOTES);
+        setupProps(connProps);
 
         final String currentComponentName = TSalesforceConnectionDefinition.COMPONENT_NAME + "_1";
         RuntimeContainer connContainer = new DefaultComponentRuntimeContainerImpl() {

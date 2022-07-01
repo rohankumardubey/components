@@ -73,7 +73,7 @@ public class SalesforceInputReaderTestIT extends SalesforceTestBase {
             outputRows.add(row);
         }
         TSalesforceOutputProperties props = (TSalesforceOutputProperties) new TSalesforceOutputProperties("foo").init();
-        setupProps(props.connection, !ADD_QUOTES);
+        setupProps(props.connection);
         props.module.moduleName.setValue(EXISTING_MODULE_NAME);
         props.module.main.schema.setValue(getSchema(false));
         doWriteRows(props,outputRows);
@@ -203,13 +203,13 @@ public class SalesforceInputReaderTestIT extends SalesforceTestBase {
             props.query.setValue(
                     "select Id,Name,ShippingStreet,ShippingPostalCode,BillingStreet,BillingState,BillingPostalCode from Account");
 
-            setupProps(props.connection, !ADD_QUOTES);
+            setupProps(props.connection);
 
             props.module.moduleName.setValue(EXISTING_MODULE_NAME);
             props.module.main.schema.setValue(getMakeRowSchema(false));
 
         } else {
-            setupProps(props.connection, !ADD_QUOTES);
+            setupProps(props.connection);
             if (emptySchema) {
                 setupModuleWithEmptySchema(props.module, EXISTING_MODULE_NAME);
             } else {
@@ -337,7 +337,7 @@ public class SalesforceInputReaderTestIT extends SalesforceTestBase {
             outputRows.add(row);
         }
         TSalesforceOutputProperties props = (TSalesforceOutputProperties) new TSalesforceOutputProperties("foo").init();
-        setupProps(props.connection, !ADD_QUOTES);
+        setupProps(props.connection);
         props.module.moduleName.setValue(EXISTING_MODULE_NAME);
         props.module.main.schema.setValue(getSchema(false));
         doWriteRows(props,outputRows);
@@ -531,7 +531,7 @@ public class SalesforceInputReaderTestIT extends SalesforceTestBase {
         // 2.Write Contact records
         ComponentDefinition sfDef = new TSalesforceOutputDefinition();
         TSalesforceOutputProperties sfProps = (TSalesforceOutputProperties) sfDef.createRuntimeProperties();
-        SalesforceTestBase.setupProps(sfProps.connection, false);
+        SalesforceTestBase.setupProps(sfProps.connection);
         sfProps.module.setValue("moduleName", "Contact");
         sfProps.module.main.schema.setValue(SCHEMA_CONTACT);
         sfProps.outputAction.setValue(SalesforceOutputProperties.OutputAction.INSERT);

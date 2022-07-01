@@ -18,6 +18,24 @@ def artifactoryCredentials = usernamePassword(
     passwordVariable: 'ARTIFACTORY_PASSWORD',
     usernameVariable: 'ARTIFACTORY_LOGIN')
 
+def sfCredentials = usernamePassword(
+    credentialsId: 'tcompv0-salesforce-credentials',
+    usernameVariable: 'SALESFORCE_USERNAME',
+    passwordVariable: 'SALESFORCE_PASSWORD')
+
+def sfSecurityToken = string(
+    credentialsId: 'tcompv0-salesforce-account-key',
+    variable: 'SALESFORCE_SECURITY_TOKEN')
+
+def sfExpiredCredentials = usernamePassword(
+    credentialsId: 'expired-salesforce-credentials',
+    usernameVariable: 'EXPIRED_SALESFORCE_USERNAME',
+    passwordVariable: 'EXPIRED_SALESFORCE_PASSWORD')
+
+def sfExpiredSecurityToken = string(
+    credentialsId: 'expired-salesforce-account-key',
+    variable: 'EXPIRED_SALESFORCE_SECURITY_TOKEN')
+
 def branch = env.BRANCH_NAME
 def repo = 'components'
 def slackChannel = 'components-ci'
@@ -99,11 +117,18 @@ spec:
       }
       steps {
         container('main') {
-           withCredentials([gitCredentials, nexusCredentials, dockerCredentials, artifactoryCredentials]) {
+           withCredentials([gitCredentials, nexusCredentials, dockerCredentials, artifactoryCredentials, sfCredentials, sfSecurityToken, sfExpiredCredentials, sfExpiredSecurityToken]) {
              sh '''#!/bin/bash
              docker version
              echo $ARTIFACTORY_PASSWORD | docker login $ARTIFACTORY_REGISTRY -u $ARTIFACTORY_LOGIN --password-stdin
-             mvn clean -B -U -V install
+             mvn clean -B -U -V \
+                -Dsalesforce.user=${SALESFORCE_USERNAME} \
+                -Dsalesforce.password=${SALESFORCE_PASSWORD} \
+                -Dsalesforce.key=${SALESFORCE_SECURITY_TOKEN} \
+                -Dsalesforce.user.expired=${EXPIRED_SALESFORCE_USERNAME} \
+                -Dsalesforce.password.expired=${EXPIRED_SALESFORCE_PASSWORD} \
+                -Dsalesforce.key.expired=${EXPIRED_SALESFORCE_SECURITY_TOKEN} \
+             install
              '''
            }
         }

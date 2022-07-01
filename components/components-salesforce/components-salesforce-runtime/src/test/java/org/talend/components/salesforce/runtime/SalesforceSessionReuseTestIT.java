@@ -91,7 +91,7 @@ public class SalesforceSessionReuseTestIT extends SalesforceTestBase {
             outputRows.add(row);
         }
         TSalesforceOutputProperties props = (TSalesforceOutputProperties) new TSalesforceOutputProperties("foo").init();
-        setupProps(props.connection, !ADD_QUOTES);
+        setupProps(props.connection);
         props.module.moduleName.setValue(EXISTING_MODULE_NAME);
         props.module.main.schema.setValue(getSchema(false));
         doWriteRows(props,outputRows);
@@ -111,7 +111,7 @@ public class SalesforceSessionReuseTestIT extends SalesforceTestBase {
         File sessionFolder = new File(tempFolder.getRoot().getPath() + "/tsalesforceconnection/");
         assertEquals(0, sessionFolder.getTotalSpace());
         LOGGER.debug("session folder: " + sessionFolder.getAbsolutePath());
-        SalesforceConnectionProperties props = setupProps(null, !ADD_QUOTES);
+        SalesforceConnectionProperties props = setupProps(null);
         // setup session function
         props.reuseSession.setValue(true);
         props.sessionDirectory.setValue(sessionFolder.getAbsolutePath());
@@ -134,7 +134,7 @@ public class SalesforceSessionReuseTestIT extends SalesforceTestBase {
         LOGGER.debug("session folder: " + sessionFolder.getAbsolutePath());
         SalesforceConnectionProperties connProps = (SalesforceConnectionProperties) getComponentService()
                 .getComponentProperties(TSalesforceConnectionDefinition.COMPONENT_NAME);
-        setupProps(connProps, !ADD_QUOTES);
+        setupProps(connProps);
         // setup session function
         connProps.reuseSession.setValue(true);
         connProps.sessionDirectory.setValue(sessionFolder.getAbsolutePath());
@@ -221,7 +221,7 @@ public class SalesforceSessionReuseTestIT extends SalesforceTestBase {
         }
 
         // 5.set correct pwd back
-        setupProps(connProps, !ADD_QUOTES);
+        setupProps(connProps);
         moduleProps = (ComponentProperties) PropertiesTestUtils.checkAndBeforeActivate(getComponentService(), f, "moduleName",
                 moduleProps);
         assertEquals(ValidationResult.Result.OK, moduleProps.getValidationResult().getStatus());
@@ -242,7 +242,7 @@ public class SalesforceSessionReuseTestIT extends SalesforceTestBase {
         TSalesforceInputProperties props = (TSalesforceInputProperties) new TSalesforceInputProperties("foo").init(); //$NON-NLS-1$
         props.module.moduleName.setValue(EXISTING_MODULE_NAME);
         props.module.main.schema.setValue(getMakeRowSchema(false));
-        props.connection = setupProps(null, !ADD_QUOTES);
+        props.connection = setupProps(null);
 
         // setup session function
         props.connection.reuseSession.setValue(true);
@@ -305,7 +305,7 @@ public class SalesforceSessionReuseTestIT extends SalesforceTestBase {
         TSalesforceInputProperties props = (TSalesforceInputProperties) new TSalesforceInputProperties("foo").init(); //$NON-NLS-1$
         props.module.moduleName.setValue(EXISTING_MODULE_NAME);
         props.module.main.schema.setValue(getMakeRowSchema(false));
-        props.connection = setupProps(null, !ADD_QUOTES);
+        props.connection = setupProps(null);
 
         // setup session function
         props.connection.bulkConnection.setValue(true);
@@ -357,7 +357,7 @@ public class SalesforceSessionReuseTestIT extends SalesforceTestBase {
         TSalesforceOutputProperties props = (TSalesforceOutputProperties) new TSalesforceOutputProperties("foo").init(); //$NON-NLS-1$
         props.module.moduleName.setValue(EXISTING_MODULE_NAME);
         props.module.main.schema.setValue(getMakeRowSchema(false));
-        props.connection = setupProps(null, !ADD_QUOTES);
+        props.connection = setupProps(null);
 
         // setup session function
         props.connection.reuseSession.setValue(true);

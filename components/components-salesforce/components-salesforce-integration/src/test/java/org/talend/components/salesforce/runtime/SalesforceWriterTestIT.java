@@ -153,7 +153,7 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
 
     public static TSalesforceOutputProperties createSalesforceoutputProperties(String moduleName) throws Exception {
         TSalesforceOutputProperties props = (TSalesforceOutputProperties) new TSalesforceOutputProperties("foo").init();
-        setupProps(props.connection, !ADD_QUOTES);
+        setupProps(props.connection);
         props.module.moduleName.setValue(moduleName);
         props.module.afterModuleName();// to setup schema.
         return props;
@@ -167,7 +167,7 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
         // Get the list of records that match the prefix to delete.
         {
             TSalesforceInputProperties sfProps = getSalesforceInputProperties();
-            SalesforceTestBase.setupProps(sfProps.connection, false);
+            SalesforceTestBase.setupProps(sfProps.connection);
             sfProps.module.setValue("moduleName", "Account");
             sfProps.module.main.schema.setValue(SCHEMA_UPDATE_ACCOUNT);
             DefaultComponentRuntimeContainerImpl container = new DefaultComponentRuntimeContainerImpl();
@@ -198,7 +198,7 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
             ComponentDefinition sfDef = new TSalesforceOutputDefinition();
 
             TSalesforceOutputProperties sfProps = (TSalesforceOutputProperties) sfDef.createRuntimeProperties();
-            SalesforceTestBase.setupProps(sfProps.connection, false);
+            SalesforceTestBase.setupProps(sfProps.connection);
             sfProps.outputAction.setValue(OutputAction.DELETE);
             sfProps.module.setValue("moduleName", "Account");
             sfProps.module.main.schema.setValue(SCHEMA_UPDATE_ACCOUNT);
@@ -298,7 +298,7 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
 
         // Prepare the lookup module data
         TSalesforceOutputProperties sfLookupProps = (TSalesforceOutputProperties) sfDef.createRuntimeProperties();
-        SalesforceTestBase.setupProps(sfLookupProps.connection, false);
+        SalesforceTestBase.setupProps(sfLookupProps.connection);
         sfLookupProps.module.setValue("moduleName", "TestLookupModule__c");
         sfLookupProps.module.main.schema.setValue(CUSTOM_LOOKUP_MODULE_SCHEMA);
         sfLookupProps.ceaseForError.setValue(true);
@@ -322,7 +322,7 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
 
         // 2. Upsert "TestModule__c" with upsert relation table
         TSalesforceOutputProperties sfTestLookupProps = (TSalesforceOutputProperties) sfDef.createRuntimeProperties().init();
-        SalesforceTestBase.setupProps(sfTestLookupProps.connection, false);
+        SalesforceTestBase.setupProps(sfTestLookupProps.connection);
         sfTestLookupProps.module.setValue("moduleName", "TestModule__c");
         sfTestLookupProps.module.main.schema.setValue(CUSTOM_TEST_MODULE_SCHEMA);
         // Automatically generate the out schemas.
@@ -373,7 +373,7 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
      */
     protected void runOutputInsert(boolean isDynamic) throws Exception {
         TSalesforceOutputProperties props = createSalesforceoutputProperties(EXISTING_MODULE_NAME);
-        setupProps(props.connection, !SalesforceTestBase.ADD_QUOTES);
+        setupProps(props.connection);
 
         props.module.moduleName.setValue(EXISTING_MODULE_NAME);
         props.module.main.schema.setValue(getMakeRowSchema(isDynamic));
@@ -392,7 +392,7 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
             assertEquals(outputRows.size(), resultMap.get(ComponentDefinition.RETURN_TOTAL_RECORD_COUNT));
             // create a new props for reading the data, the schema may be altered in the original output props
             TSalesforceOutputProperties readprops = createSalesforceoutputProperties(EXISTING_MODULE_NAME);
-            setupProps(readprops.connection, !SalesforceTestBase.ADD_QUOTES);
+            setupProps(readprops.connection);
             readprops.module.beforeModuleName();
             readprops.module.moduleName.setValue(EXISTING_MODULE_NAME);
             readprops.module.afterModuleName();// to update the schema.
@@ -426,7 +426,7 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
         ComponentDefinition sfDef = new TSalesforceOutputDefinition();
 
         TSalesforceOutputProperties sfProps = (TSalesforceOutputProperties) sfDef.createRuntimeProperties();
-        SalesforceTestBase.setupProps(sfProps.connection, false);
+        SalesforceTestBase.setupProps(sfProps.connection);
         sfProps.module.setValue("moduleName", "Account");
         sfProps.module.main.schema.setValue(SCHEMA_INSERT_ACCOUNT);
         sfProps.ceaseForError.setValue(false);
@@ -490,7 +490,7 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
         ComponentDefinition sfDef = new TSalesforceOutputDefinition();
 
         TSalesforceOutputProperties sfProps = (TSalesforceOutputProperties) sfDef.createRuntimeProperties();
-        SalesforceTestBase.setupProps(sfProps.connection, false);
+        SalesforceTestBase.setupProps(sfProps.connection);
         sfProps.module.setValue("moduleName", "Account");
         sfProps.extendInsert.setValue(false);
         sfProps.ceaseForError.setValue(false);
@@ -552,7 +552,7 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
         ComponentDefinition sfDef = new TSalesforceOutputDefinition();
 
         TSalesforceOutputProperties sfProps = (TSalesforceOutputProperties) sfDef.createRuntimeProperties();
-        SalesforceTestBase.setupProps(sfProps.connection, false);
+        SalesforceTestBase.setupProps(sfProps.connection);
         sfProps.module.setValue("moduleName", "Account");
         sfProps.module.main.schema.setValue(SCHEMA_INSERT_ACCOUNT);
         sfProps.extendInsert.setValue(false);
@@ -633,7 +633,7 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
         ComponentDefinition sfDef = new TSalesforceOutputDefinition();
 
         TSalesforceOutputProperties sfProps = (TSalesforceOutputProperties) sfDef.createRuntimeProperties();
-        SalesforceTestBase.setupProps(sfProps.connection, false);
+        SalesforceTestBase.setupProps(sfProps.connection);
         sfProps.module.setValue("moduleName", "Account");
         sfProps.module.main.schema.setValue(SCHEMA_UPDATE_ACCOUNT);
         sfProps.outputAction.setValue(OutputAction.UPDATE);
@@ -729,7 +729,7 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
         ComponentDefinition sfDef = new TSalesforceOutputDefinition();
 
         TSalesforceOutputProperties sfProps = (TSalesforceOutputProperties) sfDef.createRuntimeProperties();
-        SalesforceTestBase.setupProps(sfProps.connection, false);
+        SalesforceTestBase.setupProps(sfProps.connection);
         sfProps.module.setValue("moduleName", "Account");
         sfProps.module.main.schema.setValue(SCHEMA_UPDATE_ACCOUNT);
         sfProps.extendInsert.setValue(false);
@@ -1017,7 +1017,7 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
         ComponentDefinition sfDef = new TSalesforceOutputDefinition();
 
         TSalesforceOutputProperties sfProps = (TSalesforceOutputProperties) sfDef.createRuntimeProperties();
-        SalesforceTestBase.setupProps(sfProps.connection, false);
+        SalesforceTestBase.setupProps(sfProps.connection);
         sfProps.module.setValue("moduleName", "Event");
         sfProps.module.main.schema.setValue(SCHEMA_INSERT_EVENT);
         sfProps.ceaseForError.setValue(true);
@@ -1090,7 +1090,7 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
         // 1.Prepare output component configuration
         ComponentDefinition sfDef = new TSalesforceOutputDefinition();
         TSalesforceOutputProperties sfProps = (TSalesforceOutputProperties) sfDef.createRuntimeProperties();
-        SalesforceTestBase.setupProps(sfProps.connection, false);
+        SalesforceTestBase.setupProps(sfProps.connection);
         sfProps.module.setValue("moduleName", "Contact");
         sfProps.module.main.schema.setValue(SCHEMA_CONTACT);
         sfProps.outputAction.setValue(OutputAction.UPSERT);
@@ -1195,7 +1195,7 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
 
         ComponentDefinition sfDef = new TSalesforceOutputDefinition();
         TSalesforceOutputProperties sfProps = (TSalesforceOutputProperties) sfDef.createRuntimeProperties();
-        SalesforceTestBase.setupProps(sfProps.connection, false);
+        SalesforceTestBase.setupProps(sfProps.connection);
         sfProps.module.setValue("moduleName", "Attachment");
         sfProps.module.main.schema.setValue(SCHEMA_ATTACHMENT);
         sfProps.ceaseForError.setValue(true);
@@ -1284,7 +1284,7 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
 
         ComponentDefinition sfDef = new TSalesforceOutputDefinition();
         TSalesforceOutputProperties sfProps = (TSalesforceOutputProperties) sfDef.createRuntimeProperties();
-        SalesforceTestBase.setupProps(sfProps.connection, false);
+        SalesforceTestBase.setupProps(sfProps.connection);
         sfProps.module.setValue("moduleName", moduleName);
         sfProps.module.main.schema.setValue(SCHEMA_STATIC_RESOURCE);
         sfProps.ceaseForError.setValue(true);
@@ -1336,7 +1336,7 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
 
         ComponentDefinition sfDef = new TSalesforceOutputDefinition();
         TSalesforceOutputProperties sfProps = (TSalesforceOutputProperties) sfDef.createRuntimeProperties();
-        SalesforceTestBase.setupProps(sfProps.connection, false);
+        SalesforceTestBase.setupProps(sfProps.connection);
         sfProps.module.setValue("moduleName", moduleName);
         sfProps.module.main.schema.setValue(SCHEMA_STATIC_RESOURCE);
         sfProps.ceaseForError.setValue(true);
@@ -1449,7 +1449,7 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
         ComponentDefinition sfDef = new TSalesforceOutputDefinition();
 
         TSalesforceOutputProperties sfProps = (TSalesforceOutputProperties) sfDef.createRuntimeProperties();
-        SalesforceTestBase.setupProps(sfProps.connection, false);
+        SalesforceTestBase.setupProps(sfProps.connection);
         sfProps.module.setValue("moduleName", "Account");
         Schema dynamicSchema=SchemaBuilder.builder().record("Schema") //
                 .prop(SchemaConstants.INCLUDE_ALL_FIELDS, "true") //
@@ -1553,7 +1553,7 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
         ComponentDefinition sfDef = new TSalesforceOutputDefinition();
 
         TSalesforceOutputProperties sfProps = (TSalesforceOutputProperties) sfDef.createRuntimeProperties();
-        SalesforceTestBase.setupProps(sfProps.connection, false);
+        SalesforceTestBase.setupProps(sfProps.connection);
         sfProps.outputAction.setValue(OutputAction.UPSERT);
         sfProps.upsertKeyColumn.setValue("Id");
         sfProps.module.setValue("moduleName", "Account");
@@ -1617,7 +1617,7 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
         String random = createNewRandom();
         ComponentDefinition sfDef = new TSalesforceOutputDefinition();
         TSalesforceOutputProperties sfProps = (TSalesforceOutputProperties) sfDef.createRuntimeProperties();
-        SalesforceTestBase.setupProps(sfProps.connection, false);
+        SalesforceTestBase.setupProps(sfProps.connection);
         sfProps.module.setValue("moduleName", "Account");
         sfProps.outputAction.setValue(OutputAction.INSERT);
         sfProps.module.main.schema.setValue(SCHEMA_ACCOUNT_CASE_INSENSITIVE);
@@ -1680,7 +1680,7 @@ public class SalesforceWriterTestIT extends SalesforceTestBase {
 
     public String getFirstCreatedAccountRecordId() throws Exception {
         TSalesforceInputProperties sfInputProps = getSalesforceInputProperties();
-        SalesforceTestBase.setupProps(sfInputProps.connection, false);
+        SalesforceTestBase.setupProps(sfInputProps.connection);
         sfInputProps.module.setValue("moduleName", "Account");
         sfInputProps.module.main.schema.setValue(SCHEMA_UPDATE_ACCOUNT);
         sfInputProps.condition.setValue("Id != null ORDER BY CreatedDate");

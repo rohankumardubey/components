@@ -120,14 +120,14 @@ public class SalesforceTestBase extends AbstractComponentTest {
         return afterProperty;
     }
 
-    static public SalesforceConnectionProperties setupProps(SalesforceConnectionProperties props, boolean addQuotes) {
+    static public SalesforceConnectionProperties setupProps(SalesforceConnectionProperties props) {
         if (props == null) {
             props = (SalesforceConnectionProperties) new SalesforceConnectionProperties("foo").init();
         }
         Properties userPassword = (Properties) props.getProperty("userPassword");
-        ((Property) userPassword.getProperty("userId")).setValue(addQuotes ? "\"" + userId + "\"" : userId);
-        ((Property) userPassword.getProperty("password")).setValue(addQuotes ? "\"" + password + "\"" : password);
-        ((Property) userPassword.getProperty("securityKey")).setValue(addQuotes ? "\"" + securityKey + "\"" : securityKey);
+        ((Property) userPassword.getProperty("userId")).setValue(userId);
+        ((Property) userPassword.getProperty("password")).setValue(password);
+        ((Property) userPassword.getProperty("securityKey")).setValue(securityKey);
         return props;
     }
 
@@ -393,7 +393,7 @@ public class SalesforceTestBase extends AbstractComponentTest {
         if (null == properties) {
             properties = (TSalesforceInputProperties) new TSalesforceInputProperties("foo").init(); //$NON-NLS-1$
         }
-        setupProps(properties.connection, !ADD_QUOTES);
+        setupProps(properties.connection);
         properties.batchSize.setValue(200);
         properties.module.moduleName.setValue(moduleName);
         properties.module.main.schema.setValue(
@@ -427,13 +427,13 @@ public class SalesforceTestBase extends AbstractComponentTest {
         }
         // filtering rows
         TSalesforceOutputProperties salesforceoutputProperties = createSalesforceoutputProperties(EXISTING_MODULE_NAME);
-        setupProps(salesforceoutputProperties.connection, !ADD_QUOTES);
+        setupProps(salesforceoutputProperties.connection);
         new SalesforceTestBase().deleteRows(rows, salesforceoutputProperties);
     }
 
     private static TSalesforceOutputProperties createSalesforceoutputProperties(String moduleName) throws Exception {
         TSalesforceOutputProperties props = (TSalesforceOutputProperties) new TSalesforceOutputProperties("foo").init();
-        setupProps(props.connection, !ADD_QUOTES);
+        setupProps(props.connection);
         props.module.moduleName.setValue(moduleName);
         props.module.afterModuleName();// to setup schema.
         return props;
