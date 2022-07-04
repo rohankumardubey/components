@@ -13,13 +13,6 @@
     <packaging>pom</packaging>
     <name>Component API - Beam Parent POM</name>
 
-    <properties>
-        <avro.version>1.8.1</avro.version>
-        <beam.version>2.33.0</beam.version>
-        <spark.version>2.4.6</spark.version>
-        <hadoop.version>3.2.3</hadoop.version>
-    </properties>
-
     <!-- Necessary if you want to compile with a SNAPSHOT of beam. -->
     <repositories>
         <repository>
@@ -34,80 +27,5 @@
             </snapshots>
         </repository>
     </repositories>
-
-    <dependencyManagement>
-        <dependencies>
-            <!-- core -->
-            <dependency>
-                <groupId>org.apache.beam</groupId>
-                <artifactId>beam-sdks-java-core</artifactId>
-                <version>${beam.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.google.auto.value</groupId>
-                <artifactId>auto-value</artifactId>
-                <version>1.5.1</version>
-            </dependency>
-            <!-- extensions -->
-            <dependency>
-                <groupId>org.apache.beam</groupId>
-                <artifactId>beam-sdks-java-extensions-join-library</artifactId>
-                <version>${beam.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.beam</groupId>
-                <artifactId>beam-sdks-java-extensions-sorter</artifactId>
-                <version>${beam.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.beam</groupId>
-                <artifactId>beam-sdks-java-extensions-google-cloud-platform-core</artifactId>
-                <version>${beam.version}</version>
-            </dependency>
-            <!-- runners -->
-            <dependency>
-                <groupId>org.apache.beam</groupId>
-                <artifactId>beam-runners-direct-java</artifactId>
-                <version>${beam.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.beam</groupId>
-                <artifactId>beam-runners-spark</artifactId>
-                <version>${beam.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.beam</groupId>
-                <artifactId>beam-runners-flink_2.11</artifactId>
-                <version>${beam.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.beam</groupId>
-                <artifactId>beam-runners-google-cloud-dataflow-java</artifactId>
-                <version>${beam.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.spark</groupId>
-                <artifactId>spark-core_2.11</artifactId>
-                <version>${spark.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.glassfish.jersey.core</groupId>
-                        <artifactId>jersey-server</artifactId>
-                    </exclusion>
-                    <!-- Spark brings a vulnerable 1.x version of Log4J and and also and outdated version of SL4FJ -->
-                    <exclusion>
-                        <groupId>log4j</groupId>
-                        <artifactId>log4j</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.slf4j</groupId>
-                        <artifactId>slf4j-log4j12</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-
-        </dependencies>
-    </dependencyManagement>
 </project>
 
