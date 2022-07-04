@@ -17,7 +17,7 @@
         <johnzon.version>1.2.8</johnzon.version>
         <parquet.version>1.9.0</parquet.version>
         <geronimo-json.version>1.3</geronimo-json.version>
-        <reactor-netty.version>0.9.13.RELEASE</reactor-netty.version>
+        <reactor-netty.version>1.0.20</reactor-netty.version>
         <woodstox.version>5.0.3</woodstox.version>
     </properties>
 
@@ -51,16 +51,6 @@
             <artifactId>netty-all</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.netty</groupId>
-            <artifactId>netty-codec-http</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>io.netty</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
             <groupId>io.projectreactor.netty</groupId>
             <artifactId>reactor-netty</artifactId>
             <version>${reactor-netty.version}</version>
@@ -70,10 +60,6 @@
                     <artifactId>netty-transport-native-epoll</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>io.netty</groupId>
-            <artifactId>netty-transport-native-epoll</artifactId>
         </dependency>
         <!-- For Active directory authentication -->
         <dependency>
