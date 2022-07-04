@@ -12,13 +12,19 @@
 // ============================================================================
 package org.talend.components.api;
 
-import static org.ops4j.pax.exam.CoreOptions.*;
-
 import java.io.File;
-
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.options.DefaultCompositeOption;
 import org.ops4j.pax.exam.options.libraries.JUnitBundlesOption;
+
+import static org.ops4j.pax.exam.CoreOptions.bundle;
+import static org.ops4j.pax.exam.CoreOptions.cleanCaches;
+import static org.ops4j.pax.exam.CoreOptions.frameworkProperty;
+import static org.ops4j.pax.exam.CoreOptions.linkBundle;
+import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
+import static org.ops4j.pax.exam.CoreOptions.options;
+import static org.ops4j.pax.exam.CoreOptions.systemProperty;
+import static org.ops4j.pax.exam.CoreOptions.when;
 
 /**
  * created by sgandon on 8 sept. 2015 Detailled comment
@@ -26,7 +32,7 @@ import org.ops4j.pax.exam.options.libraries.JUnitBundlesOption;
 public class ComponentsPaxExamOptions {
 
     /**
-     * 
+     *
      */
     private static final String APACHE_KARAF_AID = "apache-karaf";
 
@@ -40,10 +46,10 @@ public class ComponentsPaxExamOptions {
         }
         return options(mavenBundle("org.apache.felix", "org.apache.felix.scr", "2.1.20"), //
                 // following 2 bundles are dependencies of "org.apache.felix.scr"
-                mavenBundle( "org.osgi", "org.osgi.util.promise"), //
-                mavenBundle( "org.osgi", "org.osgi.util.function"), //
+                mavenBundle("org.osgi", "org.osgi.util.promise"), //
+                mavenBundle("org.osgi", "org.osgi.util.function"), //
                 linkBundle("org.slf4j-slf4j-api"), //
-                bundle("mvn:org.slf4j/slf4j-simple/1.7.25").noStart(), //
+                bundle("mvn:org.slf4j/slf4j-simple/1.7.36").noStart(), //
                 linkBundle("com.fasterxml.jackson.core-jackson-annotations"), //
                 linkBundle("com.fasterxml.jackson.core-jackson-core"), //
                 linkBundle("com.cedarsoftware-json-io"), //
@@ -73,9 +79,10 @@ public class ComponentsPaxExamOptions {
                         bundle("link:classpath:META-INF/links/org.ops4j.pax.exam.invoker.junit.link")),
                 cleanCaches() //
                 , frameworkProperty("org.osgi.framework.system.packages.extra").value("sun.misc"), //
-                when(localRepo.length() > 0).useOptions(systemProperty("org.ops4j.pax.url.mvn.localRepository").value(localRepo))
+                when(localRepo.length() > 0).useOptions(
+                        systemProperty("org.ops4j.pax.url.mvn.localRepository").value(localRepo))
 
-        // ,vmOption("-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5010"), systemTimeout(0)//
+                // ,vmOption("-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5010"), systemTimeout(0)//
         );
 
     }

@@ -156,7 +156,7 @@
         <junit.version>4.13.2</junit.version>
         <kafka-clients.version>2.4.1</kafka-clients.version>
         <littleproxy.version>1.1.0</littleproxy.version>
-        <log4j.version>1.2.17</log4j.version>
+        <log4j.version>2.17.2</log4j.version>
         <marketo-soap-sdk.version>3.1</marketo-soap-sdk.version>
         <mockito-core.version>2.24.0</mockito-core.version>
         <netty-all.version>4.1.48.Final</netty-all.version>
@@ -1109,6 +1109,13 @@
                 <version>${powermock-module-junit4.version}</version>
                 <scope>test</scope>
             </dependency>
+
+            <!-- Logging -->
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>jcl-over-slf4j</artifactId>
@@ -1120,25 +1127,16 @@
                 <version>${slf4j.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>log4j-over-slf4j</artifactId>
-                <version>${slf4j.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-api</artifactId>
-                <version>${slf4j.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-log4j12</artifactId>
-                <version>${slf4j.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>log4j</groupId>
-                <artifactId>log4j</artifactId>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-core</artifactId>
                 <version>${log4j.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-slf4j-impl</artifactId>
+                <version>${log4j.version}</version>
+            </dependency>
+
             <dependency>
                 <groupId>jline</groupId>
                 <artifactId>jline</artifactId>
@@ -1480,10 +1478,15 @@
                 <groupId>org.apache.hadoop</groupId>
                 <artifactId>hadoop-common</artifactId>
                 <version>${hadoop.version}</version>
+                <!-- Hadoop brings a vulnerable 1.x version of Log4J and and also and outdated version of SL4FJ -->
                 <exclusions>
                     <exclusion>
                         <groupId>log4j</groupId>
                         <artifactId>log4j</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-log4j12</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>
