@@ -45,13 +45,6 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
-
-            <!-- Force JUnit 4 version as we don't want to migrate all of our tests -->
-            <dependency>
-                <groupId>junit</groupId>
-                <artifactId>junit</artifactId>
-                <version>4.12</version>
-            </dependency>
         </dependencies>
     </dependencyManagement>
 
