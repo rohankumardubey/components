@@ -164,6 +164,9 @@
                     <projectsDirectory>src/it</projectsDirectory>
                     <cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
                     <onlyResolveDependencies>true</onlyResolveDependencies>
+                    <pomIncludes>
+                        <pomInclude>*/pom.xml</pomInclude>
+                    </pomIncludes>
                 </configuration>
                 <executions>
                     <execution>
@@ -206,9 +209,6 @@
                                 <extraArtifact>com.amazonaws:aws-java-sdk-sts:${redshift.aws.driver.exts.version}:jar
                                 </extraArtifact>
                             </extraArtifacts>
-                            <pomIncludes>
-                                <pomInclude>*/pom.xml</pomInclude>
-                            </pomIncludes>
                         </configuration>
                     </execution>
                 </executions>

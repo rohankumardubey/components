@@ -255,6 +255,9 @@
                     <projectsDirectory>src/it</projectsDirectory>
                     <cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
                     <onlyResolveDependencies>true</onlyResolveDependencies>
+                    <pomIncludes>
+                        <pomInclude>*/pom.xml</pomInclude>
+                    </pomIncludes>
                 </configuration>
                 <executions>
                     <execution>
@@ -263,11 +266,6 @@
                         <goals>
                             <goal>install</goal>
                         </goals>
-                        <configuration>
-                            <pomIncludes>
-                                <pomInclude>*/pom.xml</pomInclude>
-                            </pomIncludes>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>
