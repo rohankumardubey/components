@@ -9,7 +9,7 @@
     <packaging>pom</packaging>
     <name>Component BOM</name>
     <properties>
-        <daikon.version>6.8.2</daikon.version>
+        <daikon.version>6.8.3</daikon.version>
 
         <!-- repositories -->
         <talend_snapshots_deployment>
@@ -34,10 +34,10 @@
         <aws-java-sdk-s3.version>${aws.version}</aws-java-sdk-s3.version>
         <aws-java-sdk-sts.version>${aws.version}</aws-java-sdk-sts.version>
         <aws.version>1.11.848</aws.version>
-        <azure-keyvault-core.version>0.9.7</azure-keyvault-core.version>
-        <azure-storage.version>8.6.0</azure-storage.version>
-        <azure-storage-blob.version>12.9.0</azure-storage-blob.version>
-        <azure-identity.version>1.2.0</azure-identity.version>
+        <azure-keyvault-core.version>1.2.6</azure-keyvault-core.version>
+        <azure-storage.version>8.6.6</azure-storage.version>
+        <azure-storage-blob.version>12.17.1</azure-storage-blob.version>
+        <azure-identity.version>1.5.3</azure-identity.version>
         <msla4j.version>1.10.1</msla4j.version>
         <org.bouncycastle.version>1.69</org.bouncycastle.version>
         <bcmail-jdk15on.version>${org.bouncycastle.version}</bcmail-jdk15on.version>
@@ -76,7 +76,7 @@
         <commons-math.version>2.1</commons-math.version>
         <commons-math3.version>3.4.1</commons-math3.version>
         <commons-modeler.version>2.0.1</commons-modeler.version>
-        <commons-net.version>2.2</commons-net.version>
+        <commons-net.version>3.8.0</commons-net.version>
         <commons-pool.version>1.6</commons-pool.version>
         <commons-pool2.version>2.4.2</commons-pool2.version>
         <commons-validator.version>1.6</commons-validator.version>
@@ -1404,6 +1404,10 @@
                         <groupId>org.slf4j</groupId>
                         <artifactId>slf4j-log4j12</artifactId>
                     </exclusion>
+                    <exclusion>
+                        <groupId>commons-net</groupId>
+                        <artifactId>commons-net</artifactId>
+                    </exclusion>
                 </exclusions>
             </dependency>
             <dependency>
@@ -1570,6 +1574,10 @@
                     <exclusion>
                         <groupId>org.slf4j</groupId>
                         <artifactId>slf4j-log4j12</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>commons-net</groupId>
+                        <artifactId>commons-net</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>
