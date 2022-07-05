@@ -211,12 +211,6 @@
         </dependency>
         <dependency>
             <groupId>org.talend.components</groupId>
-            <artifactId>components-jdbc-runtime</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.talend.components</groupId>
             <artifactId>components-api</artifactId>
             <classifier>tests</classifier>
             <scope>test</scope>
@@ -350,6 +344,7 @@
                 <!-- prevent spring plugin to create a big startable jar -->
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>2.7.1</version>
                 <executions>
                     <execution>
                         <configuration>
@@ -384,6 +379,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
+                <version>3.2.2</version>
                 <executions>
                     <!-- create an executable jar only with rest service
                         classes, excluding configuration but using the maven repo classpath files -->
@@ -442,6 +438,7 @@
             <plugin>
                 <groupId>com.webcohesion.enunciate</groupId>
                 <artifactId>enunciate-maven-plugin</artifactId>
+                <version>2.14.0</version>
                 <configuration>
                     <skipEnunciate>true</skipEnunciate>
                 </configuration>
@@ -485,7 +482,6 @@
                     classpath -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
-                <version>3.0.0-M3</version>
                 <executions>
                     <execution>
                         <goals>
