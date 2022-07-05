@@ -181,7 +181,7 @@
         <snowflake-jdbc.version>3.13.1</snowflake-jdbc.version>
         <spark.version>2.4.8</spark.version>
         <!-- This Spring Boot version is used for some integration tests in components. Services are using a different version -->
-        <spring-boot.version>1.5.22.RELEASE</spring-boot.version>
+        <spring-boot.version>2.7.1</spring-boot.version>
         <stax2-api.version>4.1</stax2-api.version>
         <talend_file_enhanced_20070724.version>6.0.0</talend_file_enhanced_20070724.version>
         <talendcsv.version>1.0.0</talendcsv.version>
@@ -1146,6 +1146,16 @@
                 <artifactId>spring-boot-starter-test</artifactId>
                 <version>${spring-boot.version}</version>
                 <scope>test</scope>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.junit.jupiter</groupId>
+                        <artifactId>junit-jupiter-engine</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.junit.vintage</groupId>
+                        <artifactId>junit-vintage-engine</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.osgi</groupId>

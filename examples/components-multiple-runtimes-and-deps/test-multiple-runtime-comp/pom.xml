@@ -77,11 +77,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>multiple-runtime-comp</artifactId>
             <version>${project.version}</version>
