@@ -36,15 +36,12 @@ class ExceptionConvertionAspect {
     @Around("execution(public * org.talend.components.service.rest.*.DefinitionsController .*(..)) "
             + "|| execution(public * org.talend.components.service.rest.*.PropertiesController .*(..)) "
             + "|| execution(public * org.talend.components.service.rest.*.RuntimesController .*(..)) ")
-    // + "|| execution(public *
-    // org.talend.components.service.rest.configuration.RestProcessingExceptionThrowingControllerI .*(..)) ") // test
-    // class
     public Object exception(ProceedingJoinPoint pjp) throws Throwable {
         try {
             return pjp.proceed();
         } catch (TalendRuntimeException e) {
             throw e; // Let TalendRuntimeException pass through (to be processed in correct HTTP code by controller
-                     // advice).
+            // advice).
         } catch (Exception e) {
             throw new TalendRuntimeException(CommonErrorCodes.UNEXPECTED_EXCEPTION, e);
         }
