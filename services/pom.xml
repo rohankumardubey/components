@@ -13,7 +13,7 @@
     <properties>
         <!-- /!\ START Spring BOM PROPERTIES /!\ -->
         <!-- /!\ To update the properties below, refer to the documentation in /doc/development.md#upgrading-spring -->
-        <talend.springboot.bom.version>0.0.1</talend.springboot.bom.version>
+        <talend.springboot.bom.version>0.0.3</talend.springboot.bom.version>
         <talend.springboot.bom.artifactId>2.7</talend.springboot.bom.artifactId>
         <!-- /!\ END Spring BOM PROPERTIES /!\ -->
     </properties>
