@@ -25,17 +25,14 @@ package org.talend.components.simplefileio.runtime.beamcopy;
  * specific language governing permissions and limitations under the License.
  */
 
-import static org.apache.beam.repackaged.beam_sdks_java_core.com.google.common.base.Preconditions.checkState;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 import java.io.IOException;
-import java.net.URI;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
-
-import org.apache.beam.repackaged.beam_sdks_java_core.com.google.common.collect.Lists;
-import org.apache.beam.repackaged.beam_sdks_java_core.com.google.common.collect.Maps;
-import org.apache.beam.repackaged.beam_sdks_java_core.com.google.common.collect.Sets;
 import org.apache.beam.sdk.coders.Coder;
 import org.apache.beam.sdk.coders.StringUtf8Coder;
 import org.apache.beam.sdk.options.PipelineOptions;
@@ -60,6 +57,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.simplefileio.runtime.utils.FileSystemUtil;
 
+import static com.google.common.base.Preconditions.checkState;
+
 /**
  * Copied from https://github.com/apache/beam/commit/89cf4613465647e2711983674879afd5f67c519d
  *
@@ -68,8 +67,10 @@ import org.talend.components.simplefileio.runtime.utils.FileSystemUtil;
  *
  * A {@code Sink} for writing records to a Hadoop filesystem using a Hadoop file-based output format.
  *
- * @param <K> The type of keys to be written to the sink.
- * @param <V> The type of values to be written to the sink.
+ * @param <K>
+ *         The type of keys to be written to the sink.
+ * @param <V>
+ *         The type of values to be written to the sink.
  */
 public class ConfigurableHDFSFileSink<K, V> extends Sink<KV<K, V>> {
 
@@ -210,14 +211,14 @@ public class ConfigurableHDFSFileSink<K, V> extends Sink<KV<K, V>> {
             }
 
             FileStatus[] sourceStatuses = FileSystemUtil.listSubFiles(fs, path); // after rename, before generate merged
-                                                                                 // file
+            // file
             if (sourceStatuses.length > 0 && mergeOutput) {
                 String sourceFileName = sourceStatuses[0].getPath().getName();
                 String extension =
                         sourceFileName.indexOf('.') > 0 ? sourceFileName.substring(sourceFileName.indexOf('.')) : "";
                 String finalPath = path + String.format("/part-r-merged%s", extension);
                 fs.delete(new Path(finalPath), true); // finalize method may be called multiple times, be sure
-                                                      // idempotent
+                // idempotent
                 LOG.info("Start to merge files in {} to {}", path, finalPath);
                 mergeOutput(fs, path, finalPath);
                 LOG.info("Merge files in {} to {} successful, start to delete the source files.", path, finalPath);
