@@ -189,6 +189,10 @@
                                 <extraArtifact>
                                     org.talend.components:components-azure-dls-gen2-blob:${project.version}:jar
                                 </extraArtifact>
+                                <extraArtifact>org.talend.components:simplefileio-runtime:${project.version}:jar
+                                </extraArtifact>
+                                <extraArtifact>org.talend.components:s3-runtime-di:${project.version}:jar
+                                </extraArtifact>
                                 <!-- JDBC drivers -->
                                 <extraArtifact>org.apache.derby:derbyclient:${derby.driver.version}:jar</extraArtifact>
                                 <extraArtifact>org.mariadb.jdbc:mariadb-java-client:${mariadb.driver.version}:jar
@@ -295,6 +299,11 @@
                                 <artifact>
                                     <groupId>org.talend.components</groupId>
                                     <artifactId>components-azure-dls-gen2-blob</artifactId>
+                                    <version>${project.version}</version>
+                                </artifact>
+                                <artifact>
+                                    <groupId>org.talend.components</groupId>
+                                    <artifactId>simplefileio-definition</artifactId>
                                     <version>${project.version}</version>
                                 </artifact>
                             </artifacts>

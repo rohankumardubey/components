@@ -20,5 +20,6 @@
         <module>components-azure-dls-gen2-blob</module>
         <!-- Slow-building components are built last. -->
         <module>components-salesforce</module>
+        <module>components-fileio</module>
     </modules>
 </project>
