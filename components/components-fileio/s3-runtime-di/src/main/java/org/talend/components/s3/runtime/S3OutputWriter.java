@@ -1,11 +1,15 @@
 package org.talend.components.s3.runtime;
 
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.amazonaws.services.s3.model.SSEAwsKeyManagementParams;
+import com.talend.csv.CSVWriter;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
 import org.apache.commons.lang3.StringUtils;
@@ -19,13 +23,6 @@ import org.talend.components.simplefileio.s3.S3DatasetProperties;
 import org.talend.components.simplefileio.s3.output.S3OutputProperties;
 import org.talend.daikon.avro.AvroRegistry;
 import org.talend.daikon.avro.converter.IndexedRecordConverter;
-
-import com.amazonaws.AmazonServiceException;
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.internal.Constants;
-import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.amazonaws.services.s3.model.SSEAwsKeyManagementParams;
-import com.csvreader.CsvWriter;
 
 public class S3OutputWriter implements Writer<Result> {
 
@@ -43,7 +40,7 @@ public class S3OutputWriter implements Writer<Result> {
 
     private AmazonS3 s3_client;
 
-    private CsvWriter writer;
+    private CSVWriter writer;
 
     private File data_file;
 
@@ -70,7 +67,7 @@ public class S3OutputWriter implements Writer<Result> {
         data_file = File.createTempFile("s3-", ".csv");
 
         OutputStream outputStream = new FileOutputStream(data_file);
-        writer = new CsvWriter(new OutputStreamWriter(outputStream), ';');
+        writer = new CSVWriter(new OutputStreamWriter(outputStream)).setSeparator(';');
     }
 
     private boolean firstRow = true;
@@ -82,9 +79,9 @@ public class S3OutputWriter implements Writer<Result> {
         // write header
         if (firstRow) {
             for (Schema.Field f : input.getSchema().getFields()) {
-                writer.write(String.valueOf(String.valueOf(f.name())));
+                writer.writeColumn(String.valueOf(String.valueOf(f.name())));
             }
-            writer.endRecord();
+            writer.endRow();
             firstRow = false;
         }
 
@@ -92,14 +89,14 @@ public class S3OutputWriter implements Writer<Result> {
         for (Schema.Field f : input.getSchema().getFields()) {
             final Object value = input.get(f.pos());
             if (value == null) {
-                writer.write(StringUtils.EMPTY);
+                writer.writeColumn(StringUtils.EMPTY);
             } else {
                 // TODO maybe adjust it, not sure
-                writer.write(String.valueOf(value));
+                writer.writeColumn(String.valueOf(value));
             }
         }
 
-        writer.endRecord();
+        writer.endRow();
 
         result.totalCount++;
     }
@@ -124,11 +121,13 @@ public class S3OutputWriter implements Writer<Result> {
             }
 
             S3DatasetProperties data_set = properties.getDatasetProperties();
-            PutObjectRequest request = new PutObjectRequest(data_set.bucket.getValue(), data_set.object.getValue(), data_file);
+            PutObjectRequest request =
+                    new PutObjectRequest(data_set.bucket.getValue(), data_set.object.getValue(), data_file);
 
             Boolean serverSideEnc = data_set.encryptDataAtRest.getValue();
             if (serverSideEnc != null && serverSideEnc) {
-                request.withSSEAwsKeyManagementParams(new SSEAwsKeyManagementParams(data_set.kmsForDataAtRest.getValue()));
+                request.withSSEAwsKeyManagementParams(
+                        new SSEAwsKeyManagementParams(data_set.kmsForDataAtRest.getValue()));
             }
 
             s3_client.putObject(request);

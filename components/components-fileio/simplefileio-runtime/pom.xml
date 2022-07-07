@@ -20,8 +20,8 @@
         <hadoop.aws.version>2.7.3.1</hadoop.aws.version>
         <parquet.version>1.9.0</parquet.version>
         <tika.version>1.28.4</tika.version>
-        <poi.version>3.17</poi.version>
-        <xlsx-streamer.version>2.2.0</xlsx-streamer.version>
+        <poi.version>3.16</poi.version>
+        <xlsx-streamer.version>1.0.0</xlsx-streamer.version>
         <coverage.sonar.reportRoot>${project.basedir}/..</coverage.sonar.reportRoot>
     </properties>
 
