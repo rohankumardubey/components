@@ -14,11 +14,8 @@
 package org.talend.components.simplefileio.runtime.hadoop.excel;
 
 import java.text.DateFormat;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
@@ -38,7 +35,6 @@ public class ExcelUtils {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExcelUtils.class);
 
     /**
-     *
      * @param cell
      * @param formulaEvaluator
      * @return return the cell value as String (if needed evaluate the existing formula)
@@ -47,7 +43,7 @@ public class ExcelUtils {
         if (cell == null) {
             return StringUtils.EMPTY;
         }
-        switch (cell.getCellTypeEnum()) {
+        switch (cell.getCellType()) {
         case BLANK:
             return "";
         case BOOLEAN:
@@ -69,12 +65,11 @@ public class ExcelUtils {
             //TODO which is better? StringUtils.trim(cell.getStringCellValue())
             return cell.getRichStringCellValue().getString();
         default:
-            return "Unknown Cell Type: " + cell.getCellTypeEnum();
+            return "Unknown Cell Type: " + cell.getCellType();
         }
     }
 
     /**
-     *
      * @param cell
      * @param cellValue
      * @return internal method which switch on the formula result value type then return a String value
@@ -83,7 +78,7 @@ public class ExcelUtils {
         if (cellValue == null) {
             return StringUtils.EMPTY;
         }
-        switch (cellValue.getCellTypeEnum()) {
+        switch (cellValue.getCellType()) {
         case BLANK:
             return "";
         case BOOLEAN:
@@ -96,67 +91,69 @@ public class ExcelUtils {
             //TODO which is better? StringUtils.trim(cell.getStringCellValue())
             return cell.getRichStringCellValue().getString();
         default:
-            return "Unknown Cell Type: " + cell.getCellTypeEnum();
+            return "Unknown Cell Type: " + cell.getCellType();
         }
     }
 
     //TODO configurable?
     //private static final DateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy", Locale.ENGLISH);//this is the one dataprep use for excel 97
     private static final DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
-    
+
     //TODO use this for number?
-//    private static DecimalFormat df = new DecimalFormat("#.####################################", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
-    
+    //    private static DecimalFormat df = new DecimalFormat("#.####################################", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
+
     //Numeric type (use data formatter to get number format right)
-    private static final DataFormatter formatter = new DataFormatter(Locale.ENGLISH);//this is the one dataprep use for excel 97
-    
+    private static final DataFormatter formatter = new DataFormatter(Locale.ENGLISH);
+    //this is the one dataprep use for excel 97
+
     /**
      * Return the numeric value.
      *
-     * @param cell the cell to extract the value from.
+     * @param cell
+     *         the cell to extract the value from.
      * @return the numeric value from the cell.
      */
     private static String getNumericValue(Cell cell, CellValue cellValue, boolean fromFormula) {
         if (DateUtil.isCellDateFormatted(cell)) {
             return sdf.format(cell.getDateCellValue());
         }
-        
+
         if (cellValue == null) {
             return formatter.formatCellValue(cell);
         }
 
         return fromFormula ? cellValue.formatAsString() : formatter.formatCellValue(cell);
     }
-    
+
     public static boolean isEmptyRow(Row row) {
-      if (row == null) {
-          return true;
-      }
-      
-      if (row.getLastCellNum() < 1) {
-          return true;
-      }
-      
-      for (int cellNum = row.getFirstCellNum(); cellNum < row.getLastCellNum(); cellNum++) {
-          Cell cell = row.getCell(cellNum);
-          if (cell != null && cell.getCellTypeEnum() != CellType.BLANK && StringUtils.isNotBlank(cell.toString())) {
-              return false;
-          }
-      }
-      return true;
+        if (row == null) {
+            return true;
+        }
+
+        if (row.getLastCellNum() < 1) {
+            return true;
+        }
+
+        for (int cellNum = row.getFirstCellNum(); cellNum < row.getLastCellNum(); cellNum++) {
+            Cell cell = row.getCell(cellNum);
+            if (cell != null && cell.getCellType() != CellType.BLANK && StringUtils.isNotBlank(cell.toString())) {
+                return false;
+            }
+        }
+        return true;
     }
-    
+
     public static boolean isEmptyRow4Stream(Row row) {
-      if (row == null) {
-          return true;
-      }
-      
-      for (Cell cell : row) {
-          if (cell != null && cell.getCellType() != Cell.CELL_TYPE_BLANK  && StringUtils.isNotBlank(cell.toString())) {
-              return false;
-          }
-      }
-      return true;
+        if (row == null) {
+            return true;
+        }
+
+        for (Cell cell : row) {
+            if (cell != null && cell.getCellType() != CellType.BLANK && StringUtils.isNotBlank(cell.toString())) {
+                return false;
+            }
+        }
+        return true;
     }
 
 }
