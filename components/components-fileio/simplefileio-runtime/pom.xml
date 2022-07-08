@@ -20,8 +20,8 @@
         <hadoop.aws.version>2.7.3.1</hadoop.aws.version>
         <parquet.version>1.9.0</parquet.version>
         <tika.version>2.4.1</tika.version>
-        <poi.version>4.1.2</poi.version>
-        <xlsx-streamer.version>2.2.0</xlsx-streamer.version>
+        <poi.version>5.2.2</poi.version>
+        <excel-streaming-reader.version>4.0.1</excel-streaming-reader.version>
         <coverage.sonar.reportRoot>${project.basedir}/..</coverage.sonar.reportRoot>
     </properties>
 
@@ -226,24 +226,11 @@
         </dependency>
 
         <dependency>
-            <groupId>com.monitorjbl</groupId>
-            <artifactId>xlsx-streamer</artifactId>
-            <version>${xlsx-streamer.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.poi</groupId>
-                    <artifactId>poi-ooxml</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>xerces</groupId>
-                    <artifactId>xercesImpl</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-api</artifactId>
-                </exclusion>
-            </exclusions>
+            <groupId>com.github.pjfanning</groupId>
+            <artifactId>excel-streaming-reader</artifactId>
+            <version>${excel-streaming-reader.version}</version>
         </dependency>
+
         <dependency>
             <groupId>org.apache.tika</groupId>
             <artifactId>tika-parsers-standard-package</artifactId>

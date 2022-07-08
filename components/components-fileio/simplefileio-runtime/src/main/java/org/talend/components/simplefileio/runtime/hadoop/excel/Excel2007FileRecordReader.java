@@ -1,7 +1,7 @@
 package org.talend.components.simplefileio.runtime.hadoop.excel;
 
-import com.monitorjbl.xlsx.StreamingReader;
-import com.monitorjbl.xlsx.impl.StreamingRow;
+import com.github.pjfanning.xlsx.StreamingReader;
+import com.github.pjfanning.xlsx.impl.StreamingRow;
 
 import java.io.IOException;
 import java.io.InputStream;
