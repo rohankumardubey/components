@@ -12,11 +12,10 @@
 // ============================================================================
 package org.talend.components.test;
 
-import static java.util.Collections.emptyList;
+import com.google.common.collect.ImmutableMap;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import org.apache.beam.runners.spark.SparkContextOptions;
 import org.apache.beam.runners.spark.SparkRunner;
 import org.apache.beam.sdk.Pipeline;
@@ -29,9 +28,8 @@ import org.apache.spark.api.java.JavaSparkContext;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
-import org.talend.components.adapter.beam.coders.LazyAvroCoder;
 
-import avro.shaded.com.google.common.collect.ImmutableMap;
+import static java.util.Collections.emptyList;
 
 /**
  * Reusable for creating a {@link org.apache.spark.api.java.JavaSparkContext} pointing to a specific cluster for Spark
@@ -53,7 +51,7 @@ public class SparkIntegrationTestResource extends TemporaryFolder {
 
     /** Default hadoop configuration. */
     public final static Map<String, String> HADOOP_CONF_DEFAULT = ImmutableMap
-            .<String, String> builder()
+            .<String, String>builder()
             .put(CommonConfigurationKeys.FS_DEFAULT_NAME_KEY, NN_DEFAULT)
             .put(YarnConfiguration.RM_ADDRESS, RM_DEFAULT)
             .put(YarnConfiguration.RM_SCHEDULER_ADDRESS, RMS_DEFAULT)
@@ -93,7 +91,8 @@ public class SparkIntegrationTestResource extends TemporaryFolder {
         this.hadoopConf = hadoopConf;
     }
 
-    public static SparkIntegrationTestResource ofYarnClient(String nn, String rm, String rms, Map<String, String> hadoopConf) {
+    public static SparkIntegrationTestResource ofYarnClient(String nn, String rm, String rms,
+            Map<String, String> hadoopConf) {
         return new SparkIntegrationTestResource(nn, rm, rms, "yarn-client", hadoopConf);
     }
 
