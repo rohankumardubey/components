@@ -26,9 +26,11 @@ import static org.talend.components.google.drive.runtime.GoogleDriveConstants.Q_
 import static org.talend.components.google.drive.runtime.GoogleDriveConstants.ROOT_OR_SHARED_WITH_ME_PARENT;
 import static org.talend.components.google.drive.runtime.GoogleDriveConstants.ROOT_FOLDER_SEPARATOR;
 
+import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -482,28 +484,49 @@ public class GoogleDriveUtils {
                 .debug("[getResource] Found fileName `{}` [id: {}, mime: {}, ext: {}]", parameters.getResourceId(),
                         fileId,
                         fileMimeType, file.getFileExtension());
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        /* Google Apps types */
-        if (GoogleDriveMimeTypes.GOOGLE_DRIVE_APPS.contains(fileMimeType)) {
-            String exportFormat = parameters.getMimeType().get(fileMimeType).getMimeType();
-            outputFileExt = parameters.getMimeType().get(fileMimeType).getExtension();
-            drive.files().export(fileId, exportFormat).executeMediaAndDownloadTo(outputStream);
-        } else { /* Standard fileName */
-            drive.files().get(fileId).setSupportsAllDrives(includeSharedDrives).executeMediaAndDownloadTo(outputStream);
-        }
-        byte[] content = outputStream.toByteArray();
-        if (parameters.isStoreToLocal()) {
-            String localFile = parameters.getOutputFileName();
-            if (parameters.isAddExt()) {
-                localFile = localFile + ((localFile.endsWith(outputFileExt)) ? "" : outputFileExt);
-            }
-            LOG.info(messages.getMessage("message.writing.resource", parameters.getResourceId(), localFile));
-            try (FileOutputStream fout = new FileOutputStream(localFile)) {
-                fout.write(content);
-            }
-        }
-
-        return new GoogleDriveGetResult(fileId, content);
+        byte[] content = null;
+        if (parameters.isCreateByteArray()) {
+			ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+			/* Google Apps types */
+			if (GoogleDriveMimeTypes.GOOGLE_DRIVE_APPS.contains(fileMimeType)) {
+				String exportFormat = parameters.getMimeType().get(fileMimeType).getMimeType();
+				outputFileExt = parameters.getMimeType().get(fileMimeType).getExtension();
+				drive.files().export(fileId, exportFormat).executeMediaAndDownloadTo(outputStream);
+			} else { /* Standard fileName */
+				drive.files().get(fileId).setSupportsAllDrives(includeSharedDrives)
+						.executeMediaAndDownloadTo(outputStream);
+			}
+			content = outputStream.toByteArray();
+			if (parameters.isStoreToLocal()) {
+				String localFile = parameters.getOutputFileName();
+				if (parameters.isAddExt()) {
+					localFile = localFile + ((localFile.endsWith(outputFileExt)) ? "" : outputFileExt);
+				}
+				LOG.info(messages.getMessage("message.writing.resource", parameters.getResourceId(), localFile));
+				try (FileOutputStream fout = new FileOutputStream(localFile)) {
+					fout.write(content);
+				}
+			} 
+		} else {
+	        String localFile = parameters.getOutputFileName();
+	        if (parameters.isAddExt()) {
+	           localFile = localFile + ((localFile.endsWith(outputFileExt)) ? "" : outputFileExt);
+	        }
+	        LOG.info(messages.getMessage("message.writing.resource", parameters.getResourceId(), localFile));
+	        try(OutputStream os = new BufferedOutputStream(new FileOutputStream(localFile))) {
+	        	/* Google Apps types */
+				if (GoogleDriveMimeTypes.GOOGLE_DRIVE_APPS.contains(fileMimeType)) {
+					String exportFormat = parameters.getMimeType().get(fileMimeType).getMimeType();
+					outputFileExt = parameters.getMimeType().get(fileMimeType).getExtension();
+					drive.files().export(fileId, exportFormat).executeMediaAndDownloadTo(os);
+				} else { /* Standard fileName */
+					drive.files().get(fileId).setSupportsAllDrives(includeSharedDrives)
+							.executeMediaAndDownloadTo(os);
+				}
+	        }
+	        
+		}
+		return new GoogleDriveGetResult(fileId, content);
     }
 
     public File putResource(GoogleDrivePutParameters parameters) throws IOException {

@@ -25,7 +25,7 @@ public class GoogleDriveGetParametersTest {
     @Before
     public void setUp() throws Exception {
         parameters = new GoogleDriveGetParameters("resource", GoogleDriveMimeTypes.newDefaultMimeTypesSupported(), true,
-                "outfile", true);
+                "outfile", true, true);
     }
 
     @Test
