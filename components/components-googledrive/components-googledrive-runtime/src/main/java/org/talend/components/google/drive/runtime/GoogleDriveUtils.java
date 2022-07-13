@@ -26,7 +26,6 @@ import static org.talend.components.google.drive.runtime.GoogleDriveConstants.Q_
 import static org.talend.components.google.drive.runtime.GoogleDriveConstants.ROOT_OR_SHARED_WITH_ME_PARENT;
 import static org.talend.components.google.drive.runtime.GoogleDriveConstants.ROOT_FOLDER_SEPARATOR;
 
-import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -484,15 +483,19 @@ public class GoogleDriveUtils {
                 .debug("[getResource] Found fileName `{}` [id: {}, mime: {}, ext: {}]", parameters.getResourceId(),
                         fileId,
                         fileMimeType, file.getFileExtension());
-        
+
         String localFile = null;
         if ((parameters.isCreateByteArray() && parameters.isStoreToLocal()) || !parameters.isCreateByteArray()) {
             localFile = parameters.getOutputFileName();
             if (parameters.isAddExt()) {
                 localFile = localFile + ((localFile.endsWith(outputFileExt)) ? "" : outputFileExt);
             }
-        } 
-        
+        }
+
+        if (!parameters.isCreateByteArray()) {
+        	LOG.info(messages.getMessage("message.writing.resource", parameters.getResourceId(), localFile));
+        }
+
         byte[] content = null;
         try (OutputStream outputStream = parameters.isCreateByteArray() ? new ByteArrayOutputStream()
                 : new FileOutputStream(localFile)) {
