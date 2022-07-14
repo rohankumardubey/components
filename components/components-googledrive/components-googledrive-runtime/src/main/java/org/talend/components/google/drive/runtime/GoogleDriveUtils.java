@@ -485,20 +485,21 @@ public class GoogleDriveUtils {
                         fileMimeType, file.getFileExtension());
 
         String localFile = null;
-        if ((parameters.isCreateByteArray() && parameters.isStoreToLocal()) || !parameters.isCreateByteArray()) {
+        if (parameters.isStoreToLocal()) {
             localFile = parameters.getOutputFileName();
             if (parameters.isAddExt()) {
                 localFile = localFile + ((localFile.endsWith(outputFileExt)) ? "" : outputFileExt);
             }
         }
 
-        if (!parameters.isCreateByteArray()) {
+        if (!parameters.isCreateByteArray() && parameters.isStoreToLocal()) {
         	LOG.info(messages.getMessage("message.writing.resource", parameters.getResourceId(), localFile));
         }
 
         byte[] content = null;
-        try (OutputStream outputStream = parameters.isCreateByteArray() ? new ByteArrayOutputStream()
-                : new FileOutputStream(localFile)) {
+		try (OutputStream outputStream = (parameters.isCreateByteArray()
+				|| (!parameters.isCreateByteArray() && !parameters.isStoreToLocal())) ? new ByteArrayOutputStream()
+						: new FileOutputStream(localFile)) {
             if (GoogleDriveMimeTypes.GOOGLE_DRIVE_APPS.contains(fileMimeType)) {
                 String exportFormat = parameters.getMimeType().get(fileMimeType).getMimeType();
                 outputFileExt = parameters.getMimeType().get(fileMimeType).getExtension();

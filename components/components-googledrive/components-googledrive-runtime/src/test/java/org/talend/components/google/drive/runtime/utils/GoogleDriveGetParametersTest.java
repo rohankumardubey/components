@@ -58,5 +58,10 @@ public class GoogleDriveGetParametersTest {
         parameters.setOutputFileName("outputFile");
         assertEquals("outputFile", parameters.getOutputFileName());
     }
+    
+    @Test
+    public void testIsCreateByteArray() throws Exception {
+        assertTrue(parameters.isCreateByteArray());
+    }
 
 }
