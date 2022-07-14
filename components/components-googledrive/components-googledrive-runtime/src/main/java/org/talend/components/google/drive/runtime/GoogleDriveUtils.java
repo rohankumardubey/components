@@ -493,13 +493,13 @@ public class GoogleDriveUtils {
         }
 
         if (!parameters.isCreateByteArray() && parameters.isStoreToLocal()) {
-        	LOG.info(messages.getMessage("message.writing.resource", parameters.getResourceId(), localFile));
+            LOG.info(messages.getMessage("message.writing.resource", parameters.getResourceId(), localFile));
         }
 
         byte[] content = null;
-		try (OutputStream outputStream = (parameters.isCreateByteArray()
-				|| (!parameters.isCreateByteArray() && !parameters.isStoreToLocal())) ? new ByteArrayOutputStream()
-						: new FileOutputStream(localFile)) {
+        try (OutputStream outputStream = (parameters.isCreateByteArray()
+                || (!parameters.isCreateByteArray() && !parameters.isStoreToLocal())) ? new ByteArrayOutputStream()
+                        : new FileOutputStream(localFile)) {
             if (GoogleDriveMimeTypes.GOOGLE_DRIVE_APPS.contains(fileMimeType)) {
                 String exportFormat = parameters.getMimeType().get(fileMimeType).getMimeType();
                 outputFileExt = parameters.getMimeType().get(fileMimeType).getExtension();
