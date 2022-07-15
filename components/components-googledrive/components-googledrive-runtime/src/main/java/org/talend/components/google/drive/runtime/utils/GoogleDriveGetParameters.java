@@ -28,7 +28,7 @@ public class GoogleDriveGetParameters {
 
     private final boolean addExt;
 
-    private boolean createByteArray;
+    private final boolean createByteArray;
 
     public GoogleDriveGetParameters(String resourceId, Map<String, MimeType> mimeType, boolean storeToLocal,
             String outputFileName, boolean addExt, boolean createByteArray) {
