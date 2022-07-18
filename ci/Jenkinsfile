@@ -20,7 +20,7 @@ def artifactoryCredentials = usernamePassword(
 
 def branch = env.BRANCH_NAME
 def repo = 'components'
-def slackChannel = 'components-ci'
+def slackChannel = 'tdp_ci'
 def escaped_branch = branch.toLowerCase().replaceAll("/", "_")    
 def PRODUCTION_DEPLOYMENT_REPOSITORY = "snapshots"
 def deploymentSuffix = (env.BRANCH_NAME == "master" || env.BRANCH_NAME.startsWith("maintenance/")) ? "${PRODUCTION_DEPLOYMENT_REPOSITORY}" : "dev_branch_snapshots/branch_${escaped_branch}"

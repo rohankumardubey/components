@@ -8,7 +8,7 @@ def veracodeCredentials = usernamePassword(
         passwordVariable: 'VERACODE_KEY',
         usernameVariable: 'VERACODE_ID')
 
-def slackChannel = 'tmp-tdp-10480-bump-tcompv0'
+def slackChannel = 'tdp_ci'
 
 def podLabel = "components-scan-${UUID.randomUUID().toString()}".take(53)
 
