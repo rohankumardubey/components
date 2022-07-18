@@ -19,13 +19,14 @@ def artifactoryCredentials = usernamePassword(
   usernameVariable: 'ARTIFACTORY_LOGIN')
 
 def branch = env.BRANCH_NAME
-def repo = 'components'
 def slackChannel = 'tdp_ci'
 def escaped_branch = branch.toLowerCase().replaceAll("/", "_")
 def PRODUCTION_DEPLOYMENT_REPOSITORY = "snapshots"
 def deploymentSuffix = (env.BRANCH_NAME == "master" || env.BRANCH_NAME.startsWith("maintenance/")) ? "${PRODUCTION_DEPLOYMENT_REPOSITORY}" : "dev_branch_snapshots/branch_${escaped_branch}"
 def m2 = "/tmp/jenkins/tdi/m2/${deploymentSuffix}"
 def podLabel = "components-${UUID.randomUUID().toString()}".take(53)
+
+final String REPOSITORY_FOLDER_WITH_RESOURCES_COPIES = '.jenkins_scripts'
 
 String dockerAndGitTag = null
 final String dockerDevRepo = 'docker-dev-local'
