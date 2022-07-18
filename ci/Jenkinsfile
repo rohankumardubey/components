@@ -123,7 +123,7 @@ spec:
 
             echo 'Docker login'
             withCredentials([artifactoryCredentials]) {
-              final String dockerLoginScriptPath = getTextFileFromResources(this, 'login_to_docker.sh')
+              final String dockerLoginScriptPath = 'resources/login_to_docker.sh'
               sh """
                 bash '${dockerLoginScriptPath}' \
                   "\${ARTIFACTORY_REGISTRY}"  \
@@ -159,7 +159,7 @@ spec:
       steps {
         container('main') {
           script {
-            final String scriptPath = getTextFileFromResources(this, 'deploy_service_docker_image.sh')
+            final String scriptPath = 'resources/deploy_service_docker_image.sh'
 
             final def pom = readMavenPom file: 'pom.xml'
             final String projectVersionFromPom = pom.version
