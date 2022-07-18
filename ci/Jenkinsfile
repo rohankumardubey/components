@@ -26,8 +26,6 @@ def deploymentSuffix = (env.BRANCH_NAME == "master" || env.BRANCH_NAME.startsWit
 def m2 = "/tmp/jenkins/tdi/m2/${deploymentSuffix}"
 def podLabel = "components-${UUID.randomUUID().toString()}".take(53)
 
-final String REPOSITORY_FOLDER_WITH_RESOURCES_COPIES = '.jenkins_scripts'
-
 String dockerAndGitTag = null
 final String dockerDevRepo = 'docker-dev-local'
 final String localRegistry = "localhost:5000/talend/common"
@@ -42,7 +40,7 @@ final String devRegistry = "${env.DOCKER_REGISTRY_HOST}/${dockerDevRepo}/talend/
  */
 static String getTextFileFromResources (final def mainScript, final String filePathInResources) {
   final String resourceContent = mainScript.libraryResource(filePathInResources)
-  final String filePath = "./${REPOSITORY_FOLDER_WITH_RESOURCES_COPIES}/${filePathInResources}"
+  final String filePath = "./.jenkins_scripts/${filePathInResources}"
   mainScript.writeFile file: filePath, text: resourceContent
   return filePath
 }
