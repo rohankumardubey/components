@@ -1,37 +1,56 @@
 def nexusCredentials = usernamePassword(
-	credentialsId: 'nexus-artifact-zl-credentials',
-    usernameVariable: 'NEXUS_USER',
-    passwordVariable: 'NEXUS_PASSWORD')
+  credentialsId: 'nexus-artifact-zl-credentials',
+  usernameVariable: 'NEXUS_USER',
+  passwordVariable: 'NEXUS_PASSWORD')
 
 def gitCredentials = usernamePassword(
-	credentialsId: 'github-credentials',
-    usernameVariable: 'GITHUB_LOGIN',
-    passwordVariable: 'GITHUB_TOKEN')
+  credentialsId: 'github-credentials',
+  usernameVariable: 'GITHUB_LOGIN',
+  passwordVariable: 'GITHUB_TOKEN')
 
 def dockerCredentials = usernamePassword(
-	credentialsId: 'docker-registry-credentials',
-    passwordVariable: 'DOCKER_PASSWORD',
-    usernameVariable: 'DOCKER_LOGIN')
+  credentialsId: 'docker-registry-credentials',
+  passwordVariable: 'DOCKER_PASSWORD',
+  usernameVariable: 'DOCKER_LOGIN')
 
 def artifactoryCredentials = usernamePassword(
-    credentialsId: 'artifactory-datapwn-credentials',
-    passwordVariable: 'ARTIFACTORY_PASSWORD',
-    usernameVariable: 'ARTIFACTORY_LOGIN')
+  credentialsId: 'artifactory-datapwn-credentials',
+  passwordVariable: 'ARTIFACTORY_PASSWORD',
+  usernameVariable: 'ARTIFACTORY_LOGIN')
 
 def branch = env.BRANCH_NAME
 def repo = 'components'
 def slackChannel = 'tdp_ci'
-def escaped_branch = branch.toLowerCase().replaceAll("/", "_")    
+def escaped_branch = branch.toLowerCase().replaceAll("/", "_")
 def PRODUCTION_DEPLOYMENT_REPOSITORY = "snapshots"
 def deploymentSuffix = (env.BRANCH_NAME == "master" || env.BRANCH_NAME.startsWith("maintenance/")) ? "${PRODUCTION_DEPLOYMENT_REPOSITORY}" : "dev_branch_snapshots/branch_${escaped_branch}"
 def m2 = "/tmp/jenkins/tdi/m2/${deploymentSuffix}"
 def podLabel = "components-${UUID.randomUUID().toString()}".take(53)
 
+String dockerAndGitTag = null
+final String dockerDevRepo = 'docker-dev-local'
+final String localRegistry = "localhost:5000/${configuration.dockerPathRepository}"
+final String devRegistry = "${env.DOCKER_REGISTRY_HOST}/${dockerDevRepo}/${configuration.dockerPathRepository}"
+
+/**
+ * Retrieves a text file from the resources folder (for example a script), writes it somewhere accessible to the pipeline
+ * and returns the path where it was written so it can be executed.
+ *
+ * This allows us to keep the shell code in shell files and benefit from the syntactic coloration,
+ * completion and linting.
+ */
+static String getTextFileFromResources (final def mainScript, final String filePathInResources) {
+  final String resourceContent = mainScript.libraryResource(filePathInResources)
+  final String filePath = "./${REPOSITORY_FOLDER_WITH_RESOURCES_COPIES}/${filePathInResources}"
+  mainScript.writeFile file: filePath, text: resourceContent
+  return filePath
+}
+
 pipeline {
   agent {
-        kubernetes {
-            label podLabel
-            yaml """
+    kubernetes {
+      label podLabel
+      yaml """
 apiVersion: v1
 kind: Pod
 spec:
@@ -71,8 +90,8 @@ spec:
     imagePullSecrets:
         - name: talend-registry
 """
-        }
     }
+  }
 
   environment {
     MAVEN_OPTS = "-Dmaven.artifact.threads=128 -Dorg.slf4j.simpleLogger.showThreadName=true -Dorg.slf4j.simpleLogger.showDateTime=true -Dorg.slf4j.simpleLogger.dateTimeFormat=HH:mm:ss -Dtalend.maven.decrypter.m2.location=${WORKSPACE}/.jenkins/"
@@ -88,45 +107,71 @@ spec:
 
   parameters {
     choice(name: 'Action',
-            choices: ['STANDARD', 'RELEASE'],
-            description: 'Kind of running : \nSTANDARD (default), normal building \nRELEASE : build release')
+      choices: ['STANDARD', 'DEPLOY'],
+      description: 'Kind of running : \nSTANDARD (default), normal building \nDEPLOY : build & deploy service Docker image')
   }
 
   stages {
-    stage('Compile | Test') {
+    stage('Prepare build') {
+      steps {
+        container('main') {
+          script {
+            final def pom = readMavenPom file: 'pom.xml'
+            final String projectVersionFromPom = pom.version
+            final String projectVersionFromPomWithoutSnapshot = projectVersionFromPom.replace('-SNAPSHOT', '')
+
+            dockerAndGitTag = "${projectVersionFromPomWithoutSnapshot}-${env.BUILD_TIMESTAMP}"
+
+            echo 'Docker login'
+            withCredentials([artifactoryCredentials]) {
+              final String dockerLoginScriptPath = getTextFileFromResources(this, 'login_to_docker.sh')
+              sh """
+                bash '${dockerLoginScriptPath}' \
+                  "\${ARTIFACTORY_REGISTRY}"  \
+                  "\${ARTIFACTORY_LOGIN}" \
+                  "\${ARTIFACTORY_PASSWORD}"
+              """
+            }
+          }
+        }
+      }
+    }
+
+
+    stage('Build') {
       when {
         expression { params.Action == 'STANDARD' }
       }
       steps {
         container('main') {
-           withCredentials([gitCredentials, nexusCredentials, dockerCredentials, artifactoryCredentials]) {
-             sh '''#!/bin/bash
-             docker version
-             echo $ARTIFACTORY_PASSWORD | docker login $ARTIFACTORY_REGISTRY -u $ARTIFACTORY_LOGIN --password-stdin
+          withCredentials([gitCredentials, nexusCredentials, dockerCredentials, artifactoryCredentials]) {
+            sh '''#!/bin/bash
              mvn clean -B -U -V install
              '''
-           }
+          }
         }
       }
     }
 
-    stage('Compile | Test | Deploy') {
+    stage('Deploy Docker Image') {
       when {
-        expression { params.Action == 'RELEASE' }
+        expression { params.Action == 'DEPLOY' }
       }
       steps {
-        container('main') {
-          withCredentials([gitCredentials, nexusCredentials, dockerCredentials, artifactoryCredentials]) {
-            sh '''#!/bin/bash
-            docker version
-            echo $ARTIFACTORY_PASSWORD | docker login $ARTIFACTORY_REGISTRY -u $ARTIFACTORY_LOGIN --password-stdin
-            mvn clean -B -U -V -s ci/settings.xml deploy
-            '''
-            // -Dgit_branch="${escaped_branch}" \
-            // -Dbigquery.project="${bigquery_project}" \
-            // -Dbigquery.service.account.file="${service_account_file}" \
-            // -Dbigquery.gcp.temp.folder="${bigquery_gcp_temp_folder}" \
-            // -Dorg.talend.components.google.drive.service_account_file="${google_drive_service_account_file}"
+        container(configuration.tsbiImage) {
+          script {
+            final String scriptPath = getTextFileFromResources(this, 'deploy_service_docker_image.sh')
+
+            final def pom = readMavenPom file: 'pom.xml'
+            final String projectVersionFromPom = pom.version
+            final String projectVersionFromPomWithoutSnapshot = projectVersionFromPom.replace('-SNAPSHOT', '')
+
+            sh """
+                bash '${scriptPath}' \
+                  '${localRegistry}' \
+                  '${devRegistry}' \
+                  '${projectVersionFromPomWithoutSnapshot}'
+              """
           }
         }
       }
@@ -135,10 +180,10 @@ spec:
 
   post {
     success {
-        slackSend(color: '#00FF00', message: "SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})", channel: "${slackChannel}")
+      slackSend(color: '#00FF00', message: "SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})", channel: "${slackChannel}")
     }
     failure {
-        slackSend(color: '#FF0000', message: "FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})", channel: "${slackChannel}")
+      slackSend(color: '#FF0000', message: "FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})", channel: "${slackChannel}")
     }
   }
 }

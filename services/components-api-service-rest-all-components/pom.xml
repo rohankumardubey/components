@@ -32,6 +32,7 @@
         <git_branch>local</git_branch>
         <talend_docker_registry>artifactory.datapwn.com</talend_docker_registry>
         <bnd-annotation.version>2.4.0</bnd-annotation.version>
+        <docker.image.tag>${project.version}-${maven.build.timestamp}</docker.image.tag>
         <!-- Aligned with component-parent -->
         <docker-maven-plugin.version>0.26.0</docker-maven-plugin.version>
     </properties>
@@ -311,10 +312,11 @@
                                                     ${talend_docker_registry}${docker.tsbiPath}/${docker.tsbiImage}:${docker.tsbiVersion}
                                                 </from>
                                                 <tags>
-                                                    <tag>${project.version}-${maven.build.timestamp}</tag>
+                                                    <tag>${docker.image.tag}</tag>
                                                 </tags>
                                                 <ports>
                                                     <port>8989</port>
+                                                    <port>9000</port> <!-- Spring Actuator -->
                                                 </ports>
                                                 <volumes>
                                                     <volume>/maven/.m2</volume>
