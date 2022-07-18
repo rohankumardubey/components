@@ -12,10 +12,16 @@
 
     <properties>
         <!-- /!\ START Spring BOM PROPERTIES /!\ -->
-        <!-- /!\ To update the properties below, refer to the documentation in /doc/development.md#upgrading-spring -->
         <talend.springboot.bom.version>0.0.3</talend.springboot.bom.version>
         <talend.springboot.bom.artifactId>2.7</talend.springboot.bom.artifactId>
         <!-- /!\ END Spring BOM PROPERTIES /!\ -->
+
+        <!-- /!\ START TSBI PROPERTIES /!\ -->
+        <docker.tsbiImage>java8-base</docker.tsbiImage>
+        <docker.tsbiVersion>2.10.4-20220707080343</docker.tsbiVersion>
+        <docker.registryName>tlnd-docker-dev</docker.registryName>
+        <docker.tsbiPath>/tlnd-docker-dev/talend/common/tsbi</docker.tsbiPath>
+        <!-- /!\ END TSBI PROPERTIES /!\ -->
     </properties>
 
     <dependencyManagement>

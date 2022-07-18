@@ -1,22 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (C) 2010-2022 Talend Inc. - www.talend.com
+  ~
+  ~ This source code is available under agreement available at
+  ~ https://www.talend.com/legal-terms/us-eula
+  ~
+  ~ You should have received a copy of the agreement
+  ~ along with this program; if not, write to Talend SA
+  ~ 5 rue Salomon de Rothschild - 92150 Suresnes
+  -->
+
+<!-- -->
+<!-- LOG Configuration -->
+<!-- -->
+<!-- It is production ready (based on Daikon Talend library) -->
 <configuration>
-    <include resource="org/springframework/boot/logging/logback/defaults.xml" />
-    <include resource="org/springframework/boot/logging/logback/console-appender.xml" />
-    <property name="LOG_PATH" value="logs" />
-    <property name="LOGGING_LEVEL" value="${LOGGING_LEVEL:-INFO}" />
-    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>logs/components-service.log</file>
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>logs/components-service.%d{yyyy-MM-dd}.log</fileNamePattern>
-            <maxHistory>30</maxHistory>
-        </rollingPolicy>
-        <layout class="org.talend.daikon.logging.event.layout.LogbackJSONLayout">
-            <param name="UserFields" value="service:tcomp" />
-            <param name="LocationInfo" value="false" />
-        </layout>
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+    <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
+
+    <property name="ECS_APPENDER_NAME" value="ecsConsole"/>
+
+    <appender name="${ECS_APPENDER_NAME}" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+            <layout class="org.talend.daikon.logging.event.layout.LogbackJSONLayout">
+                <serviceName>tcomp</serviceName>
+                <locationInfo>true</locationInfo>
+                <hostInfo>true</hostInfo>
+            </layout>
+        </encoder>
     </appender>
-    <root level="${LOGGING_LEVEL}">
-        <appender-ref ref="FILE" />
-        <appender-ref ref="CONSOLE" />
+
+    <root level="INFO">
+        <appender-ref ref="${ECS_APPENDER_NAME}"/>
     </root>
 </configuration>

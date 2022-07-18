@@ -15,16 +15,16 @@ writeAppInfoInTty() {
   # When no TTY is available, don't output to console
   if [ "`tty`" != "not a tty" ]; then
     echo "Working dir:          $PWD"
-    echo "Using java:           $JAVA_BIN"
+    echo "Using java:           $JAVA_VERSION"
     echo "Using CLASSPATH:      $APP_CLASSPATH"
     echo "launching :           $THE_CMD"
   fi
 }
 
-JAVA_BIN=`which java`
+JAVA_VERSION=`java -version 2>&1 > /dev/null | head -1`
 
-if [ -z "$JAVA_BIN" ]; then
-  echo "java is not available in the path, install java and try again."
+if [ $? -ne 0 ]; then
+  echo "Unable to get java version, please check java is installed correctly and try again."
   exit 1
 fi
 
@@ -71,7 +71,7 @@ if [ ! -z "$PAX_MVN_REPO" ] ; then
   SCRIPT_JAVA_OPTS="$SCRIPT_JAVA_OPTS -Dorg.ops4j.pax.url.mvn.repositories=$PAX_MVN_REPO"
 fi
 
-THE_CMD="$JAVA_BIN $SCRIPT_JAVA_OPTS -cp \"$APP_CLASSPATH\" $APP_CLASS $*"
+THE_CMD="java $SCRIPT_JAVA_OPTS -cp \"$APP_CLASSPATH\" $APP_CLASS $*"
 
 writeAppInfoInTty
 
