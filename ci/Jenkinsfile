@@ -31,8 +31,7 @@ pipeline {
     ARTIFACTORY_REGISTRY = "artifactory.datapwn.com"
     SLACK_CHANNEL = 'tmp-tdp-10480-bump-tcompv0'
     DOCKER_DEV_REPOSITORY_NAME = 'docker-dev-local'
-    DOCKER_LOCAL_REGISTRY_URL = 'localhost:5000/talend/common'
-    DOCKER_DEV_REGISTRY_URL = "${env.DOCKER_REGISTRY_HOST}/docker-dev-local/talend/common"
+    DOCKER_DEV_REGISTRY_URL = "artifactory.datapwn.com/docker-dev-local/talend/common"
   }
 
   options {
@@ -69,9 +68,6 @@ pipeline {
 
 
     stage('Build') {
-      when {
-        expression { params.Action == 'STANDARD' }
-      }
       steps {
         configFileProvider([mavenSettings]) {
           sh '''#!/bin/bash
@@ -106,7 +102,6 @@ pipeline {
           configFileProvider([mavenSettings]) {
             sh """
                 bash '${scriptPath}' \
-                  '${DOCKER_LOCAL_REGISTRY_URL}' \
                   '${DOCKER_DEV_REGISTRY_URL}' \
                   '${projectVersionFromPomWithoutSnapshot}' \
                   '${MAVEN_SETTINGS}'
