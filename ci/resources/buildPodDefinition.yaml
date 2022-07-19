@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: Pod
+spec:
+  imagePullSecrets:
+    - name: talend-registry
+  containers:
+    - name: talend-builder
+      image: artifactory.datapwn.com/tlnd-docker-prod/talend/common/tsbi/jdk8-builder-base:3.0.0-20220719061045
+      tty: true
+      command:
+        - cat
+      resources:
+        requests:
+          memory: "2G"
+          cpu: "2"
+        limits:
+          memory: "8G"
+          cpu: "6"
+      volumeMounts:
+        - name: docker
+          mountPath: /var/run/docker.sock
+        - name: efs-jenkins-components-maven
+          mountPath: /root/.m2/repository
+  volumes:
+    - name: docker
+      hostPath:
+        path: /var/run/docker.sock
+    - name: efs-jenkins-tdp-maven
+        persistentVolumeClaim:
+          claimName: efs-jenkins-components-m2
