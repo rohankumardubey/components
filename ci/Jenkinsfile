@@ -147,7 +147,7 @@ spec:
               --batch-mode \
               --threads 1C \
               --update-snapshots \
-              --settings "${mavenSettingsPath}"
+              --settings "${MAVEN_SETTINGS}"
              '''
           }
         }
