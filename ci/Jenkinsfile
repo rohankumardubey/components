@@ -18,6 +18,10 @@ def artifactoryCredentials = usernamePassword(
   passwordVariable: 'ARTIFACTORY_PASSWORD',
   usernameVariable: 'ARTIFACTORY_LOGIN')
 
+final def mavenSettings = configFile(
+  fileId: 'maven-settings-nexus-zl',
+  variable: 'MAVEN_SETTINGS')
+
 def branch = env.BRANCH_NAME
 def slackChannel = 'tmp-tdp-10480-bump-tcompv0'
 def escaped_branch = branch.toLowerCase().replaceAll("/", "_")
@@ -115,12 +119,6 @@ spec:
       steps {
         container('main') {
           script {
-            final def pom = readMavenPom file: 'pom.xml'
-            final String projectVersionFromPom = pom.version
-            final String projectVersionFromPomWithoutSnapshot = projectVersionFromPom.replace('-SNAPSHOT', '')
-
-            dockerAndGitTag = "${projectVersionFromPomWithoutSnapshot}-${env.BUILD_TIMESTAMP}"
-
             echo 'Docker login'
             withCredentials([artifactoryCredentials]) {
               final String dockerLoginScriptPath = 'ci/resources/login_to_docker.sh'
@@ -143,9 +141,13 @@ spec:
       }
       steps {
         container('main') {
-          withCredentials([gitCredentials, nexusCredentials, dockerCredentials, artifactoryCredentials]) {
+          configFileProvider([mavenSettings]) {
             sh '''#!/bin/bash
-             mvn clean -B -U -V install
+             mvn clean install \
+              --batch-mode \
+              --threads 1C \
+              --update-snapshots \
+              --settings "${mavenSettingsPath}"
              '''
           }
         }
@@ -165,12 +167,15 @@ spec:
             final String projectVersionFromPom = pom.version
             final String projectVersionFromPomWithoutSnapshot = projectVersionFromPom.replace('-SNAPSHOT', '')
 
-            sh """
+            configFileProvider([mavenSettings]) {
+              sh """
                 bash '${scriptPath}' \
                   '${localRegistry}' \
                   '${devRegistry}' \
-                  '${projectVersionFromPomWithoutSnapshot}'
+                  '${projectVersionFromPomWithoutSnapshot}' \
+                  '${MAVEN_SETTINGS}'
               """
+            }
           }
         }
       }

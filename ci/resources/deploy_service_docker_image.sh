@@ -11,6 +11,7 @@ main () {
   local localRegistryHost="${1:?Missing local registry host}"
   local talendRegistryHost="${2:?Missing talend registry host}"
   local projectVersion="${3:?Missing project version}"
+  local mavenSettingsPath="${4:?Missing maven settings path}"
 
   local dockerImageName="tcomp-components-api-service-rest-all-components"
   local dockerImageTimestamp=$(date '+%Y%m%d-%H%M%S')
