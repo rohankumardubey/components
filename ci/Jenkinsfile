@@ -147,6 +147,12 @@ spec:
               --batch-mode \
               --threads 1C \
               --update-snapshots \
+              --define 'skipTests' \
+              --settings "${MAVEN_SETTINGS}"
+              
+             mvn test \
+              --batch-mode \
+              --threads 1C \
               --settings "${MAVEN_SETTINGS}"
              '''
           }
