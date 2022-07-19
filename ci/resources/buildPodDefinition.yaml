@@ -26,5 +26,5 @@ spec:
       hostPath:
         path: /var/run/docker.sock
     - name: efs-jenkins-components-maven
-        persistentVolumeClaim:
-          claimName: efs-jenkins-components-m2
+      persistentVolumeClaim:
+        claimName: efs-jenkins-components-m2
