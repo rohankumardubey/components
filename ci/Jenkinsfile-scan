@@ -1,69 +1,46 @@
-def nexusCredentials = usernamePassword(
-        credentialsId: 'nexus-artifact-zl-credentials',
-        usernameVariable: 'NEXUS_USER',
-        passwordVariable: 'NEXUS_PASSWORD')
-
-def veracodeCredentials = usernamePassword(
-        credentialsId: 'veracode-api-credentials',
-        passwordVariable: 'VERACODE_KEY',
-        usernameVariable: 'VERACODE_ID')
-
-def slackChannel = 'tdp_ci'
-
-def podLabel = "components-scan-${UUID.randomUUID().toString()}".take(53)
-
-final String podDescription = """
-    apiVersion: v1
-    kind: Pod
-    spec:
-      containers:
-        - name: main
-          image: artifactory.datapwn.com/tlnd-docker-dev/talend/common/tsbi/jdk8-svc-springboot-builder:2.10.1-2.7-20220602093416
-          command: [cat]
-          tty: true
-          volumeMounts: [{name: docker, mountPath: /var/run/docker.sock}, {name: m2main, mountPath: /root/.m2/repository}]
-          resources: {requests: {memory: 3G, cpu: '2'}, limits: {memory: 8G, cpu: '2'}}
-      volumes:
-        - name: docker
-          hostPath: {path: /var/run/docker.sock}
-        - name: m2main
-          hostPath: { path: /tmp/jenkins/tdi/m2/ }
-      imagePullSecrets:
-        - name: talend-registry
-""".stripIndent()
+/*
+ * Copyright (C) 2010-2022 Talend Inc. - www.talend.com
+ *
+ * This source code is available under agreement available at https://www.talend.com/legal-terms/us-eula
+ *
+ * You should have received a copy of the agreement along with this program; if not, write to Talend SA
+ * 5 rue Salomon de Rothschild - 92150 Suresnes, France
+ *
+ */
+def POD_DEFINITION_FILE = 'ci/resources/buildPodDefinition.yaml'
 
 pipeline {
-    agent {
-        kubernetes {
-            yaml podDescription
-            defaultContainer 'main'
-        }
+  agent {
+    kubernetes {
+      yamlFile POD_DEFINITION_FILE
+      defaultContainer 'talend-builder'
     }
+  }
 
-    environment {
-        MAVEN_OPTS = '-Dmaven.artifact.threads=128 -Dorg.slf4j.simpleLogger.showThreadName=true -Dorg.slf4j.simpleLogger.showDateTime=true -Dorg.slf4j.simpleLogger.dateTimeFormat=HH:mm:ss'
-        TALEND_REGISTRY = 'registry.datapwn.com'
+  environment {
+    MAVEN_OPTS = '-Dmaven.artifact.threads=128 -Dorg.slf4j.simpleLogger.showThreadName=true -Dorg.slf4j.simpleLogger.showDateTime=true -Dorg.slf4j.simpleLogger.dateTimeFormat=HH:mm:ss'
+    TALEND_REGISTRY = 'registry.datapwn.com'
+    VERACODE_APP_NAME = 'Components'
+    VERACODE_SANDBOX = 'components'
+    APP_ID = '579232'
+    SLACK_CHANNEL = 'tmp-tdp-10480-bump-tcompv0'
+  }
 
-        VERACODE_APP_NAME = 'Components'
-        VERACODE_SANDBOX = 'components'
-        APP_ID = '579232'
-    }
+  options {
+    buildDiscarder(logRotator(artifactNumToKeepStr: '5', numToKeepStr: '5'))
+    timeout(time: 60, unit: 'MINUTES')
+    skipStagesAfterUnstable()
+  }
 
-    options {
-        buildDiscarder(logRotator(artifactNumToKeepStr: '5', numToKeepStr: '5'))
-        timeout(time: 60, unit: 'MINUTES')
-        skipStagesAfterUnstable()
-    }
+  triggers {
+    cron('0 9 * * 0')
+  }
 
-    triggers {
-        cron('0 9 * * 0')
-    }
-
-    stages {
-         stage('Prepare') {
-            steps {
-                configFileProvider([configFile(fileId: 'maven-settings-nexus-zl', variable: 'MAVEN_SETTINGS')]) {
-                    sh '''#! /bin/bash
+  stages {
+    stage('Prepare') {
+      steps {
+        configFileProvider([configFile(fileId: 'maven-settings-nexus-zl', variable: 'MAVEN_SETTINGS')]) {
+          sh '''#! /bin/bash
                         # Pass the maven credentials to the sourceclear command for the maven build, using an agent configuration file
                         # Unfortunately there seems to be no simpler way
                         # See configuration options here: https://help.veracode.com/reader/hHHR3gv0wYc2WbCclECf_A/7kaHTtCxKiogPGnzcDk0eA
@@ -77,13 +54,13 @@ pipeline {
                           --define 'skipTests' \
                           --settings "$MAVEN_SETTINGS"
                     '''
-                }
-            }
         }
-        stage("SourceClear analysis") {
-            steps {
-                withCredentials([string(credentialsId: 'veracode-token', variable: 'SRCCLR_API_TOKEN')]) {
-                    sh '''#!/bin/bash
+      }
+    }
+    stage("SourceClear analysis") {
+      steps {
+        withCredentials([string(credentialsId: 'veracode-token', variable: 'SRCCLR_API_TOKEN')]) {
+          sh '''#!/bin/bash
                       curl -sSL https://download.sourceclear.com/ci.sh \
                         | SRCCLR_API_TOKEN=${SRCCLR_API_TOKEN} DEBUG=1 sh -s -- \
                             --config agent-override.yml \
@@ -92,16 +69,16 @@ pipeline {
                             --recursive \
                             --skip-collectors npm;
                     '''
-                }
-            }
         }
+      }
     }
-    post {
-        success {
-            slackSend(color: '#00FF00', message: "SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})", channel: "${slackChannel}")
-        }
-        failure {
-            slackSend(color: '#FF0000', message: "FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})", channel: "${slackChannel}")
-        }
+  }
+  post {
+    success {
+      slackSend(color: '#00FF00', message: "SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})", channel: "${SLACK_CHANNEL}")
     }
+    failure {
+      slackSend(color: '#FF0000', message: "FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})", channel: "${SLACK_CHANNEL}")
+    }
+  }
 }
