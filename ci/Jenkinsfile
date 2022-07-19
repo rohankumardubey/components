@@ -52,18 +52,16 @@ pipeline {
   stages {
     stage('Prepare build') {
       steps {
-        container('main') {
-          script {
-            echo 'Docker login'
-            withCredentials([artifactoryCredentials]) {
-              final String dockerLoginScriptPath = 'ci/resources/login_to_docker.sh'
-              sh """
+        script {
+          echo 'Docker login'
+          withCredentials([artifactoryCredentials]) {
+            final String dockerLoginScriptPath = 'ci/resources/login_to_docker.sh'
+            sh """
                 bash '${dockerLoginScriptPath}' \
                   "\${ARTIFACTORY_REGISTRY}"  \
                   "\${ARTIFACTORY_LOGIN}" \
                   "\${ARTIFACTORY_PASSWORD}"
               """
-            }
           }
         }
       }
@@ -75,9 +73,8 @@ pipeline {
         expression { params.Action == 'STANDARD' }
       }
       steps {
-        container('main') {
-          configFileProvider([mavenSettings]) {
-            sh '''#!/bin/bash
+        configFileProvider([mavenSettings]) {
+          sh '''#!/bin/bash
              mvn clean install \
               --batch-mode \
               --threads 1C \
@@ -90,7 +87,6 @@ pipeline {
               --threads 1C \
               --settings "${MAVEN_SETTINGS}"
              '''
-          }
         }
       }
     }
@@ -100,23 +96,21 @@ pipeline {
         expression { params.Action == 'DEPLOY' }
       }
       steps {
-        container('main') {
-          script {
-            final String scriptPath = 'ci/resources/deploy_service_docker_image.sh'
+        script {
+          final String scriptPath = 'ci/resources/deploy_service_docker_image.sh'
 
-            final def pom = readMavenPom file: 'pom.xml'
-            final String projectVersionFromPom = pom.version
-            final String projectVersionFromPomWithoutSnapshot = projectVersionFromPom.replace('-SNAPSHOT', '')
+          final def pom = readMavenPom file: 'pom.xml'
+          final String projectVersionFromPom = pom.version
+          final String projectVersionFromPomWithoutSnapshot = projectVersionFromPom.replace('-SNAPSHOT', '')
 
-            configFileProvider([mavenSettings]) {
-              sh """
+          configFileProvider([mavenSettings]) {
+            sh """
                 bash '${scriptPath}' \
                   '${DOCKER_LOCAL_REGISTRY_URL}' \
                   '${DOCKER_DEV_REGISTRY_URL}' \
                   '${projectVersionFromPomWithoutSnapshot}' \
                   '${MAVEN_SETTINGS}'
               """
-            }
           }
         }
       }
