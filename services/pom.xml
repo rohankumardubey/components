@@ -19,7 +19,7 @@
         <!-- /!\ START TSBI PROPERTIES /!\ -->
         <docker.tsbiImage>java8-base</docker.tsbiImage>
         <docker.tsbiVersion>2.10.4-20220707080343</docker.tsbiVersion>
-        <docker.registryName>tlnd-docker-dev</docker.registryName>
+        <docker.registryName>docker-dev-local</docker.registryName>
         <docker.tsbiPath>/tlnd-docker-dev/talend/common/tsbi</docker.tsbiPath>
         <!-- /!\ END TSBI PROPERTIES /!\ -->
     </properties>

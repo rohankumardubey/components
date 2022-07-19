@@ -1,107 +1,44 @@
-def nexusCredentials = usernamePassword(
-  credentialsId: 'nexus-artifact-zl-credentials',
-  usernameVariable: 'NEXUS_USER',
-  passwordVariable: 'NEXUS_PASSWORD')
-
-def gitCredentials = usernamePassword(
-  credentialsId: 'github-credentials',
-  usernameVariable: 'GITHUB_LOGIN',
-  passwordVariable: 'GITHUB_TOKEN')
-
-def dockerCredentials = usernamePassword(
-  credentialsId: 'docker-registry-credentials',
-  passwordVariable: 'DOCKER_PASSWORD',
-  usernameVariable: 'DOCKER_LOGIN')
+/*
+ * Copyright (C) 2010-2022 Talend Inc. - www.talend.com
+ *
+ * This source code is available under agreement available at https://www.talend.com/legal-terms/us-eula
+ *
+ * You should have received a copy of the agreement along with this program; if not, write to Talend SA
+ * 5 rue Salomon de Rothschild - 92150 Suresnes, France
+ *
+ */
+def POD_DEFINITION_FILE = 'ci/resources/buildPodDefinition.yaml'
 
 def artifactoryCredentials = usernamePassword(
   credentialsId: 'artifactory-datapwn-credentials',
   passwordVariable: 'ARTIFACTORY_PASSWORD',
   usernameVariable: 'ARTIFACTORY_LOGIN')
 
-def branch = env.BRANCH_NAME
-def repo = 'components'
-def slackChannel = 'tdp_ci'
-def escaped_branch = branch.toLowerCase().replaceAll("/", "_")
-def PRODUCTION_DEPLOYMENT_REPOSITORY = "snapshots"
-def deploymentSuffix = (env.BRANCH_NAME == "master" || env.BRANCH_NAME.startsWith("maintenance/")) ? "${PRODUCTION_DEPLOYMENT_REPOSITORY}" : "dev_branch_snapshots/branch_${escaped_branch}"
-def m2 = "/tmp/jenkins/tdi/m2/${deploymentSuffix}"
-def podLabel = "components-${UUID.randomUUID().toString()}".take(53)
-
-String dockerAndGitTag = null
-final String dockerDevRepo = 'docker-dev-local'
-final String localRegistry = "localhost:5000/${configuration.dockerPathRepository}"
-final String devRegistry = "${env.DOCKER_REGISTRY_HOST}/${dockerDevRepo}/${configuration.dockerPathRepository}"
-
-/**
- * Retrieves a text file from the resources folder (for example a script), writes it somewhere accessible to the pipeline
- * and returns the path where it was written so it can be executed.
- *
- * This allows us to keep the shell code in shell files and benefit from the syntactic coloration,
- * completion and linting.
- */
-static String getTextFileFromResources (final def mainScript, final String filePathInResources) {
-  final String resourceContent = mainScript.libraryResource(filePathInResources)
-  final String filePath = "./${REPOSITORY_FOLDER_WITH_RESOURCES_COPIES}/${filePathInResources}"
-  mainScript.writeFile file: filePath, text: resourceContent
-  return filePath
-}
+final def mavenSettings = configFile(
+  fileId: 'maven-settings-nexus-zl',
+  variable: 'MAVEN_SETTINGS')
 
 pipeline {
   agent {
     kubernetes {
-      label podLabel
-      yaml """
-apiVersion: v1
-kind: Pod
-spec:
-    containers:
-        -
-            name: main
-            image: '${env.TSBI_IMAGE}'
-            command: [cat]
-            tty: true
-            volumeMounts: [{name: m2main, mountPath: /root/.m2/repository}]
-            resources: {requests: {memory: 3G, cpu: '2.5'}, limits: {memory: 3G, cpu: '2.5'}}
-            env:
-              - name: DOCKER_HOST
-                value: tcp://localhost:2375
-        -
-            name: dind-daemon
-            image: docker:19.03-dind
-            resources:
-                requests:
-                    cpu: 2.5
-                    memory: 3G
-            securityContext:
-                privileged: true
-            volumeMounts:
-              - name: docker-graph-storage
-                mountPath: /var/lib/docker
-            env:
-              - name: DOCKER_TLS_CERTDIR
-                value: ""
-    volumes:
-        -
-            name: m2main
-            hostPath: {path: ${m2} }
-        -
-            name: docker-graph-storage
-            emptyDir: {}
-    imagePullSecrets:
-        - name: talend-registry
-"""
+      yamlFile POD_DEFINITION_FILE
+      defaultContainer 'talend-builder'
     }
   }
 
   environment {
     MAVEN_OPTS = "-Dmaven.artifact.threads=128 -Dorg.slf4j.simpleLogger.showThreadName=true -Dorg.slf4j.simpleLogger.showDateTime=true -Dorg.slf4j.simpleLogger.dateTimeFormat=HH:mm:ss -Dtalend.maven.decrypter.m2.location=${WORKSPACE}/.jenkins/"
     ARTIFACTORY_REGISTRY = "artifactory.datapwn.com"
+    SLACK_CHANNEL = 'tmp-tdp-10480-bump-tcompv0'
+    DOCKER_DEV_REPOSITORY_NAME = 'docker-dev-local'
+    DOCKER_DEV_REGISTRY_URL = "artifactory.datapwn.com/docker-dev-local/talend/common"
   }
 
   options {
-    timeout(time: 120, unit: 'MINUTES')
+    ansiColor('xterm')
+    timeout(time: 2, unit: 'HOURS')
     skipStagesAfterUnstable()
-    buildDiscarder(logRotator(numToKeepStr: '10'))
+    buildDiscarder(logRotator(numToKeepStr: '5'))
     disableConcurrentBuilds()
   }
 
@@ -114,24 +51,16 @@ spec:
   stages {
     stage('Prepare build') {
       steps {
-        container('main') {
-          script {
-            final def pom = readMavenPom file: 'pom.xml'
-            final String projectVersionFromPom = pom.version
-            final String projectVersionFromPomWithoutSnapshot = projectVersionFromPom.replace('-SNAPSHOT', '')
-
-            dockerAndGitTag = "${projectVersionFromPomWithoutSnapshot}-${env.BUILD_TIMESTAMP}"
-
-            echo 'Docker login'
-            withCredentials([artifactoryCredentials]) {
-              final String dockerLoginScriptPath = getTextFileFromResources(this, 'login_to_docker.sh')
-              sh """
+        script {
+          echo 'Docker login'
+          withCredentials([artifactoryCredentials]) {
+            final String dockerLoginScriptPath = 'ci/resources/login_to_docker.sh'
+            sh """
                 bash '${dockerLoginScriptPath}' \
                   "\${ARTIFACTORY_REGISTRY}"  \
                   "\${ARTIFACTORY_LOGIN}" \
                   "\${ARTIFACTORY_PASSWORD}"
               """
-            }
           }
         }
       }
@@ -139,16 +68,21 @@ spec:
 
 
     stage('Build') {
-      when {
-        expression { params.Action == 'STANDARD' }
-      }
       steps {
-        container('main') {
-          withCredentials([gitCredentials, nexusCredentials, dockerCredentials, artifactoryCredentials]) {
-            sh '''#!/bin/bash
-             mvn clean -B -U -V install
+        configFileProvider([mavenSettings]) {
+          sh '''#!/bin/bash
+             mvn clean install \
+              --batch-mode \
+              --threads 1C \
+              --update-snapshots \
+              --define 'skipTests' \
+              --settings "${MAVEN_SETTINGS}"
+              
+             mvn test \
+              --batch-mode \
+              --threads 1C \
+              --settings "${MAVEN_SETTINGS}"
              '''
-          }
         }
       }
     }
@@ -158,19 +92,19 @@ spec:
         expression { params.Action == 'DEPLOY' }
       }
       steps {
-        container(configuration.tsbiImage) {
-          script {
-            final String scriptPath = getTextFileFromResources(this, 'deploy_service_docker_image.sh')
+        script {
+          final String scriptPath = 'ci/resources/deploy_service_docker_image.sh'
 
-            final def pom = readMavenPom file: 'pom.xml'
-            final String projectVersionFromPom = pom.version
-            final String projectVersionFromPomWithoutSnapshot = projectVersionFromPom.replace('-SNAPSHOT', '')
+          final def pom = readMavenPom file: 'pom.xml'
+          final String projectVersionFromPom = pom.version
+          final String projectVersionFromPomWithoutSnapshot = projectVersionFromPom.replace('-SNAPSHOT', '')
 
+          configFileProvider([mavenSettings]) {
             sh """
                 bash '${scriptPath}' \
-                  '${localRegistry}' \
-                  '${devRegistry}' \
-                  '${projectVersionFromPomWithoutSnapshot}'
+                  '${DOCKER_DEV_REGISTRY_URL}' \
+                  '${projectVersionFromPomWithoutSnapshot}' \
+                  '${MAVEN_SETTINGS}'
               """
           }
         }
@@ -180,10 +114,10 @@ spec:
 
   post {
     success {
-      slackSend(color: '#00FF00', message: "SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})", channel: "${slackChannel}")
+      slackSend(color: '#00FF00', message: "SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})", channel: "${SLACK_CHANNEL}")
     }
     failure {
-      slackSend(color: '#FF0000', message: "FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})", channel: "${slackChannel}")
+      slackSend(color: '#FF0000', message: "FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})", channel: "${SLACK_CHANNEL}")
     }
   }
 }
