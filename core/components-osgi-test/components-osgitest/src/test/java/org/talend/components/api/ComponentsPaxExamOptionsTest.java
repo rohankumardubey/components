@@ -25,7 +25,7 @@ import org.talend.components.api.test.ComponentTestUtils;
 
 @RunWith(DisablablePaxExam.class)
 @ExamReactorStrategy(PerClass.class)
-@Ignore
+@Ignore("Failing test - ignored by TDP team")
 public class ComponentsPaxExamOptionsTest {
 
     @Configuration

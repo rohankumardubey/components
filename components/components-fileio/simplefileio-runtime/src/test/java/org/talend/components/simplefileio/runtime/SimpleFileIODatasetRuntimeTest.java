@@ -325,7 +325,7 @@ public class SimpleFileIODatasetRuntimeTest {
     }
 
     @Test
-    @Ignore // FIXME fails on CI for whatever reason..
+    @Ignore("Failing test - ignored by TDP team") // FIXME fails on CI for whatever reason..
     public void testGetSampleCsv_multipleSources() throws Exception {
         RecordSet rs1 = getSimpleTestData(0);
         writeRandomCsvFile(mini.getFs(), "/user/test/input/part-00000", rs1, "UTF-8");

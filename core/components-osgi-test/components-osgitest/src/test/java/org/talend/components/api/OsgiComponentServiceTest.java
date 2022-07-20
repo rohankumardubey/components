@@ -46,7 +46,7 @@ import static org.ops4j.pax.exam.CoreOptions.options;
  */
 @RunWith(DisablablePaxExam.class)
 @ExamReactorStrategy(PerClass.class)
-@Ignore
+@Ignore("Failing test - ignored by TDP team")
 public class OsgiComponentServiceTest {
 
     static final Logger LOG = LoggerFactory.getLogger(OsgiComponentServiceTest.class);
