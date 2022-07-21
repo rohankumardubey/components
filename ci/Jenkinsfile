@@ -46,7 +46,7 @@ pipeline {
   parameters {
     choice(name: 'Action',
       choices: ['STANDARD', 'DEPLOY'],
-      description: 'Kind of running : \nSTANDARD (default), normal building \nDEPLOY : build & deploy service Docker image')
+      description: 'Kind of running : \nSTANDARD (default), normal building \nDEPLOY : build & deploy TCOMPv0 service Docker image (TDP cloud) & zip artefact (TDP on-prem)')
   }
 
   stages {
