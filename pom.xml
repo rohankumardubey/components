@@ -46,7 +46,6 @@
     <modules>
         <module>components-parent</module>
         <module>core</module>
-        <module>examples</module>
         <module>components</module>
         <module>services</module>
     </modules>
