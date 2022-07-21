@@ -3,7 +3,14 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.talend.components</groupId>
+
+    <parent>
+        <groupId>org.talend.components</groupId>
+        <artifactId>components</artifactId>
+        <version>0.38.0-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
     <artifactId>components-bom</artifactId>
     <version>0.38.0-SNAPSHOT</version>
     <packaging>pom</packaging>
@@ -1239,12 +1246,36 @@
             <!-- Components modules -->
             <dependency>
                 <groupId>org.talend.components</groupId>
+                <artifactId>components-maven-repo</artifactId>
+                <type>pom</type>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.talend.components</groupId>
+                <artifactId>components-maven-repo</artifactId>
+                <type>zip</type>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.talend.components</groupId>
+                <artifactId>components-maven-repo</artifactId>
+                <type>zip</type>
+                <classifier>config</classifier>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.talend.components</groupId>
                 <artifactId>components-adapter-beam</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.talend.components</groupId>
                 <artifactId>components-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.talend.components</groupId>
+                <artifactId>components-api-service-spi</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

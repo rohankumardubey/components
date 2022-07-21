@@ -43,21 +43,18 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api-service-rest</artifactId>
-            <version>${project.version}</version>
         </dependency>
 
         <dependency>
             <!-- only there for running test app in the IDE for now -->
             <groupId>org.talend.components</groupId>
             <artifactId>components-maven-repo</artifactId>
-            <version>${project.version}</version>
             <type>pom</type>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-maven-repo</artifactId>
-            <version>${project.version}</version>
             <type>zip</type>
             <scope>test</scope>
         </dependency>
@@ -65,7 +62,6 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-maven-repo</artifactId>
-            <version>${project.version}</version>
             <type>zip</type>
             <classifier>config</classifier>
             <scope>test</scope>
@@ -87,14 +83,12 @@
             <groupId>org.talend.components</groupId>
             <artifactId>components-api-service-rest</artifactId>
             <type>test-jar</type>
-            <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-api</artifactId>
             <classifier>tests</classifier>
-            <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>

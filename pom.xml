@@ -48,6 +48,8 @@
         <module>core</module>
         <module>components</module>
         <module>services</module>
+        <module>components-p2update-assembly</module>
+        <module>components-bom</module>
     </modules>
     <build>
         <plugins>
