@@ -12,16 +12,6 @@
 // ============================================================================
 package org.talend.components.api.service.common;
 
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -29,7 +19,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
 import org.junit.Before;
@@ -57,6 +46,16 @@ import org.talend.components.api.wizard.WizardImageType;
 import org.talend.daikon.i18n.I18nMessages;
 import org.talend.daikon.runtime.RuntimeInfo;
 
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+
 public class ComponentServiceTest extends AbstractComponentTest {
 
     static class NotExistingComponentProperties extends ComponentPropertiesImpl {
@@ -82,7 +81,7 @@ public class ComponentServiceTest extends AbstractComponentTest {
         componentService = null;
     }
 
-    // default implementation for pure java test. Shall be overriden of Spring or OSGI tests
+    // default implementation for pure java test. Shall be overriden of Spring tests
     @Override
     public ComponentService getComponentService() {
         if (componentService == null) {
@@ -96,9 +95,11 @@ public class ComponentServiceTest extends AbstractComponentTest {
 
     @Test
     public void testSupportsProps() throws Throwable {
-        ComponentProperties props = getComponentService().getComponentProperties(TestComponentDefinition.COMPONENT_NAME);
-        ComponentPropertiesWithDefinedI18N anotherProp = (ComponentPropertiesWithDefinedI18N) new ComponentPropertiesWithDefinedI18N(
-                "foo").init();
+        ComponentProperties props =
+                getComponentService().getComponentProperties(TestComponentDefinition.COMPONENT_NAME);
+        ComponentPropertiesWithDefinedI18N anotherProp =
+                (ComponentPropertiesWithDefinedI18N) new ComponentPropertiesWithDefinedI18N(
+                        "foo").init();
         List<ComponentDefinition> comps = getComponentService().getPossibleComponents(props, anotherProp);
         assertEquals("TestComponent", comps.get(0).getName());
 
@@ -109,8 +110,9 @@ public class ComponentServiceTest extends AbstractComponentTest {
 
     @Test
     public void testGetWizardIconOk() {
-        InputStream iconStream = getComponentService().getWizardPngImage(TestComponentWizardDefinition.COMPONENT_WIZARD_NAME,
-                WizardImageType.TREE_ICON_16X16);
+        InputStream iconStream =
+                getComponentService().getWizardPngImage(TestComponentWizardDefinition.COMPONENT_WIZARD_NAME,
+                        WizardImageType.TREE_ICON_16X16);
         assertNotNull(iconStream);
     }
 
@@ -123,8 +125,9 @@ public class ComponentServiceTest extends AbstractComponentTest {
 
     @Test
     public void testGetWizard() {
-        ComponentWizard wizard = getComponentService().getComponentWizard(TestComponentWizardDefinition.COMPONENT_WIZARD_NAME,
-                "userdata");
+        ComponentWizard wizard =
+                getComponentService().getComponentWizard(TestComponentWizardDefinition.COMPONENT_WIZARD_NAME,
+                        "userdata");
         assertTrue(wizard instanceof TestComponentWizard);
         assertEquals("userdata", wizard.getRepositoryLocation());
     }
@@ -165,7 +168,9 @@ public class ComponentServiceTest extends AbstractComponentTest {
     @Test
     public void testGetRuntimeInfo() throws MalformedURLException {
         // check the comp def return the proper stream for the pom
-        RuntimeInfo runtimeInfo = getComponentService().getRuntimeInfo(TestComponentDefinition.COMPONENT_NAME, ExecutionEngine.DI, null, null);
+        RuntimeInfo runtimeInfo =
+                getComponentService().getRuntimeInfo(TestComponentDefinition.COMPONENT_NAME, ExecutionEngine.DI, null,
+                        null);
         assertEquals(5, runtimeInfo.getMavenUrlDependencies().size());
         assertThat(runtimeInfo.getMavenUrlDependencies(),
                 containsInAnyOrder(new URL("mvn:org.apache.maven/maven-core/3.3.3/jar"), //

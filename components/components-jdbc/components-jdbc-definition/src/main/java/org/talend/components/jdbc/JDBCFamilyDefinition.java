@@ -12,13 +12,12 @@
 // ============================================================================
 package org.talend.components.jdbc;
 
+import com.google.auto.service.AutoService;
+
 import java.io.IOException;
 import java.io.InputStream;
-
-import org.osgi.service.component.annotations.Component;
 import org.talend.components.api.AbstractComponentFamilyDefinition;
 import org.talend.components.api.ComponentInstaller;
-import org.talend.components.api.Constants;
 import org.talend.components.jdbc.dataprep.JDBCInputDefinition;
 import org.talend.components.jdbc.dataset.JDBCDatasetDefinition;
 import org.talend.components.jdbc.datastore.JDBCDatastoreDefinition;
@@ -37,13 +36,10 @@ import org.talend.components.jdbc.tjdbcsp.TJDBCSPDefinition;
 import org.talend.components.jdbc.wizard.JDBCConnectionEditWizardDefinition;
 import org.talend.components.jdbc.wizard.JDBCConnectionWizardDefinition;
 
-import com.google.auto.service.AutoService;
-
 /**
  * Install all of the definitions provided for the JDBC family of components.
  */
 @AutoService(ComponentInstaller.class)
-@Component(name = Constants.COMPONENT_INSTALLER_PREFIX + JDBCFamilyDefinition.NAME, service = ComponentInstaller.class)
 public class JDBCFamilyDefinition extends AbstractComponentFamilyDefinition implements ComponentInstaller {
 
     public static final String NAME = "Jdbc";
@@ -73,7 +69,8 @@ public class JDBCFamilyDefinition extends AbstractComponentFamilyDefinition impl
         ClassLoader loader = JDBCFamilyDefinition.class.getClassLoader();
         runtimeProperties = new java.util.Properties();
         try (InputStream resourceStream = loader
-                .getResourceAsStream("META-INF/runtime/org.talend.components/components-jdbc-definition/runtime.properties")) {
+                .getResourceAsStream(
+                        "META-INF/runtime/org.talend.components/components-jdbc-definition/runtime.properties")) {
             runtimeProperties.load(resourceStream);
         } catch (IOException e) {
             throw new RuntimeException("Error while bootstraping runtime properties", e);
@@ -84,8 +81,10 @@ public class JDBCFamilyDefinition extends AbstractComponentFamilyDefinition impl
         super(NAME,
                 // Components
                 new TJDBCCloseDefinition(), new TJDBCCommitDefinition(), new TJDBCConnectionDefinition(),
-                new TJDBCInputDefinition(), new TJDBCOutputDefinition(), new TJDBCRollbackDefinition(), new TJDBCRowDefinition(),
-                new TJDBCSPDefinition(), new TJDBCOutputBulkDefinition(), new TJDBCBulkExecDefinition(), new TJDBCOutputBulkExecDefinition(),
+                new TJDBCInputDefinition(), new TJDBCOutputDefinition(), new TJDBCRollbackDefinition(),
+                new TJDBCRowDefinition(),
+                new TJDBCSPDefinition(), new TJDBCOutputBulkDefinition(), new TJDBCBulkExecDefinition(),
+                new TJDBCOutputBulkExecDefinition(),
                 // Component wizards
                 new JDBCConnectionWizardDefinition(), new JDBCConnectionEditWizardDefinition(),
                 // Datastore, Dataset and the component

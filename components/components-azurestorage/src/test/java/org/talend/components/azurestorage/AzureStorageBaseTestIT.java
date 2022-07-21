@@ -61,7 +61,7 @@ public abstract class AzureStorageBaseTestIT {
         runtime = new DefaultComponentRuntimeContainerImpl();
     }
 
-    // default implementation for pure java test. Shall be overriden of Spring or OSGI tests
+    // default implementation for pure java test. Shall be overriden of Spring tests
     public ComponentService getComponentService() {
         if (componentService == null) {
             DefinitionRegistry testComponentRegistry = new DefinitionRegistry();

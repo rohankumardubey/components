@@ -41,18 +41,6 @@
         <!-- Tests -->
         <dependency>
             <groupId>org.talend.components</groupId>
-            <artifactId>components-osgitest</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.ops4j.pax.url</groupId>
-            <artifactId>pax-url-aether</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.talend.components</groupId>
             <artifactId>components-api</artifactId>
         </dependency>
         <dependency>
@@ -65,14 +53,8 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-common</artifactId>
-            <scope>compile</scope>
         </dependency>
-        <dependency>
-            <groupId>org.talend.components</groupId>
-            <artifactId>components-common</artifactId>
-            <classifier>bundle</classifier>
-            <scope>test</scope>
-        </dependency>
+
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-common</artifactId>
@@ -103,12 +85,6 @@
             <groupId>org.talend.components</groupId>
             <artifactId>components-common-oauth</artifactId>
             <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.talend.components</groupId>
-            <artifactId>components-common-oauth</artifactId>
-            <classifier>bundle</classifier>
-            <scope>test</scope>
         </dependency>
 
         <dependency>
@@ -143,46 +119,6 @@
 
     <build>
         <plugins>
-            <!-- only generate the bundle link for test -->
-            <plugin>
-                <groupId>com.github.veithen.alta</groupId>
-                <artifactId>alta-maven-plugin</artifactId>
-                <version>0.4.2-Talend</version>
-                <executions>
-                    <execution>
-                        <phase>pre-integration-test</phase>
-                        <goals>
-                            <goal>generate-test-resources</goal>
-                        </goals>
-                        <configuration>
-                            <name>%groupId%-%artifactId%%dashClassifier%.link</name>
-                            <value>%url%</value>
-                            <separator>${line.separator}</separator>
-                            <outputDirectory>${project.build.testOutputDirectory}</outputDirectory>
-                            <dependencySet>
-                                <scope>test</scope>
-                            </dependencySet>
-                            <artifacts>
-                                <artifact>
-                                    <groupId>${project.groupId}</groupId>
-                                    <artifactId>components-salesforce-definition</artifactId>
-                                    <classifier>bundle</classifier>
-                                    <version>${project.version}</version>
-                                </artifact>
-                                <!-- no need at final, but need to refactor the test before removing
-                                    it -->
-                                <artifact>
-                                    <groupId>${project.groupId}</groupId>
-                                    <artifactId>components-salesforce-runtime</artifactId>
-                                    <classifier>bundle</classifier>
-                                    <version>${project.version}</version>
-                                </artifact>
-                            </artifacts>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>

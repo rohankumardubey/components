@@ -15,11 +15,9 @@ package org.talend.components.service.rest;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
 
 @SpringBootApplication
-@ComponentScan(basePackages = { "org.talend.components", "org.talend.daikon" },
-               excludeFilters = @ComponentScan.Filter(type = FilterType.REGEX, pattern = ".*Osgi"))
+@ComponentScan(basePackages = { "org.talend.components", "org.talend.daikon" })
 public class Application {
 
     public static void main(String[] args) {

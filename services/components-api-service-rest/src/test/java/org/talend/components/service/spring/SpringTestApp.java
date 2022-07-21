@@ -12,7 +12,6 @@
 // ==============================================================================
 package org.talend.components.service.spring;
 
-import org.osgi.service.component.annotations.Component;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
@@ -26,9 +25,7 @@ import org.talend.components.service.rest.configuration.ComponentsRegistrySetup;
 @SpringBootApplication
 @ComponentScan(basePackages = { "org.talend.components",
         "org.talend.daikon" }, //
-        includeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, classes = Component.class), //
         excludeFilters = { //
-                @ComponentScan.Filter(type = FilterType.REGEX, pattern = ".*Osgi"),
                 @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = { Application.class,
                         ComponentsRegistrySetup.class }) })
 public class SpringTestApp {

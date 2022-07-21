@@ -316,7 +316,7 @@
                 <version>${maven-antrun-plugin.version}</version>
                 <executions>
                     <!-- creates components.list file with components mvn urls to be used by the service -->
-                    <!-- depends on alta-maven-plugin and generate-componenets-list goal -->
+                    <!-- depends on alta-maven-plugin and generate-components-list goal -->
                     <execution>
                         <id>generate-components.list</id>
                         <phase>initialize</phase>

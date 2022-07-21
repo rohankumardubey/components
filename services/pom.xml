@@ -78,7 +78,6 @@
 
     <modules>
         <module>components-api-service-common</module>
-        <module>components-api-service-osgi</module>
         <module>components-api-service-rest-all-components</module>
         <module>components-api-service-rest</module>
         <module>components-api-service-spi-test</module>

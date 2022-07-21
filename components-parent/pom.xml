@@ -28,7 +28,6 @@
         </talend.releases.repo>
 
         <!-- plugin versions -->
-        <osgi.core.version>6.0.0</osgi.core.version>
         <tycho-p2-extras-plugin.version>0.26.0</tycho-p2-extras-plugin.version>
         <docker-maven-plugin.version>0.34.1</docker-maven-plugin.version>
         <jacoco-maven-plugin.version>0.8.2</jacoco-maven-plugin.version>
@@ -72,7 +71,7 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
-        
+
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -163,22 +162,6 @@
                     <configuration>
                         <connectionUrl>scm:git:https://github.com/Talend/components.git</connectionUrl>
                         <tag>${project.artifactId}-${project.version}</tag>
-                    </configuration>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.felix</groupId>
-                    <artifactId>maven-bundle-plugin</artifactId>
-                    <version>${maven-bundle-plugin.version}</version>
-                    <extensions>true</extensions>
-                    <configuration>
-                        <instructions>
-                            <_dsannotations-options>nocapabilities,norequirements,version;minimum=1.2.0
-                            </_dsannotations-options>
-                            <_noee>true</_noee>
-                            <Require-Capability>osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version=1.7))"
-                            </Require-Capability>
-                            <DynamicImport-Package>org.talend.daikon.*</DynamicImport-Package>
-                        </instructions>
                     </configuration>
                 </plugin>
             </plugins>
@@ -354,93 +337,6 @@
             <properties>
                 <really.skip.tests>true</really.skip.tests>
             </properties>
-        </profile>
-        <profile>
-            <id>generateP2</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-            <build>
-                <plugins>
-                    <!-- Copy the bundle to a new directory to prepare the update-site -->
-                    <plugin>
-                        <artifactId>maven-resources-plugin</artifactId>
-                        <version>3.0.2</version>
-                        <executions>
-                            <execution>
-                                <id>copy-bundles-for-publishing</id>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>copy-resources</goal>
-                                </goals>
-                                <configuration>
-                                    <outputDirectory>${project.build.directory}/source/plugins</outputDirectory>
-                                    <overwrite>true</overwrite>
-                                    <resources>
-                                        <resource>
-                                            <directory>${project.build.directory}</directory>
-                                            <includes>
-                                                <include>${project.build.finalName}-bundle.jar</include>
-                                            </includes>
-                                        </resource>
-                                    </resources>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <!-- Create the update site directory with all the repository content -->
-                    <plugin>
-                        <groupId>org.eclipse.tycho.extras</groupId>
-                        <artifactId>tycho-p2-extras-plugin</artifactId>
-                        <version>0.26.0</version>
-                        <executions>
-                            <execution>
-                                <id>publish-bundles</id>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>publish-features-and-bundles</goal>
-                                </goals>
-                                <configuration>
-                                    <metadataRepositoryLocation>${project.build.directory}/repository
-                                    </metadataRepositoryLocation>
-                                    <artifactRepositoryLocation>${project.build.directory}/repository
-                                    </artifactRepositoryLocation>
-                                    <sourceLocation>${project.build.directory}/source</sourceLocation>
-                                    <compress>true</compress>
-                                    <publishArtifacts>true</publishArtifacts>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <!-- Create the final zip of the update site -->
-                    <plugin>
-                        <artifactId>maven-assembly-plugin</artifactId>
-                        <version>3.0.0</version>
-                        <dependencies>
-                            <dependency>
-                                <groupId>org.talend.components</groupId>
-                                <artifactId>components-p2update-assembly</artifactId>
-                                <version>${project.version}</version>
-                            </dependency>
-                        </dependencies>
-                        <executions>
-                            <execution>
-                                <id>make-assembly</id>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>single</goal>
-                                </goals>
-                                <configuration>
-                                    <!-- This is where we use our shared assembly descriptor -->
-                                    <descriptorRefs>
-                                        <descriptorRef>p2updatesite</descriptorRef>
-                                    </descriptorRefs>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
         </profile>
     </profiles>
 </project>

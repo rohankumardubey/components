@@ -18,7 +18,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import org.apache.avro.Schema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,7 +41,7 @@ import org.talend.daikon.properties.service.PropertiesServiceImpl;
 import org.talend.daikon.runtime.RuntimeInfo;
 
 /**
- * Main Component Service implementation that is not related to any framework (neither OSGI, nor Spring) it uses a
+ * Main Component Service implementation that is not related to any framework (e.g. Spring) it uses a
  * ComponentRegistry implementation that will be provided by framework specific Service classes
  */
 public class ComponentServiceImpl extends PropertiesServiceImpl implements ComponentService {
@@ -89,11 +88,13 @@ public class ComponentServiceImpl extends PropertiesServiceImpl implements Compo
 
     @Override
     public ComponentDefinition getComponentDefinition(String name) {
-        Map<String, ComponentDefinition> compDefMap = definitionRegistry.getDefinitionsMapByType(ComponentDefinition.class);
+        Map<String, ComponentDefinition> compDefMap =
+                definitionRegistry.getDefinitionsMapByType(ComponentDefinition.class);
         if (compDefMap.isEmpty()) {
             throw TalendRuntimeException.createUnexpectedException("fails to retrieve any Component definitions.");
         }
-        ComponentDefinition componentDefinition = definitionRegistry.getDefinitionsMapByType(ComponentDefinition.class).get(name);
+        ComponentDefinition componentDefinition =
+                definitionRegistry.getDefinitionsMapByType(ComponentDefinition.class).get(name);
         if (componentDefinition == null) {
             // The component was not found.
             throw ComponentException.build(ComponentsApiErrorCode.WRONG_COMPONENT_NAME).set(name);
@@ -110,7 +111,8 @@ public class ComponentServiceImpl extends PropertiesServiceImpl implements Compo
         }
         ComponentWizardDefinition wizardDefinition = definitionMapByType.get(name);
         if (wizardDefinition == null) {
-            throw new ComponentException(ComponentsApiErrorCode.WRONG_WIZARD_NAME, ExceptionContext.build().put("name", name)); //$NON-NLS-1$
+            throw new ComponentException(ComponentsApiErrorCode.WRONG_WIZARD_NAME,
+                    ExceptionContext.build().put("name", name)); //$NON-NLS-1$
         }
         ComponentWizard wizard = wizardDefinition.createWizard(location);
         return wizard;
@@ -170,8 +172,9 @@ public class ComponentServiceImpl extends PropertiesServiceImpl implements Compo
 
     /**
      * get the image stream or null
-     * 
-     * @param definition, must not be null
+     *
+     * @param definition,
+     *         must not be null
      * @return the stream or null if no image was defined for th component or the path is wrong
      */
     static InputStream getImageStream(NamedThing definition, String imagePathPath) {
@@ -179,13 +182,15 @@ public class ComponentServiceImpl extends PropertiesServiceImpl implements Compo
         if (imagePathPath != null && !"".equals(imagePathPath)) { //$NON-NLS-1$
             InputStream resourceAsStream = definition.getClass().getResourceAsStream(imagePathPath);
             if (resourceAsStream == null) {// no resource found so this is an component error, so log it and return
-                                           // null
-                LOGGER.error("Failed to load the image [" + definition.getName() + "," + imagePathPath + "]"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                // null
+                LOGGER.error("Failed to load the image [" + definition.getName() + "," + imagePathPath
+                        + "]"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             } else {
                 result = resourceAsStream;
             }
         } else {// no path provided so will return null but log it.
-            LOGGER.warn("The definition of [" + definition.getName() + "] did not specify any icon"); //$NON-NLS-1$ //$NON-NLS-2$
+            LOGGER.warn("The definition of [" + definition.getName()
+                    + "] did not specify any icon"); //$NON-NLS-1$ //$NON-NLS-2$
         }
         return result;
     }
@@ -220,7 +225,8 @@ public class ComponentServiceImpl extends PropertiesServiceImpl implements Compo
     }
 
     @Override
-    public void setSchema(ComponentProperties componentProperties, Connector connector, Schema schema, boolean isOuput) {
+    public void setSchema(ComponentProperties componentProperties, Connector connector, Schema schema,
+            boolean isOuput) {
         componentProperties.setConnectedSchema(connector, schema, isOuput);
     }
 

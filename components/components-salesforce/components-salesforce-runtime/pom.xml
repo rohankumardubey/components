@@ -15,7 +15,7 @@
 
     <name>Components - Salesforce Runtime</name>
     <artifactId>components-salesforce-runtime</artifactId>
-    <packaging>bundle</packaging>
+
     <dependencies>
         <dependency>
             <groupId>org.talend.components</groupId>
@@ -116,13 +116,6 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-common</artifactId>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.talend.components</groupId>
-            <artifactId>components-common</artifactId>
-            <classifier>bundle</classifier>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.talend.components</groupId>
@@ -133,20 +126,8 @@
         <dependency>
             <groupId>org.talend.components</groupId>
             <artifactId>components-common-oauth</artifactId>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.talend.components</groupId>
-            <artifactId>components-common-oauth</artifactId>
-            <classifier>bundle</classifier>
-            <scope>test</scope>
         </dependency>
         <!-- Annotation processing -->
-        <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.service.component.annotations</artifactId>
-            <scope>provided</scope>
-        </dependency>
         <dependency>
             <groupId>com.google.auto.service</groupId>
             <artifactId>auto-service</artifactId>
@@ -238,65 +219,6 @@
                         <salesforce.key>${salesforce.key}</salesforce.key>
                     </systemPropertyVariables>
                 </configuration>
-            </plugin>
-            <plugin>
-                <!-- we should remove all the bundle in fact, but jarruntimeinfo class need dependencies.txt in the jar, so need bundle, so keep it now-->
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>lib-jar</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>bundle</goal>
-                        </goals>
-                        <configuration>
-                            <instructions>
-                                <_dsannotations-options>nocapabilities,norequirements,version;minimum=1.2.0
-                                </_dsannotations-options>
-                                <_noee>true</_noee>
-                                <Require-Capability>osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version=1.7))"
-                                </Require-Capability>
-                                <Bundle-SymbolicName>org.talend.components.salesforce.runtime.lib</Bundle-SymbolicName>
-                                <Bundle-Name>${project.name} lib</Bundle-Name>
-                                <Service-Component>*</Service-Component>
-                                <Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
-                                <Include-Resource>
-                                    {maven-resources},META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt=target/classes/META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt
-                                </Include-Resource>
-                            </instructions>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>default-jar</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>bundle</goal>
-                        </goals>
-                        <configuration>
-                            <classifier>bundle</classifier>
-                            <instructions>
-                                <_dsannotations-options>nocapabilities,norequirements,version;minimum=1.2.0
-                                </_dsannotations-options>
-                                <_noee>true</_noee>
-                                <Require-Capability>osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version=1.7))"
-                                </Require-Capability>
-                                <Bundle-SymbolicName>org.talend.components.salesforce.runtime</Bundle-SymbolicName>
-                                <Import-Package>
-                                    !*internal,org.talend*,org.slf4j*,javax.xml.namespace,org.apache.commons*,org.apache.http.*,org.apache.avro.*,org.apache.oltu.oauth2*,org.codehaus.jackson*
-                                </Import-Package>
-                                <Service-Component>*</Service-Component>
-                                <Embed-Dependency>
-                                    !components*|auto-service,*;scope=compile|runtime;artifactId=!commons-beanutils|commons-collections
-                                </Embed-Dependency>
-                                <Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
-                                <Include-Resource>
-                                    {maven-resources},META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt=target/classes/META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt
-                                </Include-Resource>
-                            </instructions>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
             <!-- used to generate soql antlr4 parser; is not included to lifecycle -->
             <plugin>

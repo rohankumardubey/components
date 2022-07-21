@@ -28,7 +28,3 @@ mvn clean install
 
 > :warning: These tests were ignored because they were already broken. But we should definitely have a look at them
 > and fix them if they're relevant or delete them otherwise.
-
-- `components-osgi-tests`
-    - `ComponentsPaxExamOptionsTest`
-    - `OsgiComponentServiceTest`
