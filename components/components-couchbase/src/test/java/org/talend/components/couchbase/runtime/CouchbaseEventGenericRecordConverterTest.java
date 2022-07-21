@@ -11,7 +11,7 @@ import org.talend.daikon.avro.converter.IndexedRecordConverter.UnmodifiableAdapt
 
 import com.couchbase.client.dcp.message.MessageUtil;
 import com.couchbase.client.deps.io.netty.buffer.ByteBuf;
-import com.couchbase.client.deps.io.netty.buffer.ByteBufUtil;
+import com.couchbase.client.deps.io.netty.buffer.Unpooled;
 
 public class CouchbaseEventGenericRecordConverterTest {
 
@@ -41,7 +41,7 @@ public class CouchbaseEventGenericRecordConverterTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testConvertToAvroIllegalValue() {
-        converter.convertToAvro(ByteBufUtil.threadLocalDirectBuffer());
+        converter.convertToAvro(Unpooled.buffer());
     }
 
     @Test
