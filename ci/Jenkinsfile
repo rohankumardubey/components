@@ -88,9 +88,9 @@ pipeline {
       }
     }
 
-    stage('Deploy Docker Image') {
+    stage('Deploy service Docker image') {
       when {
-        expression { params.Action == 'DEPLOYZZ' }
+        expression { params.Action == 'DEPLOY' }
       }
       steps {
         script {
@@ -112,7 +112,7 @@ pipeline {
       }
     }
 
-    stage('Deploy service zip') {
+    stage('Deploy service zip artefact') {
       when {
         expression { params.Action == 'DEPLOY' }
       }
