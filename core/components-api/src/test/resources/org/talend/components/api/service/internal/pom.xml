@@ -9,7 +9,6 @@
     </parent>
 
     <artifactId>org.talend.test.dependencies</artifactId>
-    <packaging>bundle</packaging>
     <name>Component API test depenencies pom</name>
 
     <properties>
@@ -92,24 +91,6 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <extensions>true</extensions>
-                <configuration>
-                    <instructions>
-                        <_dsannotations-options>nocapabilities,norequirements,version;minimum=1.2.0
-                        </_dsannotations-options>
-                        <_noee>true</_noee>
-                        <Require-Capability>osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version=1.7))"</Require-Capability>
-                        <bnd.version.policy>[$(version;==;$(@)),$(version;+;$(@)))</bnd.version.policy>
-                        <Service-Component>*</Service-Component>
-                        <Import-Package>org.osgi*</Import-Package>
-                        <Embed-Transitive>true</Embed-Transitive>
-                        <Embed-Dependency>!org.osgi.core;scope=compile|runtime</Embed-Dependency>
-                    </instructions>
-                </configuration>
             </plugin>
         </plugins>
     </build>

@@ -11,7 +11,6 @@
 
     <name>Components - JDBC - Definition</name>
     <artifactId>components-jdbc-definition</artifactId>
-    <packaging>bundle</packaging>
 
     <properties>
         <!-- runtime properties -->
@@ -240,98 +239,6 @@
                     </systemPropertyVariables>
                     <trimStackTrace>false</trimStackTrace>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>lib-jar</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>bundle</goal>
-                        </goals>
-                        <configuration>
-                            <instructions>
-                                <_dsannotations-options>nocapabilities,norequirements,version;minimum=1.2.0
-                                </_dsannotations-options>
-                                <_noee>true</_noee>
-                                <Require-Capability>osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version=1.7))"
-                                </Require-Capability>
-                                <Bundle-SymbolicName>org.talend.components.jdbc.definition.lib</Bundle-SymbolicName>
-                                <Bundle-Name>${project.name} lib</Bundle-Name>
-                                <Service-Component>*</Service-Component>
-                                <Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
-                                <Include-Resource>
-                                    {maven-resources},
-                                    META-INF/services/=target/classes/META-INF/services/,
-                                    META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt=target/classes/META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt,
-                                </Include-Resource>
-                            </instructions>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>test-bundle</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>bundle</goal>
-                        </goals>
-                        <configuration>
-                            <classifier>tests</classifier>
-                            <outputDirectory>unexisting_ouput_directory_to_avoid_classes_to_be_embedded
-                            </outputDirectory>
-                            <instructions>
-                                <_dsannotations-options>nocapabilities,norequirements,version;minimum=1.2.0
-                                </_dsannotations-options>
-                                <_noee>true</_noee>
-                                <Require-Capability>osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version=1.7))"
-                                </Require-Capability>
-                                <Import-Package>
-                                    !*internal,!org.apache.commons.dbcp2*,!org.apache.commons.io.input*,org.talend*,org.slf4j*,javax.xml.namespace,org.junit*,org.hamcrest*
-                                </Import-Package>
-                                <Bundle-SymbolicName>org.talend.components.jdbc.definition.test</Bundle-SymbolicName>
-                                <Bundle-Name>Test Fragment for ${project.name}</Bundle-Name>
-                                <Fragment-Host>org.talend.components.jdbc</Fragment-Host>
-                                <Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
-                                <DynamicImport-Package>*</DynamicImport-Package>
-                                <Embed-Dependency/>
-                                <Export-Package>*</Export-Package>
-                                <Include-Resource>=target/test-classes/</Include-Resource>
-                            </instructions>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>default-jar</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>bundle</goal>
-                        </goals>
-                        <configuration>
-                            <classifier>bundle</classifier>
-                            <instructions>
-                                <_dsannotations-options>nocapabilities,norequirements,version;minimum=1.2.0
-                                </_dsannotations-options>
-                                <_noee>true</_noee>
-                                <Require-Capability>osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version=1.7))"
-                                </Require-Capability>
-                                <Bundle-SymbolicName>org.talend.components.jdbc.definition</Bundle-SymbolicName>
-                                <Import-Package>
-                                    !*internal,!org.apache.commons.dbcp2*,!org.apache.commons.io.input*,org.talend*,org.slf4j*,javax.xml.namespace,org.apache.commons*,org.apache.avro.*
-                                </Import-Package>
-                                <Service-Component>*</Service-Component>
-                                <Embed-Dependency>
-                                    !components*|auto-service|commons-lang*|jackson*|javax.inject*,*;scope=compile|runtime
-                                </Embed-Dependency>
-                                <Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
-                                <Include-Resource>
-                                    {maven-resources},
-                                    META-INF/services/=target/classes/META-INF/services/,
-                                    META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt=target/classes/META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt,
-                                </Include-Resource>
-                            </instructions>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>

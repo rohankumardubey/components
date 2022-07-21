@@ -12,10 +12,10 @@
 // ============================================================================
 package org.talend.components.azurestorage;
 
-import org.osgi.service.component.annotations.Component;
+import com.google.auto.service.AutoService;
+
 import org.talend.components.api.AbstractComponentFamilyDefinition;
 import org.talend.components.api.ComponentInstaller;
-import org.talend.components.api.Constants;
 import org.talend.components.azurestorage.blob.tazurestoragecontainercreate.TAzureStorageContainerCreateDefinition;
 import org.talend.components.azurestorage.blob.tazurestoragecontainerdelete.TAzureStorageContainerDeleteDefinition;
 import org.talend.components.azurestorage.blob.tazurestoragecontainerexist.TAzureStorageContainerExistDefinition;
@@ -40,7 +40,7 @@ import org.talend.components.azurestorage.wizard.AzureStorageConnectionWizardDef
 /**
  * Install all of the definitions provided for the Azure Storage family of components.
  */
-@Component(name = Constants.COMPONENT_INSTALLER_PREFIX + AzureStorageFamilyDefinition.NAME, service = ComponentInstaller.class)
+@AutoService(ComponentInstaller.class)
 public class AzureStorageFamilyDefinition extends AbstractComponentFamilyDefinition implements ComponentInstaller {
 
     public static final String NAME = "Azure Storage"; //$NON-NLS-1$
@@ -50,7 +50,8 @@ public class AzureStorageFamilyDefinition extends AbstractComponentFamilyDefinit
                 // containers and blobs
                 new TAzureStorageContainerExistDefinition(), new TAzureStorageContainerCreateDefinition(),
                 new TAzureStorageContainerDeleteDefinition(), new TAzureStorageContainerListDefinition(),
-                new TAzureStorageListDefinition(), new TAzureStorageDeleteDefinition(), new TAzureStorageGetDefinition(),
+                new TAzureStorageListDefinition(), new TAzureStorageDeleteDefinition(),
+                new TAzureStorageGetDefinition(),
                 new TAzureStoragePutDefinition(),
                 // tables
                 new TAzureStorageInputTableDefinition(), new TAzureStorageOutputTableDefinition(),
@@ -61,7 +62,7 @@ public class AzureStorageFamilyDefinition extends AbstractComponentFamilyDefinit
                 new TAzureStorageQueueInputLoopDefinition(),
                 // wizards
                 new AzureStorageConnectionWizardDefinition(), new AzureStorageConnectionEditWizardDefinition()
-        //
+                //
         );
     }
 

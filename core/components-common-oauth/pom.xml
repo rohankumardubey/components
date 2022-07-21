@@ -10,7 +10,6 @@
 
     <name>Components - OAuth</name>
     <artifactId>components-common-oauth</artifactId>
-    <packaging>bundle</packaging>
 
     <dependencies>
         <dependency>
@@ -55,65 +54,4 @@
             <artifactId>jackson-mapper-asl</artifactId>
         </dependency>
     </dependencies>
-
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>lib-jar</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>bundle</goal>
-                        </goals>
-                        <configuration>
-                            <instructions>
-                                <_dsannotations-options>nocapabilities,norequirements,version;minimum=1.2.0
-                                </_dsannotations-options>
-                                <_noee>true</_noee>
-                                <Require-Capability>osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version=1.7))"
-                                </Require-Capability>
-                                <Bundle-SymbolicName>org.talend.components.common-oauth.lib</Bundle-SymbolicName>
-                                <Bundle-Name>${project.name} lib</Bundle-Name>
-                            </instructions>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>default-jar</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>bundle</goal>
-                        </goals>
-                        <configuration>
-                            <classifier>bundle</classifier>
-                            <instructions>
-                                <_dsannotations-options>nocapabilities,norequirements,version;minimum=1.2.0
-                                </_dsannotations-options>
-                                <_noee>true</_noee>
-                                <Require-Capability>osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version=1.7))"
-                                </Require-Capability>
-                                <Bundle-SymbolicName>org.talend.components.common-oauth</Bundle-SymbolicName>
-                                <Import-Package>org.talend*,
-                                    org.slf4j*,
-                                    org.codehaus.jackson*
-                                </Import-Package>
-                                <Service-Component>*</Service-Component>
-                                <Embed-Transitive>true</Embed-Transitive><!-- We need to embed oauth.common
-									this is why we set this to true and the json is a transitive dep of 3 level, 
-									need to be embedded explicitly -->
-                                <Embed-Dependency>artifactId=org.apache.oltu.oauth2*|json;inline=false
-                                </Embed-Dependency>
-                                <Export-Package>org.talend.components.common.oauth*</Export-Package>
-                                <_exportcontents>org.apache.oltu.oauth2*</_exportcontents>
-                            </instructions>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
-
 </project>

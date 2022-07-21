@@ -10,7 +10,6 @@
     </parent>
     <artifactId>components-azurestorage</artifactId>
     <name>Components - AzureStorage</name>
-    <packaging>bundle</packaging>
     <dependencies>
         <!-- Azure Storage deps ! -->
         <dependency>
@@ -46,6 +45,10 @@
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.service.component.annotations</artifactId>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.auto.service</groupId>
+            <artifactId>auto-service</artifactId>
         </dependency>
         <!-- Test dependencies -->
         <dependency>
@@ -101,46 +104,9 @@
             <classifier>lib</classifier>
             <scope>test</scope>
         </dependency>
-        <!-- Tests -->
-        <dependency>
-            <groupId>org.talend.components</groupId>
-            <artifactId>components-osgitest</artifactId>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
     <build>
         <plugins>
-            <plugin>
-                <!-- This plugin is used to generate .link files used for the OSGI test execution with PaxExam -->
-                <groupId>com.github.veithen.alta</groupId>
-                <artifactId>alta-maven-plugin</artifactId>
-                <version>0.4.2-Talend</version>
-                <executions>
-                    <execution>
-                        <phase>pre-integration-test</phase>
-                        <goals>
-                            <goal>generate-test-resources</goal>
-                        </goals>
-                        <configuration>
-                            <name>%groupId%-%artifactId%%dashClassifier%.link</name>
-                            <value>%url%</value>
-                            <separator>${line.separator}</separator>
-                            <outputDirectory>${project.build.testOutputDirectory}</outputDirectory>
-                            <dependencySet>
-                                <scope>test</scope>
-                            </dependencySet>
-                            <artifacts>
-                                <artifact>
-                                    <groupId>${project.groupId}</groupId>
-                                    <artifactId>${project.artifactId}</artifactId>
-                                    <classifier>bundle</classifier>
-                                    <version>${project.version}</version>
-                                </artifact>
-                            </artifacts>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
@@ -164,67 +130,6 @@
                         <azurestorage.usesas>${azurestorage.usesas}</azurestorage.usesas>
                     </systemPropertyVariables>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <extensions>true</extensions>
-                <executions>
-                    <execution>
-                        <id>lib-jar</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>bundle</goal>
-                        </goals>
-                        <configuration>
-                            <instructions>
-                                <_dsannotations-options>nocapabilities,norequirements,version;minimum=1.2.0
-                                </_dsannotations-options>
-                                <_noee>true</_noee>
-                                <Require-Capability>osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version=1.7))"
-                                </Require-Capability>
-                                <Bundle-SymbolicName>org.talend.components.azurestorage.lib</Bundle-SymbolicName>
-                                <Bundle-Name>${project.name} lib</Bundle-Name>
-                                <Include-Resource>
-                                    {maven-resources},META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt=target/classes/META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt
-                                </Include-Resource>
-                                <Service-Component>*</Service-Component>
-                                <Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
-                            </instructions>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>osgi-bundle</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>bundle</goal>
-                        </goals>
-                        <configuration>
-                            <classifier>bundle</classifier>
-                            <instructions>
-                                <_dsannotations-options>nocapabilities,norequirements,version;minimum=1.2.0
-                                </_dsannotations-options>
-                                <_noee>true</_noee>
-                                <Require-Capability>osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version=1.7))"
-                                </Require-Capability>
-                                <Bundle-SymbolicName>org.talend.components.azurestorage</Bundle-SymbolicName>
-                                <Service-Component>*</Service-Component>
-                                <Embed-Dependency>
-                                    *;artifactId=!components*|!slf4j*|commons-lang3*|jackson-core*;scope=compile|runtime;inline=false;
-                                </Embed-Dependency>
-                                <Include-Resource>
-                                    {maven-resources},META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt=target/classes/META-INF/maven/${project.groupId}/${project.artifactId}/dependencies.txt
-                                </Include-Resource>
-                                <Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
-                                <Import-Package>
-                                    !com.google.crypto.tink*,!com.sun.net.httpserver.*,!net.shibboleth.utilities.java.support.xml*,!org.bouncycastle.*,
-                                    !org.cryptomator.siv.*,!org.opensaml.*,!javax.servlet.*,*
-                                </Import-Package>
-                                <Embed-Transitive>true</Embed-Transitive>
-                            </instructions>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>

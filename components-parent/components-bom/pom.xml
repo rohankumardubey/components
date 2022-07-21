@@ -1203,26 +1203,12 @@
             <dependency>
                 <groupId>org.talend.daikon</groupId>
                 <artifactId>daikon-exception</artifactId>
-                <classifier>bundle</classifier>
-                <version>${daikon.version}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.talend.daikon</groupId>
-                <artifactId>daikon</artifactId>
-                <version>${daikon.version}</version>
-                <classifier>bundle</classifier>
-            </dependency>
-            <dependency>
-                <groupId>org.talend.daikon</groupId>
-                <artifactId>crypto-utils</artifactId>
                 <version>${daikon.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.talend.daikon</groupId>
                 <artifactId>crypto-utils</artifactId>
                 <version>${daikon.version}</version>
-                <classifier>bundle</classifier>
             </dependency>
             <dependency>
                 <groupId>org.talend.daikon</groupId>
@@ -1307,12 +1293,6 @@
             </dependency>
             <dependency>
                 <groupId>org.talend.components</groupId>
-                <artifactId>components-api</artifactId>
-                <version>${project.version}</version>
-                <classifier>bundle</classifier>
-            </dependency>
-            <dependency>
-                <groupId>org.talend.components</groupId>
                 <artifactId>components-api-service-common</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -1354,28 +1334,11 @@
                 <groupId>org.talend.components</groupId>
                 <artifactId>components-common</artifactId>
                 <version>${project.version}</version>
-                <classifier>bundle</classifier>
-            </dependency>
-            <dependency>
-                <groupId>org.talend.components</groupId>
-                <artifactId>components-common</artifactId>
-                <version>${project.version}</version>
                 <classifier>tests</classifier>
             </dependency>
             <dependency>
                 <groupId>org.talend.components</groupId>
                 <artifactId>components-common-oauth</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.talend.components</groupId>
-                <artifactId>components-common-oauth</artifactId>
-                <version>${project.version}</version>
-                <classifier>bundle</classifier>
-            </dependency>
-            <dependency>
-                <groupId>org.talend.components</groupId>
-                <artifactId>components-osgitest</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <!-- -->

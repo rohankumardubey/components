@@ -12,13 +12,11 @@
 // ============================================================================
 package org.talend.components.api.service.common.testcomponent;
 
-import org.osgi.service.component.annotations.Component;
-import org.talend.components.api.ComponentInstaller;
-
 import com.google.auto.service.AutoService;
 
+import org.talend.components.api.ComponentInstaller;
+
 @AutoService(ComponentInstaller.class)
-@Component(name = "test", service = ComponentInstaller.class)
 public class TestComponentInstaller implements ComponentInstaller {
 
     @Override

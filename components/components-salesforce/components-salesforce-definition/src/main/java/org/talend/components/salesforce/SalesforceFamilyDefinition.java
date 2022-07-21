@@ -12,10 +12,10 @@
 // ============================================================================
 package org.talend.components.salesforce;
 
-import org.osgi.service.component.annotations.Component;
+import com.google.auto.service.AutoService;
+
 import org.talend.components.api.AbstractComponentFamilyDefinition;
 import org.talend.components.api.ComponentInstaller;
-import org.talend.components.api.Constants;
 import org.talend.components.salesforce.dataprep.SalesforceInputDefinition;
 import org.talend.components.salesforce.dataset.SalesforceDatasetDefinition;
 import org.talend.components.salesforce.datastore.SalesforceDatastoreDefinition;
@@ -29,13 +29,10 @@ import org.talend.components.salesforce.tsalesforceoutput.TSalesforceOutputDefin
 import org.talend.components.salesforce.tsalesforceoutputbulk.TSalesforceOutputBulkDefinition;
 import org.talend.components.salesforce.tsalesforceoutputbulkexec.TSalesforceOutputBulkExecDefinition;
 
-import com.google.auto.service.AutoService;
-
 /**
  * Install all of the definitions provided for the Salesforce family of components.
  */
 @AutoService(ComponentInstaller.class)
-@Component(name = Constants.COMPONENT_INSTALLER_PREFIX + SalesforceFamilyDefinition.NAME, service = ComponentInstaller.class)
 public class SalesforceFamilyDefinition extends AbstractComponentFamilyDefinition implements ComponentInstaller {
 
     public static final String NAME = "Salesforce";
@@ -43,17 +40,20 @@ public class SalesforceFamilyDefinition extends AbstractComponentFamilyDefinitio
     public SalesforceFamilyDefinition() {
         super(NAME,
                 // Components
-                new TSalesforceBulkExecDefinition(), new TSalesforceConnectionDefinition(), new TSalesforceGetDeletedDefinition(),
+                new TSalesforceBulkExecDefinition(), new TSalesforceConnectionDefinition(),
+                new TSalesforceGetDeletedDefinition(),
                 new TSalesforceGetServerTimestampDefinition(), new TSalesforceGetUpdatedDefinition(),
-                new TSalesforceInputDefinition(), new TSalesforceOutputDefinition(), new TSalesforceOutputBulkDefinition(),
+                new TSalesforceInputDefinition(), new TSalesforceOutputDefinition(),
+                new TSalesforceOutputBulkDefinition(),
                 new TSalesforceOutputBulkExecDefinition(),
                 // Component wizards
                 new SalesforceConnectionWizardDefinition(),
                 //TODO remove the edit one as it's duplicated
-                new SalesforceConnectionEditWizardDefinition(), 
+                new SalesforceConnectionEditWizardDefinition(),
                 new SalesforceModuleWizardDefinition(),
                 // Datastore, Dataset and the component
-                new SalesforceDatastoreDefinition(), new SalesforceDatasetDefinition(), new SalesforceInputDefinition());
+                new SalesforceDatastoreDefinition(), new SalesforceDatasetDefinition(),
+                new SalesforceInputDefinition());
     }
 
     @Override
