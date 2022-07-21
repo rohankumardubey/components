@@ -9,7 +9,7 @@
     <packaging>pom</packaging>
     <name>Component BOM</name>
     <properties>
-        <daikon.version>6.8.3</daikon.version>
+        <daikon.version>6.8.4</daikon.version>
 
         <!-- repositories -->
         <talend_snapshots_deployment>
