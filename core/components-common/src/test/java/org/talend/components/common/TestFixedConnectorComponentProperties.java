@@ -12,14 +12,10 @@
 // ============================================================================
 package org.talend.components.common;
 
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
 import org.junit.Rule;
@@ -37,11 +33,19 @@ import org.talend.components.api.test.SimpleComponentDefinition;
 import org.talend.daikon.properties.property.Property;
 import org.talend.daikon.properties.property.PropertyFactory;
 
+import static org.hamcrest.Matchers.hasSize;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+
 public class TestFixedConnectorComponentProperties {
 
     static public class TestProperties extends FixedConnectorsComponentProperties {
 
-        static final PropertyPathConnector REJECT_CONNECTOR = new PropertyPathConnector(Connector.REJECT_NAME, "reject");
+        static final PropertyPathConnector REJECT_CONNECTOR =
+                new PropertyPathConnector(Connector.REJECT_NAME, "reject");
 
         static final PropertyPathConnector MAIN_CONNECTOR = new PropertyPathConnector(Connector.MAIN_NAME, "main");
 
@@ -50,7 +54,6 @@ public class TestFixedConnectorComponentProperties {
         public Property reject = PropertyFactory.newSchema("reject"); //$NON-NLS-1$
 
         /**
-         * 
          * @param name
          */
         public TestProperties(String name) {
@@ -76,7 +79,7 @@ public class TestFixedConnectorComponentProperties {
     @Rule
     public ErrorCollector errorCollector = new ErrorCollector();
 
-    // default implementation for pure java test. Shall be overriden of Spring or OSGI tests
+    // default implementation for pure java test. Shall be overriden of Spring tests
     public ComponentService getComponentService() {
         DefinitionRegistry testComponentRegistry = new DefinitionRegistry();
         SimpleComponentDefinition componentDef = new SimpleComponentDefinition("foo", ExecutionEngine.DI);
@@ -114,8 +117,9 @@ public class TestFixedConnectorComponentProperties {
         ComponentProperties componentProperties = getComponentService().getComponentProperties("foo"); //$NON-NLS-1$
         Set<? extends Connector> availableConnections = componentProperties.getAvailableConnectors(null, true);
         assertThat(availableConnections, hasSize(2));
-        availableConnections = componentProperties.getAvailableConnectors(Collections.singleton(TestProperties.MAIN_CONNECTOR),
-                true);
+        availableConnections =
+                componentProperties.getAvailableConnectors(Collections.singleton(TestProperties.MAIN_CONNECTOR),
+                        true);
         assertThat(availableConnections, hasSize(1));
         assertTrue(availableConnections.contains(TestProperties.REJECT_CONNECTOR));
     }

@@ -19,7 +19,6 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
-
 import org.talend.components.api.AbstractTopLevelDefinition;
 import org.talend.components.api.component.runtime.ExecutionEngine;
 import org.talend.components.api.exception.error.ComponentsErrorCode;
@@ -33,8 +32,7 @@ import org.talend.daikon.properties.property.Property;
 public abstract class AbstractComponentDefinition extends AbstractTopLevelDefinition implements ComponentDefinition {
 
     /**
-     * Component name. It is used to define component name, which will be displayed in Studio Palette Also it is used by
-     * bnd library to create OSGi bundle
+     * Component name. It is used to define component name, which will be displayed in Studio Palette
      */
     private String componentName;
 
@@ -43,9 +41,11 @@ public abstract class AbstractComponentDefinition extends AbstractTopLevelDefini
     /**
      * Constructor sets component name
      *
-     * @param componentName component name
-     * @param allEngines true if available for all execution engines, false if not available for none (this should hide
-     * the component).
+     * @param componentName
+     *         component name
+     * @param allEngines
+     *         true if available for all execution engines, false if not available for none (this should hide
+     *         the component).
      */
     public AbstractComponentDefinition(String componentName, boolean allEngines) {
         this.componentName = componentName;
@@ -56,11 +56,14 @@ public abstract class AbstractComponentDefinition extends AbstractTopLevelDefini
 
     /**
      * Constructor sets component name
-     * 
-     * @param componentName component name
-     * @param engine1 an execution engine that this component is valid for.
-     * @param engineOthers other execution engines that this component can generate runtimes for. (This technique with
-     * varargs is just to guarantee that there is at least one execution engine specified.)
+     *
+     * @param componentName
+     *         component name
+     * @param engine1
+     *         an execution engine that this component is valid for.
+     * @param engineOthers
+     *         other execution engines that this component can generate runtimes for. (This technique with
+     *         varargs is just to guarantee that there is at least one execution engine specified.)
      */
     public AbstractComponentDefinition(String componentName, ExecutionEngine engine1, ExecutionEngine... engineOthers) {
         this.componentName = componentName;
@@ -71,7 +74,7 @@ public abstract class AbstractComponentDefinition extends AbstractTopLevelDefini
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @return component name
      */
     @Override
@@ -108,7 +111,8 @@ public abstract class AbstractComponentDefinition extends AbstractTopLevelDefini
                 .put("available", getSupportedExecutionEngines().toString()).throwIt();
     }
 
-    protected void assertConnectorTopologyCompatibility(ConnectorTopology connectorTopology) throws TalendRuntimeException {
+    protected void assertConnectorTopologyCompatibility(ConnectorTopology connectorTopology)
+            throws TalendRuntimeException {
         if (!getSupportedConnectorTopologies().contains(connectorTopology)) {
             throwIncompatibleConnectorTopologyException(connectorTopology);
         }
@@ -232,7 +236,7 @@ public abstract class AbstractComponentDefinition extends AbstractTopLevelDefini
      * return the list of ComponentProperties that may be assigned to nested properties of the main ComponentProperties
      * class(see {@link AbstractComponentDefinition#getPropertyClass()} associated with this definiton.<br/>
      * This method uses static class definition to avoid ComponentProperties instanciation.
-     * 
+     *
      * @return return the list of ComponentProperties that may be assigned to a nested property of this component
      * associated ComponentProperties.
      */

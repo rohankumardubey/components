@@ -92,7 +92,7 @@ public class SalesforceTestBase extends AbstractComponentTest {
         componentService = null;
     }
 
-    // default implementation for pure java test. Shall be overriden of Spring or OSGI tests
+    // default implementation for pure java test. Shall be overriden of Spring tests
     @Override
     public ComponentService getComponentService() {
         if (componentService == null) {
