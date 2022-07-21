@@ -32,6 +32,7 @@ pipeline {
     SLACK_CHANNEL = 'tmp-tdp-10480-bump-tcompv0'
     DOCKER_DEV_REPOSITORY_NAME = 'docker-dev-local'
     DOCKER_DEV_REGISTRY_URL = "artifactory.datapwn.com/docker-dev-local/talend/common"
+    NEXUS_REPOSITORY_URL = "https://artifacts-zl.talend.com/nexus/content/repositories"
   }
 
   options {
@@ -89,7 +90,7 @@ pipeline {
 
     stage('Deploy Docker Image') {
       when {
-        expression { params.Action == 'DEPLOY' }
+        expression { params.Action == 'DEPLOYZZ' }
       }
       steps {
         script {
@@ -104,6 +105,34 @@ pipeline {
                 bash '${scriptPath}' \
                   '${DOCKER_DEV_REGISTRY_URL}' \
                   '${projectVersionFromPomWithoutSnapshot}' \
+                  '${MAVEN_SETTINGS}'
+              """
+          }
+        }
+      }
+    }
+
+    stage('Deploy service zip') {
+      when {
+        expression { params.Action == 'DEPLOY' }
+      }
+      steps {
+        script {
+          final String scriptPath = 'ci/resources/deploy_service_zip_artefact.sh'
+
+          final def pom = readMavenPom file: 'pom.xml'
+          final String projectVersionFromPom = pom.version
+
+          final String nexusRepositoryId = projectVersionFromPom.endsWith('-SNAPSHOT')
+            ? 'snapshots'
+            : 'releases'
+
+          configFileProvider([mavenSettings]) {
+            sh """
+                bash '${scriptPath}' \
+                  '${nexusRepositoryId}' \
+                  '${NEXUS_REPOSITORY_URL}' \
+                  '${projectVersionFromPom}' \
                   '${MAVEN_SETTINGS}'
               """
           }
