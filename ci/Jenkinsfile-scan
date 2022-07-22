@@ -23,7 +23,7 @@ pipeline {
     VERACODE_APP_NAME = 'Components'
     VERACODE_SANDBOX = 'components'
     APP_ID = '579232'
-    SLACK_CHANNEL = 'tmp-tdp-10480-bump-tcompv0'
+    SLACK_CHANNEL = 'tdp_ci'
   }
 
   options {
