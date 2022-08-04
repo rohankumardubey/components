@@ -46,13 +46,13 @@ public class GoogleDriveGetDefinition extends GoogleDriveComponentDefinition {
             ConnectorTopology connectorTopology) {
         assertEngineCompatibility(engine);
         assertConnectorTopologyCompatibility(connectorTopology);
-        if (ConnectorTopology.NONE.equals(connectorTopology)) {
+        switch (connectorTopology) {
+        case NONE:
             return getRuntimeInfo(GoogleDriveConnectionDefinition.GET_RUNTIME_CLASS);
-        } else if (ConnectorTopology.OUTGOING.equals(connectorTopology)) {
+        case OUTGOING:
             return getRuntimeInfo(GoogleDriveConnectionDefinition.SOURCE_CLASS);
-        } else {
-            return null;
         }
+        return null;
     }
 
     @Override
