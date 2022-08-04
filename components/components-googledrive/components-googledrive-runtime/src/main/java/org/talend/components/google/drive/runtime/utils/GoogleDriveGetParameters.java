@@ -28,13 +28,16 @@ public class GoogleDriveGetParameters {
 
     private final boolean addExt;
 
+    private final boolean createByteArray;
+
     public GoogleDriveGetParameters(String resourceId, Map<String, MimeType> mimeType, boolean storeToLocal,
-            String outputFileName, boolean addExt) {
+            String outputFileName, boolean addExt, boolean createByteArray) {
         this.resourceId = resourceId;
         this.mimeTypeForExport = mimeType;
         this.storeToLocal = storeToLocal;
         this.outputFileName = outputFileName;
         this.addExt = addExt;
+        this.createByteArray = createByteArray;
     }
 
     public String getResourceId() {
@@ -55,6 +58,10 @@ public class GoogleDriveGetParameters {
 
     public boolean isAddExt() {
         return addExt;
+    }
+
+    public boolean isCreateByteArray() {
+        return createByteArray;
     }
 
     public void setOutputFileName(String outputFileName) {
