@@ -78,7 +78,7 @@ public class GoogleDriveGetRuntime extends GoogleDriveRuntime implements Compone
             mimes.put(MIME_TYPE_GOOGLE_PRESENTATION, properties.exportPresentation.getValue());
             mimes.put(MIME_TYPE_GOOGLE_SPREADSHEET, properties.exportSpreadsheet.getValue());
             GoogleDriveGetParameters p = new GoogleDriveGetParameters(resourceId, mimes, properties.storeToLocal.getValue(),
-                    properties.outputFileName.getValue(), properties.setOutputExt.getValue());
+                    properties.outputFileName.getValue(), properties.setOutputExt.getValue(), false);
             //
             GoogleDriveGetResult r = utils.getResource(p);
             fileId = r.getId();
