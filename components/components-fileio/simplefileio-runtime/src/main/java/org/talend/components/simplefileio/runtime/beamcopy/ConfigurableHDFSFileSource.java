@@ -12,9 +12,12 @@
  */
 package org.talend.components.simplefileio.runtime.beamcopy;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
+import com.google.common.base.Function;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
+import javax.annotation.Nullable;
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
@@ -25,9 +28,6 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
-
-import javax.annotation.Nullable;
-
 import org.apache.beam.sdk.coders.Coder;
 import org.apache.beam.sdk.coders.KvCoder;
 import org.apache.beam.sdk.coders.VoidCoder;
@@ -52,10 +52,8 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.LineRecordReader;
 import org.apache.hadoop.mapreduce.task.TaskAttemptContextImpl;
 
-import com.google.common.base.Function;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Copied from https://github.com/apache/beam/commit/89cf4613465647e2711983674879afd5f67c519d
@@ -98,8 +96,10 @@ import com.google.common.collect.Maps;
  * input splits, this class extends {@link BoundedSource} rather than {@link org.apache.beam.sdk.io.OffsetBasedSource},
  * since the latter dictates input splits.
  *
- * @param <K> The type of keys to be read from the source.
- * @param <V> The type of values to be read from the source.
+ * @param <K>
+ *         The type of keys to be read from the source.
+ * @param <V>
+ *         The type of values to be read from the source.
  */
 public class ConfigurableHDFSFileSource<K, V> extends BoundedSource<KV<K, V>> {
 
@@ -134,7 +134,7 @@ public class ConfigurableHDFSFileSource<K, V> extends BoundedSource<KV<K, V>> {
      * class and value class.
      */
     public static <K, V, T extends FileInputFormat<K, V>> ConfigurableHDFSFileSource<K, V> from(String filepattern,
-                                                                                                Class<T> formatClass, Class<K> keyClass, Class<V> valueClass) {
+            Class<T> formatClass, Class<K> keyClass, Class<V> valueClass) {
         return new ConfigurableHDFSFileSource<>(filepattern, formatClass, keyClass, valueClass);
     }
 
@@ -142,7 +142,7 @@ public class ConfigurableHDFSFileSource<K, V> extends BoundedSource<KV<K, V>> {
      * Create a {@code HDFSFileSource} based on a file or a file pattern specification.
      */
     protected ConfigurableHDFSFileSource(String filepattern, Class<? extends FileInputFormat<?, ?>> formatClass,
-                                         Class<K> keyClass, Class<V> valueClass) {
+            Class<K> keyClass, Class<V> valueClass) {
         this(filepattern, formatClass, keyClass, valueClass, null);
     }
 
@@ -150,7 +150,7 @@ public class ConfigurableHDFSFileSource<K, V> extends BoundedSource<KV<K, V>> {
      * Create a {@code HDFSFileSource} based on a single Hadoop input split, which won't be split up further.
      */
     protected ConfigurableHDFSFileSource(String filepattern, Class<? extends FileInputFormat<?, ?>> formatClass,
-                                         Class<K> keyClass, Class<V> valueClass, SerializableSplit serializableSplit) {
+            Class<K> keyClass, Class<V> valueClass, SerializableSplit serializableSplit) {
         this.filepattern = filepattern;
         this.formatClass = formatClass;
         this.keyClass = keyClass;
@@ -160,7 +160,7 @@ public class ConfigurableHDFSFileSource<K, V> extends BoundedSource<KV<K, V>> {
     }
 
     protected ConfigurableHDFSFileSource(String filepattern, Class<? extends FileInputFormat<?, ?>> formatClass,
-                                         Class<K> keyClass, Class<V> valueClass, SerializableSplit serializableSplit, Configuration conf) {
+            Class<K> keyClass, Class<V> valueClass, SerializableSplit serializableSplit, Configuration conf) {
         this(filepattern, formatClass, keyClass, valueClass, serializableSplit);
         // serialize conf to map
         for (Map.Entry<String, String> entry : conf) {
@@ -181,8 +181,16 @@ public class ConfigurableHDFSFileSource<K, V> extends BoundedSource<KV<K, V>> {
         conf.set("fs.s3t.impl.disable.cache", "true");
         conf.set("fs.file.impl.disable.cache", "true");
         conf.set("fs.hdfs.impl.disable.cache", "true");
+
+        // FIXME: for whatever reason, a core-default.xml with an invalid "128MB" value for this
+        //  property ends up in the classpath, which leads to logical "NumberFormatException" when
+        //  initializing the S3AFileSystem class later on. This must be because we bumped a hadoop
+        //  dependency because "128MB" is the new default: https://github.com/apache/hadoop/blob/trunk/hadoop-common-project/hadoop-common/src/main/resources/core-default.xml#L1528
+        //  but we rely here on a forked version, so let's force the numerical value: https://github.com/Talend/hadoop/blob/trunk/hadoop-common-project/hadoop-common/src/main/resources/core-default.xml#L1116
+        conf.set("fs.s3a.multipart.threshold", "2147483647");
+
         conf.set(LineRecordReader.MAX_LINE_LENGTH,
-                 Integer.toString(conf.getInt("maxRowSize", 10*1024*1024))); // 10 Mo Max per line.
+                Integer.toString(conf.getInt("maxRowSize", 10 * 1024 * 1024))); // 10 Mo Max per line.
 
         return job;
     }
@@ -215,20 +223,23 @@ public class ConfigurableHDFSFileSource<K, V> extends BoundedSource<KV<K, V>> {
     public List<? extends BoundedSource<KV<K, V>>> split(long desiredBundleSizeBytes, PipelineOptions options)
             throws Exception {
         if (serializableSplit == null) {
-            return Lists.transform(computeSplits(desiredBundleSizeBytes), new Function<InputSplit, BoundedSource<KV<K, V>>>() {
+            return Lists.transform(computeSplits(desiredBundleSizeBytes),
+                    new Function<InputSplit, BoundedSource<KV<K, V>>>() {
 
-                @Override
-                public BoundedSource<KV<K, V>> apply(@Nullable InputSplit inputSplit) {
-                    return new ConfigurableHDFSFileSource<>(filepattern, formatClass, keyClass, valueClass, new SerializableSplit(
-                            inputSplit));
-                }
-            });
+                        @Override
+                        public BoundedSource<KV<K, V>> apply(@Nullable InputSplit inputSplit) {
+                            return new ConfigurableHDFSFileSource<>(filepattern, formatClass, keyClass, valueClass,
+                                    new SerializableSplit(
+                                            inputSplit));
+                        }
+                    });
         } else {
             return ImmutableList.of(this);
         }
     }
 
-    private FileInputFormat<?, ?> createFormat(Job job) throws IOException, IllegalAccessException, InstantiationException {
+    private FileInputFormat<?, ?> createFormat(Job job)
+            throws IOException, IllegalAccessException, InstantiationException {
         Path path = new Path(filepattern);
         FileInputFormat.addInputPath(job, path);
         return formatClass.newInstance();
@@ -288,7 +299,7 @@ public class ConfigurableHDFSFileSource<K, V> extends BoundedSource<KV<K, V>> {
                 size += st.getLen();
             }
         } catch (IOException | NoSuchMethodException | InvocationTargetException | IllegalAccessException
-                | InstantiationException e) {
+                 | InstantiationException e) {
             // ignore, and return 0
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
@@ -297,7 +308,8 @@ public class ConfigurableHDFSFileSource<K, V> extends BoundedSource<KV<K, V>> {
         return size;
     }
 
-    private <K, V> List<FileStatus> listStatus(FileInputFormat<K, V> format, JobContext jobContext) throws NoSuchMethodException,
+    private <K, V> List<FileStatus> listStatus(FileInputFormat<K, V> format, JobContext jobContext)
+            throws NoSuchMethodException,
             InvocationTargetException, IllegalAccessException {
         // FileInputFormat#listStatus is protected, so call using reflection
         Method listStatus = FileInputFormat.class.getDeclaredMethod("listStatus", JobContext.class);
@@ -413,8 +425,10 @@ public class ConfigurableHDFSFileSource<K, V> extends BoundedSource<KV<K, V>> {
             }
         }
 
-        private <K, V> RecordReader<K, V> createRecordReader(InputSplit split) throws IOException, InterruptedException {
-            final RecordReader<K, V> reader = (RecordReader<K, V>) format.createRecordReader(split, this.attemptContext);
+        private <K, V> RecordReader<K, V> createRecordReader(InputSplit split)
+                throws IOException, InterruptedException {
+            final RecordReader<K, V> reader =
+                    (RecordReader<K, V>) format.createRecordReader(split, this.attemptContext);
             return LimitedLineRecordReader.buildReader(reader);
         }
 
