@@ -75,6 +75,16 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.talend.components</groupId>
+            <artifactId>simplefileio-runtime</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.talend.components</groupId>
+            <artifactId>s3-runtime-di</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.apache.derby</groupId>
             <artifactId>derby</artifactId>
         </dependency>
