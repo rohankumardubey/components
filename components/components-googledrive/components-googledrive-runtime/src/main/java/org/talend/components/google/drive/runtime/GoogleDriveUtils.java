@@ -1,6 +1,6 @@
 // ============================================================================
 //
-// Copyright (C) 2006-2017 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2022 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
 // %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
@@ -29,6 +29,7 @@ import static org.talend.components.google.drive.runtime.GoogleDriveConstants.RO
 import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -460,25 +461,39 @@ public class GoogleDriveUtils {
                 .debug("[getResource] Found fileName `{}` [id: {}, mime: {}, ext: {}]", parameters.getResourceId(),
                         fileId,
                         fileMimeType, file.getFileExtension());
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        /* Google Apps types */
-        if (GoogleDriveMimeTypes.GOOGLE_DRIVE_APPS.contains(fileMimeType)) {
-            String exportFormat = parameters.getMimeType().get(fileMimeType).getMimeType();
-            outputFileExt = parameters.getMimeType().get(fileMimeType).getExtension();
-            drive.files().export(fileId, exportFormat).executeMediaAndDownloadTo(outputStream);
-        } else { /* Standard fileName */
-            drive.files().get(fileId).setSupportsAllDrives(includeSharedDrives).executeMediaAndDownloadTo(outputStream);
-        }
-        byte[] content = outputStream.toByteArray();
+
+        String localFile = null;
         if (parameters.isStoreToLocal()) {
-            String localFile = parameters.getOutputFileName();
+            localFile = parameters.getOutputFileName();
             if (parameters.isAddExt()) {
                 localFile = localFile + ((localFile.endsWith(outputFileExt)) ? "" : outputFileExt);
             }
+        }
+
+        if (!parameters.isCreateByteArray() && parameters.isStoreToLocal()) {
             LOG.info(messages.getMessage("message.writing.resource", parameters.getResourceId(), localFile));
-            try (FileOutputStream fout = new FileOutputStream(localFile)) {
-                fout.write(content);
-                fout.close();
+        }
+
+        byte[] content = null;
+        try (OutputStream outputStream = (parameters.isCreateByteArray() || !parameters.isStoreToLocal())
+                ? new ByteArrayOutputStream() : new FileOutputStream(localFile)) {
+            if (GoogleDriveMimeTypes.GOOGLE_DRIVE_APPS.contains(fileMimeType)) {
+                String exportFormat = parameters.getMimeType().get(fileMimeType).getMimeType();
+                outputFileExt = parameters.getMimeType().get(fileMimeType).getExtension();
+                drive.files().export(fileId, exportFormat).executeMediaAndDownloadTo(outputStream);
+            } else { /* Standard fileName */
+                drive.files().get(fileId).setSupportsAllDrives(includeSharedDrives)
+                    .executeMediaAndDownloadTo(outputStream);
+            }
+
+            if (parameters.isCreateByteArray()) {
+                content = ((ByteArrayOutputStream) outputStream).toByteArray();
+                if (parameters.isStoreToLocal()) {
+                    LOG.info(messages.getMessage("message.writing.resource", parameters.getResourceId(), localFile));
+                    try (FileOutputStream fout = new FileOutputStream(localFile)) {
+                        fout.write(content);
+                    }
+                }
             }
         }
 

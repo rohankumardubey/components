@@ -13,7 +13,7 @@ public class GoogleDriveGetParametersTest {
     @Before
     public void setUp() throws Exception {
         parameters = new GoogleDriveGetParameters("resource", GoogleDriveMimeTypes.newDefaultMimeTypesSupported(), true,
-                "outfile", true);
+                "outfile", true, true);
     }
 
     @Test
@@ -45,6 +45,11 @@ public class GoogleDriveGetParametersTest {
     public void testSetOutputFileName() throws Exception {
         parameters.setOutputFileName("outputFile");
         assertEquals("outputFile", parameters.getOutputFileName());
+    }
+    
+    @Test
+    public void testIsCreateByteArray() throws Exception {
+        assertTrue(parameters.isCreateByteArray());
     }
 
 }
