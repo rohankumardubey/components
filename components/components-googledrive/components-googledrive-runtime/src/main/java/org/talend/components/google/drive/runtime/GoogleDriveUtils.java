@@ -483,6 +483,12 @@ public class GoogleDriveUtils {
                 .debug("[getResource] Found fileName `{}` [id: {}, mime: {}, ext: {}]", parameters.getResourceId(),
                         fileId,
                         fileMimeType, file.getFileExtension());
+        if(!parameters.isStoreToLocal() && !parameters.isCreateByteArray()) {
+            LOG
+            .debug("[getResource] Skipping file `{}` [id: {}, mime: {}, ext: {}], wrong configuration : either save to local file or provide an outgoing link for the component!", parameters.getResourceId(),
+                    fileId, fileMimeType, file.getFileExtension());
+            return new GoogleDriveGetResult(null, null);
+        }
 
         String localFile = null;
         if (parameters.isStoreToLocal()) {
