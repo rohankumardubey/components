@@ -337,6 +337,11 @@
                                                     <OPS4J_PAX_OPTS>
                                                         -Dorg.ops4j.pax.url.mvn.useFallbackRepositories=false
                                                     </OPS4J_PAX_OPTS>
+                                                    <!--
+                                                    Use a dedicated port for management probe (actuator) as it's a good
+                                                    practice.
+                                                    -->
+                                                    <MANAGEMENT_SERVER_PORT>9000</MANAGEMENT_SERVER_PORT>
                                                 </env>
                                                 <labels>
                                                     <name>Talend Component REST API packaged with all components</name>
