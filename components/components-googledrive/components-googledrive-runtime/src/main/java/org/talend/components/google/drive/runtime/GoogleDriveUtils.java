@@ -487,7 +487,7 @@ public class GoogleDriveUtils {
             LOG
             .debug("[getResource] Skipping file `{}` [id: {}, mime: {}, ext: {}], wrong configuration : either save to local file or provide an outgoing link for the component!", parameters.getResourceId(),
                     fileId, fileMimeType, file.getFileExtension());
-            return new GoogleDriveGetResult(null, null);
+            return new GoogleDriveGetResult(fileId, null);
         }
 
         String localFile = null;
