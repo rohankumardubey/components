@@ -10,13 +10,9 @@ set -xe
 main () {
   local talendRegistryHost="${1:?Missing talend registry host}"
   local projectVersion="${2:?Missing project version}"
-  local mavenSettingsPath="${3:?Missing maven settings path}"
-
-  local dockerImageName="tcomp-components-api-service-rest-all-components"
-  local dockerImageTimestamp=$(date '+%Y%m%d-%H%M%S')
-
-  # Format already used by the fabric8 docker-maven-plugin configuration
-  local dockerImageTag="${projectVersion}-${dockerImageTimestamp}"
+  local dockerImageName=${3?Missing docker image name}
+  local dockerImageTag="${4:?Missing docker image tag}"
+  local mavenSettingsPath="${5:?Missing maven settings path}"
 
   (
     cd services/components-api-service-rest-all-components
@@ -37,6 +33,11 @@ main () {
     docker tag "${talendRegistryHost}/${dockerImageName}:${dockerImageTag}" "${talendRegistryHost}/${dockerImageName}:latest"
     docker push "${talendRegistryHost}/${dockerImageName}:latest"
   )
+
+  # Define a git tag with the same name as the Docker tag for tracability reasons (even for non-release builds)
+  local dockerTracabilityTagName="tdp/docker/${projectVersion}"
+  git tag "${dockerTracabilityTagName}"
+  git push origin "${dockerTracabilityTagName}"
 }
 
 main "$@"

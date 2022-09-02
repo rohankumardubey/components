@@ -28,11 +28,6 @@ main() {
   (
     cd services/components-api-service-rest-all-components
 
-#    mvn deploy \
-#      --define 'skipTests=true' \
-#      --activate-profiles deployService
-#      --settings "$mavenSettingsPath"
-
     printf 'Deploying zip %s to repository %s (with %s classifier)\n' "${zipName}" "${nexusRepositoryId}" "${tdpClassifier}"
 
     mvn deploy:deploy-file \

@@ -18,6 +18,18 @@ final def mavenSettings = configFile(
   fileId: 'maven-settings-nexus-zl',
   variable: 'MAVEN_SETTINGS')
 
+String dockerAndGitTag = null
+String projectBuildVersion = ''
+String projectNextVersion = ''
+
+@NonCPS
+static String getNewVersion (String version) {
+  def pattern = ~/(\d{1,3})\.(\d{1,3})\.\d{1,4}$/
+  String newVersion = version.replaceFirst(pattern) { _, major, minor -> "${major}.${(minor as int) + 1}.0" }
+  newVersion += "-SNAPSHOT"
+  return newVersion
+}
+
 pipeline {
   agent {
     kubernetes {
@@ -32,7 +44,9 @@ pipeline {
     SLACK_CHANNEL = 'tdp_ci'
     DOCKER_DEV_REPOSITORY_NAME = 'docker-dev-local'
     DOCKER_DEV_REGISTRY_URL = "artifactory.datapwn.com/docker-dev-local/talend/common"
+    DOCKER_IMAGE_NAME = 'tcomp-components-api-service-rest-all-components'
     NEXUS_REPOSITORY_URL = "https://artifacts-zl.talend.com/nexus/content/repositories"
+    TDP_MAINTENANCE_BRANCH_NAME = 'maintenance/tdp'
   }
 
   options {
@@ -45,14 +59,67 @@ pipeline {
 
   parameters {
     choice(name: 'Action',
-      choices: ['STANDARD', 'DEPLOY'],
-      description: 'Kind of running : \nSTANDARD (default), normal building \nDEPLOY : build & deploy TCOMPv0 service Docker image (TDP cloud) & zip artefact (TDP on-prem)')
+      choices: ['STANDARD', 'DEPLOY', 'RELEASE'],
+      description: 'Type of build : \nSTANDARD (default): compile & run tests \nDEPLOY : build & deploy TCOMPv0 service Docker image (TDP cloud) & zip artefact (TDP on-prem)\nRELEASE: build, deploy & release TCOMPv0 service Docker image (TDP cloud) & zip artefact (TDP on-prem)'
+    )
+    booleanParam(
+      name: "specify_version",
+      description: "RELEASE ACTION ONLY • Check if you want to specify a version for release. Otherwise, project version (from pom) is used",
+      defaultValue: false
+    )
+    string(
+      name: "release_version",
+      description: "RELEASE ACTION ONLY • Release version. Won't be used if specify_version not checked",
+      defaultValue: "0.0.0")
+    string(
+      name: "next_version",
+      description: "RELEASE ACTION ONLY • Next version. Won't be used if specify_version not checked",
+      defaultValue: "0.0.0-SNAPSHOT")
   }
 
   stages {
+    stage('Validate parameters') {
+      steps {
+        script {
+          final def pom = readMavenPom file: 'pom.xml'
+          final String projectVersionFromPom = pom.version
+
+          projectBuildVersion = projectVersionFromPom.replace('-SNAPSHOT', '')
+
+          if (params.Action == 'RELEASE') {
+            if (env.BRANCH_NAME != env.TDP_MAINTENANCE_BRANCH_NAME) {
+              error("TCOMPv0 service should only be released on ${env.TDP_MAINTENANCE_BRANCH_NAME}")
+            }
+
+            if (params.specify_version && params.release_version.endsWith('-SNAPSHOT')) {
+              error("Cannot release a SNAPSHOT version: ${params.release_version}")
+            }
+
+            if (params.specify_version && !params.next_version.endsWith('-SNAPSHOT')) {
+              error("Next version number must be a SNAPSHOT version: ${params.next_version}")
+            }
+
+            if (params.specify_version) {
+              projectBuildVersion = params.release_version
+              projectNextVersion = params.next_version
+            } else {
+              // Default behavior: use version defined in POM & automatically compute next version
+              projectNextVersion = getNewVersion(projectBuildVersion);
+            }
+          }
+
+          echo "Building version: ${projectBuildVersion}"
+          echo "Build action: ${params.Action}"
+          echo 'The build\'s parameters are valid'
+        }
+      }
+    }
+
     stage('Prepare build') {
       steps {
         script {
+          dockerAndGitTag = "${projectBuildVersion}-${env.BUILD_TIMESTAMP}"
+
           echo 'Docker login'
           withCredentials([artifactoryCredentials]) {
             final String dockerLoginScriptPath = 'ci/resources/login_to_docker.sh'
@@ -68,9 +135,23 @@ pipeline {
     }
 
 
-    stage('Build') {
+    stage('Build & test') {
       steps {
         configFileProvider([mavenSettings]) {
+
+          if (params.Action == 'RELEASE') {
+            // NOTE: Artifacts are not re-built in push stage, this means they must be built directly with the version to release (a non-SNAPSHOT one)
+            final String updateVersionScriptPath = 'ci/resources/set_release_version_in_pom.sh'
+            sh """
+                bash '${updateVersionScriptPath}' \
+                  '${projectBuildVersion}' \
+                  '${MAVEN_SETTINGS}' \
+              """
+          }
+
+          // This also builds the service ZIP file
+          // Why do a "clean install" then a "test" and not a "clean test" right away? Because for some reason, it
+          // does not work (some tests are failing...)
           sh '''#!/bin/bash
              mvn clean install \
               --batch-mode \
@@ -88,23 +169,24 @@ pipeline {
       }
     }
 
-    stage('Deploy service Docker image') {
+    stage('Build & deploy service Docker image') {
       when {
-        expression { params.Action == 'DEPLOY' }
+        expression { params.Action == 'DEPLOY' || params.Action == 'RELEASE' }
       }
       steps {
         script {
-          final String scriptPath = 'ci/resources/deploy_service_docker_image.sh'
+          final String scriptPath = 'ci/resources/build_and_deploy_service_docker_image.sh'
 
-          final def pom = readMavenPom file: 'pom.xml'
-          final String projectVersionFromPom = pom.version
-          final String projectVersionFromPomWithoutSnapshot = projectVersionFromPom.replace('-SNAPSHOT', '')
-
+          // Docker images are always built with a non-SNAPSHOT version as it allows us later to promote them
+          // to prod repository once they have been tested. This makes sure the version pushed to production is
+          // exactly the one tested by the QA (no rebuild of the image in-between)
           configFileProvider([mavenSettings]) {
             sh """
                 bash '${scriptPath}' \
                   '${DOCKER_DEV_REGISTRY_URL}' \
-                  '${projectVersionFromPomWithoutSnapshot}' \
+                  '${projectBuildVersion}' \
+                  '${env.DOCKER_IMAGE_NAME}' \
+                  '${dockerAndGitTag}' \
                   '${MAVEN_SETTINGS}'
               """
           }
@@ -114,12 +196,13 @@ pipeline {
 
     stage('Deploy service zip artefact') {
       when {
-        expression { params.Action == 'DEPLOY' }
+        expression { params.Action == 'DEPLOY' || params.Action == 'RELEASE' }
       }
       steps {
         script {
           final String scriptPath = 'ci/resources/deploy_service_zip_artefact.sh'
 
+          // Read POM once again since version could have been updated for release builds
           final def pom = readMavenPom file: 'pom.xml'
           final String projectVersionFromPom = pom.version
 
@@ -127,6 +210,9 @@ pipeline {
             ? 'snapshots'
             : 'releases'
 
+          // Contrary to docker images, one want the ability to publish SNAPSHOT versions of the ZIP artifact
+          // This is why we're not using the project build version here but the project version from the POM
+          // (which will be a SNAPSHOT for "DEPLOY" builds, and a non-SNAPSHOT for "RELEASE" ones)
           configFileProvider([mavenSettings]) {
             sh """
                 bash '${scriptPath}' \
@@ -139,6 +225,30 @@ pipeline {
         }
       }
     }
+
+    stage('Commit & tag release') {
+      when {
+        expression { params.Action == 'RELEASE' }
+      }
+
+      steps {
+        container(configuration.tsbiImage) {
+          script {
+            final String commitScriptPath = 'ci/resources/tag_release_and_set_new_version.sh'
+            configFileProvider([mavenSettings]) {
+              sh """
+                  bash '${commitScriptPath}' \
+                    '${dockerAndGitTag}' \
+                    '${projectNextVersion}' \
+                    '${MAVEN_SETTINGS}'
+                """
+            }
+          }
+        }
+      }
+    }
+
+
   }
 
   post {
