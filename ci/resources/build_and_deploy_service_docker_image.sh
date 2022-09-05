@@ -37,7 +37,7 @@ main () {
   )
 
   # Define a git tag with the same name as the Docker tag for traceability reasons (even for non-release builds)
-  local dockerTraceabilityTagName="tdp/docker/${projectVersion}"
+  local dockerTraceabilityTagName="tdp/docker/${dockerImageTag}"
   git tag "${dockerTraceabilityTagName}"
   git push origin "${dockerTraceabilityTagName}"
 }
