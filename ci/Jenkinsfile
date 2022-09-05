@@ -14,6 +14,11 @@ def artifactoryCredentials = usernamePassword(
   passwordVariable: 'ARTIFACTORY_PASSWORD',
   usernameVariable: 'ARTIFACTORY_LOGIN')
 
+def gitCredentials = usernamePassword(
+  credentialsId: 'github-credentials',
+  usernameVariable: 'GITHUB_LOGIN',
+  passwordVariable: 'GITHUB_TOKEN')
+
 final def mavenSettings = configFile(
   fileId: 'maven-settings-nexus-zl',
   variable: 'MAVEN_SETTINGS')
@@ -89,7 +94,7 @@ pipeline {
           if (params.Action == 'RELEASE') {
             echo "Releasing branch ${env.BRANCH_NAME}"
 
-            if (env.BRANCH_NAME != env.TDP_MAINTENANCE_BRANCH_NAME && !env.BRANCH_NAME.contains('anicolas')) {
+            if (env.BRANCH_NAME != e nv.TDP_MAINTENANCE_BRANCH_NAME && !env.BRANCH_NAME.contains('anicolas')) {
               error("TCOMPv0 service should only be released on ${env.TDP_MAINTENANCE_BRANCH_NAME}")
             }
 
@@ -183,15 +188,17 @@ pipeline {
           // Docker images are always built with a non-SNAPSHOT version as it allows us later to promote them
           // to prod repository once they have been tested. This makes sure the version pushed to production is
           // exactly the one tested by the QA (no rebuild of the image in-between)
-          configFileProvider([mavenSettings]) {
-            sh """
-                bash '${scriptPath}' \
-                  '${DOCKER_DEV_REGISTRY_URL}' \
-                  '${projectBuildVersion}' \
-                  '${env.DOCKER_IMAGE_NAME}' \
-                  '${dockerAndGitTag}' \
-                  '${MAVEN_SETTINGS}'
-              """
+          withCredentials([gitCredentials]) {
+            configFileProvider([mavenSettings]) {
+              sh """
+                  bash '${scriptPath}' \
+                    '${DOCKER_DEV_REGISTRY_URL}' \
+                    '${projectBuildVersion}' \
+                    '${env.DOCKER_IMAGE_NAME}' \
+                    '${dockerAndGitTag}' \
+                    '${MAVEN_SETTINGS}'
+                """
+            }
           }
         }
       }
@@ -238,13 +245,15 @@ pipeline {
         container(configuration.tsbiImage) {
           script {
             final String commitScriptPath = 'ci/resources/tag_release_and_set_new_version.sh'
-            configFileProvider([mavenSettings]) {
-              sh """
-                  bash '${commitScriptPath}' \
-                    '${dockerAndGitTag}' \
-                    '${projectNextVersion}' \
-                    '${MAVEN_SETTINGS}'
-                """
+            withCredentials([gitCredentials]) {
+              configFileProvider([mavenSettings]) {
+                sh """
+                    bash '${commitScriptPath}' \
+                      '${dockerAndGitTag}' \
+                      '${projectNextVersion}' \
+                      '${MAVEN_SETTINGS}'
+                  """
+              }
             }
           }
         }
