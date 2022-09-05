@@ -137,6 +137,16 @@ pipeline {
                   "\${ARTIFACTORY_PASSWORD}"
               """
           }
+
+          echo 'Git login'
+          withCredentials([gitCredentials]) {
+            final String configureGitScriptPath = 'ci/resources/configure_git.sh'
+            sh """
+                bash '${configureGitScriptPath}' \
+                  "\${GITHUB_LOGIN}" \
+                  "\${GITHUB_TOKEN}"
+              """
+          }
         }
       }
     }
