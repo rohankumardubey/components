@@ -258,7 +258,7 @@ pipeline {
             configFileProvider([mavenSettings]) {
               sh """
                     bash '${commitScriptPath}' \
-                      '${dockerAndGitTag}' \
+                      '${projectBuildVersion}' \
                       '${projectNextVersion}' \
                       '${MAVEN_SETTINGS}'
                   """
