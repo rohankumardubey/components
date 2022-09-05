@@ -5,8 +5,10 @@ set -xe
 # Builds & deploys TCOMPv0 Docker image and pushes it on Talend's registry
 # Two tags are set, the version's and latest
 # $1: The host of the Talend Docker registry
-# $2: The project's version
-# $3: The path to the maven settings file
+# $2: The project version
+# $3: Name of the Docker image
+# $4: Tag of the Docker image
+# $5: The path to the maven settings file
 main () {
   local talendRegistryHost="${1:?Missing talend registry host}"
   local projectVersion="${2:?Missing project version}"
@@ -34,10 +36,10 @@ main () {
     docker push "${talendRegistryHost}/${dockerImageName}:latest"
   )
 
-  # Define a git tag with the same name as the Docker tag for tracability reasons (even for non-release builds)
-  local dockerTracabilityTagName="tdp/docker/${projectVersion}"
-  git tag "${dockerTracabilityTagName}"
-  git push origin "${dockerTracabilityTagName}"
+  # Define a git tag with the same name as the Docker tag for traceability reasons (even for non-release builds)
+  local dockerTraceabilityTagName="tdp/docker/${projectVersion}"
+  git tag "${dockerTraceabilityTagName}"
+  git push origin "${dockerTraceabilityTagName}"
 }
 
 main "$@"
