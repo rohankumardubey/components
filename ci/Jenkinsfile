@@ -88,8 +88,8 @@ pipeline {
 
           if (params.Action == 'RELEASE') {
             echo "Releasing branch ${env.BRANCH_NAME}"
-            
-            if (env.BRANCH_NAME != env.TDP_MAINTENANCE_BRANCH_NAME || !env.BRANCH_NAME.contains('anicolas')) {
+
+            if (env.BRANCH_NAME != env.TDP_MAINTENANCE_BRANCH_NAME && !env.BRANCH_NAME.contains('anicolas')) {
               error("TCOMPv0 service should only be released on ${env.TDP_MAINTENANCE_BRANCH_NAME}")
             }
 
