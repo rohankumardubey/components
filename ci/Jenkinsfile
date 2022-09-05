@@ -252,18 +252,16 @@ pipeline {
       }
 
       steps {
-        container(configuration.tsbiImage) {
-          script {
-            final String commitScriptPath = 'ci/resources/tag_release_and_set_new_version.sh'
-            withCredentials([gitCredentials]) {
-              configFileProvider([mavenSettings]) {
-                sh """
+        script {
+          final String commitScriptPath = 'ci/resources/tag_release_and_set_new_version.sh'
+          withCredentials([gitCredentials]) {
+            configFileProvider([mavenSettings]) {
+              sh """
                     bash '${commitScriptPath}' \
                       '${dockerAndGitTag}' \
                       '${projectNextVersion}' \
                       '${MAVEN_SETTINGS}'
                   """
-              }
             }
           }
         }
