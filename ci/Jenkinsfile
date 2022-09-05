@@ -137,34 +137,35 @@ pipeline {
 
     stage('Build & test') {
       steps {
-        configFileProvider([mavenSettings]) {
+        script {
+          configFileProvider([mavenSettings]) {
+            if (params.Action == 'RELEASE') {
+              // NOTE: Artifacts are not re-built in push stage, this means they must be built directly with the version to release (a non-SNAPSHOT one)
+              final String updateVersionScriptPath = 'ci/resources/set_release_version_in_pom.sh'
+              sh """
+                  bash '${updateVersionScriptPath}' \
+                    '${projectBuildVersion}' \
+                    '${MAVEN_SETTINGS}' \
+                """
+            }
 
-          if (params.Action == 'RELEASE') {
-            // NOTE: Artifacts are not re-built in push stage, this means they must be built directly with the version to release (a non-SNAPSHOT one)
-            final String updateVersionScriptPath = 'ci/resources/set_release_version_in_pom.sh'
-            sh """
-                bash '${updateVersionScriptPath}' \
-                  '${projectBuildVersion}' \
-                  '${MAVEN_SETTINGS}' \
-              """
+            // This also builds the service ZIP file
+            // Why do a "clean install" then a "test" and not a "clean test" right away? Because for some reason, it
+            // does not work (some tests are failing...)
+            sh '''#!/bin/bash
+               mvn clean install \
+                --batch-mode \
+                --threads 1C \
+                --update-snapshots \
+                --define 'skipTests' \
+                --settings "${MAVEN_SETTINGS}"
+                
+               mvn test \
+                --batch-mode \
+                --threads 1C \
+                --settings "${MAVEN_SETTINGS}"
+               '''
           }
-
-          // This also builds the service ZIP file
-          // Why do a "clean install" then a "test" and not a "clean test" right away? Because for some reason, it
-          // does not work (some tests are failing...)
-          sh '''#!/bin/bash
-             mvn clean install \
-              --batch-mode \
-              --threads 1C \
-              --update-snapshots \
-              --define 'skipTests' \
-              --settings "${MAVEN_SETTINGS}"
-              
-             mvn test \
-              --batch-mode \
-              --threads 1C \
-              --settings "${MAVEN_SETTINGS}"
-             '''
         }
       }
     }
