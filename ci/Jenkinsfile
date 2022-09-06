@@ -64,8 +64,8 @@ pipeline {
 
   parameters {
     choice(name: 'Action',
-      choices: ['STANDARD', 'DEPLOY', 'RELEASE'],
-      description: 'Type of build : \nSTANDARD (default): compile & run tests \nDEPLOY : build & deploy TCOMPv0 service Docker image (TDP cloud) & zip artefact (TDP on-prem)\nRELEASE: build, deploy & release TCOMPv0 service Docker image (TDP cloud) & zip artefact (TDP on-prem)'
+      choices: ['STANDARD', 'PUBLISH', 'RELEASE'],
+      description: 'Type of build : \nSTANDARD (default): compile & run tests \nPUBLISH : build & deploy TCOMPv0 service Docker image (TDP cloud) & zip artefact (TDP on-prem)\nRELEASE: build, deploy & release TCOMPv0 service Docker image (TDP cloud) & zip artefact (TDP on-prem)'
     )
     booleanParam(
       name: "specify_version",
@@ -189,7 +189,7 @@ pipeline {
 
     stage('Build & deploy service Docker image') {
       when {
-        expression { params.Action == 'DEPLOY' || params.Action == 'RELEASE' }
+        expression { params.Action == 'PUBLISH' || params.Action == 'RELEASE' }
       }
       steps {
         script {
@@ -216,7 +216,7 @@ pipeline {
 
     stage('Deploy service zip artefact') {
       when {
-        expression { params.Action == 'DEPLOY' || params.Action == 'RELEASE' }
+        expression { params.Action == 'PUBLISH' || params.Action == 'RELEASE' }
       }
       steps {
         script {
@@ -232,7 +232,7 @@ pipeline {
 
           // Contrary to docker images, one want the ability to publish SNAPSHOT versions of the ZIP artifact
           // This is why we're not using the project build version here but the project version from the POM
-          // (which will be a SNAPSHOT for "DEPLOY" builds, and a non-SNAPSHOT for "RELEASE" ones)
+          // (which will be a SNAPSHOT for "PUBLISH" builds, and a non-SNAPSHOT for "RELEASE" ones)
           configFileProvider([mavenSettings]) {
             sh """
                 bash '${scriptPath}' \
