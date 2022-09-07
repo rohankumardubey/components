@@ -2,21 +2,19 @@
 
 set -xe
 
-# Builds & deploys TCOMPv0 Docker image and pushes it on Talend's registry
+# Builds & publish TCOMPv0 Docker image (pushes it on Talend's registry)
 # Two tags are set, the version's and latest
 # $1: The host of the Talend Docker registry
-# $2: The project's version
-# $3: The path to the maven settings file
+# $2: The project version
+# $3: Name of the Docker image
+# $4: Tag of the Docker image
+# $5: The path to the maven settings file
 main () {
   local talendRegistryHost="${1:?Missing talend registry host}"
   local projectVersion="${2:?Missing project version}"
-  local mavenSettingsPath="${3:?Missing maven settings path}"
-
-  local dockerImageName="tcomp-components-api-service-rest-all-components"
-  local dockerImageTimestamp=$(date '+%Y%m%d-%H%M%S')
-
-  # Format already used by the fabric8 docker-maven-plugin configuration
-  local dockerImageTag="${projectVersion}-${dockerImageTimestamp}"
+  local dockerImageName=${3?Missing docker image name}
+  local dockerImageTag="${4:?Missing docker image tag}"
+  local mavenSettingsPath="${5:?Missing maven settings path}"
 
   (
     cd services/components-api-service-rest-all-components
@@ -37,6 +35,11 @@ main () {
     docker tag "${talendRegistryHost}/${dockerImageName}:${dockerImageTag}" "${talendRegistryHost}/${dockerImageName}:latest"
     docker push "${talendRegistryHost}/${dockerImageName}:latest"
   )
+
+  # Define a git tag with the same name as the Docker tag for traceability reasons (even for non-release builds)
+  local dockerTraceabilityTagName="tdp/docker/${dockerImageTag}"
+  git tag "${dockerTraceabilityTagName}"
+  git push origin "${dockerTraceabilityTagName}"
 }
 
 main "$@"
