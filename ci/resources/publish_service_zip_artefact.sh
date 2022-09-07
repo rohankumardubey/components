@@ -13,7 +13,7 @@
 
 set -xe
 
-# Deploys a TCOMPv0 service zip to Nexus
+# Publish a TCOMPv0 service zip to Nexus
 # $1: The version of the artifact to be pushed
 # $2: The path to the maven settings file, take it from the appropriate Jenkins credentials
 main() {

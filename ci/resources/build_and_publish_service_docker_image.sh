@@ -2,7 +2,7 @@
 
 set -xe
 
-# Builds & deploys TCOMPv0 Docker image and pushes it on Talend's registry
+# Builds & publish TCOMPv0 Docker image (pushes it on Talend's registry)
 # Two tags are set, the version's and latest
 # $1: The host of the Talend Docker registry
 # $2: The project version

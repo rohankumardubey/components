@@ -65,7 +65,7 @@ pipeline {
   parameters {
     choice(name: 'Action',
       choices: ['STANDARD', 'PUBLISH', 'RELEASE'],
-      description: 'Type of build : \nSTANDARD (default): compile & run tests \nPUBLISH : build & deploy TCOMPv0 service Docker image (TDP cloud) & zip artefact (TDP on-prem)\nRELEASE: build, deploy & release TCOMPv0 service Docker image (TDP cloud) & zip artefact (TDP on-prem)'
+      description: 'Type of build : \nSTANDARD (default): compile & run tests \nPUBLISH : build & publish TCOMPv0 service Docker image (TDP cloud) & zip artefact (TDP on-prem)\nRELEASE: build, publish & release TCOMPv0 service Docker image (TDP cloud) & zip artefact (TDP on-prem)'
     )
     booleanParam(
       name: "specify_version",
@@ -187,13 +187,13 @@ pipeline {
       }
     }
 
-    stage('Build & deploy service Docker image') {
+    stage('Build & publish service Docker image') {
       when {
         expression { params.Action == 'PUBLISH' || params.Action == 'RELEASE' }
       }
       steps {
         script {
-          final String scriptPath = 'ci/resources/build_and_deploy_service_docker_image.sh'
+          final String scriptPath = 'ci/resources/build_and_publish_service_docker_image.sh'
 
           // Docker images are always built with a non-SNAPSHOT version as it allows us later to promote them
           // to prod repository once they have been tested. This makes sure the version pushed to production is
@@ -214,13 +214,13 @@ pipeline {
       }
     }
 
-    stage('Deploy service zip artefact') {
+    stage('Publish service zip artefact') {
       when {
         expression { params.Action == 'PUBLISH' || params.Action == 'RELEASE' }
       }
       steps {
         script {
-          final String scriptPath = 'ci/resources/deploy_service_zip_artefact.sh'
+          final String scriptPath = 'ci/resources/publish_service_zip_artefact.sh'
 
           // Read POM once again since version could have been updated for release builds
           final def pom = readMavenPom file: 'pom.xml'
