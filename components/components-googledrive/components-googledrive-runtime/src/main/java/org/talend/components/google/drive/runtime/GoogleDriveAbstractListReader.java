@@ -208,8 +208,9 @@ public abstract class GoogleDriveAbstractListReader extends AbstractBoundedReade
     private boolean processFolder() throws IOException {
         if (folderId == null && hasMoreSubFolders()) {
             folderId = subFolders.remove(0);
-            request.setQ(format(query, folderId));
-            LOG.debug("query = {} {}.", query, folderId);
+            query = format(format(query, folderId));
+            request.setQ(query);
+            LOG.debug("[processFolder] query = {}.", query);
         }
         executeAndProcessQueryResults(includeSubDirectories);
         // finished for folderId

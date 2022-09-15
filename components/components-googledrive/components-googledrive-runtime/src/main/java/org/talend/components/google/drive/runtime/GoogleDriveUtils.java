@@ -211,13 +211,6 @@ public class GoogleDriveUtils {
         String start = path.get(0);
         result = checkPath(0, path, start, "root", searchInTrash);
         LOG.debug("[getFolderIds] checkPath returned : {}", result);
-        if (result.isEmpty() && !folderName.contains(PATH_SEPARATOR)) {
-            LOG.debug("[getFolderIds] Searching with global search...");
-            result = new ArrayList<>();
-            result.add(findResourceByGlobalSearch(folderName, FOLDER_TYPE));
-        }
-
-        LOG.debug("[getFolderIds] Returning {}.", result);
         return result;
     }
 
