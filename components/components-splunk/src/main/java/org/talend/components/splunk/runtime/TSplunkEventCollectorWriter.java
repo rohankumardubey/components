@@ -26,6 +26,7 @@ import org.apache.avro.SchemaBuilder;
 import org.apache.avro.SchemaBuilder.FieldAssembler;
 import org.apache.avro.SchemaBuilder.FieldBuilder;
 import org.apache.avro.generic.IndexedRecord;
+import org.apache.http.Consts;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
@@ -222,11 +223,11 @@ public class TSplunkEventCollectorWriter implements Writer<Result> {
     public HttpPost createRequest(List<SplunkJSONEvent> events) throws UnsupportedEncodingException {
         HttpPost request = new HttpPost(fullRequestUrl);
         request.addHeader("Authorization", "Splunk " + token);
-        StringBuffer requestString = new StringBuffer();
+        StringBuilder requestString = new StringBuilder();
         for (SplunkJSONEvent event : events) {
             requestString.append(JsonWriter.objectToJson(event, args));
         }
-        request.setEntity(new StringEntity(requestString.toString()));
+        request.setEntity(new StringEntity(requestString.toString(), Consts.UTF_8));
         return request;
     }
 
