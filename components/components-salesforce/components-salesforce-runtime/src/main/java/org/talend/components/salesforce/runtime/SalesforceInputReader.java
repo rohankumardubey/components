@@ -14,10 +14,10 @@ package org.talend.components.salesforce.runtime;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.IndexedRecord;
@@ -25,9 +25,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.components.api.container.RuntimeContainer;
 import org.talend.components.api.exception.ComponentException;
+import org.talend.components.salesforce.soql.FieldDescription;
+import org.talend.components.salesforce.soql.SoqlQuery;
 import org.talend.components.salesforce.tsalesforceinput.TSalesforceInputProperties;
 import org.talend.daikon.avro.AvroUtils;
-import org.talend.daikon.avro.SchemaConstants;
 
 import com.sforce.soap.partner.QueryResult;
 import com.sforce.soap.partner.sobject.SObject;
@@ -56,36 +57,32 @@ public class SalesforceInputReader extends SalesforceReader<IndexedRecord> {
             querySchema = super.getSchema();
             if (inProperties.manualQuery.getValue()) {
                 if (AvroUtils.isIncludeAllFields(properties.module.main.schema.getValue())) {
-                    SObject currentSObject = getCurrentSObject();
-                    Iterator<XmlObject> children = currentSObject.getChildren();
-                    List<String> columnsName = new ArrayList<>();
-                    int idCount = 0;
-                    while (children.hasNext()) {
-                        String elementName = children.next().getName().getLocalPart();
-                        if ("Id".equals(elementName) && idCount == 0) {
-                            // Ignore the first 'Id' field which always return for query.
-                            idCount++;
+                    List<Schema.Field> copyFieldList = new ArrayList<>();
+
+                    // logic almost the same as it is in GuessSchema (SalesforceSourseOrSink): TDI-48569
+                    SoqlQuery query = SoqlQuery.getInstance();
+                    query.init(inProperties.query.getValue());
+                    for (FieldDescription fieldDescription : query.getFieldDescriptions()) {
+                        final String simpleName = fieldDescription.getSimpleName();
+                        final Schema.Field schemaField = Optional.ofNullable(querySchema.getField(simpleName))
+                                .orElseGet(() -> querySchema.getFields().stream()
+                                        .filter(it -> it.name().equalsIgnoreCase(simpleName))
+                                        .findAny()
+                                        .orElse(null));
+                        if (schemaField == null) {
                             continue;
                         }
-                        if (!columnsName.contains(elementName)) {
-                            columnsName.add(elementName);
-                        }
-                    }
 
-                    List<Schema.Field> copyFieldList = new ArrayList<>();
-                    for (String columnName : columnsName) {
-                        Schema.Field se = querySchema.getField(columnName);
-                        if (se != null) {
-                            Schema.Field field = new Schema.Field(se.name(), se.schema(), se.doc(), se.defaultVal());
-                            Map<String, Object> fieldProps = se.getObjectProps();
-                            for (String propName : fieldProps.keySet()) {
-                                Object propValue = fieldProps.get(propName);
-                                if (propValue != null) {
-                                    field.addProp(propName, propValue);
-                                }
+                        Schema.Field field = new Schema.Field(
+                                fieldDescription.getFullName(), schemaField.schema(), schemaField.doc(), schemaField.defaultVal());
+                        Map<String, Object> props = schemaField.getObjectProps();
+                        for (String propName : props.keySet()) {
+                            Object propValue = props.get(propName);
+                            if (propValue != null) {
+                                field.addProp(propName, propValue);
                             }
-                            copyFieldList.add(field);
                         }
+                        copyFieldList.add(field);
                     }
                     Map<String, Object> objectProps = querySchema.getObjectProps();
                     querySchema = Schema.createRecord(querySchema.getName(), querySchema.getDoc(), querySchema.getNamespace(),
