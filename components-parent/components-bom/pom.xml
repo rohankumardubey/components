@@ -11,8 +11,7 @@
     <properties>
         <components.version>0.37.13-SNAPSHOT</components.version>
         <components-api-service-rest.version>0.28.14</components-api-service-rest.version>
-        <daikon.version>0.31.12</daikon.version>
-        <crypto-utils.version>6.8.11</crypto-utils.version>
+        <daikon.version>6.8.11</daikon.version>
         <json-io.version>4.13.1-TALEND</json-io.version>
         <!-- repositories -->
         <talend_snapshots_deployment>https://artifacts-oss.talend.com/nexus/content/repositories/TalendOpenSourceSnapshot/</talend_snapshots_deployment>
@@ -1350,11 +1349,6 @@
             </dependency>
             <dependency>
                 <groupId>org.talend.daikon</groupId>
-                <artifactId>daikon-spring-utils</artifactId>
-                <version>${daikon.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.talend.daikon</groupId>
                 <artifactId>daikon</artifactId>
                 <version>${daikon.version}</version>
             </dependency>
@@ -1378,18 +1372,18 @@
             <dependency>
                 <groupId>org.talend.daikon</groupId>
                 <artifactId>crypto-utils</artifactId>
-                <version>${crypto-utils.version}</version>
+                <version>${daikon.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.talend.daikon</groupId>
                 <artifactId>crypto-utils</artifactId>
-                <version>${crypto-utils.version}</version>
+                <version>${daikon.version}</version>
                 <classifier>bundle</classifier>
             </dependency>
             <dependency>
                 <groupId>org.talend.daikon</groupId>
                 <artifactId>crypto-utils</artifactId>
-                <version>${crypto-utils.version}</version>
+                <version>${daikon.version}</version>
                 <classifier>tests</classifier>
             </dependency>
             <dependency>
