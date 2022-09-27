@@ -11,6 +11,7 @@
 
     <properties>
         <paxexamversion>4.9.1</paxexamversion>
+        <crypto-utils.version>6.8.11</crypto-utils.version>
     </properties>
 
     <name>Component API OSGI tests</name>
@@ -77,7 +78,7 @@
         <dependency>
             <groupId>org.talend.daikon</groupId>
             <artifactId>daikon-exception</artifactId>
-            <version>${daikon.version}</version>
+            <version>${crypto-utils.version}</version>
             <classifier>bundle</classifier>
             <scope>test</scope>
         </dependency>
