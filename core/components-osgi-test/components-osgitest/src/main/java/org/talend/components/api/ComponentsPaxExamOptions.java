@@ -61,6 +61,9 @@ public class ComponentsPaxExamOptions {
                 linkBundle("org.talend.daikon-daikon-bundle"), //
                 linkBundle("org.talend.daikon-daikon-exception-bundle"), //
                 linkBundle("org.talend.daikon-daikon-tests").noStart(), //
+                linkBundle("com.github.luben-zstd-jni"), //
+                linkBundle("org.brotli-dec"), //
+                linkBundle("org.tukaani-xz"), //
                 linkBundle("org.ops4j.pax.url-pax-url-aether"),
                 linkBundle("org.talend.components-components-api-bundle"), //
                 linkBundle("org.talend.components-components-api-service-osgi").start(), //
