@@ -250,25 +250,25 @@ public class GoogleDriveUtils {
         }
     }
 
-	private String findResourceByGlobalSearch(String resource, String type) throws IOException {
-		StringBuilder querybuilder = new StringBuilder();
-		// Location restriction: do not search in shared locations if not required
-		String locationRestriction = includeSharedItems ? "" : Q_AND + "'me' in owners";
-		switch (type) {
-		case FILE_TYPE:
-			querybuilder.append(format(Q_NAME, resource)).append(Q_AND).append(Q_MIME_NOT_FOLDER).append(locationRestriction);
-			break;
-		case FOLDER_TYPE:
-			querybuilder.append(format(Q_NAME, resource)).append(Q_AND).append(Q_MIME_FOLDER).append(locationRestriction);
-			break;
-		case FILEFOLDER_TYPE:
-			querybuilder.append(format(Q_NAME, resource)).append(locationRestriction);
-			break;
-		default:
-		}
+    private String findResourceByGlobalSearch(String resource, String type) throws IOException {
+        StringBuilder querybuilder = new StringBuilder();
+        // Location restriction: do not search in shared locations if not required
+        String locationRestriction = includeSharedItems ? "" : Q_AND + "'me' in owners";
+        switch (type) {
+        case FILE_TYPE:
+            querybuilder.append(format(Q_NAME, resource)).append(Q_AND).append(Q_MIME_NOT_FOLDER).append(locationRestriction);
+            break;
+        case FOLDER_TYPE:
+            querybuilder.append(format(Q_NAME, resource)).append(Q_AND).append(Q_MIME_FOLDER).append(locationRestriction);
+            break;
+        case FILEFOLDER_TYPE:
+            querybuilder.append(format(Q_NAME, resource)).append(locationRestriction);
+            break;
+        default:
+        }
 
-		String query = querybuilder.toString();
-        
+    	String query = querybuilder.toString();
+
         LOG.debug("[findResourceByGlobalSearch] Searching for {} [{}] with `{}`.", resource, type, query);
         return getResourceId(query, resource, type);
     }
